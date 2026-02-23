@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BoxShadowStyles {
+class AppBoxShadow {
 
   static BoxShadow subtle = BoxShadow(
     color: const Color(0xFF000000).withValues(alpha: 0.05),

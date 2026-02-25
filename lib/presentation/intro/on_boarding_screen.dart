@@ -82,10 +82,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         children: [
           Image.asset(
             _data[index]["image"]!,
-            width: 318, 
-            height: 288,
-            cacheWidth: 636, 
-            cacheHeight: 576,
+            width: 270, 
+            height: 245,
+            cacheWidth: 540, 
+            cacheHeight: 490,
           ),
           const SizedBox(height: 60),
           Text(
@@ -137,7 +137,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               onTap: _onSkipPressed,
               child: Text(
                 "SKIP",
-                style: TextStyles.title.copyWith(
+                style: TextStyles.bodyLarge.copyWith(
                   color: AppColors.secondary300,
                 ),
               ),

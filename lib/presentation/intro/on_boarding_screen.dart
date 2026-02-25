@@ -23,12 +23,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     {
       "image": "assets/images/OnBoarding2.webp",
       "title": "Empower Your Team",
-      "desc": "Manage your entire field service workflow from a single, intuitive digital hub. No more fragmented tools."
+      "desc": "Enable instant job syncing and real-time reporting. Keep your field technicians aligned with zero latency."
     },
     {
       "image": "assets/images/OnBoarding3.webp",
       "title": "Optimize Peformance", 
-      "desc": "Manage your entire field service workflow from a single, intuitive digital hub. No more fragmented tools."
+      "desc": "Make data-driven decisions with real-time analytics. Track and easily see your improvements."
     },
   ];
 

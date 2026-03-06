@@ -6,7 +6,6 @@ import 'widgets/auth_footer_link.dart';
 import '../common/core/themes/colors.dart';
 import '../common/core/themes/dimens.dart';
 import '../common/core/themes/text_styles.dart';
-import 'choose_role_screen.dart';
 import 'sign_up_screen.dart';
 import 'forgot_password_screen.dart';
 
@@ -95,11 +94,7 @@ class LoginScreen extends StatelessWidget {
                   AuthPrimaryButton(
                     text: 'Sign In',
                     onPressed: () {
-                      // Go to ChooseRoleScreen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ChooseRoleScreen()),
-                      );
+                      
                     },
                   ),
 

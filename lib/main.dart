@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zent_fe/presentation/intro/splash_screen.dart';
+import 'package:zent_fe/presentation/common/intro/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());

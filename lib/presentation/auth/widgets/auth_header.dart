@@ -1,0 +1,58 @@
+import 'package:flutter/material.dart';
+import '../../common/core/themes/colors.dart';
+import '../../common/core/themes/dimens.dart';
+import '../../common/core/themes/text_styles.dart';
+
+class AuthHeader extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final bool showLogo;
+  final bool isCenter;
+
+  const AuthHeader({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.showLogo = false,
+    this.isCenter = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: isCenter ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        if (showLogo) ...[
+          Row(
+            mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start, 
+            children: [
+              Image.asset('assets/images/ZentAvatar.png', height: 24, fit: BoxFit.contain),
+              const SizedBox(width: AppDimens.spaceSm),
+              Text(
+                'ZENT',
+                style: TextStyles.title.copyWith(
+                  letterSpacing: 1.5,
+                  color: AppColors.primary500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceXl),
+        ],
+        Text(
+          title,
+          style: TextStyles.display.copyWith(color: AppColors.primary500),
+          textAlign: isCenter ? TextAlign.center : TextAlign.start,
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: AppDimens.spaceSm),
+          Text(
+            subtitle!,
+            style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary400),
+            textAlign: isCenter ? TextAlign.center : TextAlign.start,
+          ),
+        ],
+      ],
+    );
+  }
+}

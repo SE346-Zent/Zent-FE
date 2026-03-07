@@ -37,7 +37,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
         if (widget.label != null) ...[
           Text(
             widget.label!,
-            style: TextStyles.bodyLarge.copyWith(
+            style: TextStyles.title.copyWith(
               color: AppColors.primary500,
               fontWeight: FontWeight.bold,
             ),

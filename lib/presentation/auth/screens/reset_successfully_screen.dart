@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import '../../common/core/themes/colors.dart';
-import '../../common/core/themes/dimens.dart';
-import '../../common/core/themes/text_styles.dart';
+import 'package:go_router/go_router.dart';
+
+// Core Routing & Theming
+import 'package:zent_fe/routing/routes.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+
+// Shared Auth Components
+import '../widgets/auth_app_bar.dart';
+import '../widgets/zent_bottom_logo.dart';
+
+// Feature-specific Widgets
+import '../widgets/success_checkmark.dart';
 
 class ResetSuccessfullyScreen extends StatelessWidget {
   const ResetSuccessfullyScreen({super.key});
@@ -12,55 +22,20 @@ class ResetSuccessfullyScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surface50,
       
-      // APP BAR WITHOUT BACK BUTTON
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false, 
-        title: Text(
-          'Reset Password',
-          style: TextStyles.title.copyWith(
-            color: AppColors.primary500,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      // Use our shared AppBar without leading back button
+      appBar: const AuthAppBar(title: 'Reset Password'),
       
       body: SafeArea(
         child: Column(
           children: [
-            // MAIN CONTENT
+            // Main Content Area
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceLg),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center, 
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Icon Checkmark Success
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.check_circle_outline,
-                          size: 60,
-                          color: AppColors.tertiary500,
-                        ),
-                      ),
-                    ),
+                    const SuccessCheckmark(),
 
                     const SizedBox(height: AppDimens.spaceXl),
 
@@ -88,17 +63,14 @@ class ResetSuccessfullyScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            (route) => false,
-                          );
-                        },
+                        onPressed: () => context.go(Routes.login), // Wipe stack and go to Login
                         icon: const Icon(Icons.login, color: Colors.white),
                         label: Text(
                           'Back to Login',
-                          style: TextStyles.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyles.title.copyWith(
+                            color: Colors.white, 
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.tertiary500,
@@ -114,25 +86,8 @@ class ResetSuccessfullyScreen extends StatelessWidget {
               ),
             ),
 
-            // FREEZE FOOTER
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('assets/images/ZentAvatar.png', height: 28, fit: BoxFit.contain),
-                  const SizedBox(width: AppDimens.spaceSm),
-                  Text(
-                    'ZENT',
-                    style: TextStyles.title.copyWith(
-                      letterSpacing: 1.5,
-                      color: AppColors.primary500,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Fixed Footer
+            const ZentBottomLogo(),
           ],
         ),
       ),

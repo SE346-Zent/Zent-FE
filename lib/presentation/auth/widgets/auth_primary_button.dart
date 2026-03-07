@@ -34,9 +34,9 @@ class AuthPrimaryButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: TextStyles.bodyLarge.copyWith(
+          style: TextStyles.title.copyWith(
             color: AppColors.surface50,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.normal,
           ),
         ),
       ),

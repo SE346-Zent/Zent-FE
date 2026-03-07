@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+
+// Core Routing & Theming
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+
+// Shared Auth Components
 import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_primary_button.dart';
 import '../widgets/auth_footer_link.dart';
-import '../../common/core/themes/colors.dart';
-import '../../common/core/themes/dimens.dart';
-import '../../common/core/themes/text_styles.dart';
-import 'forgot_password_screen.dart';
+
+// Feature-specific Widgets
+import '../widgets/login_background.dart';
+import '../widgets/forgot_password_button.dart';
+import '../widgets/social_login_section.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background500,
@@ -19,22 +26,16 @@ class LoginScreen extends StatelessWidget {
         child: Stack(
           children: [
             // 1. Background Image
-            Image.asset(
-              'assets/images/LoginBackground.png', 
-              width: double.infinity,
-              height: 320, 
-              fit: BoxFit.cover,
-              cacheHeight: 400,
-            ),
+            const LoginBackground(),
 
             // 2. Main Form Container
             Container(
-              margin: const EdgeInsets.only(top: 280), 
+              margin: const EdgeInsets.only(top: 280),
               padding: const EdgeInsets.all(AppDimens.spaceLg),
               decoration: BoxDecoration(
                 color: AppColors.background500,
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32), 
+                  topLeft: Radius.circular(32),
                   topRight: Radius.circular(32),
                 ),
               ),
@@ -58,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                     hintText: 'name@gmail.com',
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  
+
                   const SizedBox(height: AppDimens.spaceMd),
 
                   const AuthTextField(
@@ -68,24 +69,7 @@ class LoginScreen extends StatelessWidget {
                   ),
 
                   // Forgot Password Link
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
-                        );
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyles.label.copyWith(
-                          color: AppColors.tertiary500,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
+                  const ForgotPasswordButton(),
 
                   const SizedBox(height: AppDimens.spaceLg),
 
@@ -93,44 +77,23 @@ class LoginScreen extends StatelessWidget {
                   AuthPrimaryButton(
                     text: 'Sign In',
                     onPressed: () {
-                      
+                      // TODO: Implement login logic
                     },
                   ),
 
                   const SizedBox(height: AppDimens.spaceXl),
 
-                  // Social Login Divider
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: AppColors.secondary200)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('Or continue with', style: TextStyles.label),
-                      ),
-                      Expanded(child: Divider(color: AppColors.secondary200)),
-                    ],
-                  ),
-
-                  const SizedBox(height: AppDimens.spaceLg),
-
-                  // Social Buttons 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _socialIconTile(Icons.g_mobiledata), 
-                      _socialIconTile(Icons.discord),      
-                      _socialIconTile(Icons.terminal),     
-                    ],
-                  ),
+                  // Social Login Section
+                  const SocialLoginSection(),
 
                   const SizedBox(height: AppDimens.spaceXl),
 
-                  // Footer Section
+                  // Footer Section (Optional: Kept just in case)
                   AuthFooterLink(
                     text: "Don't have an account?",
                     linkText: 'Sign Up',
                     onTap: () {
-
+                      // TODO: Navigate to Sign Up screen via GoRouter
                     },
                   ),
                 ],
@@ -139,18 +102,6 @@ class LoginScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  // Helper Widget
-  Widget _socialIconTile(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.secondary200),
-        borderRadius: BorderRadius.circular(AppDimens.boraSm),
-      ),
-      child: Icon(icon, color: AppColors.primary500),
     );
   }
 }

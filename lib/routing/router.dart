@@ -9,7 +9,7 @@ import '../presentation/common/intro/screens/on_boarding_screen.dart';
 import '../../presentation/auth/screens/login_screen.dart';
 import '../../presentation/auth/screens/forgot_password_screen.dart'; 
 import '../../presentation/auth/screens/verify_otp_screen.dart';
-import '../../presentation/auth/screens/create_new_password_screen.dart';
+import '../presentation/auth/screens/reset_password_screen.dart';
 import '../../presentation/auth/screens/reset_successfully_screen.dart';
 
 class AppRouter {
@@ -26,7 +26,7 @@ class AppRouter {
         builder: (context, state) => const OnBoardingScreen(),
       ),
 
-      // 2. Auth Flow 
+      // 2. Auth Flow
       GoRoute(
         path: Routes.login,
         builder: (context, state) => const LoginScreen(),
@@ -34,19 +34,25 @@ class AppRouter {
           GoRoute(
             path: Routes.forgetPassword,
             builder: (context, state) => const ForgotPasswordScreen(),
+            routes: [
+              GoRoute(
+                path: Routes.verifyOtp,
+                builder: (context, state) => const VerifyOtpScreen(),
+                routes: [
+                  GoRoute(
+                    path: Routes.resetPassword, 
+                    builder: (context, state) => const ResetPasswordScreen(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.resetSuccessfully,
+                        builder: (context, state) => const ResetSuccessfullyScreen(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
-          GoRoute(
-            path: Routes.verifyOtp,
-            builder: (context, state) => const VerifyOtpScreen(),
-          ),
-          GoRoute(
-            path: Routes.resetPassword,
-            builder: (context, state) => const CreateNewPasswordScreen(),
-          ),
-          GoRoute(
-            path: Routes.resetSuccessfully,
-            builder: (context, state) => const ResetSuccessfullyScreen(),
-          )
         ],
       ),
 

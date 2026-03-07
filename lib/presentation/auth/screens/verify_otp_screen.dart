@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+// Core Routing & Theming
+import 'package:zent_fe/routing/routes.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+
+// Shared Auth Components
+import '../widgets/auth_app_bar.dart';
 import '../widgets/auth_primary_button.dart';
-import '../../common/core/themes/colors.dart';
-import '../../common/core/themes/dimens.dart';
-import '../../common/core/themes/text_styles.dart';
-import 'create_new_password_screen.dart';
+import '../widgets/zent_bottom_logo.dart';
+
+// Feature-specific Widgets
+import '../widgets/verify_otp_header.dart';
+import '../widgets/otp_input_section.dart';
+import '../widgets/resend_otp_text.dart';
 
 class VerifyOtpScreen extends StatelessWidget {
   const VerifyOtpScreen({super.key});
@@ -12,29 +23,11 @@ class VerifyOtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface50,
-      
-      // APP BAR WITH BACK BUTTON AND TITLE
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Verification',
-          style: TextStyles.title.copyWith(
-            color: AppColors.primary500,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      
+      appBar: const AuthAppBar(title: 'Verification'),
       body: SafeArea(
         child: Column(
           children: [
-            // PHẦN 2: NỘI DUNG CHÍNH (CUỘN ĐƯỢC)
+            // Scrollable Main Content
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppDimens.spaceLg),
@@ -43,62 +36,18 @@ class VerifyOtpScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: AppDimens.spaceXl),
 
-                    Image.asset('assets/images/VerifyOTP1.png', height: 100),
+                    const VerifyOtpHeader(email: 'name@gmail.com'),
 
                     const SizedBox(height: AppDimens.spaceXl),
 
-                    Text(
-                      'Verify OTP',
-                      style: TextStyles.display.copyWith(color: AppColors.primary500),
-                    ),
-
-                    const SizedBox(height: AppDimens.spaceSm),
-
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary400),
-                        children: [
-                          const TextSpan(text: 'The OTP code has been sent to\n'),
-                          TextSpan(
-                            text: 'name@gmail.com',
-                            style: const TextStyle(
-                              color: AppColors.tertiary500,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    const OtpInputSection(),
 
                     const SizedBox(height: AppDimens.spaceXl),
 
-                    // KHU VỰC 6 Ô NHẬP OTP
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(
-                        6, 
-                        (index) => _buildOtpBox(''),
-                      ),
-                    ),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary400),
-                        children: [
-                          const TextSpan(text: 'Haven\'t received OTP Code? '),
-                          TextSpan(
-                            text: 'Resend',
-                            style: const TextStyle(
-                              color: AppColors.tertiary500,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                    ResendOtpText(
+                      onResend: () {
+                        // TODO: Implement resend OTP logic
+                      },
                     ),
 
                     const SizedBox(height: AppDimens.spaceXl),
@@ -106,10 +55,8 @@ class VerifyOtpScreen extends StatelessWidget {
                     AuthPrimaryButton(
                       text: 'Send →',
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const CreateNewPasswordScreen()),
-                        );
+                        // Navigate to Reset Password
+                        context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}');
                       },
                     ),
                   ],
@@ -117,51 +64,9 @@ class VerifyOtpScreen extends StatelessWidget {
               ),
             ),
 
-            // PHẦN 3: LOGO CỐ ĐỊNH Ở ĐÁY
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('assets/images/ZentAvatar.png', height: 28, fit: BoxFit.contain),
-                  const SizedBox(width: AppDimens.spaceSm),
-                  Text(
-                    'ZENT',
-                    style: TextStyles.title.copyWith(
-                      letterSpacing: 1.5,
-                      color: AppColors.primary500,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Fixed Bottom Logo
+            const ZentBottomLogo(),
           ],
-        ),
-      ),
-    );
-  }
-
-  // WIDGET CON: VẼ Ô OTP
-  Widget _buildOtpBox(String digit) {
-    bool hasValue = digit.isNotEmpty;
-    return Container(
-      width: 48,
-      height: 48,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.surface50,
-        borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        border: Border.all(
-          color: hasValue ? AppColors.tertiary500 : AppColors.secondary200,
-          width: hasValue ? 1.5 : 1.0,
-        ),
-      ),
-      child: Text(
-        digit,
-        style: TextStyles.title.copyWith(
-          color: AppColors.primary500,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );

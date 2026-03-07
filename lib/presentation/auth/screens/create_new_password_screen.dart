@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'widgets/auth_header.dart';
-import 'widgets/auth_text_field.dart';
-import 'widgets/auth_primary_button.dart';
-import '../common/core/themes/colors.dart';
-import '../common/core/themes/dimens.dart';
-import '../common/core/themes/text_styles.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_primary_button.dart';
+import '../../common/core/themes/colors.dart';
+import '../../common/core/themes/dimens.dart';
+import '../../common/core/themes/text_styles.dart';
 import 'reset_successfully_screen.dart';
 
 class CreateNewPasswordScreen extends StatelessWidget {

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'widgets/auth_header.dart';
-import 'widgets/auth_text_field.dart';
-import 'widgets/auth_primary_button.dart';
-import 'widgets/auth_footer_link.dart';
-import '../common/core/themes/colors.dart';
-import '../common/core/themes/dimens.dart';
-import '../common/core/themes/text_styles.dart';
-import 'sign_up_screen.dart';
+import '../widgets/auth_header.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_primary_button.dart';
+import '../widgets/auth_footer_link.dart';
+import '../../common/core/themes/colors.dart';
+import '../../common/core/themes/dimens.dart';
+import '../../common/core/themes/text_styles.dart';
 import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -131,11 +130,7 @@ class LoginScreen extends StatelessWidget {
                     text: "Don't have an account?",
                     linkText: 'Sign Up',
                     onTap: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                      );
+
                     },
                   ),
                 ],

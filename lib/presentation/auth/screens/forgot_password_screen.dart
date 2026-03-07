@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'widgets/auth_text_field.dart';
-import 'widgets/auth_primary_button.dart';
-import '../common/core/themes/colors.dart';
-import '../common/core/themes/dimens.dart';
-import '../common/core/themes/text_styles.dart';
+import '../widgets/auth_text_field.dart';
+import '../widgets/auth_primary_button.dart';
+import '../../common/core/themes/colors.dart';
+import '../../common/core/themes/dimens.dart';
+import '../../common/core/themes/text_styles.dart';
 import 'verify_otp_screen.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {

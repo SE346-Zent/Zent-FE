@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
-import '../common/core/themes/colors.dart';
-import '../common/core/themes/dimens.dart';
-import '../common/core/themes/text_styles.dart';
+import '../../common/core/themes/colors.dart';
+import '../../common/core/themes/dimens.dart';
+import '../../common/core/themes/text_styles.dart';
 
 class ResetSuccessfullyScreen extends StatelessWidget {
   const ResetSuccessfullyScreen({super.key});

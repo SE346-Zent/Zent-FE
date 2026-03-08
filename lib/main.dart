@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:zent_fe/presentation/admin/company_settings/company_settings_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/company_settings_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/profile_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
+import 'package:zent_fe/routing/router.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserManagementViewModel()),
+        ChangeNotifierProvider(create: (_) => CompanySettingsViewModel()),
+        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+        ChangeNotifierProvider(create: (_) => SecuritySettingsViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,12 +25,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return MaterialApp.router(
+      title: 'Zent FE',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const CompanySettingsScreen(),
+      routerConfig: appRouter,
     );
   }
 }

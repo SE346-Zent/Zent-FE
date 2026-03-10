@@ -4,6 +4,7 @@ import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/company_settings_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
+import '../presentation/common/core/layouts/admin_main_layout.dart';
 
 import './routes.dart' show Routes;
 
@@ -63,20 +64,53 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
 
-    // Admin top level routes
-    GoRoute(
-      path: Routes.adminDashboard,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Admin Dashboard Screen'))),
-    ),
-    GoRoute(
-      path: Routes.adminReports,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Admin Reports Screen'))),
-    ),
-    GoRoute(
-      path: Routes.adminTeam, // Profile Menu: User Management
-      builder: (context, state) => const UserManagementScreen(),
+    // Admin top level routes using StatefulShellRoute
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return AdminMainLayout(navigationShell: navigationShell);
+      },
+      branches: [
+        // Branch 0: Dashboard
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.adminDashboard,
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Admin Dashboard Screen')),
+              ),
+            ),
+          ],
+        ),
+        // Branch 1: Reports
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.adminReports,
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Admin Reports Screen')),
+              ),
+            ),
+          ],
+        ),
+        // Branch 2: Team
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.adminTeam, // Profile Menu: User Management
+              builder: (context, state) => const UserManagementScreen(),
+            ),
+          ],
+        ),
+        // Branch 3: Admin (Me)
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.me, // Initial Screen
+              builder: (context, state) => const ProfileScreen(),
+            ),
+          ],
+        ),
+      ],
     ),
     GoRoute(
       // CompanySettings
@@ -89,10 +123,6 @@ final GoRouter appRouter = GoRouter(
       name: 'securitySettings',
       path: '/admin/security-settings',
       builder: (context, state) => const SecuritySettingsScreen(),
-    ),
-    GoRoute(
-      path: Routes.me, // Initial Screen
-      builder: (context, state) => const ProfileScreen(),
     ),
 
     // Technician top level routes

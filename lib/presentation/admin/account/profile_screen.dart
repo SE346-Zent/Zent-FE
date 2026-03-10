@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../common/core/layouts/admin_main_layout.dart';
 import '../../common/core/themes/dimens.dart';
+import '../../common/core/themes/colors.dart';
 import 'widgets/account_header.dart';
 import 'widgets/profile_avatar.dart';
 import 'widgets/profile_logout_button.dart';
@@ -16,7 +16,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
 
-    return AdminMainLayout(
+    return Scaffold(
+      backgroundColor: AppColors.background500,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(

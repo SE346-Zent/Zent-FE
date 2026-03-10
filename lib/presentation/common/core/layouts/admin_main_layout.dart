@@ -1,33 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
 import '../themes/dimens.dart';
 
-class AdminMainLayout extends StatefulWidget {
-  final Widget body;
+class AdminMainLayout extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
 
-  const AdminMainLayout({super.key, required this.body});
-
-  @override
-  State<AdminMainLayout> createState() => _AdminMainLayoutState();
-}
-
-class _AdminMainLayoutState extends State<AdminMainLayout> {
-  int _currentIndex = 0;
+  const AdminMainLayout({super.key, required this.navigationShell});
 
   void _onNavTap(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background500,
-      body: widget.body,
+      body: navigationShell,
       bottomNavigationBar: _AdminBottomNavBar(
-        currentIndex: _currentIndex,
+        currentIndex: navigationShell.currentIndex,
         onTap: _onNavTap,
       ),
     );

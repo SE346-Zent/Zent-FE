@@ -22,10 +22,10 @@ class UserModel extends User {
   //* from json -> model
   factory UserModel.fromJson(Map<String, dynamic> json) {
     String parseRole(String beRole) {
-      if (beRole == 'STUDENT') return 'BUYER';
-      if (beRole == 'SHOP_OWNER') return 'SHOPOWNER';
-      if (beRole == 'ADMIN' || beRole == 'SUPER_ADMIN') return 'ADMIN';
-      return 'TRANSPORTER';
+      if (beRole == 'SUPER_ADMIN') return 'SUPERADMIN';
+      if (beRole == 'TECHNICIAN') return 'TECHNICIAN';
+      if (beRole == 'CUSTOMER') return 'CUSTOMER';
+      return 'ADMIN';
     }
 
     return UserModel(
@@ -34,7 +34,7 @@ class UserModel extends User {
       name: json['fullName'] as String? ?? "abc",
       role: UserRoles.values.firstWhere(
         (e) => e.name.toUpperCase() == parseRole(json['role'] as String? ?? ''),
-        orElse: () => UserRoles.buyer, // Fallback
+        orElse: () => UserRoles.admin, // Fallback
       ),
     );
   }

@@ -218,14 +218,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   String adaptRoleFromFEToBE(String role) {
     switch (role.toUpperCase()) {
-      case 'BUYER':
-        return 'STUDENT';
-      case 'SHOPOWNER':
-        return 'SHOP_OWNER';
+      case 'SUPERADMIN':
+        return 'SUPER_ADMIN';
+      case 'TECHNICIAN':
+        return 'TECHNICIAN';
+      case 'CUSTOMER':
+        return 'CUSTOMER';
       case 'ADMIN':
-        return 'ADMIN';
       default:
-        return 'TRANSPORTER';
+        return 'ADMIN';
     }
   }
 }

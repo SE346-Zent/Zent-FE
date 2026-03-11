@@ -126,25 +126,51 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // Technician top level routes
-    GoRoute(
-      path: Routes.techHome,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Tech Home Screen'))),
-    ),
-    GoRoute(
-      path: Routes.techWorkOrder,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Tech Work Order Screen'))),
-    ),
-    GoRoute(
-      path: Routes.techMessage,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Tech Message Screen'))),
-    ),
-    GoRoute(
-      path: Routes.techMe,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Tech Me Screen'))),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        // TODO: Replace this with TechMainLayout(navigationShell: navigationShell) when the UI is implemented
+        return Scaffold(body: navigationShell);
+      },
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.techHome,
+              builder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Tech Home Screen'))),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.techWorkOrder,
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Tech Work Order Screen')),
+              ),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.techMessage,
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Tech Message Screen')),
+              ),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.techMe,
+              builder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Tech Me Screen'))),
+            ),
+          ],
+        ),
+      ],
     ),
   ],
 );

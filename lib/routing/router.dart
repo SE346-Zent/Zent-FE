@@ -96,8 +96,9 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: Routes.adminTeam, // Profile Menu: User Management
-              builder: (context, state) => const UserManagementScreen(),
+              path: Routes.adminTeam,
+              builder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Team Screen'))),
             ),
           ],
         ),
@@ -115,16 +116,32 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       // CompanySettings
       name: 'companySettings',
-      path: '/admin/company-settings',
+      path: Routes.companySettings,
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const CompanySettingsScreen(),
     ),
     GoRoute(
       // SecuritySettings
       name: 'securitySettings',
-      path: '/admin/security-settings',
+      path: Routes.securitySettings,
+      parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const SecuritySettingsScreen(),
     ),
-
+    GoRoute(
+      // UserManagement
+      name: 'userManagement',
+      path: Routes.userManagement,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const UserManagementScreen(),
+    ),
+    GoRoute(
+      // SystemLog
+      name: 'systemLog',
+      path: Routes.systemLog,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) =>
+          const Scaffold(body: Center(child: Text('System Log Screen'))),
+    ),
     // Technician top level routes
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {

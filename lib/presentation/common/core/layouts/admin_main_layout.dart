@@ -39,7 +39,6 @@ class _AdminBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 84.0,
-      margin: const EdgeInsets.only(bottom: 24.0),
       decoration: const BoxDecoration(
         color: AppColors.surface100,
         border: Border(

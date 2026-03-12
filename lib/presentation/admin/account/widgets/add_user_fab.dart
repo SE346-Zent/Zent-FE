@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/text_styles.dart';
 
 class AddUserFab extends StatelessWidget {
   final VoidCallback onPressed;
@@ -12,6 +11,7 @@ class AddUserFab extends StatelessWidget {
     return Container(
       width: 61.0,
       height: 61.0,
+      alignment: Alignment.center,
       margin: const EdgeInsets.only(bottom: 24.0, right: 8.0),
       decoration: BoxDecoration(
         color: AppColors.tertiary400,
@@ -29,12 +29,10 @@ class AddUserFab extends StatelessWidget {
         onPressed: onPressed,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: Text(
-          '+',
-          style: TextStyles.display.copyWith(
-            color: AppColors.surface100,
-            height: 1.0,
-          ),
+        child: const Icon(
+          Icons.add,
+          size: 32.0,
+          color: AppColors.surface100,
         ),
       ),
     );

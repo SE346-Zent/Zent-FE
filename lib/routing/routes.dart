@@ -22,4 +22,10 @@ abstract final class Routes {
   static const techWorkOrder = '/tech/work-order';
   static const techMessage = '/tech/message';
   static const techMe = '/tech/me';
+
+  // admin profile menu
+  static const userManagement = '/admin/account/user-management';
+  static const securitySettings = '/admin/account/security-settings';
+  static const companySettings = '/admin/account/company-settings';
+  static const systemLog = '/admin/account/system-log';
 }

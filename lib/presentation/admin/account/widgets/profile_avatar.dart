@@ -35,8 +35,8 @@ class ProfileAvatar extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          width: 118.0,
-          height: 118.0,
+          width: 100.0,
+          height: 100.0,
           decoration: BoxDecoration(
             color: imageUrl == null ? _randomColor : AppColors.surface100,
             shape: BoxShape.circle,
@@ -62,8 +62,8 @@ class ProfileAvatar extends StatelessWidget {
           bottom: 4.0,
           right: 4.0,
           child: Container(
-            width: 28.0,
-            height: 28.0,
+            width: 24.0,
+            height: 24.0,
             decoration: BoxDecoration(
               color: AppColors.tertiary500,
               shape: BoxShape.circle,

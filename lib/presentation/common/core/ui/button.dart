@@ -27,7 +27,7 @@ class PrimaryActionButton extends StatelessWidget {
     required this.onPressed,
     this.icon,
     // Size defaults
-    this.width,
+    this.width = 364.0,
     this.height = 49.0,
     this.iconSize = 24.0,
     // Style defaults
@@ -40,8 +40,8 @@ class PrimaryActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedTextStyle = textStyle ??
-        TextStyles.title.copyWith(color: foregroundColor);
+    final resolvedTextStyle =
+        textStyle ?? TextStyles.title.copyWith(color: foregroundColor);
     final resolvedShadow = shadow ?? BoxShadowStyles.subtle;
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(borderRadius),

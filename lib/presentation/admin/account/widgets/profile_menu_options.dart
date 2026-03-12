@@ -40,16 +40,6 @@ class ProfileMenuOptions extends StatelessWidget {
             'System Log',
           ),
         ),
-        const SizedBox(height: AppDimens.spaceMd),
-        ProfileMenuItem(
-          title: 'Company Settings',
-          subtitle: 'Security & Biomaker',
-          iconData: Icons.business_outlined,
-          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
-            context,
-            'Company Settings',
-          ),
-        ),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -175,13 +176,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             ),
           Container(
             decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary800.withValues(alpha: 0.20),
-                  offset: const Offset(0, 4),
-                  blurRadius: 10.0,
-                ),
-              ],
+              boxShadow: [BoxShadowStyles.raised],
               borderRadius: BorderRadius.circular(AppDimens.boraMd),
             ),
             child: ElevatedButton(

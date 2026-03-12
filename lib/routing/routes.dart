@@ -26,6 +26,5 @@ abstract final class Routes {
   // admin profile menu
   static const userManagement = '/admin/account/user-management';
   static const securitySettings = '/admin/account/security-settings';
-  static const companySettings = '/admin/account/company-settings';
   static const systemLog = '/admin/account/system-log';
 }

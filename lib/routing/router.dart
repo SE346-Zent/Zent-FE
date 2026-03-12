@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/admin/account/profile_screen.dart';
-import '../presentation/admin/account/company_settings_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/common/core/layouts/admin_main_layout.dart';
@@ -112,13 +111,6 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
-    ),
-    GoRoute(
-      // CompanySettings
-      name: 'companySettings',
-      path: Routes.companySettings,
-      parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const CompanySettingsScreen(),
     ),
     GoRoute(
       // SecuritySettings

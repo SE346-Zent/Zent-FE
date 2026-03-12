@@ -166,9 +166,8 @@ class UserListItem extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               _statusText,
-              style: TextStyles.bodyLarge.copyWith(
+              style: TextStyles.bodyMedium.copyWith(
                 color: _statusTextColor,
-                fontSize: 14.0, // adjusted to fit the badge proportionally
               ),
             ),
           ),

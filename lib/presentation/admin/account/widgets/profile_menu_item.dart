@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
+import '../../../common/core/themes/boxshadow.dart';
 
 class ProfileMenuItem extends StatelessWidget {
   final String title;
@@ -19,12 +20,17 @@ class ProfileMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface100,
-      shape: RoundedRectangleBorder(
-        side: const BorderSide(color: AppColors.surface600, width: 1.0),
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        boxShadow: [BoxShadowStyles.subtle],
       ),
+      child: Material(
+        color: AppColors.surface100,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.surface600, width: 1.0),
+          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -37,9 +43,9 @@ class ProfileMenuItem extends StatelessWidget {
               Container(
                 width: 36.0,
                 height: 36.0,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.tertiary50,
-                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                  shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
                 child: Icon(iconData, color: AppColors.tertiary500, size: 20.0),
@@ -77,6 +83,7 @@ class ProfileMenuItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
+import '../../../common/core/themes/boxshadow.dart';
 
 class AddUserFab extends StatelessWidget {
   final VoidCallback onPressed;
@@ -11,28 +12,25 @@ class AddUserFab extends StatelessWidget {
     return Container(
       width: 61.0,
       height: 61.0,
-      alignment: Alignment.center,
       margin: const EdgeInsets.only(bottom: 24.0, right: 8.0),
       decoration: BoxDecoration(
         color: AppColors.tertiary400,
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary800.withValues(alpha: 0.25),
-            blurRadius: 10.0,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadowStyles.raised],
       ),
-      child: FloatingActionButton(
-        onPressed: onPressed,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: const Icon(
-          Icons.add,
-          size: 32.0,
-          color: AppColors.surface100,
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          onTap: onPressed,
+          child: const Center(
+            child: Icon(
+              Icons.add,
+              size: 32.0,
+              color: AppColors.surface100,
+            ),
+          ),
         ),
       ),
     );

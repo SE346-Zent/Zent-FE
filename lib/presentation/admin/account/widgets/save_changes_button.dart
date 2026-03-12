@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
+import '../../../common/core/themes/boxshadow.dart';
 
 class SaveChangesButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -16,13 +17,7 @@ class SaveChangesButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.tertiary500,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            offset: const Offset(0, 1),
-            blurRadius: 2.0,
-          ),
-        ],
+        boxShadow: [BoxShadowStyles.subtle],
       ),
       child: Material(
         color: Colors.transparent,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/text_styles.dart';
+import '../../../common/core/themes/boxshadow.dart';
 import 'dart:math';
 
 class ProfileAvatar extends StatelessWidget {
@@ -46,7 +47,8 @@ class ProfileAvatar extends StatelessWidget {
                     fit: BoxFit.cover,
                   )
                 : null,
-            border: Border.all(color: AppColors.surface600, width: 1.0),
+            border: Border.all(color: AppColors.surface100, width: 3.0),
+            boxShadow: [BoxShadowStyles.subtle],
           ),
           alignment: Alignment.center,
           child: imageUrl == null || imageUrl!.isEmpty

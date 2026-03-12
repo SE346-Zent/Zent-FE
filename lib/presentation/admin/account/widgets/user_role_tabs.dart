@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
+import '../../../common/core/themes/boxshadow.dart';
 
 class UserRoleTabs extends StatelessWidget {
   final int activeIndex;
@@ -47,13 +48,7 @@ class UserRoleTabs extends StatelessWidget {
             color: isActive ? AppColors.surface100 : Colors.transparent,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary100.withValues(alpha: 0.2),
-                      blurRadius: 4.0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
+                ? [BoxShadowStyles.subtle]
                 : [],
           ),
           alignment: Alignment.center,

@@ -34,9 +34,6 @@ class ProfileViewModel extends ChangeNotifier {
       case 'Security Settings':
         context.push(Routes.securitySettings);
         break;
-      case 'Company Settings':
-        context.push(Routes.companySettings);
-        break;
       case 'System Log':
         context.push(Routes.systemLog);
         break;

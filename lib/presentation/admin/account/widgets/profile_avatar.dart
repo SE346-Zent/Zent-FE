@@ -48,7 +48,7 @@ class ProfileAvatar extends StatelessWidget {
                   )
                 : null,
             border: Border.all(color: AppColors.surface100, width: 3.0),
-            boxShadow: [BoxShadowStyles.subtle],
+            boxShadow: [BoxShadowStyles.raised],
           ),
           alignment: Alignment.center,
           child: imageUrl == null || imageUrl!.isEmpty
@@ -64,8 +64,8 @@ class ProfileAvatar extends StatelessWidget {
           bottom: 4.0,
           right: 4.0,
           child: Container(
-            width: 24.0,
-            height: 24.0,
+            width: 20.0,
+            height: 20.0,
             decoration: BoxDecoration(
               color: AppColors.tertiary500,
               shape: BoxShape.circle,
@@ -73,7 +73,7 @@ class ProfileAvatar extends StatelessWidget {
             ),
             child: const Icon(
               Icons.edit_outlined,
-              size: 16.0,
+              size: 10.0,
               color: AppColors.surface100,
             ),
           ),

@@ -20,7 +20,7 @@ class ProfileMenuOptions extends StatelessWidget {
             'User Management',
           ),
         ),
-        const SizedBox(height: AppDimens.spaceMd),
+        const SizedBox(height: AppDimens.spaceSm),
         ProfileMenuItem(
           title: 'Security Settings',
           subtitle: 'Security & Biomaker',
@@ -30,7 +30,7 @@ class ProfileMenuOptions extends StatelessWidget {
             'Security Settings',
           ),
         ),
-        const SizedBox(height: AppDimens.spaceMd),
+        const SizedBox(height: AppDimens.spaceSm),
         ProfileMenuItem(
           title: 'System Log',
           subtitle: 'Security & Biomaker',

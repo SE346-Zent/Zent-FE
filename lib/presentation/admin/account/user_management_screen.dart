@@ -16,12 +16,14 @@ class UserManagementScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<UserManagementViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      floatingActionButton: AddUserFab(
-        onPressed: () => context.read<UserManagementViewModel>().addUser(),
-      ),
-      body: SafeArea(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        floatingActionButton: AddUserFab(
+          onPressed: () => context.read<UserManagementViewModel>().addUser(),
+        ),
+        body: SafeArea(
         child: Column(
           children: [
             const AccountHeader(title: 'Manage Account'),
@@ -46,6 +48,7 @@ class UserManagementScreen extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

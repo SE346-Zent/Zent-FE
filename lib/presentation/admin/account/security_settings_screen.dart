@@ -15,9 +15,11 @@ class SecuritySettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<SecuritySettingsViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: SafeArea(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        body: SafeArea(
         child: Column(
           children: [
             const AccountHeader(title: 'Security Settings'),
@@ -54,6 +56,7 @@ class SecuritySettingsScreen extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

@@ -11,6 +11,7 @@ class ProfileLogoutButton extends StatelessWidget {
     return PrimaryActionButton(
       label: 'Sign Out',
       icon: Icons.logout,
+      width: 364.0,
       onPressed: onPressed,
     );
   }

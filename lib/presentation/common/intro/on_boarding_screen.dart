@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -18,17 +19,20 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     {
       "image": "assets/images/OnBoarding1.webp",
       "title": "Centralize Your Operations",
-      "desc": "Manage your entire field service workflow from a single, intuitive digital hub. No more fragmented tools."
+      "desc":
+          "Manage your entire field service workflow from a single, intuitive digital hub. No more fragmented tools.",
     },
     {
       "image": "assets/images/OnBoarding2.webp",
       "title": "Empower Your Team",
-      "desc": "Enable instant job syncing and real-time reporting. Keep your field technicians aligned with zero latency."
+      "desc":
+          "Enable instant job syncing and real-time reporting. Keep your field technicians aligned with zero latency.",
     },
     {
       "image": "assets/images/OnBoarding3.webp",
-      "title": "Optimize Peformance", 
-      "desc": "Make data-driven decisions with real-time analytics. Track and easily see your improvements."
+      "title": "Optimize Peformance",
+      "desc":
+          "Make data-driven decisions with real-time analytics. Track and easily see your improvements.",
     },
   ];
 
@@ -65,9 +69,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 itemBuilder: (context, index) => _buildPageContent(index),
               ),
             ),
-            
+
             _buildBottomControls(isLastPage),
-            const SizedBox(height: 30), 
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -82,16 +86,40 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         children: [
           Image.asset(
             _data[index]["image"]!,
-            width: 270, 
+            width: 270,
             height: 245,
-            cacheWidth: 540, 
+            cacheWidth: 540,
             cacheHeight: 490,
           ),
           const SizedBox(height: 60),
-          Text(
-            _data[index]["title"]!,
-            textAlign: TextAlign.center,
-            style: TextStyles.display.copyWith(color: AppColors.primary500),
+          Builder(
+            builder: (context) {
+              final title = _data[index]["title"]!;
+              final firstSpaceIndex = title.indexOf(' ');
+              final firstWord = firstSpaceIndex != -1
+                  ? title.substring(0, firstSpaceIndex)
+                  : title;
+              final restOfTitle = firstSpaceIndex != -1
+                  ? title.substring(firstSpaceIndex)
+                  : '';
+
+              return RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: TextStyles.display,
+                  children: [
+                    TextSpan(
+                      text: firstWord,
+                      style: TextStyle(color: AppColors.tertiary500),
+                    ),
+                    TextSpan(
+                      text: restOfTitle,
+                      style: TextStyle(color: AppColors.primary500),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: AppDimens.spaceMd),
           Text(
@@ -111,14 +139,16 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         _data.length,
-        (index) => AnimatedContainer( 
+        (index) => AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
           width: _currentPage == index ? AppDimens.spaceLg : AppDimens.spaceSm,
           height: AppDimens.spaceSm,
           decoration: BoxDecoration(
-            color: _currentPage == index ? AppColors.tertiary500 : AppColors.background600,
+            color: _currentPage == index
+                ? AppColors.tertiary500
+                : AppColors.background600,
             borderRadius: BorderRadius.circular(AppDimens.boraXs),
           ),
         ),
@@ -130,10 +160,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Row(
-        mainAxisAlignment: isLastPage ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: isLastPage
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.spaceBetween,
         children: [
           if (!isLastPage)
-            InkWell( 
+            InkWell(
               onTap: _onSkipPressed,
               child: Text(
                 "SKIP",
@@ -142,17 +174,25 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
               ),
             ),
-          ElevatedButton(
-            onPressed: _onNextPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.tertiary500,
-              minimumSize: Size(isLastPage ? 229 : 170, 45), 
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.boraMd)),
-              elevation: 0,
+          Container(
+            decoration: BoxDecoration(
+              boxShadow: [BoxShadowStyles.raised],
+              borderRadius: BorderRadius.circular(AppDimens.boraMd),
             ),
-            child: Text(
-              isLastPage ? "Get Started →" : "Continue",
-              style: TextStyles.title.copyWith(color: AppColors.surface50),
+            child: ElevatedButton(
+              onPressed: _onNextPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.tertiary500,
+                minimumSize: Size(isLastPage ? 229 : 170, 45),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                isLastPage ? "Get Started →" : "Continue",
+                style: TextStyles.title.copyWith(color: AppColors.surface100),
+              ),
             ),
           ),
         ],

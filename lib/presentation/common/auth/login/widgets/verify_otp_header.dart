@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import '../../../core/app_assets.dart';
 
 class VerifyOtpHeader extends StatelessWidget {
   final String email;
@@ -15,7 +16,7 @@ class VerifyOtpHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Image.asset('assets/images/VerifyOTP1.png', height: 100),
+        Image.asset(AppAssets.verifyOtpImage, height: 100),
         const SizedBox(height: AppDimens.spaceXl),
         Text(
           'Verify OTP',

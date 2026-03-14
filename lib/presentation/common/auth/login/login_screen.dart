@@ -5,15 +5,15 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Auth Components
-import '../widgets/auth_header.dart';
-import '../widgets/auth_text_field.dart';
-import '../widgets/auth_primary_button.dart';
-import '../widgets/auth_footer_link.dart';
+import 'widgets/auth_header.dart';
+import 'widgets/auth_text_field.dart';
+import 'widgets/auth_primary_button.dart';
+import 'widgets/auth_footer_link.dart';
 
 // Feature-specific Widgets
-import '../widgets/login_background.dart';
-import '../widgets/forgot_password_button.dart';
-import '../widgets/social_login_section.dart';
+import 'widgets/login_background.dart';
+import 'widgets/forgot_password_button.dart';
+import 'widgets/social_login_section.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

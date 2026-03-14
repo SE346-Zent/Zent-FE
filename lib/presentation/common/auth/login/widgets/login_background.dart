@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/app_assets.dart';
 
 class LoginBackground extends StatelessWidget {
   const LoginBackground({super.key});
@@ -6,7 +7,7 @@ class LoginBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/images/LoginBackground.webp',
+      AppAssets.loginBackground,
       width: double.infinity,
       height: 320,
       fit: BoxFit.cover,

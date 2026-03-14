@@ -3,6 +3,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart'; // Import shadow vào đây
+import '../../../core/app_assets.dart';
 
 class SocialLoginButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -34,7 +35,7 @@ class SocialLoginButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/GoogleIcon.webp',
+              AppAssets.googleIcon,
               width: 24,
               height: 24,
             ),

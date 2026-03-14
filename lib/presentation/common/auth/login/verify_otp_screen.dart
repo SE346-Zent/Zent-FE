@@ -7,14 +7,14 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Auth Components
-import '../widgets/auth_app_bar.dart';
-import '../widgets/auth_primary_button.dart';
-import '../widgets/zent_bottom_logo.dart';
+import 'widgets/auth_app_bar.dart';
+import 'widgets/auth_primary_button.dart';
+import 'widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
-import '../widgets/verify_otp_header.dart';
-import '../widgets/otp_input_section.dart';
-import '../widgets/resend_otp_text.dart';
+import 'widgets/verify_otp_header.dart';
+import 'widgets/otp_input_section.dart';
+import 'widgets/resend_otp_text.dart';
 
 class VerifyOtpScreen extends StatelessWidget {
   const VerifyOtpScreen({super.key});

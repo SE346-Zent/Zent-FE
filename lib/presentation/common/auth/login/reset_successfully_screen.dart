@@ -8,11 +8,11 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 // Shared Auth Components
-import '../widgets/auth_app_bar.dart';
-import '../widgets/zent_bottom_logo.dart';
+import 'widgets/auth_app_bar.dart';
+import 'widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
-import '../widgets/success_checkmark.dart';
+import 'widgets/success_checkmark.dart';
 
 class ResetSuccessfullyScreen extends StatelessWidget {
   const ResetSuccessfullyScreen({super.key});

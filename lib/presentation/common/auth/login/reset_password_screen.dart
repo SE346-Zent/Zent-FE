@@ -7,15 +7,15 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Auth Components
-import '../widgets/auth_app_bar.dart';
-import '../widgets/auth_header.dart';
-import '../widgets/auth_text_field.dart';
-import '../widgets/auth_primary_button.dart';
-import '../widgets/zent_bottom_logo.dart';
+import 'widgets/auth_app_bar.dart';
+import 'widgets/auth_header.dart';
+import 'widgets/auth_text_field.dart';
+import 'widgets/auth_primary_button.dart';
+import 'widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
-import '../widgets/password_strength_indicator.dart';
-import '../widgets/password_requirements_box.dart';
+import 'widgets/password_strength_indicator.dart';
+import 'widgets/password_requirements_box.dart';
 
 class ResetPasswordScreen extends StatelessWidget {
   const ResetPasswordScreen({super.key});

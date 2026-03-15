@@ -12,7 +12,6 @@ class SuccessCheckmark extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
-        // 💡 1. Bóng đổ của cái Vòng tròn bọc ngoài
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.20),

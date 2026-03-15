@@ -18,7 +18,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.me, // Set Profile as initial route for testing
+  initialLocation: Routes.splash,
   routes: [
     // Main routes
     GoRoute(

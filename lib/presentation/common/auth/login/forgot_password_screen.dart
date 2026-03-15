@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
@@ -15,11 +16,16 @@ import 'widgets/zent_bottom_logo.dart';
 import 'widgets/forgot_password_header.dart';
 import 'widgets/back_to_sign_in_button.dart';
 
+// ViewModel
+import 'view_models/forgot_password_view_model.dart';
+
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<ForgotPasswordViewModel>();
+    debugPrint('ViewModel check: $viewModel');
     return Scaffold(
       backgroundColor: AppColors.surface50,
       body: SafeArea(

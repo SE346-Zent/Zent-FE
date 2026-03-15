@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
@@ -17,11 +18,16 @@ import 'widgets/zent_bottom_logo.dart';
 import 'widgets/password_strength_indicator.dart';
 import 'widgets/password_requirements_box.dart';
 
+// ViewModel
+import 'view_models/reset_password_view_model.dart';
+
 class ResetPasswordScreen extends StatelessWidget {
   const ResetPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<ResetPasswordViewModel>();
+    debugPrint('ViewModel check: $viewModel');
     return Scaffold(
       backgroundColor: AppColors.surface50,
       

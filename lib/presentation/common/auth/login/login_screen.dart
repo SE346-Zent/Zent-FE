@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 // Core Routing & Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -15,11 +16,16 @@ import 'widgets/login_background.dart';
 import 'widgets/forgot_password_button.dart';
 import 'widgets/social_login_section.dart';
 
+// ViewModel
+import 'view_models/login_view_model.dart';
+
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<LoginViewModel>();
+    debugPrint('ViewModel check: $viewModel');
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SingleChildScrollView(

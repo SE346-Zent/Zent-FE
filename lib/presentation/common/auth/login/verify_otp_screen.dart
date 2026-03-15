@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
@@ -16,11 +17,16 @@ import 'widgets/verify_otp_header.dart';
 import 'widgets/otp_input_section.dart';
 import 'widgets/resend_otp_text.dart';
 
+// ViewModel
+import 'view_models/verify_otp_view_model.dart';
+
 class VerifyOtpScreen extends StatelessWidget {
   const VerifyOtpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<VerifyOtpViewModel>();
+    debugPrint('ViewModel check: $viewModel');
     return Scaffold(
       backgroundColor: AppColors.surface50,
       appBar: const AuthAppBar(title: 'Verification'),

@@ -5,10 +5,12 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final bool showBackButton;
 
   const AuthAppBar({
     super.key, 
     required this.title,
+    this.showBackButton = true,
   });
 
   @override
@@ -16,10 +18,13 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-        onPressed: () => context.pop(), // GoRouter back navigation
-      ),
+      automaticallyImplyLeading: showBackButton,
+      leading: showBackButton
+        ? IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
+            onPressed: () => context.pop(), // GoRouter back navigation
+          )
+        : null,
       title: Text(
         title,
         style: TextStyles.title.copyWith(

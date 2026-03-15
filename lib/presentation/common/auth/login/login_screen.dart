@@ -73,7 +73,7 @@ class LoginScreen extends StatelessWidget {
                         keyboardType: TextInputType.emailAddress,
                       ),
 
-                      const SizedBox(height: AppDimens.spaceSm),
+                      const SizedBox(height: AppDimens.spaceMd),
 
                       const AuthTextField(
                         label: 'Password',

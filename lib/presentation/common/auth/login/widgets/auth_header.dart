@@ -26,7 +26,7 @@ class AuthHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start, 
             children: [
-              Image.asset('assets/images/ZentAvatar.png', height: 24, fit: BoxFit.contain),
+              Image.asset('assets/images/ZentLogo.webp', height: 24, fit: BoxFit.contain),
               const SizedBox(width: AppDimens.spaceSm),
               Text(
                 'ZENT',

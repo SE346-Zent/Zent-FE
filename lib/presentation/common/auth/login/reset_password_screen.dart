@@ -28,82 +28,73 @@ class ResetPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ResetPasswordViewModel>();
     debugPrint('ViewModel check: $viewModel');
-    
-    return Scaffold(
-      backgroundColor: AppColors.surface50,
-      
-      // 💡 Khóa chân Logo Zent ở đáy màn hình
-      resizeToAvoidBottomInset: false,
-      
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 💡 Đường kẻ đen mỏng chắn trên AppBar
-            Container(
-              height: 1.0,
-              width: double.infinity,
-              color: Colors.black, 
-            ),
-
-            // 💡 AppBar được dời vào trong Column
-            const AuthAppBar(title: 'Reset Password'),
-
-            // Rollable content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceLg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const AuthHeader(
-                      title: 'Create New Password',
-                      subtitle: 'Your new password must be different from previously used password',
-                      showLogo: false,
-                      isCenter: false,
-                    ),
-                    
-                    // 💡 YÊU CẦU 1: Giảm khoảng cách từ Subtitle xuống Textbox
-                    const SizedBox(height: AppDimens.spaceMd), 
-
-                    const AuthTextField(
-                      label: 'New Password',
-                      hintText: 'Enter your new password',
-                      isPassword: true,
-                    ),
-
-                    // 💡 YÊU CẦU 2: Tăng khoảng cách từ Textbox xuống Password Strength
-                    const SizedBox(height: AppDimens.spaceLg), 
-
-                    const PasswordStrengthIndicator(),
-
-                    const SizedBox(height: AppDimens.spaceLg),
-
-                    const AuthTextField(
-                      label: 'Confirm Password',
-                      hintText: 'Confirm new password',
-                      isPassword: true,
-                    ),
-
-                    const SizedBox(height: AppDimens.spaceLg),
-
-                    const PasswordRequirementsBox(),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    AuthPrimaryButton(
-                      text: 'Reset Password',
-                      onPressed: () {
-                        context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}');
-                      },
-                    ),
-                  ],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.surface50,
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(height: 1.0, width: double.infinity, color: Colors.black),
+              const AuthAppBar(title: 'Reset Password'),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppDimens.spaceLg),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const AuthHeader(
+                                  title: 'Create New Password',
+                                  subtitle: 'Your new password must be different from previously used password',
+                                  showLogo: false,
+                                  isCenter: false,
+                                ),
+                                const SizedBox(height: AppDimens.spaceMd), 
+                                const AuthTextField(
+                                  label: 'New Password',
+                                  hintText: 'Enter your new password',
+                                  isPassword: true,
+                                ),
+                                const SizedBox(height: AppDimens.spaceLg), 
+                                const PasswordStrengthIndicator(),
+                                const SizedBox(height: AppDimens.spaceLg),
+                                const AuthTextField(
+                                  label: 'Confirm Password',
+                                  hintText: 'Confirm new password',
+                                  isPassword: true,
+                                ),
+                                const SizedBox(height: AppDimens.spaceLg),
+                                const PasswordRequirementsBox(),
+                                const SizedBox(height: AppDimens.spaceXl),
+                                AuthPrimaryButton(
+                                  text: 'Reset Password',
+                                  onPressed: () => context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}'),
+                                ),
+                                const Spacer(),
+                                const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: AppDimens.spaceLg),
+                                    child: ZentBottomLogo(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-
-            // Fixed Bottom Logo
-            const ZentBottomLogo(),
-          ],
+            ],
+          ),
         ),
       ),
     );

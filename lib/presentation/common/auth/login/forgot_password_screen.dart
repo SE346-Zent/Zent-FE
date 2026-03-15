@@ -26,59 +26,58 @@ class ForgotPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ForgotPasswordViewModel>();
     debugPrint('ViewModel check: $viewModel');
-    return Scaffold(
-      backgroundColor: AppColors.surface50,
-      resizeToAvoidBottomInset: false, 
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 1.0, 
-              width: double.infinity,
-              color: AppColors.primary900, 
-            ),
-
-            // 1. Rollable Content (Scrollable Form Area)
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceLg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header Section
-                    const ForgotPasswordHeader(),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    // Email Input Field
-                    const AuthTextField(
-                      hintText: 'Enter your new email address',
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    // Action Button
-                    AuthPrimaryButton(
-                      text: 'Send OTP Code',
-                      onPressed: () {
-                        // Push to OTP Screen (Allows popping back to fix email)
-                        context.push('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}');
-                      },
-                    ),
-
-                    const SizedBox(height: AppDimens.spaceLg),
-
-                    // Back to Sign In Link
-                    const BackToSignInButton(),
-                  ],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.surface50,
+        resizeToAvoidBottomInset: false, 
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(height: 1.0, width: double.infinity, color: AppColors.primary900),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppDimens.spaceLg),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const ForgotPasswordHeader(),
+                                const SizedBox(height: AppDimens.spaceXl),
+                                const AuthTextField(
+                                  hintText: 'Enter your new email address',
+                                  keyboardType: TextInputType.emailAddress,
+                                ),
+                                const SizedBox(height: AppDimens.spaceXl),
+                                AuthPrimaryButton(
+                                  text: 'Send OTP Code',
+                                  onPressed: () => context.push('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}'),
+                                ),
+                                const SizedBox(height: AppDimens.spaceLg),
+                                const BackToSignInButton(),
+                                const Spacer(),
+                                const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: AppDimens.spaceLg),
+                                    child: ZentBottomLogo(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-
-            // 2. Freeze Content (Bottom Logo)
-            const ZentBottomLogo(),
-          ],
+            ],
+          ),
         ),
       ),
     );

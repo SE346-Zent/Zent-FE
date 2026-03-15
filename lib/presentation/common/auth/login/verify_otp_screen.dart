@@ -27,58 +27,54 @@ class VerifyOtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<VerifyOtpViewModel>();
     debugPrint('ViewModel check: $viewModel');
-    
-    return Scaffold(
-      backgroundColor: AppColors.surface50,
-      resizeToAvoidBottomInset: false, 
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 1.0,
-              width: double.infinity,
-              color: Colors.black, 
-            ),
-            const AuthAppBar(title: 'Verification'),
-
-            // 1. Scrollable Main Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceLg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const VerifyOtpHeader(email: 'name@gmail.com'),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    const OtpInputSection(),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    ResendOtpText(
-                      onResend: () {
-                        // TODO: Implement resend OTP logic
-                      },
-                    ),
-
-                    const SizedBox(height: AppDimens.spaceXl),
-
-                    AuthPrimaryButton(
-                      text: 'Send →',
-                      onPressed: () {
-                        // Navigate to Reset Password
-                        context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}');
-                      },
-                    ),
-                  ],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.surface50,
+        resizeToAvoidBottomInset: false, 
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(height: 1.0, width: double.infinity, color: Colors.black),
+              const AuthAppBar(title: 'Verification'),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppDimens.spaceLg),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const VerifyOtpHeader(email: 'name@gmail.com'),
+                                const SizedBox(height: AppDimens.spaceXl),
+                                const OtpInputSection(),
+                                const SizedBox(height: AppDimens.spaceXl),
+                                ResendOtpText(onResend: () {}),
+                                const SizedBox(height: AppDimens.spaceXl),
+                                AuthPrimaryButton(
+                                  text: 'Send →',
+                                  onPressed: () => context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}'),
+                                ),
+                                const Spacer(),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: AppDimens.spaceLg),
+                                  child: ZentBottomLogo(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-
-            // Fixed Bottom Logo
-            const ZentBottomLogo(),
-          ],
+            ],
+          ),
         ),
       ),
     );

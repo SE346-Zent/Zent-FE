@@ -7,8 +7,8 @@ class SuccessCheckmark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150,
-      height: 150,
+      width: 135,
+      height: 135,
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
@@ -23,7 +23,7 @@ class SuccessCheckmark extends StatelessWidget {
       child: Center(
         child: Icon(
           Icons.check_circle_outline,
-          size: 110,
+          size: 85,
           color: AppColors.tertiary500,
         ),
       ),

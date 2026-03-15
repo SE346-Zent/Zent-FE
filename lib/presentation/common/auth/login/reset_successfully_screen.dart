@@ -21,13 +21,18 @@ class ResetSuccessfullyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface50,
-      
-      // Use our shared AppBar without leading back button
-      appBar: const AuthAppBar(title: 'Reset Password'),
-      
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           children: [
+            Container(
+              height: 1.0,
+              width: double.infinity,
+              color: Colors.black,
+            ),
+
+            const AuthAppBar(title: 'Reset Password'),
+
             // Main Content Area
             Expanded(
               child: Padding(
@@ -58,12 +63,22 @@ class ResetSuccessfullyScreen extends StatelessWidget {
 
                     const SizedBox(height: AppDimens.spaceXl),
 
-                    // Back to Login Button
-                    SizedBox(
+                    Container(
                       width: double.infinity,
                       height: 52,
+                      decoration: BoxDecoration(
+                        color: AppColors.tertiary500,
+                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 2.0,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                       child: ElevatedButton.icon(
-                        onPressed: () => context.go(Routes.login), // Wipe stack and go to Login
+                        onPressed: () => context.go(Routes.login),
                         icon: const Icon(Icons.login, color: Colors.white),
                         label: Text(
                           'Back to Login',
@@ -73,11 +88,12 @@ class ResetSuccessfullyScreen extends StatelessWidget {
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.tertiary500,
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppDimens.boraMd),
                           ),
-                          elevation: 0,
                         ),
                       ),
                     ),

@@ -16,9 +16,18 @@ class ForgotPasswordButton extends StatelessWidget {
         onPressed: () => context.go('${Routes.login}/${Routes.forgetPassword}'),
         child: Text(
           'Forgot Password?',
-          style: TextStyles.label.copyWith(
-            color: AppColors.tertiary500,
-            fontWeight: FontWeight.bold,
+          style: TextStyles.bodyLarge.copyWith(
+            color: Colors.transparent,
+            fontWeight: FontWeight.w900,
+            shadows: [
+              Shadow(
+                color: AppColors.tertiary500,
+                offset: const Offset(0, -1),
+              )
+            ],
+            decoration: TextDecoration.underline,
+            decorationColor: AppColors.tertiary500,
+            decorationThickness: 1.5,
           ),
         ),
       ),

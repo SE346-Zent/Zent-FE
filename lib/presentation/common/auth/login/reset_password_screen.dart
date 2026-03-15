@@ -28,14 +28,26 @@ class ResetPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ResetPasswordViewModel>();
     debugPrint('ViewModel check: $viewModel');
+    
     return Scaffold(
       backgroundColor: AppColors.surface50,
       
-      appBar: const AuthAppBar(title: 'Reset Password'),
+      // 💡 Khóa chân Logo Zent ở đáy màn hình
+      resizeToAvoidBottomInset: false,
       
       body: SafeArea(
         child: Column(
           children: [
+            // 💡 Đường kẻ đen mỏng chắn trên AppBar
+            Container(
+              height: 1.0,
+              width: double.infinity,
+              color: Colors.black, 
+            ),
+
+            // 💡 AppBar được dời vào trong Column
+            const AuthAppBar(title: 'Reset Password'),
+
             // Rollable content
             Expanded(
               child: SingleChildScrollView(
@@ -50,7 +62,8 @@ class ResetPasswordScreen extends StatelessWidget {
                       isCenter: false,
                     ),
                     
-                    const SizedBox(height: AppDimens.spaceXl),
+                    // 💡 YÊU CẦU 1: Giảm khoảng cách từ Subtitle xuống Textbox
+                    const SizedBox(height: AppDimens.spaceMd), 
 
                     const AuthTextField(
                       label: 'New Password',
@@ -58,10 +71,9 @@ class ResetPasswordScreen extends StatelessWidget {
                       isPassword: true,
                     ),
 
-                    const SizedBox(height: AppDimens.spaceSm),
+                    // 💡 YÊU CẦU 2: Tăng khoảng cách từ Textbox xuống Password Strength
+                    const SizedBox(height: AppDimens.spaceLg), 
 
-                    // Password strength indicator (demo with static weak level,
-                    // can be dynamic based on input)
                     const PasswordStrengthIndicator(),
 
                     const SizedBox(height: AppDimens.spaceLg),
@@ -74,8 +86,6 @@ class ResetPasswordScreen extends StatelessWidget {
 
                     const SizedBox(height: AppDimens.spaceLg),
 
-                    // Password requirements box (static for now,
-                    // can be dynamic based on input)
                     const PasswordRequirementsBox(),
 
                     const SizedBox(height: AppDimens.spaceXl),
@@ -83,7 +93,6 @@ class ResetPasswordScreen extends StatelessWidget {
                     AuthPrimaryButton(
                       text: 'Reset Password',
                       onPressed: () {
-                        // Navigate to Success Screen via GoRouter
                         context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}');
                       },
                     ),

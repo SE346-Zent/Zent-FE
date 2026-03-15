@@ -24,7 +24,6 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
         title,
         style: TextStyles.title.copyWith(
           color: AppColors.primary500,
-          fontWeight: FontWeight.bold,
         ),
       ),
       centerTitle: true,

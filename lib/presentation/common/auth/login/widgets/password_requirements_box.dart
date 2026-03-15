@@ -18,16 +18,24 @@ class PasswordRequirementsBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppDimens.spaceLg),
+      // 💡 YÊU CẦU 3: Giảm thụt lề bên trong hộp (Từ spaceLg -> spaceMd)
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        border: Border.all(color: AppColors.secondary200),
+        border: Border.all(color: AppColors.secondary50),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.30),
+            blurRadius: 3.0,
+            offset: const Offset(0, 2), 
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Password requirements:', style: TextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+          Text('Password requirements:', style: TextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: AppDimens.spaceSm),
           _buildRequirementItem('At least 8 characters long', isMet: hasMinLength),
           const SizedBox(height: AppDimens.spaceXs),
@@ -48,7 +56,7 @@ class PasswordRequirementsBox extends StatelessWidget {
           color: isMet ? Colors.green : AppColors.secondary400,
         ),
         const SizedBox(width: AppDimens.spaceSm),
-        Text(text, style: TextStyles.label.copyWith(color: AppColors.secondary400)),
+        Text(text, style: TextStyles.label.copyWith(color: AppColors.secondary500)),
       ],
     );
   }

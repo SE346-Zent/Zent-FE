@@ -16,7 +16,7 @@ class VerifyOtpHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Image.asset(AppAssets.verifyOtpImage, height: 100),
+        Image.asset(AppAssets.verifyOtpImage, height: 180),
         const SizedBox(height: AppDimens.spaceXl),
         Text(
           'Verify OTP',

@@ -33,61 +33,70 @@ class _AuthTextFieldState extends State<AuthTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. Label
         if (widget.label != null) ...[
           Text(
             widget.label!,
             style: TextStyles.title.copyWith(
               color: AppColors.primary500,
-              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: AppDimens.spaceSm),
+          const SizedBox(height: AppDimens.spaceXs),
         ],
-        
-        const SizedBox(height: AppDimens.spaceSm),
-        
-        // 2. Text Field
-        TextField(
-          controller: widget.controller,
-          obscureText: widget.isPassword ? _obscureText : false,
-          keyboardType: widget.keyboardType,
-          style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
-          decoration: InputDecoration(
-            hintText: widget.hintText,
-            hintStyle: TextStyles.bodyMedium.copyWith(color: AppColors.secondary300),
-            prefixIcon: widget.prefixIcon != null 
-                ? Icon(widget.prefixIcon, color: AppColors.secondary400) 
-                : null,
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      size: 20,
-                      color: AppColors.secondary400,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppDimens.boraSm),
-              borderSide: const BorderSide(color: AppColors.secondary200),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppDimens.boraSm),
-              borderSide: const BorderSide(color: AppColors.secondary200),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppDimens.boraSm),
-              borderSide: const BorderSide(color: AppColors.tertiary500, width: 2),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppDimens.spaceMd, 
-              vertical: AppDimens.spaceMd, 
+
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppDimens.boraSm),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.30),
+                blurRadius: 1.0,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: widget.controller,
+            obscureText: widget.isPassword ? _obscureText : false,
+            keyboardType: widget.keyboardType,
+            style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              hintStyle: TextStyles.bodyMedium.copyWith(color: AppColors.secondary200),
+              prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon, color: AppColors.secondary400) : null,
+              suffixIcon: widget.isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        size: 20,
+                        color: AppColors.secondary400,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                borderSide: const BorderSide(color: Colors.transparent),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                borderSide: const BorderSide(
+                  color: AppColors.secondary200,
+                  width: 1.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                borderSide: const BorderSide(color: AppColors.tertiary500, width: 1.5),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.spaceMd,
+                vertical: AppDimens.spaceMd,
+              ),
             ),
           ),
         ),

@@ -26,86 +26,87 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<LoginViewModel>();
     debugPrint('ViewModel check: $viewModel');
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            // 1. Background Image
-            const LoginBackground(),
-
-            // 2. Main Form Container
-            Container(
-              margin: const EdgeInsets.only(top: 280),
-              padding: const EdgeInsets.all(AppDimens.spaceLg),
-              decoration: BoxDecoration(
-                color: AppColors.background500,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+    
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: screenHeight * 0.28,
+                  width: double.infinity,
+                  child: const LoginBackground(),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppDimens.spaceMd),
 
-                  // Header Section
-                  const AuthHeader(
-                    title: 'Welcome back!',
-                    subtitle: 'Log in your Zent account to experience the wonderful app',
-                    showLogo: false,
+                Container(
+                  margin: EdgeInsets.only(top: screenHeight * 0.25),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimens.spaceLg, 
+                    vertical: AppDimens.spaceMd,
                   ),
-
-                  const SizedBox(height: AppDimens.spaceXl),
-
-                  // Input Section
-                  const AuthTextField(
-                    label: 'Email Address',
-                    hintText: 'name@gmail.com',
-                    keyboardType: TextInputType.emailAddress,
+                  decoration: BoxDecoration(
+                    color: AppColors.background500,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(32),
+                      topRight: Radius.circular(32),
+                    ),
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const AuthHeader(
+                        title: 'Welcome back!',
+                        subtitle: 'Log in your Zent account to experience the wonderful app',
+                        showLogo: false,
+                      ),
 
-                  const SizedBox(height: AppDimens.spaceMd),
+                      const SizedBox(height: AppDimens.spaceLg),
 
-                  const AuthTextField(
-                    label: 'Password',
-                    hintText: 'Enter your password',
-                    isPassword: true,
+                      const AuthTextField(
+                        label: 'Email Address',
+                        hintText: 'name@gmail.com',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+
+                      const SizedBox(height: AppDimens.spaceSm),
+
+                      const AuthTextField(
+                        label: 'Password',
+                        hintText: 'Enter your password',
+                        isPassword: true,
+                      ),
+
+                      const ForgotPasswordButton(),
+
+                      const SizedBox(height: AppDimens.spaceMd),
+
+                      AuthPrimaryButton(
+                        text: 'Sign In',
+                        onPressed: () {},
+                      ),
+
+                      const SizedBox(height: AppDimens.spaceLg),
+
+                      const SocialLoginSection(),
+
+                      const SizedBox(height: AppDimens.spaceLg),
+
+                      AuthFooterLink(
+                        text: "Don't have an account?",
+                        linkText: 'Sign Up',
+                        onTap: () {},
+                      ),
+                    ],
                   ),
-
-                  // Forgot Password Link
-                  const ForgotPasswordButton(),
-
-                  const SizedBox(height: AppDimens.spaceLg),
-
-                  // Action Button
-                  AuthPrimaryButton(
-                    text: 'Sign In',
-                    onPressed: () {
-                      // TODO: Implement login logic
-                    },
-                  ),
-
-                  const SizedBox(height: AppDimens.spaceXl),
-
-                  // Social Login Section
-                  const SocialLoginSection(),
-
-                  const SizedBox(height: AppDimens.spaceXl),
-
-                  // Footer Section (Optional: Kept just in case)
-                  AuthFooterLink(
-                    text: "Don't have an account?",
-                    linkText: 'Sign Up',
-                    onTap: () {
-                      // TODO: Navigate to Sign Up screen via GoRouter
-                    },
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

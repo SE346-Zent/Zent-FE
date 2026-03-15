@@ -18,6 +18,14 @@ class _OtpInputSectionState extends State<OtpInputSection> {
   final int _otpLength = 6;
 
   @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();

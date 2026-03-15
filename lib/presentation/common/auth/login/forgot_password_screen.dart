@@ -28,16 +28,20 @@ class ForgotPasswordScreen extends StatelessWidget {
     debugPrint('ViewModel check: $viewModel');
     return Scaffold(
       backgroundColor: AppColors.surface50,
+      resizeToAvoidBottomInset: false, 
       body: SafeArea(
         child: Column(
           children: [
+            Container(
+              height: 1.0, 
+              width: double.infinity,
+              color: AppColors.primary900, 
+            ),
+
             // 1. Rollable Content (Scrollable Form Area)
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimens.spaceLg,
-                  vertical: 40,
-                ),
+                padding: const EdgeInsets.all(AppDimens.spaceLg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -48,7 +52,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
                     // Email Input Field
                     const AuthTextField(
-                      hintText: 'Enter your email address',
+                      hintText: 'Enter your new email address',
                       keyboardType: TextInputType.emailAddress,
                     ),
 

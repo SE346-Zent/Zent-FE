@@ -27,21 +27,27 @@ class VerifyOtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<VerifyOtpViewModel>();
     debugPrint('ViewModel check: $viewModel');
+    
     return Scaffold(
       backgroundColor: AppColors.surface50,
-      appBar: const AuthAppBar(title: 'Verification'),
+      resizeToAvoidBottomInset: false, 
       body: SafeArea(
         child: Column(
           children: [
-            // Scrollable Main Content
+            Container(
+              height: 1.0,
+              width: double.infinity,
+              color: Colors.black, 
+            ),
+            const AuthAppBar(title: 'Verification'),
+
+            // 1. Scrollable Main Content
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppDimens.spaceLg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: AppDimens.spaceXl),
-
                     const VerifyOtpHeader(email: 'name@gmail.com'),
 
                     const SizedBox(height: AppDimens.spaceXl),

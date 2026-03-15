@@ -7,23 +7,24 @@ class SuccessCheckmark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
-      height: 100,
+      width: 150,
+      height: 150,
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
+        // 💡 1. Bóng đổ của cái Vòng tròn bọc ngoài
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.20),
+            blurRadius: 10.0,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: const Center(
+      child: Center(
         child: Icon(
           Icons.check_circle_outline,
-          size: 60,
+          size: 110,
           color: AppColors.tertiary500,
         ),
       ),

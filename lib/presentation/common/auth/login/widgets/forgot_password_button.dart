@@ -20,10 +20,7 @@ class ForgotPasswordButton extends StatelessWidget {
             color: Colors.transparent,
             fontWeight: FontWeight.w900,
             shadows: [
-              Shadow(
-                color: AppColors.tertiary500,
-                offset: const Offset(0, -1),
-              )
+              Shadow(color: AppColors.tertiary500, offset: const Offset(0, -1)),
             ],
             decoration: TextDecoration.underline,
             decorationColor: AppColors.tertiary500,

@@ -1,4 +1,3 @@
 import 'package:flutter/material.dart';
 
-class ResetPasswordViewModel extends ChangeNotifier {
-}
+class ResetPasswordViewModel extends ChangeNotifier {}

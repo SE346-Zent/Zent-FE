@@ -16,7 +16,7 @@ class AuthPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0), 
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Container(
         width: double.infinity,
         height: 48,
@@ -36,16 +36,14 @@ class AuthPrimaryButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
-            elevation: 0, 
+            elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
             ),
           ),
           child: Text(
             text,
-            style: TextStyles.title.copyWith(
-              color: AppColors.surface50,
-            ),
+            style: TextStyles.title.copyWith(color: AppColors.surface50),
           ),
         ),
       ),

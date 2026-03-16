@@ -36,9 +36,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
         if (widget.label != null) ...[
           Text(
             widget.label!,
-            style: TextStyles.middle.copyWith(
-              color: AppColors.primary500,
-            ),
+            style: TextStyles.middle.copyWith(color: AppColors.primary500),
           ),
           const SizedBox(height: AppDimens.spaceXs),
         ],
@@ -62,8 +60,12 @@ class _AuthTextFieldState extends State<AuthTextField> {
             style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: TextStyles.bodyMedium.copyWith(color: AppColors.secondary200),
-              prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon, color: AppColors.secondary400) : null,
+              hintStyle: TextStyles.bodyMedium.copyWith(
+                color: AppColors.secondary200,
+              ),
+              prefixIcon: widget.prefixIcon != null
+                  ? Icon(widget.prefixIcon, color: AppColors.secondary400)
+                  : null,
               suffixIcon: widget.isPassword
                   ? IconButton(
                       icon: Icon(
@@ -91,7 +93,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                borderSide: const BorderSide(color: AppColors.tertiary500, width: 1.5),
+                borderSide: const BorderSide(
+                  color: AppColors.tertiary500,
+                  width: 1.5,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppDimens.spaceMd,

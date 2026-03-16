@@ -31,7 +31,7 @@ class AppColors {
   static const Color tertiary200 = Color(0xFF8BBAD4);
   static const Color tertiary300 = Color(0xFF569BC0);
   static const Color tertiary400 = Color(0xFF3587B4);
-  static const Color tertiary500 = Color(0xFF0369A1); 
+  static const Color tertiary500 = Color(0xFF0369A1);
   static const Color tertiary600 = Color(0xFF036093);
   static const Color tertiary700 = Color(0xFF024B72);
   static const Color tertiary800 = Color(0xFF023A59);

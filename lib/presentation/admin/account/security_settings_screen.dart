@@ -20,43 +20,43 @@ class SecuritySettingsScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background500,
         body: SafeArea(
-        child: Column(
-          children: [
-            const AccountHeader(title: 'Security Settings'),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const ChangePasswordSection(),
-                    const SizedBox(height: AppDimens.spaceXl),
-                    TwoFactorSection(
-                      securityData: viewModel.settingsData,
-                      onToggle: (value) => viewModel.toggleTwoFactor(value),
-                    ),
-                    const SizedBox(height: AppDimens.spaceXl),
-                  ],
+          child: Column(
+            children: [
+              const AccountHeader(title: 'Security Settings'),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppDimens.spaceMd),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const ChangePasswordSection(),
+                      const SizedBox(height: AppDimens.spaceXl),
+                      TwoFactorSection(
+                        securityData: viewModel.settingsData,
+                        onToggle: (value) => viewModel.toggleTwoFactor(value),
+                      ),
+                      const SizedBox(height: AppDimens.spaceXl),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: AppDimens.spaceMd,
-                right: AppDimens.spaceMd,
-                bottom: AppDimens.spaceLg,
-                top: AppDimens.spaceSm,
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: AppDimens.spaceMd,
+                  right: AppDimens.spaceMd,
+                  bottom: AppDimens.spaceLg,
+                  top: AppDimens.spaceSm,
+                ),
+                child: SaveChangesButton(
+                  onPressed: () {
+                    context.read<SecuritySettingsViewModel>().saveChanges();
+                  },
+                ),
               ),
-              child: SaveChangesButton(
-                onPressed: () {
-                  context.read<SecuritySettingsViewModel>().saveChanges();
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

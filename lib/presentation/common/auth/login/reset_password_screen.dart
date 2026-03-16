@@ -36,15 +36,25 @@ class ResetPasswordScreen extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              Container(height: 1.0, width: double.infinity, color: Colors.black),
+              Container(
+                height: 1.0,
+                width: double.infinity,
+                color: Colors.black,
+              ),
               const AuthAppBar(title: 'Reset Password'),
-              Container(height: 1.0, width: double.infinity, color: AppColors.secondary50),
+              Container(
+                height: 1.0,
+                width: double.infinity,
+                color: AppColors.secondary50,
+              ),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
                       child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
                         child: IntrinsicHeight(
                           child: Padding(
                             padding: const EdgeInsets.all(AppDimens.spaceLg),
@@ -53,17 +63,18 @@ class ResetPasswordScreen extends StatelessWidget {
                               children: [
                                 const AuthHeader(
                                   title: 'Create New Password',
-                                  subtitle: 'Your new password must be different from previously used password',
+                                  subtitle:
+                                      'Your new password must be different from previously used password',
                                   showLogo: false,
                                   isCenter: false,
                                 ),
-                                const SizedBox(height: AppDimens.spaceMd), 
+                                const SizedBox(height: AppDimens.spaceMd),
                                 const AuthTextField(
                                   label: 'New Password',
                                   hintText: 'Enter your new password',
                                   isPassword: true,
                                 ),
-                                const SizedBox(height: AppDimens.spaceLg), 
+                                const SizedBox(height: AppDimens.spaceLg),
                                 const PasswordStrengthIndicator(),
                                 const SizedBox(height: AppDimens.spaceLg),
                                 const AuthTextField(
@@ -76,12 +87,16 @@ class ResetPasswordScreen extends StatelessWidget {
                                 const SizedBox(height: AppDimens.spaceXl),
                                 AuthPrimaryButton(
                                   text: 'Reset Password',
-                                  onPressed: () => context.go('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}'),
+                                  onPressed: () => context.go(
+                                    '${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}',
+                                  ),
                                 ),
                                 const Spacer(),
                                 const Center(
                                   child: Padding(
-                                    padding: EdgeInsets.only(top: AppDimens.spaceLg),
+                                    padding: EdgeInsets.only(
+                                      top: AppDimens.spaceLg,
+                                    ),
                                     child: ZentBottomLogo(),
                                   ),
                                 ),

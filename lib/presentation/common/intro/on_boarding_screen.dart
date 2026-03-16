@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -19,19 +21,19 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   final List<Map<String, String>> _data = [
     {
-      "image": "assets/images/OnBoarding1.webp",
+      "image": AppAssets.onboarding1,
       "title": "Centralize Your Operations",
       "desc":
           "Manage your entire field service workflow from a single, intuitive digital hub. No more fragmented tools.",
     },
     {
-      "image": "assets/images/OnBoarding2.webp",
+      "image": AppAssets.onboarding2,
       "title": "Empower Your Team",
       "desc":
           "Enable instant job syncing and real-time reporting. Keep your field technicians aligned with zero latency.",
     },
     {
-      "image": "assets/images/OnBoarding3.webp",
+      "image": AppAssets.onboarding3,
       "title": "Optimize Peformance",
       "desc":
           "Make data-driven decisions with real-time analytics. Track and easily see your improvements.",

@@ -166,9 +166,7 @@ class UserListItem extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               _statusText,
-              style: TextStyles.bodyMedium.copyWith(
-                color: _statusTextColor,
-              ),
+              style: TextStyles.bodyMedium.copyWith(color: _statusTextColor),
             ),
           ),
           const SizedBox(width: AppDimens.spaceMd),

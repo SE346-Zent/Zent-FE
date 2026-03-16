@@ -47,9 +47,7 @@ class UserRoleTabs extends StatelessWidget {
           decoration: BoxDecoration(
             color: isActive ? AppColors.surface100 : Colors.transparent,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            boxShadow: isActive
-                ? [BoxShadowStyles.subtle]
-                : [],
+            boxShadow: isActive ? [BoxShadowStyles.subtle] : [],
           ),
           alignment: Alignment.center,
           child: Text(

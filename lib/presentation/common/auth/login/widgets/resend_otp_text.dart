@@ -5,10 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 class ResendOtpText extends StatelessWidget {
   final VoidCallback onResend;
 
-  const ResendOtpText({
-    super.key, 
-    required this.onResend,
-  });
+  const ResendOtpText({super.key, required this.onResend});
 
   @override
   Widget build(BuildContext context) {

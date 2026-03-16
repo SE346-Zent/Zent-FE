@@ -14,13 +14,10 @@ class BackToSignInButton extends StatelessWidget {
       child: Text(
         '← Back to Sign In',
         style: TextStyles.bodyLarge.copyWith(
-          color: Colors.transparent, 
+          color: Colors.transparent,
           fontWeight: FontWeight.bold,
           shadows: [
-            Shadow(
-              color: AppColors.tertiary500,
-              offset: const Offset(0, -2),
-            )
+            Shadow(color: AppColors.tertiary500, offset: const Offset(0, -2)),
           ],
           decoration: TextDecoration.underline,
           decorationColor: AppColors.tertiary500,

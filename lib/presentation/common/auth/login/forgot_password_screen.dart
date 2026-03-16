@@ -30,17 +30,23 @@ class ForgotPasswordScreen extends StatelessWidget {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.surface50,
-        resizeToAvoidBottomInset: false, 
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: Column(
             children: [
-              Container(height: 1.0, width: double.infinity, color: AppColors.primary900),
+              Container(
+                height: 1.0,
+                width: double.infinity,
+                color: AppColors.primary900,
+              ),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
                       child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
                         child: IntrinsicHeight(
                           child: Padding(
                             padding: const EdgeInsets.all(AppDimens.spaceLg),
@@ -56,14 +62,18 @@ class ForgotPasswordScreen extends StatelessWidget {
                                 const SizedBox(height: AppDimens.spaceXl),
                                 AuthPrimaryButton(
                                   text: 'Send OTP Code',
-                                  onPressed: () => context.push('${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}'),
+                                  onPressed: () => context.push(
+                                    '${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}',
+                                  ),
                                 ),
                                 const SizedBox(height: AppDimens.spaceLg),
                                 const BackToSignInButton(),
                                 const Spacer(),
                                 const Center(
                                   child: Padding(
-                                    padding: EdgeInsets.only(top: AppDimens.spaceLg),
+                                    padding: EdgeInsets.only(
+                                      top: AppDimens.spaceLg,
+                                    ),
                                     child: ZentBottomLogo(),
                                   ),
                                 ),

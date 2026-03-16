@@ -26,9 +26,9 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<LoginViewModel>();
     debugPrint('ViewModel check: $viewModel');
-    
+
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -46,7 +46,7 @@ class LoginScreen extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.only(top: screenHeight * 0.25),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimens.spaceLg, 
+                    horizontal: AppDimens.spaceLg,
                     vertical: AppDimens.spaceMd,
                   ),
                   decoration: BoxDecoration(
@@ -61,7 +61,8 @@ class LoginScreen extends StatelessWidget {
                     children: [
                       const AuthHeader(
                         title: 'Welcome back!',
-                        subtitle: 'Log in your Zent account to experience the wonderful app',
+                        subtitle:
+                            'Log in your Zent account to experience the wonderful app',
                         showLogo: false,
                       ),
 
@@ -85,10 +86,7 @@ class LoginScreen extends StatelessWidget {
 
                       const SizedBox(height: AppDimens.spaceMd),
 
-                      AuthPrimaryButton(
-                        text: 'Sign In',
-                        onPressed: () {},
-                      ),
+                      AuthPrimaryButton(text: 'Sign In', onPressed: () {}),
 
                       const SizedBox(height: AppDimens.spaceLg),
 

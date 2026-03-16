@@ -25,11 +25,7 @@ class AddUserFab extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           child: const Center(
-            child: Icon(
-              Icons.add,
-              size: 32.0,
-              color: AppColors.surface100,
-            ),
+            child: Icon(Icons.add, size: 32.0, color: AppColors.surface100),
           ),
         ),
       ),

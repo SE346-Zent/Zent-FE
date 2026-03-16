@@ -8,7 +8,7 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
 
   const AuthAppBar({
-    super.key, 
+    super.key,
     required this.title,
     this.showBackButton = true,
   });
@@ -20,16 +20,14 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       automaticallyImplyLeading: showBackButton,
       leading: showBackButton
-        ? IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-            onPressed: () => context.pop(), // GoRouter back navigation
-          )
-        : null,
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
+              onPressed: () => context.pop(), // GoRouter back navigation
+            )
+          : null,
       title: Text(
         title,
-        style: TextStyles.title.copyWith(
-          color: AppColors.primary500,
-        ),
+        style: TextStyles.title.copyWith(color: AppColors.primary500),
       ),
       centerTitle: true,
     );

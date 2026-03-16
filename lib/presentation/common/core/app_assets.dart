@@ -12,5 +12,4 @@ class AppAssets {
 
   // Icon assets
   static const String googleIcon = '$_iconPath/GoogleIcon.webp';
-
 }

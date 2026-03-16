@@ -22,9 +22,9 @@ class SocialLoginSection extends StatelessWidget {
             Expanded(child: Divider(color: AppColors.secondary200)),
           ],
         ),
-        
+
         const SizedBox(height: AppDimens.spaceLg),
-        
+
         // Google Button
         SocialLoginButton(
           onPressed: () {

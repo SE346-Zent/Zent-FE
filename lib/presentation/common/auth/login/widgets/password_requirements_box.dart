@@ -28,20 +28,32 @@ class PasswordRequirementsBox extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.30),
             blurRadius: 3.0,
-            offset: const Offset(0, 2), 
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Password requirements:', style: TextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            'Password requirements:',
+            style: TextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: AppDimens.spaceSm),
-          _buildRequirementItem('At least 8 characters long', isMet: hasMinLength),
+          _buildRequirementItem(
+            'At least 8 characters long',
+            isMet: hasMinLength,
+          ),
           const SizedBox(height: AppDimens.spaceXs),
-          _buildRequirementItem('Contains at least one number', isMet: hasNumber),
+          _buildRequirementItem(
+            'Contains at least one number',
+            isMet: hasNumber,
+          ),
           const SizedBox(height: AppDimens.spaceXs),
-          _buildRequirementItem('Contains at least one special character', isMet: hasSpecialChar),
+          _buildRequirementItem(
+            'Contains at least one special character',
+            isMet: hasSpecialChar,
+          ),
         ],
       ),
     );
@@ -56,7 +68,10 @@ class PasswordRequirementsBox extends StatelessWidget {
           color: isMet ? Colors.green : AppColors.secondary400,
         ),
         const SizedBox(width: AppDimens.spaceSm),
-        Text(text, style: TextStyles.label.copyWith(color: AppColors.secondary500)),
+        Text(
+          text,
+          style: TextStyles.label.copyWith(color: AppColors.secondary500),
+        ),
       ],
     );
   }

@@ -4,7 +4,8 @@ import 'package:zent_fe/presentation/common/intro/on_boarding_screen.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart' show AppAssets;
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class AppSplashScreen extends StatefulWidget {
   const AppSplashScreen({super.key});

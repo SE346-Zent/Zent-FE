@@ -7,10 +7,7 @@ import '../../../core/app_assets.dart';
 class VerifyOtpHeader extends StatelessWidget {
   final String email;
 
-  const VerifyOtpHeader({
-    super.key, 
-    required this.email,
-  });
+  const VerifyOtpHeader({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +23,9 @@ class VerifyOtpHeader extends StatelessWidget {
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary400),
+            style: TextStyles.bodyMedium.copyWith(
+              color: AppColors.secondary400,
+            ),
             children: [
               const TextSpan(text: 'The OTP code has been sent to\n'),
               TextSpan(

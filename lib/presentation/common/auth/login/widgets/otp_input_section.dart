@@ -50,7 +50,7 @@ class _OtpInputSectionState extends State<OtpInputSection> {
             onChanged: (value) => setState(() {}),
           ),
         ),
-        
+
         GestureDetector(
           onTap: () => _focusNode.requestFocus(),
           child: Row(
@@ -60,9 +60,10 @@ class _OtpInputSectionState extends State<OtpInputSection> {
               if (_controller.text.length > index) {
                 char = _controller.text[index];
               }
-              
-              bool isFocused = (_controller.text.length == index) && _focusNode.hasFocus;
-              
+
+              bool isFocused =
+                  (_controller.text.length == index) && _focusNode.hasFocus;
+
               return _buildOtpBox(char, isFocused);
             }),
           ),
@@ -71,26 +72,31 @@ class _OtpInputSectionState extends State<OtpInputSection> {
     );
   }
 
-Widget _buildOtpBox(String digit, bool isFocused) {
-  bool hasValue = digit.isNotEmpty;
-  return Container(
-    width: 48,
-    height: 48,
-    alignment: Alignment.center,
-    decoration: BoxDecoration(
-      color: isFocused ? AppColors.surface50 : AppColors.surface50,
-      borderRadius: BorderRadius.circular(AppDimens.boraSm),
-      border: Border.all(
-        color: isFocused ? AppColors.tertiary500 : (hasValue ? AppColors.tertiary500 : AppColors.secondary200),
-        width: isFocused ? 2.0 : 1.0,
+  Widget _buildOtpBox(String digit, bool isFocused) {
+    bool hasValue = digit.isNotEmpty;
+    return Container(
+      width: 48,
+      height: 48,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: isFocused ? AppColors.surface50 : AppColors.surface50,
+        borderRadius: BorderRadius.circular(AppDimens.boraSm),
+        border: Border.all(
+          color: isFocused
+              ? AppColors.tertiary500
+              : (hasValue ? AppColors.tertiary500 : AppColors.secondary200),
+          width: isFocused ? 2.0 : 1.0,
+        ),
+        boxShadow: isFocused ? [BoxShadowStyles.raised] : null,
       ),
-      boxShadow: isFocused ? [BoxShadowStyles.raised] : null,
-    ),
-    child: isFocused && !hasValue 
-      ? _buildCursor() 
-      : Text(digit, style: TextStyles.title.copyWith(fontWeight: FontWeight.bold)),
-  );
-}
+      child: isFocused && !hasValue
+          ? _buildCursor()
+          : Text(
+              digit,
+              style: TextStyles.title.copyWith(fontWeight: FontWeight.bold),
+            ),
+    );
+  }
 
   Widget _buildCursor() {
     return TweenAnimationBuilder<double>(

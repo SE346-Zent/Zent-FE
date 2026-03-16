@@ -3,22 +3,20 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart'; // Import shadow vào đây
-import 'package:zent_fe/presentation/common/core/app_assets.dart' show AppAssets; 
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class SocialLoginButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const SocialLoginButton({
-    super.key,
-    required this.onPressed,
-  });
+  const SocialLoginButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        boxShadow: [BoxShadowStyles.subtle], 
+        boxShadow: [BoxShadowStyles.subtle],
       ),
       child: OutlinedButton(
         onPressed: onPressed,
@@ -34,15 +32,13 @@ class SocialLoginButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              AppAssets.googleIcon,
-              width: 24,
-              height: 24,
-            ),
+            Image.asset(AppAssets.googleIcon, width: 24, height: 24),
             const SizedBox(width: AppDimens.spaceSm),
             Text(
               'Continue with Google',
-              style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
+              style: TextStyles.bodyLarge.copyWith(
+                color: AppColors.secondary500,
+              ),
             ),
           ],
         ),

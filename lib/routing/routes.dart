@@ -5,7 +5,7 @@ abstract final class Routes {
   static const login = '/login';
 
   // auth sub routes
-  
+
   // forget-password -> verifyOtp -> reset password -> reset-successfully
 
   // admin top level

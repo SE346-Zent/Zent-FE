@@ -30,20 +30,41 @@ class PasswordStrengthIndicator extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Password Strength', style: TextStyles.label.copyWith(color: AppColors.secondary400)),
-            Text(strengthText, style: TextStyles.label.copyWith(color: strengthColor, fontWeight: FontWeight.bold)),
+            Text(
+              'Password Strength',
+              style: TextStyles.label.copyWith(color: AppColors.secondary400),
+            ),
+            Text(
+              strengthText,
+              style: TextStyles.label.copyWith(
+                color: strengthColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: AppDimens.spaceXs),
         Row(
           children: [
-            _buildStrengthBar(isActive: strengthLevel >= 1, color: strengthColor),
+            _buildStrengthBar(
+              isActive: strengthLevel >= 1,
+              color: strengthColor,
+            ),
             const SizedBox(width: 8),
-            _buildStrengthBar(isActive: strengthLevel >= 2, color: strengthColor),
+            _buildStrengthBar(
+              isActive: strengthLevel >= 2,
+              color: strengthColor,
+            ),
             const SizedBox(width: 8),
-            _buildStrengthBar(isActive: strengthLevel >= 3, color: strengthColor),
+            _buildStrengthBar(
+              isActive: strengthLevel >= 3,
+              color: strengthColor,
+            ),
             const SizedBox(width: 8),
-            _buildStrengthBar(isActive: strengthLevel >= 4, color: strengthColor),
+            _buildStrengthBar(
+              isActive: strengthLevel >= 4,
+              color: strengthColor,
+            ),
           ],
         ),
       ],

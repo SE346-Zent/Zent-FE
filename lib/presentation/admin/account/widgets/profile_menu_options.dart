@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/core/themes/dimens.dart';
-import 'profile_menu_item.dart';
+import '../../../common/core/ui/menu_item.dart';
 import 'package:provider/provider.dart';
 import '../viewmodel/profile_viewmodel.dart';
 
@@ -11,7 +11,7 @@ class ProfileMenuOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ProfileMenuItem(
+        MenuItem(
           title: 'User Management',
           subtitle: 'Contact details & address',
           iconData: Icons.person_outline,
@@ -21,7 +21,7 @@ class ProfileMenuOptions extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppDimens.spaceSm),
-        ProfileMenuItem(
+        MenuItem(
           title: 'Security Settings',
           subtitle: 'Security & Biomaker',
           iconData: Icons.lock_outline,
@@ -31,7 +31,7 @@ class ProfileMenuOptions extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppDimens.spaceSm),
-        ProfileMenuItem(
+        MenuItem(
           title: 'System Log',
           subtitle: 'Security & Biomaker',
           iconData: Icons.person_outline,

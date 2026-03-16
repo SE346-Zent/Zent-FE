@@ -4,13 +4,13 @@ import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
 import '../../../common/core/themes/boxshadow.dart';
 
-class ProfileMenuItem extends StatelessWidget {
+class MenuItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData iconData;
   final VoidCallback onTap;
 
-  const ProfileMenuItem({
+  const MenuItem({
     super.key,
     required this.title,
     required this.subtitle,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../common/core/themes/colors.dart';
 import '../../common/core/themes/dimens.dart';
-import 'widgets/account_header.dart';
+import '../../common/core/ui/account_header.dart';
 import 'widgets/change_password_section.dart';
 import 'widgets/save_changes_button.dart';
 import 'widgets/two_factor_section.dart';

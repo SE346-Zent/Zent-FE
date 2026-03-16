@@ -4,11 +4,11 @@ import '../../../common/core/themes/text_styles.dart';
 import '../../../common/core/themes/boxshadow.dart';
 import 'dart:math';
 
-class ProfileAvatar extends StatelessWidget {
+class Avatar extends StatelessWidget {
   final String? imageUrl;
   final String name;
 
-  const ProfileAvatar({super.key, this.imageUrl, required this.name});
+  const Avatar({super.key, this.imageUrl, required this.name});
 
   String get _initials {
     if (name.isEmpty) return 'U';

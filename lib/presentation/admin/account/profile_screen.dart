@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../common/core/themes/dimens.dart';
 import '../../common/core/themes/colors.dart';
-import 'widgets/account_header.dart';
-import 'widgets/profile_avatar.dart';
-import 'widgets/profile_logout_button.dart';
+import '../../common/core/ui/account_header.dart';
+import '../../common/core/ui/avatar.dart';
+import '../../common/core/ui/button.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +34,7 @@ class ProfileScreen extends StatelessWidget {
                 verticalPadding: 0,
               ),
               const SizedBox(height: AppDimens.spaceLg),
-              ProfileAvatar(name: viewModel.userInfo.userName),
+              Avatar(name: viewModel.userInfo.userName),
               const SizedBox(height: AppDimens.spaceMd),
               // User Info
               ProfileUserInfo(userInfo: viewModel.userInfo),
@@ -43,7 +43,9 @@ class ProfileScreen extends StatelessWidget {
               const ProfileMenuOptions(),
               const SizedBox(height: AppDimens.spaceXl),
               // Sign Out Button
-              ProfileLogoutButton(
+              PrimaryActionButton(
+                label: 'Sign Out',
+                icon: Icons.logout,
                 onPressed: () => context.read<ProfileViewModel>().logout(),
               ),
             ],

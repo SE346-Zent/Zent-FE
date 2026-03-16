@@ -14,7 +14,7 @@ class ZentBottomLogo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/images/ZentAvatar.png', 
+            'assets/images/ZentLogo.webp', 
             height: 28, 
             fit: BoxFit.contain,
           ),

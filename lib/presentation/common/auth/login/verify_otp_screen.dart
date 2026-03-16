@@ -37,6 +37,7 @@ class VerifyOtpScreen extends StatelessWidget {
             children: [
               Container(height: 1.0, width: double.infinity, color: Colors.black),
               const AuthAppBar(title: 'Verification'),
+              Container(height: 1.0, width: double.infinity, color: AppColors.secondary50),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {

@@ -30,6 +30,7 @@ class ResetSuccessfullyScreen extends StatelessWidget {
               title: 'Reset Password',
               showBackButton: false,
             ),
+            Container(height: 1.0, width: double.infinity, color: AppColors.secondary50),
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {

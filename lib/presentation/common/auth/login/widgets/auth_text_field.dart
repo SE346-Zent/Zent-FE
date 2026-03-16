@@ -59,10 +59,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
             controller: widget.controller,
             obscureText: widget.isPassword ? _obscureText : false,
             keyboardType: widget.keyboardType,
-            style: TextStyles.bodyLarge.copyWith(color: AppColors.primary500),
+            style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: TextStyles.bodyLarge.copyWith(color: AppColors.secondary200),
+              hintStyle: TextStyles.bodyMedium.copyWith(color: AppColors.secondary200),
               prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon, color: AppColors.secondary400) : null,
               suffixIcon: widget.isPassword
                   ? IconButton(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/core/themes/dimens.dart';
-import 'profile_menu_item.dart';
+import '../../../common/core/ui/profile_menu_item.dart';
 import 'package:provider/provider.dart';
 import '../viewmodel/profile_viewmodel.dart';
 

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../common/core/themes/colors.dart';
 import '../../common/core/themes/dimens.dart';
 import 'viewmodel/user_management_viewmodel.dart';
-import 'widgets/account_header.dart';
+import '../../common/core/ui/account_header.dart';
 import 'widgets/add_user_fab.dart';
 import 'widgets/user_management_list.dart';
 import 'widgets/user_role_tabs.dart';

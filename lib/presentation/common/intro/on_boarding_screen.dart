@@ -4,16 +4,35 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
-class OnBoardingScreen extends StatefulWidget {
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class OnboardingStepCubit extends Cubit<int> {
+  OnboardingStepCubit() : super(0);
+  void setStep(int step) => emit(step);
+}
+
+class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
 
   @override
-  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => OnboardingStepCubit(),
+      child: const _OnBoardingScreenContent(),
+    );
+  }
 }
 
-class _OnBoardingScreenState extends State<OnBoardingScreen> {
+class _OnBoardingScreenContent extends StatefulWidget {
+  const _OnBoardingScreenContent();
+
+  @override
+  State<_OnBoardingScreenContent> createState() => _OnBoardingContentState();
+}
+
+class _OnBoardingContentState extends State<_OnBoardingScreenContent> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+
 
   final List<Map<String, String>> _data = [
     {
@@ -37,7 +56,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   ];
 
   void _onNextPressed() {
-    if (_currentPage < _data.length - 1) {
+    final currentPage = context.read<OnboardingStepCubit>().state;
+    if (currentPage < _data.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -53,32 +73,37 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLastPage = _currentPage == _data.length - 1;
+    return BlocBuilder<OnboardingStepCubit, int>(
+      builder: (context, currentPage) {
+        bool isLastPage = currentPage == _data.length - 1;
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                allowImplicitScrolling: true,
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: _data.length,
-                itemBuilder: (context, index) => _buildPageContent(index),
-              ),
+        return Scaffold(
+          backgroundColor: AppColors.background500,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    allowImplicitScrolling: true,
+                    onPageChanged: (index) =>
+                        context.read<OnboardingStepCubit>().setStep(index),
+                    itemCount: _data.length,
+                    itemBuilder: (context, index) =>
+                        _buildPageContent(index, currentPage),
+                  ),
+                ),
+                _buildBottomControls(isLastPage),
+                const SizedBox(height: 30),
+              ],
             ),
-
-            _buildBottomControls(isLastPage),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildPageContent(int index) {
+  Widget _buildPageContent(int index, int currentPage) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -128,13 +153,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
           ),
           const SizedBox(height: 40),
-          _buildPageIndicator(),
+          _buildPageIndicator(currentPage),
         ],
       ),
     );
   }
 
-  Widget _buildPageIndicator() {
+  Widget _buildPageIndicator(int currentPage) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
@@ -143,10 +168,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
-          width: _currentPage == index ? AppDimens.spaceLg : AppDimens.spaceSm,
+          width: currentPage == index ? AppDimens.spaceLg : AppDimens.spaceSm,
           height: AppDimens.spaceSm,
           decoration: BoxDecoration(
-            color: _currentPage == index
+            color: currentPage == index
                 ? AppColors.tertiary500
                 : AppColors.background600,
             borderRadius: BorderRadius.circular(AppDimens.boraXs),

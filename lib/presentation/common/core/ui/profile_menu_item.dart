@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
-import '../../../common/core/themes/text_styles.dart';
-import '../../../common/core/themes/boxshadow.dart';
+import '../themes/colors.dart';
+import '../themes/dimens.dart';
+import '../themes/text_styles.dart';
+import '../themes/boxshadow.dart';
 
 class ProfileMenuItem extends StatelessWidget {
   final String title;

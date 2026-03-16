@@ -3,7 +3,75 @@ import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 enum UserStatus { active, away, inactive }
+
+// --- BLOC IMPLEMENTATION ---
+abstract class UserStatusEvent {}
+
+class UpdateUserStatus extends UserStatusEvent {
+  final UserStatus status;
+  UpdateUserStatus(this.status);
+}
+
+class UserStatusState {
+  final UserStatus status;
+  const UserStatusState(this.status);
+
+  String get text {
+    switch (status) {
+      case UserStatus.active:
+        return 'Active';
+      case UserStatus.away:
+        return 'Away';
+      case UserStatus.inactive:
+        return 'Inactive';
+    }
+  }
+
+  Color get bgColor {
+    switch (status) {
+      case UserStatus.active:
+        return AppColors.success50;
+      case UserStatus.away:
+        return AppColors.error50; // Closest existing value without inventing new Warning colors
+      case UserStatus.inactive:
+        return AppColors.secondary50;
+    }
+  }
+
+  Color get textColor {
+    switch (status) {
+      case UserStatus.active:
+        return AppColors.success500;
+      case UserStatus.away:
+        return AppColors.error500; // Closest existing value
+      case UserStatus.inactive:
+        return AppColors.secondary500;
+    }
+  }
+
+  Color get dotColor {
+    switch (status) {
+      case UserStatus.active:
+        return AppColors.success300;
+      case UserStatus.away:
+        return AppColors.error300;
+      case UserStatus.inactive:
+        return AppColors.secondary300;
+    }
+  }
+}
+
+class UserStatusBloc extends Bloc<UserStatusEvent, UserStatusState> {
+  UserStatusBloc(UserStatus initialStatus) : super(UserStatusState(initialStatus)) {
+    on<UpdateUserStatus>((event, emit) {
+      emit(UserStatusState(event.status));
+    });
+  }
+}
+// -----------------------------
 
 class UserListItem extends StatelessWidget {
   final String userName;
@@ -21,54 +89,15 @@ class UserListItem extends StatelessWidget {
     required this.onEditTap,
   });
 
-  String get _statusText {
-    switch (status) {
-      case UserStatus.active:
-        return 'Active';
-      case UserStatus.away:
-        return 'Away';
-      case UserStatus.inactive:
-        return 'Inactive';
-    }
-  }
 
-  Color get _statusBgColor {
-    switch (status) {
-      case UserStatus.active:
-        return AppColors.success50;
-      case UserStatus.away:
-        return AppColors
-            .error50; // Closest existing value without inventing new Warning colors
-      case UserStatus.inactive:
-        return AppColors.secondary50;
-    }
-  }
-
-  Color get _statusTextColor {
-    switch (status) {
-      case UserStatus.active:
-        return AppColors.success500;
-      case UserStatus.away:
-        return AppColors.error500; // Closest existing value
-      case UserStatus.inactive:
-        return AppColors.secondary500;
-    }
-  }
-
-  Color get _statusDotColor {
-    switch (status) {
-      case UserStatus.active:
-        return AppColors.success300;
-      case UserStatus.away:
-        return AppColors.error300;
-      case UserStatus.inactive:
-        return AppColors.secondary300;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return BlocProvider(
+      create: (_) => UserStatusBloc(status),
+      child: BlocBuilder<UserStatusBloc, UserStatusState>(
+        builder: (context, state) {
+          return Container(
       width: 364.0,
       height: 62.0,
       decoration: BoxDecoration(
@@ -115,7 +144,7 @@ class UserListItem extends StatelessWidget {
                     width: 12.0,
                     height: 12.0,
                     decoration: BoxDecoration(
-                      color: _statusDotColor,
+                      color: state.dotColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppColors.surface100,
@@ -160,14 +189,14 @@ class UserListItem extends StatelessWidget {
             width: 72.0,
             height: 31.0,
             decoration: BoxDecoration(
-              color: _statusBgColor,
+              color: state.bgColor,
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
             ),
             alignment: Alignment.center,
             child: Text(
-              _statusText,
+              state.text,
               style: TextStyles.bodyMedium.copyWith(
-                color: _statusTextColor,
+                color: state.textColor,
               ),
             ),
           ),
@@ -187,6 +216,9 @@ class UserListItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+        },
       ),
     );
   }

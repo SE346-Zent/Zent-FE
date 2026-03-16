@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../common/core/themes/dimens.dart';
 import '../../common/core/themes/colors.dart';
-import 'widgets/account_header.dart';
-import 'widgets/profile_avatar.dart';
+import '../../common/core/ui/account_header.dart';
+import '../../common/core/ui/profile_avatar.dart';
 import 'widgets/profile_logout_button.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';

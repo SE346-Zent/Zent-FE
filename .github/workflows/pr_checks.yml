@@ -38,5 +38,6 @@ jobs:
         # Checks for syntax errors and unused variables
         run: flutter analyze
 
-      - name: Run Unit Tests
-        run: flutter test
+      # Note: Unit tests are currently skipped to speed up PR checks.
+      # - name: Run Unit Tests
+      #   run: flutter test

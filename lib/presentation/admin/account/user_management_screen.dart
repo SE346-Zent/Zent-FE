@@ -14,6 +14,18 @@ class UserManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => UserManagementViewModel(),
+      child: const _UserManagementScreenContent(),
+    );
+  }
+}
+
+class _UserManagementScreenContent extends StatelessWidget {
+  const _UserManagementScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = context.watch<UserManagementViewModel>();
 
     return GestureDetector(

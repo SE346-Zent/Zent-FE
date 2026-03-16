@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/profile_viewmodel.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
 import 'package:zent_fe/routing/router.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserManagementViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
-        ChangeNotifierProvider(create: (_) => SecuritySettingsViewModel()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

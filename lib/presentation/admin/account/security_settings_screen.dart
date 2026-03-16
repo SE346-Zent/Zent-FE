@@ -13,11 +13,24 @@ class SecuritySettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => SecuritySettingsViewModel(),
+      child: const _SecuritySettingsScreenContent(),
+    );
+  }
+}
+
+class _SecuritySettingsScreenContent extends StatelessWidget {
+  const _SecuritySettingsScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = context.watch<SecuritySettingsViewModel>();
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: AppColors.background500,
         body: SafeArea(
         child: Column(

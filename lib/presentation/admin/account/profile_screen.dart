@@ -14,6 +14,18 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ProfileViewModel(),
+      child: const _ProfileScreenContent(),
+    );
+  }
+}
+
+class _ProfileScreenContent extends StatelessWidget {
+  const _ProfileScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
 
     return Scaffold(

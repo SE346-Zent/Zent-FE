@@ -13,7 +13,7 @@ import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/common/core/layouts/admin_main_layout.dart';
-import 'package:zent_fe/domain/entities/enums/UserRole.dart' show UserRole;
+import 'package:zent_fe/domain/entities/enums/user_role.dart' show UserRole;
 import './routes.dart' show Routes;
 
 // ---------------------------------------------------------------------------

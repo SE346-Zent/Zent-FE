@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/themes/colors.dart';
 import '../../../core/themes/dimens.dart';
 import '../../../core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/app_assets.dart' show AppAssets;
 
 class AuthHeader extends StatelessWidget {
   final String title;
@@ -26,7 +27,7 @@ class AuthHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: isCenter ? MainAxisAlignment.center : MainAxisAlignment.start, 
             children: [
-              Image.asset('assets/images/ZentLogo.webp', height: 24, fit: BoxFit.contain),
+              Image.asset(AppAssets.blackLogo, height: 24, fit: BoxFit.contain),
               const SizedBox(width: AppDimens.spaceSm),
               Text(
                 'ZENT',

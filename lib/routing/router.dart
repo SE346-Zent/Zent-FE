@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../presentation/common/intro/on_boarding_screen.dart';
+import '../presentation/common/intro/splash_screen.dart';
+import '../presentation/common/auth/login/login_screen.dart';
+import '../presentation/common/auth/login/forgot_password_screen.dart';
+import '../presentation/common/auth/login/verify_otp_screen.dart';
+import '../presentation/common/auth/login/reset_password_screen.dart';
+import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
@@ -11,48 +18,37 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.me, // Set Profile as initial route for testing
+  initialLocation: Routes.splash,
   routes: [
     // Main routes
     GoRoute(
       path: Routes.splash,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Splash Screen'))),
+      builder: (context, state) => const AppSplashScreen(),
     ),
     GoRoute(
       path: Routes.onBoarding,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('OnBoarding Screen'))),
+      builder: (context, state) => const OnBoardingScreen(),
     ),
     GoRoute(
       path: Routes.login,
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Login Screen'))),
+      builder: (context, state) => const LoginScreen(),
       routes: [
         // Sub routes for password recovery flow
         GoRoute(
           path: Routes.forgetPassword,
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Forget Password Screen')),
-          ),
+          builder: (context, state) => const ForgotPasswordScreen(),
           routes: [
             GoRoute(
               path: Routes.verifyOtp,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Verify OTP Screen')),
-              ),
+              builder: (context, state) => const VerifyOtpScreen(),
               routes: [
                 GoRoute(
                   path: Routes.resetPassword,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Reset Password Screen')),
-                  ),
+                  builder: (context, state) => const ResetPasswordScreen(),
                   routes: [
                     GoRoute(
                       path: Routes.resetSuccessfully,
-                      builder: (context, state) => const Scaffold(
-                        body: Center(child: Text('Reset Successfully Screen')),
-                      ),
+                      builder: (context, state) => const ResetSuccessfullyScreen(),
                     ),
                   ],
                 ),

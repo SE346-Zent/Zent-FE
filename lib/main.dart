@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/auth/login/view_models/login_view_model.dart';
+import 'package:zent_fe/presentation/common/auth/login/view_models/forgot_password_view_model.dart';
+import 'package:zent_fe/presentation/common/auth/login/view_models/reset_password_view_model.dart';
+import 'package:zent_fe/presentation/common/auth/login/view_models/verify_otp_view_model.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/profile_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
 import 'package:zent_fe/routing/router.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoginViewModel()),
+        ChangeNotifierProvider(create: (_) => ForgotPasswordViewModel()),
+        ChangeNotifierProvider(create: (_) => ResetPasswordViewModel()),
+        ChangeNotifierProvider(create: (_) => VerifyOtpViewModel()),
+
+        ChangeNotifierProvider(create: (_) => UserManagementViewModel()),
+        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+        ChangeNotifierProvider(create: (_) => SecuritySettingsViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

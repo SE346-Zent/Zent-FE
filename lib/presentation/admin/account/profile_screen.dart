@@ -43,9 +43,18 @@ class ProfileScreen extends StatelessWidget {
               const ProfileMenuOptions(),
               const SizedBox(height: AppDimens.spaceXl),
               // Sign Out Button
-              ProfileLogoutButton(
-                onPressed: () => context.read<ProfileViewModel>().logout(),
-              ),
+              viewModel.isLoading
+                  ? const CircularProgressIndicator()
+                  : ProfileLogoutButton(
+                      onPressed: () async {
+                        await viewModel.logout();
+                        if (viewModel.errorMessage != null && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(viewModel.errorMessage!)),
+                          );
+                        }
+                      },
+                    ),
             ],
           ),
         ),

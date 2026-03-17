@@ -32,7 +32,7 @@ Future<void> init() async {
   sl.registerFactory(() => ResetPasswordViewModel());
   sl.registerFactory(() => VerifyOtpViewModel());
   sl.registerFactory(() => UserManagementViewModel());
-  sl.registerFactory(() => ProfileViewModel());
+  sl.registerFactory(() => ProfileViewModel(sl()));
   sl.registerFactory(() => SecuritySettingsViewModel());
 
   // Repository

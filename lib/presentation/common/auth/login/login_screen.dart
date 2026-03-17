@@ -25,13 +25,13 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<LoginViewModel>();
-    
+
     // Automatically show error if it exists
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (viewModel.errorMessage != null && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(viewModel.errorMessage!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
       }
     });
 

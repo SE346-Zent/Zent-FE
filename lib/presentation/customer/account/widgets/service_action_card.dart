@@ -21,9 +21,7 @@ class ServiceActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: AppDimens.spaceMd,
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
       decoration: BoxDecoration(
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),

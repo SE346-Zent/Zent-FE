@@ -29,18 +29,13 @@ class ProfileViewModel extends ChangeNotifier {
     debugPrint("action triggered: Viewmodel logic navigated to $menuName");
     switch (menuName) {
       case 'User Management':
-        context.push(Routes.adminTeam);
+        context.push(Routes.userManagement);
         break;
       case 'Security Settings':
-        context.push('/admin/security-settings');
-        break;
-      case 'Company Settings':
-        context.push('/admin/company-settings');
+        context.push(Routes.securitySettings);
         break;
       case 'System Log':
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('System Log not implemented yet')),
-        );
+        context.push(Routes.systemLog);
         break;
       default:
         break;

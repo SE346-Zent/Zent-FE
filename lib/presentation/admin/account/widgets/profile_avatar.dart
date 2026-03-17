@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/text_styles.dart';
+import '../../../common/core/themes/boxshadow.dart';
 import 'dart:math';
 
 class ProfileAvatar extends StatelessWidget {
@@ -35,8 +36,8 @@ class ProfileAvatar extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          width: 118.0,
-          height: 118.0,
+          width: 100.0,
+          height: 100.0,
           decoration: BoxDecoration(
             color: imageUrl == null ? _randomColor : AppColors.surface100,
             shape: BoxShape.circle,
@@ -46,7 +47,8 @@ class ProfileAvatar extends StatelessWidget {
                     fit: BoxFit.cover,
                   )
                 : null,
-            border: Border.all(color: AppColors.surface600, width: 1.0),
+            border: Border.all(color: AppColors.surface100, width: 3.0),
+            boxShadow: [BoxShadowStyles.raised],
           ),
           alignment: Alignment.center,
           child: imageUrl == null || imageUrl!.isEmpty
@@ -62,8 +64,8 @@ class ProfileAvatar extends StatelessWidget {
           bottom: 4.0,
           right: 4.0,
           child: Container(
-            width: 28.0,
-            height: 28.0,
+            width: 20.0,
+            height: 20.0,
             decoration: BoxDecoration(
               color: AppColors.tertiary500,
               shape: BoxShape.circle,
@@ -71,7 +73,7 @@ class ProfileAvatar extends StatelessWidget {
             ),
             child: const Icon(
               Icons.edit_outlined,
-              size: 16.0,
+              size: 10.0,
               color: AppColors.surface100,
             ),
           ),

@@ -16,34 +16,37 @@ class UserManagementScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<UserManagementViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      floatingActionButton: AddUserFab(
-        onPressed: () => context.read<UserManagementViewModel>().addUser(),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const AccountHeader(title: 'Manage Account'),
-            const SizedBox(height: AppDimens.spaceLg),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
-              child: UserSearchBar(),
-            ),
-            const SizedBox(height: AppDimens.spaceMd),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimens.spaceMd,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        floatingActionButton: AddUserFab(
+          onPressed: () => context.read<UserManagementViewModel>().addUser(),
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              const AccountHeader(title: 'Manage Account'),
+              const SizedBox(height: AppDimens.spaceLg),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                child: UserSearchBar(),
               ),
-              child: UserRoleTabs(
-                activeIndex: viewModel.activeTabIndex,
-                onTabChanged: (index) =>
-                    context.read<UserManagementViewModel>().changeTab(index),
+              const SizedBox(height: AppDimens.spaceMd),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                ),
+                child: UserRoleTabs(
+                  activeIndex: viewModel.activeTabIndex,
+                  onTabChanged: (index) =>
+                      context.read<UserManagementViewModel>().changeTab(index),
+                ),
               ),
-            ),
-            const SizedBox(height: AppDimens.spaceLg),
-            const UserManagementList(),
-          ],
+              const SizedBox(height: AppDimens.spaceLg),
+              const UserManagementList(),
+            ],
+          ),
         ),
       ),
     );

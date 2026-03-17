@@ -4,6 +4,8 @@ import 'package:zent_fe/presentation/common/intro/on_boarding_screen.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class AppSplashScreen extends StatefulWidget {
   const AppSplashScreen({super.key});
@@ -31,9 +33,9 @@ class _AppSplashScreenState extends State<AppSplashScreen> {
     });
 
     final onboardingImages = [
-      'assets/images/OnBoarding1.webp',
-      'assets/images/OnBoarding2.webp',
-      'assets/images/OnBoarding3.webp',
+      AppAssets.onboarding1,
+      AppAssets.onboarding2,
+      AppAssets.onboarding3,
     ];
 
     try {
@@ -92,7 +94,7 @@ class _AppSplashScreenState extends State<AppSplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/images/ZentLogo.webp', width: 109, height: 129),
+            Image.asset(AppAssets.blackLogo, width: 109, height: 129),
             AnimatedContainer(
               duration: const Duration(milliseconds: 1000),
               height: _isVisible ? AppDimens.spaceLg : 0,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
-import '../themes/dimens.dart';
 
 class AdminMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -38,8 +37,7 @@ class _AdminBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 84.0,
-      margin: const EdgeInsets.only(bottom: 24.0),
+      height: 64.0,
       decoration: const BoxDecoration(
         color: AppColors.surface100,
         border: Border(
@@ -103,11 +101,10 @@ class _NavBarItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 34.0,
-              height: 34.0,
-              child: Icon(icon, size: 24.0, color: color),
+              width: 24.0,
+              height: 24.0,
+              child: Icon(icon, size: 22.0, color: color),
             ),
-            const SizedBox(height: AppDimens.spaceXs),
             Text(label, style: TextStyles.bodyMedium.copyWith(color: color)),
           ],
         ),

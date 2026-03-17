@@ -66,7 +66,7 @@ class _TwoFactorAuthToggleState extends State<TwoFactorAuthToggle> {
             width: 58.0,
             height: 28.0,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(100.0),
+              borderRadius: BorderRadius.circular(AppDimens.boraLg),
               color: _value ? AppColors.tertiary500 : AppColors.secondary200,
             ),
             child: AnimatedAlign(

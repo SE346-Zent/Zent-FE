@@ -61,12 +61,16 @@ class TwoFactorAuthToggle extends StatelessWidget {
                   height: 28.0,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppDimens.boraLg),
-                    color: isEnabled ? AppColors.tertiary500 : AppColors.secondary200,
+                    color: isEnabled
+                        ? AppColors.tertiary500
+                        : AppColors.secondary200,
                   ),
                   child: AnimatedAlign(
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeInOut,
-                    alignment: isEnabled ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isEnabled
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2.0),
                       child: Container(

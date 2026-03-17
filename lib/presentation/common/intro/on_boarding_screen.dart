@@ -37,7 +37,6 @@ class _OnBoardingScreenContent extends StatefulWidget {
 class _OnBoardingContentState extends State<_OnBoardingScreenContent> {
   final PageController _pageController = PageController();
 
-
   final List<Map<String, String>> _data = [
     {
       "image": AppAssets.onboarding1,

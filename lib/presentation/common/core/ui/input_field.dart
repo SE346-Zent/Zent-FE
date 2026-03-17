@@ -17,10 +17,10 @@ import '../themes/text_styles.dart';
 ///
 /// **Features:**
 /// - Includes a label above the input area.
-/// - leading [icon] for context.
+/// - leading [leadingIcon] for context.
 /// - Supports [isReadOnly] mode with a lock icon.
 /// - Supports [isPassword] (obscure text) mode.
-class InputField extends StatelessWidget {
+class InputField extends StatefulWidget {
   /// The label displayed above the input field.
   final String label;
 
@@ -58,6 +58,12 @@ class InputField extends StatelessWidget {
   /// Optional focus node for managing keyboard focus.
   final FocusNode? focusNode;
 
+  /// Callback for tap events on the field.
+  final VoidCallback? onTap;
+
+  /// Alignment of the text within the field.
+  final TextAlign textAlign;
+
   const InputField({
     super.key,
     required this.label,
@@ -72,7 +78,40 @@ class InputField extends StatelessWidget {
     this.keyboardType,
     this.isPassword = false,
     this.focusNode,
+    this.onTap,
+    this.textAlign = TextAlign.start,
   });
+
+  @override
+  State<InputField> createState() => _InputFieldState();
+}
+
+class _InputFieldState extends State<InputField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        widget.controller ?? TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void didUpdateWidget(InputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller == null &&
+        widget.initialValue != oldWidget.initialValue) {
+      _controller.text = widget.initialValue ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +119,7 @@ class InputField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          widget.label,
           style: TextStyles.middle.copyWith(color: AppColors.secondary500),
         ),
         const SizedBox(
@@ -89,7 +128,9 @@ class InputField extends StatelessWidget {
         Container(
           height: 48.0,
           decoration: BoxDecoration(
-            color: isReadOnly ? AppColors.secondary50 : Colors.transparent,
+            color: widget.isReadOnly
+                ? AppColors.secondary50
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(
               AppDimens.boraMd,
             ), // Assuming standard radius
@@ -102,25 +143,26 @@ class InputField extends StatelessWidget {
                   horizontal: AppDimens.spaceMd,
                 ),
                 child: Icon(
-                  leadingIcon,
+                  widget.leadingIcon,
                   color: AppColors.secondary300,
                   size: 20.0,
                 ),
               ),
               Expanded(
                 child: TextFormField(
-                  controller: controller,
-                  initialValue: controller == null ? initialValue : null,
-                  onChanged: onChanged,
-                  readOnly: isReadOnly,
-                  obscureText: isPassword,
-                  keyboardType: keyboardType,
-                  focusNode: focusNode,
+                  controller: _controller,
+                  onChanged: widget.onChanged,
+                  readOnly: widget.isReadOnly,
+                  obscureText: widget.isPassword,
+                  keyboardType: widget.keyboardType,
+                  focusNode: widget.focusNode,
+                  onTap: widget.onTap,
+                  textAlign: widget.textAlign,
                   style: TextStyles.bodyLarge.copyWith(
                     color: AppColors.primary500,
                   ),
                   decoration: InputDecoration(
-                    hintText: hintText,
+                    hintText: widget.hintText,
                     hintStyle: TextStyles.bodyLarge.copyWith(
                       color: AppColors.secondary300,
                     ),
@@ -130,12 +172,12 @@ class InputField extends StatelessWidget {
                   ),
                 ),
               ),
-              if (suffixIcon != null)
+              if (widget.suffixIcon != null)
                 Padding(
                   padding: const EdgeInsets.only(right: AppDimens.spaceMd),
-                  child: suffixIcon,
+                  child: widget.suffixIcon,
                 ),
-              if (isReadOnly && suffixIcon == null)
+              if (widget.isReadOnly && widget.suffixIcon == null)
                 const Padding(
                   padding: EdgeInsets.only(right: AppDimens.spaceMd),
                   child: SizedBox(
@@ -151,10 +193,10 @@ class InputField extends StatelessWidget {
             ],
           ),
         ),
-        if (helperText != null) ...[
+        if (widget.helperText != null) ...[
           const SizedBox(height: AppDimens.spaceXs),
           Text(
-            helperText!,
+            widget.helperText!,
             style: TextStyles.bodyMedium.copyWith(
               color: AppColors.secondary500,
             ),

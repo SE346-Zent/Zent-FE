@@ -10,7 +10,6 @@ class UserListItem extends StatelessWidget {
   final String userName;
   final String userRole;
   final String? avatarUrl;
-  final String initialStatus;
   final VoidCallback onEditTap;
 
   const UserListItem({
@@ -18,49 +17,14 @@ class UserListItem extends StatelessWidget {
     required this.userName,
     required this.userRole,
     this.avatarUrl,
-    required this.initialStatus,
     required this.onEditTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => UserStatusBloc(initialStatus),
-      child: _UserListItemContent(
-        userName: userName,
-        userRole: userRole,
-        avatarUrl: avatarUrl,
-        onEditTap: onEditTap,
-      ),
-    );
-  }
-}
-
-class _UserListItemContent extends StatelessWidget {
-  final String userName;
-  final String userRole;
-  final String? avatarUrl;
-  final VoidCallback onEditTap;
-
-  const _UserListItemContent({
-    required this.userName,
-    required this.userRole,
-    this.avatarUrl,
-    required this.onEditTap,
-  });
-
-  String _getStatusText(UserStatusState state) => state.statusText;
-
-  Color _getStatusBgColor(UserStatusState state) => state.backgroundColor;
-
-  Color _getStatusTextColor(UserStatusState state) => state.textColor;
-
-  Color _getStatusDotColor(UserStatusState state) => state.dotColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<UserStatusBloc, UserStatusState>(
-      builder: (context, state) {
+    return BlocSelector<UserStatusBloc, UserStatusState, String>(
+      selector: (state) => state.getStatusFor(userName),
+      builder: (context, status) {
         return Container(
           width: double.infinity,
           height: 62.0,
@@ -110,7 +74,7 @@ class _UserListItemContent extends StatelessWidget {
                         width: 12.0,
                         height: 12.0,
                         decoration: BoxDecoration(
-                          color: _getStatusDotColor(state),
+                          color: UserStatusState.getDotColor(status),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: AppColors.surface100,
@@ -156,14 +120,14 @@ class _UserListItemContent extends StatelessWidget {
                 width: 72.0,
                 height: 31.0,
                 decoration: BoxDecoration(
-                  color: _getStatusBgColor(state),
+                  color: UserStatusState.getBackgroundColor(status),
                   borderRadius: BorderRadius.circular(AppDimens.boraSm),
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _getStatusText(state),
+                  status,
                   style: TextStyles.bodyLarge.copyWith(
-                    color: _getStatusTextColor(state),
+                    color: UserStatusState.getTextColor(status),
                   ),
                 ),
               ),

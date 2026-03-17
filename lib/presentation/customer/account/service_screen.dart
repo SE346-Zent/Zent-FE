@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/service_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_action_card.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_header.dart';
@@ -21,17 +22,11 @@ class CustomerServiceScreen extends StatelessWidget {
 class _ServiceScreenContent extends StatelessWidget {
   const _ServiceScreenContent();
 
-  void _onServiceCardTapped(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.goNamed('customerMyProducts');
-        break;
-      case 1:
-        context.goNamed('customerRequestService');
-        break;
-      case 2:
-        context.goNamed('customerActiveRepairs');
-        break;
+  void _onServiceCardTapped(BuildContext context, String? routeName) {
+    if (routeName != null) {
+      context.goNamed(routeName);
+    } else {
+      debugPrint("action triggered: tap on service card with no route");
     }
   }
 
@@ -65,16 +60,21 @@ class _ServiceScreenContent extends StatelessWidget {
                   avatarUrl: viewModel.avatarUrl,
                 ),
                 Expanded(
-                  child: ListView.builder(
+                  child: ListView.separated(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
                     itemCount: viewModel.serviceActions.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: AppDimens.spaceMd),
                     itemBuilder: (context, index) {
                       final action = viewModel.serviceActions[index];
                       return ServiceActionCard(
                         title: action['title'] as String,
                         subtitle: action['subtitle'] as String,
                         iconData: action['icon'] as IconData,
-                        onTap: () => _onServiceCardTapped(context, index),
+                        onTap: () => _onServiceCardTapped(
+                          context,
+                          action['routeName'] as String?,
+                        ),
                       );
                     },
                   ),

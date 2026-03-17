@@ -23,7 +23,6 @@ class ServiceActionCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: AppDimens.spaceMd,
-        vertical: AppDimens.spaceMd, // Increased from spaceSm (8px)
       ),
       decoration: BoxDecoration(
         color: AppColors.surface100,
@@ -38,7 +37,7 @@ class ServiceActionCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppDimens.spaceMd,
-              vertical: 12.0, // Reduced from spaceMd (16px)
+              vertical: 8.0, // Reduced from 12.0
             ),
             child: Row(
               children: [

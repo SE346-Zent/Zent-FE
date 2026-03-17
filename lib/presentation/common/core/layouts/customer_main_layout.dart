@@ -9,7 +9,10 @@ class CustomerMainLayout extends StatelessWidget {
   const CustomerMainLayout({super.key, required this.navigationShell});
 
   void _onNavTap(int index) {
-    navigationShell.goBranch(index);
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
   }
 
   @override
@@ -98,11 +101,11 @@ class _NavBarItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 32.0,
-              height: 32.0,
-              child: Icon(icon, size: 30.0, color: color),
+              width: 24.0,
+              height: 24.0,
+              child: Icon(icon, size: 24.0, color: color),
             ),
-            Text(label, style: TextStyles.bodyLarge.copyWith(color: color)),
+            Text(label, style: TextStyles.bodyMedium.copyWith(color: color)),
           ],
         ),
       ),

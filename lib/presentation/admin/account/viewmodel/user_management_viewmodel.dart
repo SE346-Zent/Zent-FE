@@ -38,6 +38,17 @@ class UserManagementViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> get activeData =>
       _activeTabIndex == 0 ? _techniciansData : _adminsData;
 
+  Map<String, String> get initialStatusMap {
+    final map = <String, String>{};
+    for (var user in _techniciansData) {
+      map[user['userName'] as String] = user['status'] as String;
+    }
+    for (var user in _adminsData) {
+      map[user['userName'] as String] = user['status'] as String;
+    }
+    return map;
+  }
+
   void changeTab(int index) {
     if (_activeTabIndex != index) {
       _activeTabIndex = index;

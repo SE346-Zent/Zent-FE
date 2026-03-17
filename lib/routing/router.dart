@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/common/intro/on_boarding_screen.dart';
@@ -16,9 +18,105 @@ import '../presentation/customer/account/profile_screen.dart';
 import 'package:zent_fe/presentation/customer/account/personal_info_screen.dart';
 import 'package:zent_fe/presentation/common/core/layouts/admin_main_layout.dart';
 import 'package:zent_fe/presentation/common/core/layouts/customer_main_layout.dart';
+import 'package:zent_fe/domain/entities/enums/user_role.dart' show UserRole;
 import './routes.dart' show Routes;
 
 // ---------------------------------------------------------------------------
+// RBAC — Role-Based Access Control
+// ---------------------------------------------------------------------------
+
+/// Token store.
+/// Call [RbacTokenStore.setToken] from your auth datasource after login and
+/// [RbacTokenStore.clearToken] on logout.
+class RbacTokenStore {
+  RbacTokenStore._();
+
+  static String? _token;
+
+  static void setToken(String token) => _token = token;
+  static void clearToken() => _token = null;
+  static String? get token => _token;
+}
+
+UserRole _getRoleFromToken() {
+  final token = RbacTokenStore.token;
+  if (token == null) return UserRole.unauthenticated;
+  try {
+    final parts = token.split('.');
+    if (parts.length != 3) return UserRole.unauthenticated;
+    // Base64Url-decode the payload (middle segment) and parse claims.
+    final normalized = base64Url.normalize(parts[1]);
+    final decoded = utf8.decode(base64Url.decode(normalized));
+    final claims = jsonDecode(decoded) as Map<String, dynamic>;
+    return switch (claims['role'] as String?) {
+      'admin' => UserRole.admin,
+      'technician' => UserRole.technician,
+      'customer' => UserRole.customer,
+      _ => UserRole.unauthenticated,
+    };
+  } catch (_) {
+    return UserRole.unauthenticated;
+  }
+}
+
+const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
+
+String? _rbacRedirect(BuildContext context, GoRouterState state) {
+  final location = state.matchedLocation;
+  final role = _getRoleFromToken();
+
+  final isPublic = _publicPrefixes.any(
+    (p) => location == p || location.startsWith('$p/'),
+  );
+
+  // ── Unauthenticated ─────────────────────────────────────────────────────
+  if (role == UserRole.unauthenticated) {
+    // Allow public routes; everything else goes to login.
+    return isPublic ? null : Routes.login;
+  }
+
+  // ── Authenticated on a public / auth route ───────────────────────────────
+  // Redirect straight to the role's home screen.
+  if (isPublic) {
+    return switch (role) {
+      UserRole.admin => Routes.adminDashboard,
+      UserRole.technician => Routes.techHome,
+      UserRole.customer => Routes.customerServices,
+      UserRole.unauthenticated => null,
+    };
+  }
+
+  // ── Guard role-specific route sections ──────────────────────────────────
+  final isAdminRoute = location.startsWith('/admin');
+  final isTechRoute = location.startsWith('/tech');
+  final isCustomerRoute = location.startsWith('/customer');
+
+  if (isAdminRoute && role != UserRole.admin) {
+    return switch (role) {
+      UserRole.technician => Routes.techHome,
+      UserRole.customer => Routes.customerServices,
+      _ => Routes.login,
+    };
+  }
+
+  if (isTechRoute && role != UserRole.technician) {
+    return switch (role) {
+      UserRole.admin => Routes.adminDashboard,
+      UserRole.customer => Routes.customerServices,
+      _ => Routes.login,
+    };
+  }
+
+  if (isCustomerRoute && role != UserRole.customer) {
+    return switch (role) {
+      UserRole.admin => Routes.adminDashboard,
+      UserRole.technician => Routes.techHome,
+      _ => Routes.login,
+    };
+  }
+
+  return null; // No redirect needed.
+}
 
 // ---------------------------------------------------------------------------
 

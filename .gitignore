@@ -48,3 +48,4 @@ app.*.map.json
 .env
 tasks/
 analyze_out.txt
+analyze_utf8.txt

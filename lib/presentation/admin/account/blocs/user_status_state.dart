@@ -3,64 +3,60 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 
 abstract class UserStatusState extends Equatable {
-  const UserStatusState();
+  final Map<String, String> userStatuses;
 
-  String get statusText;
-  Color get backgroundColor;
-  Color get textColor;
-  Color get dotColor;
+  const UserStatusState(this.userStatuses);
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [userStatuses];
+
+  // Helper to get status mapping for a specific user
+  String getStatusFor(String userName) => userStatuses[userName] ?? 'Active';
+
+  static Color getBackgroundColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return AppColors.success50;
+      case 'away':
+        return AppColors.warning50;
+      case 'inactive':
+        return AppColors.secondary50;
+      default:
+        return AppColors.secondary50;
+    }
+  }
+
+  static Color getTextColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return AppColors.success500;
+      case 'away':
+        return AppColors.warning500;
+      case 'inactive':
+        return AppColors.secondary500;
+      default:
+        return AppColors.secondary500;
+    }
+  }
+
+  static Color getDotColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return AppColors.success500;
+      case 'away':
+        return AppColors.warning500;
+      case 'inactive':
+        return AppColors.secondary500;
+      default:
+        return AppColors.secondary500;
+    }
+  }
 }
 
 class UserStatusInitial extends UserStatusState {
-  final String status;
-
-  const UserStatusInitial(this.status);
-
-  @override
-  String get statusText => status;
-  @override
-  Color get backgroundColor => AppColors.secondary50;
-  @override
-  Color get textColor => AppColors.secondary500;
-  @override
-  Color get dotColor => AppColors.secondary300;
-
-  @override
-  List<Object?> get props => [status];
+  const UserStatusInitial(super.userStatuses);
 }
 
-class UserStatusActive extends UserStatusState {
-  @override
-  String get statusText => 'Active';
-  @override
-  Color get backgroundColor => AppColors.success50;
-  @override
-  Color get textColor => AppColors.success500;
-  @override
-  Color get dotColor => AppColors.success500;
-}
-
-class UserStatusAway extends UserStatusState {
-  @override
-  String get statusText => 'Away';
-  @override
-  Color get backgroundColor => AppColors.warning50;
-  @override
-  Color get textColor => AppColors.warning500;
-  @override
-  Color get dotColor => AppColors.warning500;
-}
-
-class UserStatusInactive extends UserStatusState {
-  @override
-  String get statusText => 'Inactive';
-  @override
-  Color get backgroundColor => AppColors.secondary50;
-  @override
-  Color get textColor => AppColors.secondary500;
-  @override
-  Color get dotColor => AppColors.secondary500;
+class UserStatusUpdateSuccess extends UserStatusState {
+  const UserStatusUpdateSuccess(super.userStatuses);
 }

@@ -2,21 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
-import 'viewmodel/user_management_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
-import 'widgets/add_user_fab.dart';
-import 'widgets/user_management_list.dart';
-import 'widgets/user_role_tabs.dart';
-import 'widgets/user_search_bar.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/add_user_fab.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/user_management_list.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/user_role_tabs.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/user_search_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zent_fe/presentation/admin/account/blocs/user_status_bloc.dart';
 
 class UserManagementScreen extends StatelessWidget {
   const UserManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => UserManagementViewModel(),
-      child: const _UserManagementScreenContent(),
+    final viewModel = UserManagementViewModel();
+    return ChangeNotifierProvider.value(
+      value: viewModel,
+      child: BlocProvider(
+        create: (context) => UserStatusBloc(viewModel.initialStatusMap),
+        child: const _UserManagementScreenContent(),
+      ),
     );
   }
 }

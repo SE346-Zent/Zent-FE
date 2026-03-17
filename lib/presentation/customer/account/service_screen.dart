@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/service_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_action_card.dart';
@@ -20,8 +21,18 @@ class CustomerServiceScreen extends StatelessWidget {
 class _ServiceScreenContent extends StatelessWidget {
   const _ServiceScreenContent();
 
-  void _onServiceCardTapped(int index) {
-    debugPrint("action triggered: tap service card $index");
+  void _onServiceCardTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        context.goNamed('customerMyProducts');
+        break;
+      case 1:
+        context.goNamed('customerRequestService');
+        break;
+      case 2:
+        context.goNamed('customerActiveRepairs');
+        break;
+    }
   }
 
   @override
@@ -44,7 +55,7 @@ class _ServiceScreenContent extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Foreground Layer
           SafeArea(
             child: Column(
@@ -63,7 +74,7 @@ class _ServiceScreenContent extends StatelessWidget {
                         title: action['title'] as String,
                         subtitle: action['subtitle'] as String,
                         iconData: action['icon'] as IconData,
-                        onTap: () => _onServiceCardTapped(index),
+                        onTap: () => _onServiceCardTapped(context, index),
                       );
                     },
                   ),

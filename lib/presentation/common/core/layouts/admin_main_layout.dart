@@ -9,10 +9,7 @@ class AdminMainLayout extends StatelessWidget {
   const AdminMainLayout({super.key, required this.navigationShell});
 
   void _onNavTap(int index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+    navigationShell.goBranch(index);
   }
 
   @override
@@ -37,41 +34,44 @@ class _AdminBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 64.0,
+      height: 70.0,
       decoration: const BoxDecoration(
         color: AppColors.surface100,
         border: Border(
           top: BorderSide(color: AppColors.surface700, width: 1.0),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavBarItem(
-            icon: Icons.grid_view_outlined,
-            label: 'Dashboard',
-            isSelected: currentIndex == 0,
-            onTap: () => onTap(0),
-          ),
-          _NavBarItem(
-            icon: Icons.insert_chart_outlined, // Changed to linear chart
-            label: 'Reports',
-            isSelected: currentIndex == 1,
-            onTap: () => onTap(1),
-          ),
-          _NavBarItem(
-            icon: Icons.groups_outlined,
-            label: 'Team',
-            isSelected: currentIndex == 2,
-            onTap: () => onTap(2),
-          ),
-          _NavBarItem(
-            icon: Icons.person_outline, // Changed to businessperson type icon
-            label: 'Admin',
-            isSelected: currentIndex == 3,
-            onTap: () => onTap(3),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 6.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _NavBarItem(
+              icon: Icons.grid_view_outlined,
+              label: 'Dashboard',
+              isSelected: currentIndex == 0,
+              onTap: () => onTap(0),
+            ),
+            _NavBarItem(
+              icon: Icons.insert_chart_outlined, // Changed to linear chart
+              label: 'Reports',
+              isSelected: currentIndex == 1,
+              onTap: () => onTap(1),
+            ),
+            _NavBarItem(
+              icon: Icons.groups_outlined,
+              label: 'Team',
+              isSelected: currentIndex == 2,
+              onTap: () => onTap(2),
+            ),
+            _NavBarItem(
+              icon: Icons.person_outline, // Changed to businessperson type icon
+              label: 'Admin',
+              isSelected: currentIndex == 3,
+              onTap: () => onTap(3),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -101,11 +101,11 @@ class _NavBarItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: Icon(icon, size: 22.0, color: color),
+              width: 32.0,
+              height: 32.0,
+              child: Icon(icon, size: 30.0, color: color),
             ),
-            Text(label, style: TextStyles.bodyMedium.copyWith(color: color)),
+            Text(label, style: TextStyles.bodyLarge.copyWith(color: color)),
           ],
         ),
       ),

@@ -20,10 +20,5 @@ class ServiceViewModel extends ChangeNotifier {
       "subtitle": "Track ongoing work orders and status updates",
       "icon": Icons.local_shipping_outlined,
     },
-    {
-      "title": "Help Center",
-      "subtitle": "Find manuals, FAQs, and contact support",
-      "icon": Icons.help_outline,
-    },
   ];
 }

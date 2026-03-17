@@ -14,7 +14,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(ChatLoading());
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     try {
       final mockData = [
         const ChatPreview(

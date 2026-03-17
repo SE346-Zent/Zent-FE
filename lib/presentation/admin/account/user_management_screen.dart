@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../common/core/themes/colors.dart';
-import '../../common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'viewmodel/user_management_viewmodel.dart';
-import '../../common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'widgets/add_user_fab.dart';
 import 'widgets/user_management_list.dart';
 import 'widgets/user_role_tabs.dart';
@@ -11,6 +11,18 @@ import 'widgets/user_search_bar.dart';
 
 class UserManagementScreen extends StatelessWidget {
   const UserManagementScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => UserManagementViewModel(),
+      child: const _UserManagementScreenContent(),
+    );
+  }
+}
+
+class _UserManagementScreenContent extends StatelessWidget {
+  const _UserManagementScreenContent();
 
   @override
   Widget build(BuildContext context) {

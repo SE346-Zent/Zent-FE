@@ -6,10 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 class ChatHeader extends StatelessWidget {
   final VoidCallback onSearchPressed;
 
-  const ChatHeader({
-    super.key,
-    required this.onSearchPressed,
-  });
+  const ChatHeader({super.key, required this.onSearchPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +20,7 @@ class ChatHeader extends StatelessWidget {
         children: [
           Text(
             'Messages',
-            style: TextStyles.headline.copyWith(
-              color: AppColors.primary500,
-            ),
+            style: TextStyles.headline.copyWith(color: AppColors.primary500),
           ),
           InkWell(
             onTap: onSearchPressed,
@@ -39,11 +34,11 @@ class ChatHeader extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: const SizedBox(
-                width: 14.0,
-                height: 14.0,
+                width: 18.0,
+                height: 18.0,
                 child: Icon(
                   Icons.search,
-                  size: 14.0,
+                  size: 18.0,
                   color: AppColors.tertiary500,
                 ),
               ),

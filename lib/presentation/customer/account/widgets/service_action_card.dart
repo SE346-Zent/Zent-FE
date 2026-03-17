@@ -23,7 +23,7 @@ class ServiceActionCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: AppDimens.spaceMd,
-        vertical: AppDimens.spaceSm,
+        vertical: AppDimens.spaceMd, // Increased from spaceSm (8px)
       ),
       decoration: BoxDecoration(
         color: AppColors.surface100,
@@ -36,7 +36,10 @@ class ServiceActionCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
           child: Padding(
-            padding: const EdgeInsets.all(AppDimens.spaceMd),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimens.spaceMd,
+              vertical: 12.0, // Reduced from spaceMd (16px)
+            ),
             child: Row(
               children: [
                 Container(
@@ -53,7 +56,7 @@ class ServiceActionCard extends StatelessWidget {
                     child: Icon(
                       iconData,
                       color: AppColors.tertiary500,
-                      size: 28.0, // Assuming Visual approximation for 32x32 bounding box
+                      size: 32.0,
                     ),
                   ),
                 ),
@@ -64,12 +67,16 @@ class ServiceActionCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyles.title.copyWith(color: AppColors.secondary500),
+                        style: TextStyles.title.copyWith(
+                          color: AppColors.secondary500,
+                        ),
                       ),
                       const SizedBox(height: 4.0),
                       Text(
                         subtitle,
-                        style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
                       ),
                     ],
                   ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/user_list_item.dart';
+// Enum removed as it's replaced by Bloc states. String values are used for mock data.
 
 class UserManagementViewModel extends ChangeNotifier {
   int _activeTabIndex = 0;
@@ -7,16 +7,16 @@ class UserManagementViewModel extends ChangeNotifier {
 
   final List<Map<String, dynamic>> _techniciansData = [
     {
-      'userName': 'John Doe (Tech)',
+      'userName': 'John Doe',
       'userRole': 'Senior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=11',
-      'status': UserStatus.active,
+      'status': 'Active',
     },
     {
-      'userName': 'Jane Smith (Tech)',
+      'userName': 'Jane Smith',
       'userRole': 'Junior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=5',
-      'status': UserStatus.away,
+      'status': 'Away',
     },
   ];
 
@@ -25,13 +25,13 @@ class UserManagementViewModel extends ChangeNotifier {
       'userName': 'Alice Admin',
       'userRole': 'System Administrator',
       'avatarUrl': 'https://i.pravatar.cc/150?img=1',
-      'status': UserStatus.active,
+      'status': 'Active',
     },
     {
       'userName': 'Bob Manager',
       'userRole': 'Regional Manager',
       'avatarUrl': 'https://i.pravatar.cc/150?img=13',
-      'status': UserStatus.inactive,
+      'status': 'Inactive',
     },
   ];
 

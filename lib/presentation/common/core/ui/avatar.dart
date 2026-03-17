@@ -4,8 +4,23 @@ import '../../../common/core/themes/text_styles.dart';
 import '../../../common/core/themes/boxshadow.dart';
 import 'dart:math';
 
+/// A circular user avatar that supports images, initials, and an edit badge.
+///
+/// **Usage:**
+/// ```dart
+/// Avatar(name: 'John Doe', imageUrl: 'https://...')
+/// ```
+///
+/// **Features:**
+/// - Displays a network image if [imageUrl] is provided.
+/// - Fallback: Generates 1-2 character initials from [name].
+/// - Fallback: Assigns a persistent random background color based on [name].
+/// - Includes a small edit icon badge at the bottom-right.
 class Avatar extends StatelessWidget {
+  /// Optional URL for the profile image.
   final String? imageUrl;
+
+  /// The user's name, used to generate initials and background color.
   final String name;
 
   const Avatar({super.key, this.imageUrl, required this.name});

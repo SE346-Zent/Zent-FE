@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/presentation/common/core/ui/menu_item.dart';
-import 'viewmodels/customer_profile_viewmodel.dart';
-import 'widgets/profile_user_info.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
+import 'package:zent_fe/presentation/customer/account/widgets/profile_user_info.dart';
 
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({super.key});
@@ -24,8 +25,12 @@ class CustomerProfileScreen extends StatelessWidget {
 class _ProfileScreenContent extends StatelessWidget {
   const _ProfileScreenContent();
 
-  void _onMenuItemTapped(int index) {
-    debugPrint("action triggered: tap on menu item $index");
+  void _onMenuItemTapped(BuildContext context, int index) {
+    if (index == 0) {
+      context.goNamed('customerPersonalInfo');
+    } else {
+      debugPrint("action triggered: tap on menu item $index");
+    }
   }
 
   void _onSignOutPressed() {
@@ -41,7 +46,7 @@ class _ProfileScreenContent extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppDimens.spaceMd,
+            horizontal: 0,
             vertical: AppDimens.spaceMd,
           ),
           child: Column(
@@ -56,25 +61,38 @@ class _ProfileScreenContent extends StatelessWidget {
               const SizedBox(height: AppDimens.spaceLg),
               Avatar(name: viewModel.userName, imageUrl: viewModel.avatarUrl),
               const SizedBox(height: AppDimens.spaceMd),
-              ProfileUserInfo(name: viewModel.userName, role: viewModel.userRole),
+              ProfileUserInfo(
+                name: viewModel.userName,
+                role: viewModel.userRole,
+              ),
               const SizedBox(height: AppDimens.spaceXl),
               ...List.generate(viewModel.menuItems.length, (index) {
                 final item = viewModel.menuItems[index];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: AppDimens.spaceMd),
+                  padding: const EdgeInsets.only(
+                    bottom: AppDimens.spaceMd,
+                    left: AppDimens.spaceMd,
+                    right: AppDimens.spaceMd,
+                  ),
                   child: MenuItem(
                     title: item['title'] as String,
                     subtitle: item['subtitle'] as String,
                     iconData: item['icon'] as IconData,
-                    onTap: () => _onMenuItemTapped(index),
+                    onTap: () => _onMenuItemTapped(context, index),
                   ),
                 );
               }),
               const SizedBox(height: AppDimens.spaceXl),
-              PrimaryActionButton(
-                label: 'Sign Out',
-                icon: Icons.logout,
-                onPressed: _onSignOutPressed,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                ),
+                child: PrimaryActionButton(
+                  label: 'Sign Out',
+                  width: double.infinity,
+                  icon: Icons.logout,
+                  onPressed: _onSignOutPressed,
+                ),
               ),
             ],
           ),

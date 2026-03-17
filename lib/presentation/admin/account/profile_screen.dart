@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../common/core/themes/dimens.dart';
-import '../../common/core/themes/colors.dart';
-import '../../common/core/ui/account_header.dart';
-import '../../common/core/ui/avatar.dart';
-import '../../common/core/ui/button.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
+import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +14,18 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ProfileViewModel(),
+      child: const _ProfileScreenContent(),
+    );
+  }
+}
+
+class _ProfileScreenContent extends StatelessWidget {
+  const _ProfileScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
 
     return Scaffold(
@@ -21,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppDimens.spaceMd,
+            horizontal: 0,
             vertical: AppDimens.spaceMd,
           ),
           child: Column(
@@ -40,13 +52,22 @@ class ProfileScreen extends StatelessWidget {
               ProfileUserInfo(userInfo: viewModel.userInfo),
               const SizedBox(height: AppDimens.spaceXl),
               // Menu Items
-              const ProfileMenuOptions(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                child: ProfileMenuOptions(),
+              ),
               const SizedBox(height: AppDimens.spaceXl),
               // Sign Out Button
-              PrimaryActionButton(
-                label: 'Sign Out',
-                icon: Icons.logout,
-                onPressed: () => context.read<ProfileViewModel>().logout(),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                ),
+                child: PrimaryActionButton(
+                  label: 'Sign Out',
+                  width: double.infinity,
+                  icon: Icons.logout,
+                  onPressed: () => context.read<ProfileViewModel>().logout(),
+                ),
               ),
             ],
           ),

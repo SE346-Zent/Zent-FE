@@ -4,11 +4,32 @@ import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
 
+/// A standardized header for account-related screens.
+///
+/// **Usage:**
+/// ```dart
+/// const AccountHeader(title: 'Settings')
+/// ```
+///
+/// **Features:**
+/// - Includes a leading back button (pops the navigator by default).
+/// - Centered title.
+/// - Optional bottom divider.
 class AccountHeader extends StatelessWidget {
+  /// The text displayed as the screen title.
   final String title;
+
+  /// Optional callback for the back button.
+  /// If null, defaults to `context.pop()`.
   final VoidCallback? onBackPressed;
+
+  /// Whether to display the bottom divider line.
   final bool showDivider;
+
+  /// Horizontal padding for the header content.
   final double horizontalPadding;
+
+  /// Vertical padding for the header content.
   final double verticalPadding;
 
   const AccountHeader({

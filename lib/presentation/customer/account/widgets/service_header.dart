@@ -7,11 +7,7 @@ class ServiceHeader extends StatelessWidget {
   final String userName;
   final String? avatarUrl;
 
-  const ServiceHeader({
-    super.key,
-    required this.userName,
-    this.avatarUrl,
-  });
+  const ServiceHeader({super.key, required this.userName, this.avatarUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +24,16 @@ class ServiceHeader extends StatelessWidget {
             children: [
               Text(
                 'Zent',
-                style: TextStyles.headline.copyWith(color: AppColors.surface100),
+                style: TextStyles.headline.copyWith(
+                  color: AppColors.surface100,
+                ),
               ),
               Row(
                 children: [
-                  const Icon(Icons.notifications_none, color: AppColors.surface100),
+                  const Icon(
+                    Icons.notifications_none,
+                    color: AppColors.surface100,
+                  ),
                   const SizedBox(width: AppDimens.spaceMd),
                   Container(
                     width: 32.0,
@@ -40,14 +41,19 @@ class ServiceHeader extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.surface100,
-                      border: Border.all(color: AppColors.surface100, width: 1.5),
+                      border: Border.all(
+                        color: AppColors.surface100,
+                        width: 1.5,
+                      ),
                       image: avatarUrl != null
                           ? DecorationImage(
                               image: NetworkImage(avatarUrl!),
                               fit: BoxFit.cover,
                             )
                           : const DecorationImage(
-                              image: AssetImage("assets/images/OnBoarding1.webp"), // Fallback mock image
+                              image: AssetImage(
+                                "assets/images/OnBoarding1.webp",
+                              ), // Fallback mock image
                               fit: BoxFit.cover,
                             ),
                     ),
@@ -57,7 +63,7 @@ class ServiceHeader extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // Greeting Text
         Padding(
           padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -69,7 +75,7 @@ class ServiceHeader extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: "Good morning!\n",
-                      style: TextStyles.headline.copyWith(
+                      style: TextStyles.title.copyWith(
                         color: AppColors.secondary300,
                       ),
                     ),
@@ -91,7 +97,7 @@ class ServiceHeader extends StatelessWidget {
               const SizedBox(height: AppDimens.spaceLg),
               Text(
                 "Your available services",
-                style: TextStyles.title.copyWith(color: AppColors.primary500),
+                style: TextStyles.middle.copyWith(color: AppColors.primary500),
               ),
             ],
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import '../viewmodel/user_management_viewmodel.dart';
 import 'user_list_item.dart';
 
@@ -24,7 +24,7 @@ class UserManagementList extends StatelessWidget {
             userName: user['userName'],
             userRole: user['userRole'],
             avatarUrl: user['avatarUrl'],
-            status: user['status'],
+            initialStatus: user['status'],
             onEditTap: () => viewModel.editUser(index),
           );
         },

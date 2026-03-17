@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'security_card_container.dart';
 import 'security_section_title.dart';
 import 'two_factor_auth_toggle.dart';

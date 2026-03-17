@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../common/core/themes/colors.dart';
-import '../../common/core/themes/dimens.dart';
-import '../../common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'widgets/change_password_section.dart';
 import 'widgets/save_changes_button.dart';
 import 'widgets/two_factor_section.dart';
@@ -10,6 +10,18 @@ import 'viewmodel/security_settings_viewmodel.dart';
 
 class SecuritySettingsScreen extends StatelessWidget {
   const SecuritySettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => SecuritySettingsViewModel(),
+      child: const _SecuritySettingsScreenContent(),
+    );
+  }
+}
+
+class _SecuritySettingsScreenContent extends StatelessWidget {
+  const _SecuritySettingsScreenContent();
 
   @override
   Widget build(BuildContext context) {

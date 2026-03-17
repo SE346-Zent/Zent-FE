@@ -24,9 +24,20 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<LoginViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+    return ChangeNotifierProvider(
+      create: (_) => LoginViewModel(),
+      child: const _LoginScreenContent(),
+    );
+  }
+}
 
+class _LoginScreenContent extends StatelessWidget {
+  const _LoginScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
+    // ignore: unused_local_variable
+    final viewModel = context.watch<LoginViewModel>();
     final screenHeight = MediaQuery.of(context).size.height;
 
     return GestureDetector(
@@ -42,7 +53,6 @@ class LoginScreen extends StatelessWidget {
                   width: double.infinity,
                   child: const LoginBackground(),
                 ),
-
                 Container(
                   margin: EdgeInsets.only(top: screenHeight * 0.25),
                   padding: const EdgeInsets.symmetric(
@@ -65,35 +75,24 @@ class LoginScreen extends StatelessWidget {
                             'Log in your Zent account to experience the wonderful app',
                         showLogo: false,
                       ),
-
                       const SizedBox(height: AppDimens.spaceLg),
-
                       const AuthTextField(
                         label: 'Email Address',
                         hintText: 'name@gmail.com',
                         keyboardType: TextInputType.emailAddress,
                       ),
-
                       const SizedBox(height: AppDimens.spaceMd),
-
                       const AuthTextField(
                         label: 'Password',
                         hintText: 'Enter your password',
                         isPassword: true,
                       ),
-
                       const ForgotPasswordButton(),
-
                       const SizedBox(height: AppDimens.spaceMd),
-
                       AuthPrimaryButton(text: 'Sign In', onPressed: () {}),
-
                       const SizedBox(height: AppDimens.spaceLg),
-
                       const SocialLoginSection(),
-
                       const SizedBox(height: AppDimens.spaceLg),
-
                       AuthFooterLink(
                         text: "Don't have an account?",
                         linkText: 'Sign Up',

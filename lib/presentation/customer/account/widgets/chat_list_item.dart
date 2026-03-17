@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import '../blocs/chat_state.dart';
+import 'package:zent_fe/presentation/customer/account/blocs/chat_state.dart';
 
 class ChatListItem extends StatelessWidget {
   final ChatPreview chat;
   final VoidCallback onTap;
 
-  const ChatListItem({
-    super.key,
-    required this.chat,
-    required this.onTap,
-  });
+  const ChatListItem({super.key, required this.chat, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +39,9 @@ class ChatListItem extends StatelessWidget {
                         fit: BoxFit.cover,
                       )
                     : const DecorationImage(
-                        image: AssetImage("assets/images/OnBoarding1.webp"), // Fallback mock image
+                        image: AssetImage(
+                          "assets/images/OnBoarding1.webp",
+                        ), // Fallback mock image
                         fit: BoxFit.cover,
                       ),
               ),
@@ -57,14 +55,20 @@ class ChatListItem extends StatelessWidget {
                 children: [
                   Text(
                     chat.name,
-                    style: TextStyles.title.copyWith(color: AppColors.primary500),
+                    style: TextStyles.title.copyWith(
+                      color: AppColors.primary500,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4.0),
                   Text(
                     chat.lastMessage,
-                    style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary500),
+                    style: TextStyles.bodyMedium.copyWith(
+                      color: chat.unreadCount > 0
+                          ? AppColors.tertiary500
+                          : AppColors.tertiary300,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -79,7 +83,11 @@ class ChatListItem extends StatelessWidget {
               children: [
                 Text(
                   chat.time,
-                  style: TextStyles.label.copyWith(color: AppColors.tertiary500),
+                  style: TextStyles.label.copyWith(
+                    color: chat.unreadCount > 0
+                        ? AppColors.tertiary500
+                        : AppColors.tertiary300,
+                  ),
                 ),
                 const SizedBox(height: 6.0),
                 if (chat.unreadCount > 0)
@@ -93,11 +101,16 @@ class ChatListItem extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       '${chat.unreadCount}',
-                      style: TextStyles.label.copyWith(color: AppColors.tertiary500),
+                      style: TextStyles.label.copyWith(
+                        color: AppColors.tertiary500,
+                      ),
                     ),
                   )
                 else
-                  const SizedBox(width: 21.0, height: 21.0), // Spacer maintaining layout height
+                  const SizedBox(
+                    width: 21.0,
+                    height: 21.0,
+                  ), // Spacer maintaining layout height
               ],
             ),
           ],

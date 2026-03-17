@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/dimens.dart';
-import '../../../common/core/ui/menu_item.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/ui/menu_item.dart';
 import 'package:provider/provider.dart';
 import '../viewmodel/profile_viewmodel.dart';
 

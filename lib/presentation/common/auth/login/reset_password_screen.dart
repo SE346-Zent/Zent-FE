@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
-import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
@@ -26,8 +25,21 @@ class ResetPasswordScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ResetPasswordViewModel(),
+      child: const _ResetPasswordScreenContent(),
+    );
+  }
+}
+
+class _ResetPasswordScreenContent extends StatelessWidget {
+  const _ResetPasswordScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final viewModel = context.watch<ResetPasswordViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -87,9 +99,8 @@ class ResetPasswordScreen extends StatelessWidget {
                                 const SizedBox(height: AppDimens.spaceXl),
                                 AuthPrimaryButton(
                                   text: 'Reset Password',
-                                  onPressed: () => context.go(
-                                    '${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}',
-                                  ),
+                                  onPressed: () =>
+                                      context.goNamed('resetSuccessfully'),
                                 ),
                                 const Spacer(),
                                 const Center(

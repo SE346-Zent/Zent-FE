@@ -18,12 +18,19 @@ class ChatPreview extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, lastMessage, time, unreadCount, avatarUrl];
+  List<Object?> get props => [
+    id,
+    name,
+    lastMessage,
+    time,
+    unreadCount,
+    avatarUrl,
+  ];
 }
 
 abstract class ChatState extends Equatable {
   const ChatState();
-  
+
   @override
   List<Object> get props => [];
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
-import '../../../common/core/themes/text_styles.dart';
-import '../../../common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class UserRoleTabs extends StatelessWidget {
   final int activeIndex;

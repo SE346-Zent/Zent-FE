@@ -9,10 +9,7 @@ class CustomerMainLayout extends StatelessWidget {
   const CustomerMainLayout({super.key, required this.navigationShell});
 
   void _onNavTap(int index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+    navigationShell.goBranch(index);
   }
 
   @override
@@ -32,40 +29,46 @@ class _CustomerBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _CustomerBottomNavBar({required this.currentIndex, required this.onTap});
+  const _CustomerBottomNavBar({
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 64.0,
+      height: 70.0,
       decoration: const BoxDecoration(
         color: AppColors.surface100,
         border: Border(
           top: BorderSide(color: AppColors.surface700, width: 1.0),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavBarItem(
-            icon: Icons.assignment_outlined,
-            label: 'Service',
-            isSelected: currentIndex == 0,
-            onTap: () => onTap(0),
-          ),
-          _NavBarItem(
-            icon: Icons.send_outlined,
-            label: 'Messages',
-            isSelected: currentIndex == 1,
-            onTap: () => onTap(1),
-          ),
-          _NavBarItem(
-            icon: Icons.person_outline,
-            label: 'Profile',
-            isSelected: currentIndex == 2,
-            onTap: () => onTap(2),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 6.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _NavBarItem(
+              icon: Icons.assignment_outlined,
+              label: 'Service',
+              isSelected: currentIndex == 0,
+              onTap: () => onTap(0),
+            ),
+            _NavBarItem(
+              icon: Icons.send_outlined,
+              label: 'Messages',
+              isSelected: currentIndex == 1,
+              onTap: () => onTap(1),
+            ),
+            _NavBarItem(
+              icon: Icons.person_outline,
+              label: 'Profile',
+              isSelected: currentIndex == 2,
+              onTap: () => onTap(2),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -95,11 +98,11 @@ class _NavBarItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: Icon(icon, size: 22.0, color: color),
+              width: 32.0,
+              height: 32.0,
+              child: Icon(icon, size: 30.0, color: color),
             ),
-            Text(label, style: TextStyles.bodyMedium.copyWith(color: color)),
+            Text(label, style: TextStyles.bodyLarge.copyWith(color: color)),
           ],
         ),
       ),

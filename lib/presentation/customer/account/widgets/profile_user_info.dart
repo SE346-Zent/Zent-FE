@@ -7,11 +7,7 @@ class ProfileUserInfo extends StatelessWidget {
   final String name;
   final String role;
 
-  const ProfileUserInfo({
-    super.key,
-    required this.name,
-    required this.role,
-  });
+  const ProfileUserInfo({super.key, required this.name, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +15,14 @@ class ProfileUserInfo extends StatelessWidget {
       children: [
         Text(
           name,
-          style: TextStyles.headline.copyWith(
-            color: AppColors.primary500,
-          ),
+          style: TextStyles.headline.copyWith(color: AppColors.primary500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: AppDimens.spaceXs),
         Text(
           role,
-          style: TextStyles.bodyMedium.copyWith(
-            color: AppColors.secondary500,
-          ),
+          style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

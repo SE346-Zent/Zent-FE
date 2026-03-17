@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/chat_bloc.dart';
-import '../blocs/chat_state.dart';
-import 'chat_list_item.dart';
+import 'package:zent_fe/presentation/customer/account/blocs/chat_bloc.dart';
+import 'package:zent_fe/presentation/customer/account/blocs/chat_state.dart';
+import 'package:zent_fe/presentation/customer/account/widgets/chat_list_item.dart';
 
 class ChatList extends StatelessWidget {
   const ChatList({super.key});
@@ -25,10 +25,7 @@ class ChatList extends StatelessWidget {
             itemCount: chats.length,
             itemBuilder: (context, index) {
               final chat = chats[index];
-              return ChatListItem(
-                chat: chat,
-                onTap: () => _onChatTapped(chat),
-              );
+              return ChatListItem(chat: chat, onTap: () => _onChatTapped(chat));
             },
           );
         }

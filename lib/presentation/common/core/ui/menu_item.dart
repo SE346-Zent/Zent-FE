@@ -4,10 +4,34 @@ import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
 import '../../../common/core/themes/boxshadow.dart';
 
+/// A standard navigation list item used in account menus.
+///
+/// **Usage:**
+/// ```dart
+/// MenuItem(
+///   title: 'Profile info',
+///   subtitle: 'Change your personal details',
+///   iconData: Icons.person_outline,
+///   onTap: () => print('Tapped!'),
+/// )
+/// ```
+///
+/// **Features:**
+/// - Displays a leading icon with a circular background.
+/// - Title and subtitle layout.
+/// - Trailing chevron icon.
+/// - Built-in feedback on tap.
 class MenuItem extends StatelessWidget {
+  /// The primary bold text for the menu item.
   final String title;
+
+  /// The descriptive secondary text below the title.
   final String subtitle;
+
+  /// The icon displayed on the left side.
   final IconData iconData;
+
+  /// Callback function triggered when the item is tapped.
   final VoidCallback onTap;
 
   const MenuItem({
@@ -35,7 +59,6 @@ class MenuItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
           child: Container(
-            width: 364.0,
             height: 60.0,
             padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
             child: Row(

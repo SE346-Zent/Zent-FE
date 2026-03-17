@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../routing/routes.dart';
 
 class UserProfileInfo {
   final String userName;
@@ -29,13 +28,13 @@ class ProfileViewModel extends ChangeNotifier {
     debugPrint("action triggered: Viewmodel logic navigated to $menuName");
     switch (menuName) {
       case 'User Management':
-        context.push(Routes.userManagement);
+        context.goNamed('userManagement');
         break;
       case 'Security Settings':
-        context.push(Routes.securitySettings);
+        context.goNamed('securitySettings');
         break;
       case 'System Log':
-        context.push(Routes.systemLog);
+        context.goNamed('systemLog');
         break;
       default:
         break;

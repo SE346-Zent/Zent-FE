@@ -25,7 +25,15 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<LoginViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+    
+    // Automatically show error if it exists
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (viewModel.errorMessage != null && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(viewModel.errorMessage!)),
+        );
+      }
+    });
 
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -68,25 +76,37 @@ class LoginScreen extends StatelessWidget {
 
                       const SizedBox(height: AppDimens.spaceLg),
 
-                      const AuthTextField(
+                      AuthTextField(
                         label: 'Email Address',
                         hintText: 'name@gmail.com',
                         keyboardType: TextInputType.emailAddress,
+                        controller: viewModel.emailController,
                       ),
 
                       const SizedBox(height: AppDimens.spaceMd),
 
-                      const AuthTextField(
+                      AuthTextField(
                         label: 'Password',
                         hintText: 'Enter your password',
                         isPassword: true,
+                        controller: viewModel.passwordController,
                       ),
 
                       const ForgotPasswordButton(),
 
                       const SizedBox(height: AppDimens.spaceMd),
 
-                      AuthPrimaryButton(text: 'Sign In', onPressed: () {}),
+                      viewModel.isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : AuthPrimaryButton(
+                              text: 'Sign In',
+                              onPressed: () async {
+                                final success = await viewModel.login();
+                                if (success && context.mounted) {
+                                  // Router will pick up the change if it listens to token store
+                                }
+                              },
+                            ),
 
                       const SizedBox(height: AppDimens.spaceLg),
 

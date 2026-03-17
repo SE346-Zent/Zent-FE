@@ -49,6 +49,7 @@ app.*.map.json
 tasks/
 analyze_out.txt
 analyze_utf8.txt
+analyze.txt
 
 # Platform specific generated files
 **/linux/flutter/generated_plugin_registrant.cc
@@ -59,3 +60,4 @@ analyze_utf8.txt
 **/ios/Runner/GeneratedPluginRegistrant.h
 **/ios/Runner/GeneratedPluginRegistrant.m
 **/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+linux/flutter/generated_plugin_registrant.cc

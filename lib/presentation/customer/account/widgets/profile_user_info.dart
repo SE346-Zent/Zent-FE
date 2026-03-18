@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
-import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class ProfileUserInfo extends StatelessWidget {
@@ -19,7 +18,7 @@ class ProfileUserInfo extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: AppDimens.spaceXs),
+        //const SizedBox(height: AppDimens.spaceXs),
         Text(
           role,
           style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),

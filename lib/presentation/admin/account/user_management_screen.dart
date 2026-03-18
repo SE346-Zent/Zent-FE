@@ -10,13 +10,14 @@ import 'package:zent_fe/presentation/admin/account/widgets/user_role_tabs.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/user_search_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zent_fe/presentation/admin/account/blocs/user_status_bloc.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class UserManagementScreen extends StatelessWidget {
   const UserManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = UserManagementViewModel();
+    final viewModel = di.sl<UserManagementViewModel>();
     return ChangeNotifierProvider.value(
       value: viewModel,
       child: BlocProvider(

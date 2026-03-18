@@ -9,6 +9,7 @@ import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/presentation/common/core/ui/menu_item.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/profile_user_info.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({super.key});
@@ -16,7 +17,7 @@ class CustomerProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CustomerProfileViewModel(),
+      create: (_) => di.sl<CustomerProfileViewModel>(),
       child: const _ProfileScreenContent(),
     );
   }

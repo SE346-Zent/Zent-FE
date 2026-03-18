@@ -5,6 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/admin/account/blocs/user_status_bloc.dart';
 import 'package:zent_fe/presentation/admin/account/blocs/user_status_state.dart';
+import 'package:zent_fe/domain/entities/enums/user_status.dart';
 
 class UserListItem extends StatelessWidget {
   final String userName;
@@ -22,7 +23,7 @@ class UserListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<UserStatusBloc, UserStatusState, String>(
+    return BlocSelector<UserStatusBloc, UserStatusState, UserStatus>(
       selector: (state) => state.getStatusFor(userName),
       builder: (context, status) {
         return Container(
@@ -38,13 +39,13 @@ class UserListItem extends StatelessWidget {
             children: [
               // Avatar Block
               SizedBox(
-                width: 49.0,
-                height: 49.0,
+                width: 40.0,
+                height: 40.0,
                 child: Stack(
                   children: [
                     Container(
-                      width: 49.0,
-                      height: 49.0,
+                      width: 40.0,
+                      height: 40.0,
                       decoration: BoxDecoration(
                         color: AppColors.surface600,
                         shape: BoxShape.circle,
@@ -125,7 +126,7 @@ class UserListItem extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  status,
+                  status.name[0].toUpperCase() + status.name.substring(1),
                   style: TextStyles.bodyLarge.copyWith(
                     color: UserStatusState.getTextColor(status),
                   ),

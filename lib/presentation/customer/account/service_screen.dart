@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/service_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_action_card.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_header.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class CustomerServiceScreen extends StatelessWidget {
   const CustomerServiceScreen({super.key});
@@ -13,7 +14,7 @@ class CustomerServiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ServiceViewModel(),
+      create: (_) => di.sl<ServiceViewModel>(),
       child: const _ServiceScreenContent(),
     );
   }

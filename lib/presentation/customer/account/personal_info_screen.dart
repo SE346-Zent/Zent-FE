@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/customer/account/viewmodels/personal_info_v
 import 'package:zent_fe/presentation/customer/account/widgets/personal_info_avatar_group.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/personal_info_fields.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/personal_info_save_button.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class CustomerPersonalInfoScreen extends StatelessWidget {
   const CustomerPersonalInfoScreen({super.key});
@@ -14,7 +15,7 @@ class CustomerPersonalInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => PersonalInfoViewModel(),
+      create: (_) => di.sl<PersonalInfoViewModel>(),
       child: const _PersonalInfoScreenContent(),
     );
   }

@@ -17,6 +17,7 @@ import 'widgets/back_to_sign_in_button.dart';
 
 // ViewModel
 import 'view_models/forgot_password_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -24,7 +25,7 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ForgotPasswordViewModel(),
+      create: (_) => di.sl<ForgotPasswordViewModel>(),
       child: const _ForgotPasswordScreenContent(),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -8,6 +9,10 @@ class ServiceHeader extends StatelessWidget {
   final String? avatarUrl;
 
   const ServiceHeader({super.key, required this.userName, this.avatarUrl});
+
+  void _onAvatarTap(BuildContext context) {
+    context.goNamed('customerMe');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,27 +40,30 @@ class ServiceHeader extends StatelessWidget {
                     color: AppColors.surface100,
                   ),
                   const SizedBox(width: AppDimens.spaceMd),
-                  Container(
-                    width: 32.0,
-                    height: 32.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.surface100,
-                      border: Border.all(
+                  InkWell(
+                    onTap: () => _onAvatarTap(context),
+                    child: Container(
+                      width: 32.0,
+                      height: 32.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
                         color: AppColors.surface100,
-                        width: 1.5,
+                        border: Border.all(
+                          color: AppColors.surface100,
+                          width: 1.5,
+                        ),
+                        image: avatarUrl != null
+                            ? DecorationImage(
+                                image: NetworkImage(avatarUrl!),
+                                fit: BoxFit.cover,
+                              )
+                            : const DecorationImage(
+                                image: AssetImage(
+                                  "assets/images/OnBoarding1.webp",
+                                ), // Fallback mock image
+                                fit: BoxFit.cover,
+                              ),
                       ),
-                      image: avatarUrl != null
-                          ? DecorationImage(
-                              image: NetworkImage(avatarUrl!),
-                              fit: BoxFit.cover,
-                            )
-                          : const DecorationImage(
-                              image: AssetImage(
-                                "assets/images/OnBoarding1.webp",
-                              ), // Fallback mock image
-                              fit: BoxFit.cover,
-                            ),
                     ),
                   ),
                 ],

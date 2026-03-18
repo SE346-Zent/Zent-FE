@@ -28,8 +28,8 @@ class ChatListItem extends StatelessWidget {
           children: [
             // Avatar
             Container(
-              width: 50.0,
-              height: 50.0,
+              width: 40.0,
+              height: 40.0,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.tertiary500, width: 1.0),

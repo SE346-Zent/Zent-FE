@@ -19,6 +19,7 @@ import 'widgets/password_requirements_box.dart';
 
 // ViewModel
 import 'view_models/reset_password_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ResetPasswordScreen extends StatelessWidget {
   const ResetPasswordScreen({super.key});
@@ -26,7 +27,7 @@ class ResetPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ResetPasswordViewModel(),
+      create: (_) => di.sl<ResetPasswordViewModel>(),
       child: const _ResetPasswordScreenContent(),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -6,17 +7,30 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
+import 'package:zent_fe/presentation/common/intro/blocs/on_boarding_cubit.dart';
 
-class OnBoardingScreen extends StatefulWidget {
+class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
 
   @override
-  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => OnBoardingCubit(),
+      child: const _OnBoardingScreenContent(),
+    );
+  }
 }
 
-class _OnBoardingScreenState extends State<OnBoardingScreen> {
+class _OnBoardingScreenContent extends StatefulWidget {
+  const _OnBoardingScreenContent();
+
+  @override
+  State<_OnBoardingScreenContent> createState() =>
+      _OnBoardingScreenContentState();
+}
+
+class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
 
   final List<Map<String, String>> _data = [
     {
@@ -39,8 +53,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     },
   ];
 
-  void _onNextPressed() {
-    if (_currentPage < _data.length - 1) {
+  void _onNextPressed(int currentPage) {
+    if (currentPage < _data.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -55,29 +69,41 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    bool isLastPage = _currentPage == _data.length - 1;
+    return BlocBuilder<OnBoardingCubit, OnBoardingState>(
+      builder: (context, state) {
+        int currentPage = state.currentPage;
+        bool isLastPage = currentPage == _data.length - 1;
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                allowImplicitScrolling: true,
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: _data.length,
-                itemBuilder: (context, index) => _buildPageContent(index),
-              ),
+        return Scaffold(
+          backgroundColor: AppColors.background500,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    allowImplicitScrolling: true,
+                    onPageChanged: (index) =>
+                        context.read<OnBoardingCubit>().setPage(index),
+                    itemCount: _data.length,
+                    itemBuilder: (context, index) => _buildPageContent(index),
+                  ),
+                ),
+
+                _buildBottomControls(isLastPage, currentPage),
+                const SizedBox(height: 30),
+              ],
             ),
-
-            _buildBottomControls(isLastPage),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -138,28 +164,34 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        _data.length,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
-          width: _currentPage == index ? AppDimens.spaceLg : AppDimens.spaceSm,
-          height: AppDimens.spaceSm,
-          decoration: BoxDecoration(
-            color: _currentPage == index
-                ? AppColors.tertiary500
-                : AppColors.background600,
-            borderRadius: BorderRadius.circular(AppDimens.boraXs),
+    return BlocBuilder<OnBoardingCubit, OnBoardingState>(
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            _data.length,
+            (index) => AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
+              width: state.currentPage == index
+                  ? AppDimens.spaceLg
+                  : AppDimens.spaceSm,
+              height: AppDimens.spaceSm,
+              decoration: BoxDecoration(
+                color: state.currentPage == index
+                    ? AppColors.tertiary500
+                    : AppColors.background600,
+                borderRadius: BorderRadius.circular(AppDimens.boraXs),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildBottomControls(bool isLastPage) {
+  Widget _buildBottomControls(bool isLastPage, int currentPage) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Row(
@@ -183,7 +215,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               borderRadius: BorderRadius.circular(AppDimens.boraMd),
             ),
             child: ElevatedButton(
-              onPressed: _onNextPressed,
+              onPressed: () => _onNextPressed(currentPage),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.tertiary500,
                 minimumSize: Size(isLastPage ? 229 : 170, 45),

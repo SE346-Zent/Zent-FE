@@ -16,7 +16,7 @@ class ChangePasswordSection extends StatelessWidget {
           title: 'Change Password',
           iconData: Icons.lock_outline,
           iconColor: AppColors.tertiary400,
-          iconSize: 18.0,
+          iconSize: 24.0,
         ),
         SizedBox(height: AppDimens.spaceMd),
         SecurityCardContainer(

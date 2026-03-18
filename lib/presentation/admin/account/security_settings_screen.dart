@@ -7,6 +7,7 @@ import 'widgets/save_changes_button.dart';
 import 'widgets/two_factor_section.dart';
 import 'package:provider/provider.dart';
 import 'viewmodel/security_settings_viewmodel.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class SecuritySettingsScreen extends StatelessWidget {
   const SecuritySettingsScreen({super.key});
@@ -14,7 +15,7 @@ class SecuritySettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SecuritySettingsViewModel(),
+      create: (_) => di.sl<SecuritySettingsViewModel>(),
       child: const _SecuritySettingsScreenContent(),
     );
   }

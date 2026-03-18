@@ -18,6 +18,7 @@ import 'widgets/resend_otp_text.dart';
 
 // ViewModel
 import 'view_models/verify_otp_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class VerifyOtpScreen extends StatelessWidget {
   const VerifyOtpScreen({super.key});
@@ -25,7 +26,7 @@ class VerifyOtpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => VerifyOtpViewModel(),
+      create: (_) => di.sl<VerifyOtpViewModel>(),
       child: const _VerifyOtpScreenContent(),
     );
   }

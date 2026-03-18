@@ -16,6 +16,9 @@ import '../presentation/common/auth/login/view_models/verify_otp_view_model.dart
 import '../presentation/admin/account/viewmodel/user_management_viewmodel.dart';
 import '../presentation/admin/account/viewmodel/profile_viewmodel.dart';
 import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -34,6 +37,9 @@ Future<void> init() async {
   sl.registerFactory(() => UserManagementViewModel());
   sl.registerFactory(() => ProfileViewModel(sl()));
   sl.registerFactory(() => SecuritySettingsViewModel());
+  sl.registerFactory(() => CustomerProfileViewModel());
+  sl.registerFactory(() => PersonalInfoViewModel());
+  sl.registerFactory(() => ServiceViewModel());
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(

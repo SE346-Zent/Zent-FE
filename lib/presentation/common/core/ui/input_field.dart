@@ -139,8 +139,9 @@ class _InputFieldState extends State<InputField> {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimens.spaceMd,
+                padding: const EdgeInsets.only(
+                  left: AppDimens.spaceMd,
+                  right: 8.0,
                 ),
                 child: Icon(
                   widget.leadingIcon,

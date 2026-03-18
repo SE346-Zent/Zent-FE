@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:zent_fe/domain/entities/enums/user_status.dart';
 
 abstract class UserStatusEvent extends Equatable {
   const UserStatusEvent();
@@ -9,7 +10,7 @@ abstract class UserStatusEvent extends Equatable {
 
 class UserStatusUpdateRequested extends UserStatusEvent {
   final String userName;
-  final String status;
+  final UserStatus status;
 
   const UserStatusUpdateRequested({
     required this.userName,

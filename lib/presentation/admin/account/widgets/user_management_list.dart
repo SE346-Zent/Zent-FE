@@ -14,6 +14,7 @@ class UserManagementList extends StatelessWidget {
 
     return Expanded(
       child: ListView.separated(
+        key: ValueKey<int>(viewModel.activeTabIndex),
         padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
         itemCount: activeData.length,
         separatorBuilder: (context, index) =>

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
@@ -6,8 +8,8 @@ import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
-import 'package:provider/provider.dart';
 import 'viewmodel/profile_viewmodel.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -15,7 +17,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProfileViewModel(),
+      create: (_) => di.sl<ProfileViewModel>(),
       child: const _ProfileScreenContent(),
     );
   }

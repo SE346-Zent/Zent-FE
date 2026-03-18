@@ -1,0 +1,22 @@
+import '../../domain/entities/user.dart';
+import '../../domain/entities/enums/user_roles.dart';
+
+abstract class AuthRepository {
+  Future<User> login({required String email, required String password});
+
+  Future<void> signup({
+    required String email,
+    required String password,
+    required UserRoles role,
+    required String fullName,
+    required String phoneNumber,
+  });
+
+  Future<User> verifyOtp({required String email, required String otp});
+
+  Future<void> resendOtp(String email);
+
+  Future<void> logout();
+
+  Future<void> refreshToken();
+}

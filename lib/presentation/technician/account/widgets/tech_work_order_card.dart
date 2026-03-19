@@ -24,7 +24,7 @@ class WorkOrderCard extends StatelessWidget {
         : AppColors.surface600;
 
     // Status Color Processing
-    Color statusColor = AppColors.tertiary400; // In Progress
+    Color statusColor = AppColors.tertiary400;
     if (isCompleted) statusColor = AppColors.success500;
     if (isPending) statusColor = AppColors.secondary200;
 
@@ -164,9 +164,9 @@ class WorkOrderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
+      boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

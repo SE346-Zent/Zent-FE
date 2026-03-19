@@ -170,7 +170,7 @@ class WorkOrderCard extends StatelessWidget {
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
-        ], // Subtle shadow
+        ],
       ),
       alignment: Alignment.center,
       child: Text(text, style: TextStyles.title.copyWith(color: textColor)),

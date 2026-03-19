@@ -61,3 +61,7 @@ analyze.txt
 **/ios/Runner/GeneratedPluginRegistrant.m
 **/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
 linux/flutter/generated_plugin_registrant.cc
+flutter_analyze.txt
+replace.dart
+replacer.py
+replacer2.py

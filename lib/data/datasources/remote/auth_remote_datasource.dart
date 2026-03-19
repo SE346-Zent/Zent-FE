@@ -26,7 +26,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     "BASE_URL",
     fallback: "http://localhost:3000/api",
   );
-  static const Duration _timeOut = Duration(seconds: 20);
+  static final Duration _timeOut = Duration(
+    seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
+  );
 
   AuthRemoteDatasourceImpl(this.client);
 

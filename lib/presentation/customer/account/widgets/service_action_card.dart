@@ -68,7 +68,6 @@ class ServiceActionCard extends StatelessWidget {
                           color: AppColors.secondary500,
                         ),
                       ),
-                      const SizedBox(height: 4.0),
                       Text(
                         subtitle,
                         style: TextStyles.bodyLarge.copyWith(

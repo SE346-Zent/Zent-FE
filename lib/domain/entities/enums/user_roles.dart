@@ -1,1 +1,1 @@
-enum UserRoles { admin, superAdmin, technician, customer }
+enum UserRoles { admin, technician, customer, unauthenticated }

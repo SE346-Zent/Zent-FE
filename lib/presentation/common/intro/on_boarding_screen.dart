@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
-import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
-import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 import 'package:zent_fe/presentation/common/intro/blocs/on_boarding_cubit.dart';
+import 'package:zent_fe/routing/route_names.dart';
+
+import 'widgets/on_boarding_page_content.dart';
+import 'widgets/on_boarding_bottom_controls.dart';
 
 class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
@@ -60,12 +61,12 @@ class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.goNamed('login');
+      context.goNamed(RouteNames.login);
     }
   }
 
   void _onSkipPressed() {
-    context.goNamed('login');
+    context.goNamed(RouteNames.login);
   }
 
   @override
@@ -93,145 +94,23 @@ class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
                     onPageChanged: (index) =>
                         context.read<OnBoardingCubit>().setPage(index),
                     itemCount: _data.length,
-                    itemBuilder: (context, index) => _buildPageContent(index),
+                    itemBuilder: (context, index) => OnBoardingPageContent(
+                      data: _data[index],
+                      totalPages: _data.length,
+                    ),
                   ),
                 ),
-
-                _buildBottomControls(isLastPage, currentPage),
+                OnBoardingBottomControls(
+                  isLastPage: isLastPage,
+                  onNextPressed: () => _onNextPressed(currentPage),
+                  onSkipPressed: _onSkipPressed,
+                ),
                 const SizedBox(height: 30),
               ],
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildPageContent(int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            _data[index]["image"]!,
-            width: 270,
-            height: 245,
-            cacheWidth: 540,
-            cacheHeight: 490,
-          ),
-          const SizedBox(height: 60),
-          Builder(
-            builder: (context) {
-              final title = _data[index]["title"]!;
-              final firstSpaceIndex = title.indexOf(' ');
-              final firstWord = firstSpaceIndex != -1
-                  ? title.substring(0, firstSpaceIndex)
-                  : title;
-              final restOfTitle = firstSpaceIndex != -1
-                  ? title.substring(firstSpaceIndex)
-                  : '';
-
-              return RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: TextStyles.display,
-                  children: [
-                    TextSpan(
-                      text: firstWord,
-                      style: TextStyle(color: AppColors.tertiary500),
-                    ),
-                    TextSpan(
-                      text: restOfTitle,
-                      style: TextStyle(color: AppColors.primary500),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: AppDimens.spaceMd),
-          Text(
-            _data[index]["desc"]!,
-            textAlign: TextAlign.center,
-            style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
-          ),
-          const SizedBox(height: 40),
-          _buildPageIndicator(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPageIndicator() {
-    return BlocBuilder<OnBoardingCubit, OnBoardingState>(
-      builder: (context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            _data.length,
-            (index) => AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
-              width: state.currentPage == index
-                  ? AppDimens.spaceLg
-                  : AppDimens.spaceSm,
-              height: AppDimens.spaceSm,
-              decoration: BoxDecoration(
-                color: state.currentPage == index
-                    ? AppColors.tertiary500
-                    : AppColors.background600,
-                borderRadius: BorderRadius.circular(AppDimens.boraXs),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildBottomControls(bool isLastPage, int currentPage) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Row(
-        mainAxisAlignment: isLastPage
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.spaceBetween,
-        children: [
-          if (!isLastPage)
-            InkWell(
-              onTap: _onSkipPressed,
-              child: Text(
-                "SKIP",
-                style: TextStyles.bodyLarge.copyWith(
-                  color: AppColors.secondary300,
-                ),
-              ),
-            ),
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [BoxShadowStyles.raised],
-              borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            ),
-            child: ElevatedButton(
-              onPressed: () => _onNextPressed(currentPage),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.tertiary500,
-                minimumSize: Size(isLastPage ? 229 : 170, 45),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                isLastPage ? "Get Started →" : "Continue",
-                style: TextStyles.title.copyWith(color: AppColors.surface100),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

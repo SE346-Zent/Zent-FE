@@ -39,13 +39,13 @@ class UserListItem extends StatelessWidget {
             children: [
               // Avatar Block
               SizedBox(
-                width: 40.0,
-                height: 40.0,
+                width: 44.0,
+                height: 44.0,
                 child: Stack(
                   children: [
                     Container(
-                      width: 40.0,
-                      height: 40.0,
+                      width: 44.0,
+                      height: 44.0,
                       decoration: BoxDecoration(
                         color: AppColors.surface600,
                         shape: BoxShape.circle,

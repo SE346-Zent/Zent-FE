@@ -23,24 +23,24 @@ class TechProfileViewModel extends ChangeNotifier {
 
   void handleMenuTap(BuildContext context, String menuName) {
     debugPrint("action triggered: Viewmodel logic navigated to $menuName");
-    
+
     switch (menuName) {
-      case 'Personal Info': 
-        context.push('${Routes.techMe}/${Routes.personalInfo}'); 
+      case 'Personal Info':
+        context.push('${Routes.techMe}/${Routes.personalInfo}');
         break;
-        
+
       case 'Help me':
         // TODO: Thêm Route cho Help
         break;
-        
+
       case 'Security':
         context.push('${Routes.techMe}/${Routes.techSecuritySettings}');
         break;
-        
+
       case 'Notifications':
         context.push('${Routes.techMe}/${Routes.notifications}');
         break;
-        
+
       default:
         break;
     }

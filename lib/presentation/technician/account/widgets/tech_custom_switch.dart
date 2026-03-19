@@ -28,11 +28,11 @@ class TechCustomSwitch extends StatelessWidget {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              top: 2.0, 
+              top: 2.0,
               left: value ? 30.0 : 2.0,
               right: value ? 2.0 : 30.0,
               child: Container(
-                width: 24.0, 
+                width: 24.0,
                 height: 24.0,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,

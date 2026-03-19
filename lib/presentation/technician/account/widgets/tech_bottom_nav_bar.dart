@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Themes 
+// Themes
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
@@ -35,10 +35,15 @@ class TechBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(0, 'Home', Icons.home_outlined, Icons.home),
-              _buildNavItem(1, 'Work Orders', Icons.assignment_outlined, Icons.assignment),
-              
-              const SizedBox(width: 70.0), 
-              
+              _buildNavItem(
+                1,
+                'Work Orders',
+                Icons.assignment_outlined,
+                Icons.assignment,
+              ),
+
+              const SizedBox(width: 70.0),
+
               _buildNavItem(2, 'Messages', Icons.send_outlined, Icons.send),
               _buildNavItem(3, 'Profile', Icons.person_outline, Icons.person),
             ],
@@ -55,10 +60,7 @@ class TechBottomNavBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.tertiary500,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.tertiary200, 
-                  width: 4.0,
-                ),
+                border: Border.all(color: AppColors.tertiary200, width: 4.0),
                 boxShadow: [BoxShadowStyles.raised],
               ),
               child: const Icon(
@@ -74,9 +76,9 @@ class TechBottomNavBar extends StatelessWidget {
   }
 
   Widget _buildNavItem(
-    int index, 
-    String label, 
-    IconData inactiveIcon, 
+    int index,
+    String label,
+    IconData inactiveIcon,
     IconData activeIcon,
   ) {
     final isSelected = currentIndex == index;

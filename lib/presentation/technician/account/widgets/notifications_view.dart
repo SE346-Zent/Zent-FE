@@ -18,7 +18,7 @@ class TechNotificationsView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      
+
       appBar: const TechAppBar(
         title: 'Settings',
         showBackButton: true,
@@ -33,12 +33,18 @@ class TechNotificationsView extends StatelessWidget {
             children: [
               Text(
                 'NOTIFICATIONS',
-                style: TextStyles.display.copyWith(color: AppColors.primary500, fontSize: 32, fontWeight: FontWeight.w900),
+                style: TextStyles.display.copyWith(
+                  color: AppColors.primary500,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: 8.0),
               Text(
                 'Manage how you receive updates about jobs, inventory and messages.',
-                style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary300),
+                style: TextStyles.bodyMedium.copyWith(
+                  color: AppColors.secondary300,
+                ),
               ),
               const SizedBox(height: AppDimens.spaceXl),
 
@@ -95,7 +101,10 @@ class TechNotificationsView extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline, color: AppColors.tertiary500),
+                    const Icon(
+                      Icons.info_outline,
+                      color: AppColors.tertiary500,
+                    ),
                     const SizedBox(width: 12.0),
                     Expanded(
                       child: Column(
@@ -103,12 +112,16 @@ class TechNotificationsView extends StatelessWidget {
                         children: [
                           Text(
                             'Push Permissions',
-                            style: TextStyles.bodyLarge.copyWith(color: Colors.black),
+                            style: TextStyles.bodyLarge.copyWith(
+                              color: Colors.black,
+                            ),
                           ),
                           const SizedBox(height: 4.0),
                           Text(
                             'To receive these alerts, ensure notifications are enabled in your device settings',
-                            style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary300),
+                            style: TextStyles.bodyMedium.copyWith(
+                              color: AppColors.secondary300,
+                            ),
                           ),
                         ],
                       ),
@@ -149,13 +162,19 @@ class TechNotificationsView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyles.bodyLarge.copyWith(
-                  color: AppColors.primary500,
-                  height:1.2)
+                Text(
+                  title,
+                  style: TextStyles.bodyLarge.copyWith(
+                    color: AppColors.primary500,
+                    height: 1.2,
+                  ),
                 ),
-                Text(subtitle, style: TextStyles.bodyMedium.copyWith(
-                  color: AppColors.secondary300,
-                  height:1.2)
+                Text(
+                  subtitle,
+                  style: TextStyles.bodyMedium.copyWith(
+                    color: AppColors.secondary300,
+                    height: 1.2,
+                  ),
                 ),
               ],
             ),

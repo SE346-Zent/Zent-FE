@@ -6,15 +6,15 @@ class TechPersonalInfoViewModel extends ChangeNotifier {
   String email = 'hungdepzai@zent.com';
   String phoneNumber = '1235578';
 
-  bool isLoading = false; 
+  bool isLoading = false;
 
   void saveChanges(BuildContext context) {
     debugPrint('Viewmodel logic: Saving changes (Fake data)...');
-    
+
     notifyListeners();
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Successfully updated!')),
-    );
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Successfully updated!')));
   }
 }

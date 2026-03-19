@@ -18,25 +18,46 @@ class TechWorkOrderView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const TechAppBar(title: 'Work Orders', showBackButton: false, showBottomDivider: false),
-      
+      appBar: const TechAppBar(
+        title: 'Work Orders',
+        showBackButton: false,
+        showBottomDivider: false,
+      ),
+
       body: SafeArea(
         child: Column(
           children: [
             // Search Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd, vertical: AppDimens.spaceSm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.spaceMd,
+                vertical: AppDimens.spaceSm,
+              ),
               child: Container(
                 height: 40.0,
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.0), border: Border.all(color: AppColors.secondary200)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: AppColors.secondary200),
+                ),
                 child: TextField(
-                  style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary200),
+                  style: TextStyles.bodyLarge.copyWith(
+                    color: AppColors.secondary200,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Search users by name or ID',
-                    hintStyle: TextStyles.bodyLarge.copyWith(color: AppColors.secondary200),
-                    prefixIcon: const Icon(Icons.search, color: AppColors.secondary300, size: 20.0), // Icon kính lúp
+                    hintStyle: TextStyles.bodyLarge.copyWith(
+                      color: AppColors.secondary200,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppColors.secondary300,
+                      size: 20.0,
+                    ), // Icon kính lúp
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0), // Căn giữa chữ
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0,
+                    ), // Căn giữa chữ
                   ),
                 ),
               ),
@@ -48,7 +69,9 @@ class TechWorkOrderView extends StatelessWidget {
               height: 40.0,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                ),
                 itemCount: viewModel.filters.length,
                 itemBuilder: (context, index) {
                   final isSelected = viewModel.selectedFilterIndex == index;
@@ -59,13 +82,21 @@ class TechWorkOrderView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.tertiary500 : Colors.white,
+                        color: isSelected
+                            ? AppColors.tertiary500
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
-                        border: isSelected ? null : Border.all(color: AppColors.secondary100),
+                        border: isSelected
+                            ? null
+                            : Border.all(color: AppColors.secondary100),
                       ),
                       child: Text(
                         viewModel.filters[index],
-                        style: TextStyles.bodyLarge.copyWith(color: isSelected ? Colors.white : AppColors.secondary500),
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: isSelected
+                              ? Colors.white
+                              : AppColors.secondary500,
+                        ),
                       ),
                     ),
                   );
@@ -77,7 +108,9 @@ class TechWorkOrderView extends StatelessWidget {
             // Work Order List
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                ),
                 itemCount: viewModel.filteredOrders.length,
                 itemBuilder: (context, index) {
                   return WorkOrderCard(order: viewModel.filteredOrders[index]);

@@ -17,14 +17,13 @@ final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
   // 1, 2, 3, 4. DATA, DOMAIN, CORE, EXTERNAL LAYERS
 
-
-  // 5. PRESENTATION LAYER (ViewModels)  
+  // 5. PRESENTATION LAYER (ViewModels)
   // Auth ViewModels
   sl.registerFactory(() => LoginViewModel());
   sl.registerFactory(() => ForgotPasswordViewModel());
   sl.registerFactory(() => ResetPasswordViewModel());
   sl.registerFactory(() => VerifyOtpViewModel());
-  
+
   // Tech ViewModels
   sl.registerFactory(() => TechProfileViewModel());
   sl.registerFactory(() => TechPersonalInfoViewModel());

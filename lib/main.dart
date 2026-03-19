@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/admin/account/viewmodel/profile_viewmodel.d
 import 'package:zent_fe/presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
 import 'package:zent_fe/routing/router.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDependencies();
   runApp(

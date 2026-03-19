@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zent_fe/presentation/technician/account/widgets/tech_bottom_nav_bar.dart'; 
+import 'package:zent_fe/presentation/technician/account/widgets/tech_bottom_nav_bar.dart';
 
 class TechMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
-  const TechMainLayout({
-    super.key,
-    required this.navigationShell,
-  });
+  const TechMainLayout({super.key, required this.navigationShell});
 
   void _goBranch(int index) {
     navigationShell.goBranch(
@@ -22,9 +19,8 @@ class TechMainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // extendBody: true, // (Bật cái này lên nếu ông muốn phần thân nội dung cuộn luồn xuống dưới cái thanh Nav)
-
       body: navigationShell,
-      
+
       bottomNavigationBar: TechBottomNavBar(
         currentIndex: navigationShell.currentIndex,
         onTap: _goBranch,

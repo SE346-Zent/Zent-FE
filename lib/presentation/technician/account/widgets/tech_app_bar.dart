@@ -7,7 +7,7 @@ class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showBackButton;
   // 💡 1. THÊM BIẾN NÀY ĐỂ TÙY CHỈNH ẨN/HIỆN
-  final bool showBottomDivider; 
+  final bool showBottomDivider;
 
   const TechAppBar({
     super.key,
@@ -19,13 +19,13 @@ class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.surface100, 
+      backgroundColor: AppColors.surface100,
       elevation: 0,
       automaticallyImplyLeading: showBackButton,
       leading: showBackButton
           ? IconButton(
               icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-              onPressed: () => context.pop(), 
+              onPressed: () => context.pop(),
             )
           : null,
       title: Text(
@@ -33,16 +33,14 @@ class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: TextStyles.title.copyWith(color: AppColors.primary500),
       ),
       centerTitle: true,
-      
+
       flexibleSpace: Container(
         margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.black, width: 1.0), 
-          ),
+          border: Border(top: BorderSide(color: Colors.black, width: 1.0)),
         ),
       ),
-      
+
       bottom: showBottomDivider
           ? const PreferredSize(
               preferredSize: Size.fromHeight(1.0),
@@ -57,5 +55,6 @@ class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight + (showBottomDivider ? 1.0 : 0.0));
+  Size get preferredSize =>
+      Size.fromHeight(kToolbarHeight + (showBottomDivider ? 1.0 : 0.0));
 }

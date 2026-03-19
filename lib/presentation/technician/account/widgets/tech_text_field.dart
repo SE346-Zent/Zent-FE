@@ -7,11 +7,11 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 class TechTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final IconData? prefixIcon; 
+  final IconData? prefixIcon;
   final IconData? suffixIcon;
   final int? maxLines;
   final TextEditingController? controller;
-  final bool readOnly; 
+  final bool readOnly;
   final TextStyle? labelStyle;
 
   const TechTextField({
@@ -35,32 +35,43 @@ class TechTextField extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
           child: Text(
             label,
-            style: labelStyle ?? TextStyles.title.copyWith(color: AppColors.primary500),
+            style:
+                labelStyle ??
+                TextStyles.title.copyWith(color: AppColors.primary500),
           ),
         ),
 
         Container(
           decoration: BoxDecoration(
-            color: readOnly ? AppColors.secondary50 : AppColors.surface100, 
-            borderRadius: BorderRadius.circular(AppDimens.boraMd), 
+            color: readOnly ? AppColors.secondary50 : AppColors.surface100,
+            borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary100, width: 1.0),
             boxShadow: [BoxShadowStyles.subtle],
           ),
           child: TextField(
             controller: controller,
             maxLines: maxLines,
-            readOnly: readOnly, 
+            readOnly: readOnly,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
               color: readOnly ? AppColors.secondary200 : AppColors.primary500,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              hintText: hint, 
-              hintStyle: TextStyles.bodyLarge.copyWith(color: AppColors.secondary200),
-              prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.secondary100) : null,
-              suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: AppColors.secondary100) : null,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
+              hintText: hint,
+              hintStyle: TextStyles.bodyLarge.copyWith(
+                color: AppColors.secondary200,
+              ),
+              prefixIcon: prefixIcon != null
+                  ? Icon(prefixIcon, color: AppColors.secondary100)
+                  : null,
+              suffixIcon: suffixIcon != null
+                  ? Icon(suffixIcon, color: AppColors.secondary100)
+                  : null,
             ),
           ),
         ),

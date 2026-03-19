@@ -36,10 +36,7 @@ class TechPrimaryButton extends StatelessWidget {
                   strokeWidth: 2,
                 ),
               )
-            : Text(
-                text,
-                style: TextStyles.title.copyWith(color: Colors.white),
-              ),
+            : Text(text, style: TextStyles.title.copyWith(color: Colors.white)),
       ],
     );
 
@@ -55,9 +52,7 @@ class TechPrimaryButton extends StatelessWidget {
         child: InkWell(
           onTap: isLoading ? null : onPressed,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
-          child: Center(
-            child: buttonChild,
-          ),
+          child: Center(child: buttonChild),
         ),
       ),
     );

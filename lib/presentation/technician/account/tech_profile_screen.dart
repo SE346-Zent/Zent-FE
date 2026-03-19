@@ -14,8 +14,8 @@ class TechProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<TechProfileViewModel>(), 
-      child: const TechProfileView(), 
+      create: (_) => sl<TechProfileViewModel>(),
+      child: const TechProfileView(),
     );
   }
 }

@@ -49,39 +49,41 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TechPersonalInfoViewModel>();
-    
+
     return Scaffold(
       backgroundColor: AppColors.background500,
 
-      appBar: const TechAppBar(
-        title: 'Personal Info',
-        showBackButton: true, 
-      ),
-      
+      appBar: const TechAppBar(title: 'Personal Info', showBackButton: true),
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimens.spaceMd),
           child: Column(
             children: [
-              ProfileAvatar(name: viewModel.fullName), 
-              const SizedBox(height: AppDimens.spaceSm), 
+              ProfileAvatar(name: viewModel.fullName),
+              const SizedBox(height: AppDimens.spaceSm),
 
               Text(
                 'Hung dep zai',
-                style: TextStyles.display.copyWith(color: Colors.black, fontSize: 24),
+                style: TextStyles.display.copyWith(
+                  color: Colors.black,
+                  fontSize: 24,
+                ),
               ),
               const SizedBox(height: 4.0),
               Text(
                 'Senior electrician',
-                style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary500),
+                style: TextStyles.bodyMedium.copyWith(
+                  color: AppColors.secondary500,
+                ),
               ),
 
               const SizedBox(height: AppDimens.spaceXl),
-              
+
               TechTextField(
                 label: 'Full name',
                 hint: 'Enter your name',
-                controller: _nameController, 
+                controller: _nameController,
                 prefixIcon: Icons.person_outline,
               ),
               const SizedBox(height: AppDimens.spaceLg),
@@ -101,7 +103,9 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Contact admin to change your Employee ID',
-                    style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary500),
+                    style: TextStyles.bodyMedium.copyWith(
+                      color: AppColors.secondary500,
+                    ),
                   ),
                 ),
               ),
@@ -111,19 +115,19 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
               TechTextField(
                 label: 'Email Address',
                 hint: 'Enter your email address',
-                controller: _emailController, 
+                controller: _emailController,
                 prefixIcon: Icons.email_outlined,
               ),
               const SizedBox(height: AppDimens.spaceLg),
-              
+
               TechTextField(
                 label: 'Phone number',
                 hint: 'Enter your phone number',
-                controller: _phoneController, 
+                controller: _phoneController,
                 prefixIcon: Icons.phone_outlined,
               ),
               const SizedBox(height: AppDimens.spaceXl),
-              
+
               TechPrimaryButton(
                 text: 'Save Changes',
                 icon: Icons.topic_outlined,

@@ -59,21 +59,27 @@ class _TechSecurityViewState extends State<TechSecurityView> {
                       label: 'Current Password',
                       hint: '••••••••',
                       suffixIcon: Icons.visibility_off_outlined,
-                      labelStyle: TextStyles.bodyLarge.copyWith(color: AppColors.primary500),
+                      labelStyle: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
                     ),
                     SizedBox(height: AppDimens.spaceMd),
                     TechTextField(
                       label: 'New Password',
                       hint: '••••••••',
                       suffixIcon: Icons.visibility_off_outlined,
-                      labelStyle: TextStyles.bodyLarge.copyWith(color: AppColors.primary500),
+                      labelStyle: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
                     ),
                     SizedBox(height: AppDimens.spaceMd),
                     TechTextField(
                       label: 'Confirm New Password',
                       hint: '••••••••',
                       suffixIcon: Icons.visibility_off_outlined,
-                      labelStyle: TextStyles.bodyLarge.copyWith(color: AppColors.primary500),
+                      labelStyle: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
                     ),
                   ],
                 ),
@@ -86,7 +92,9 @@ class _TechSecurityViewState extends State<TechSecurityView> {
                 child: TechTextField(
                   label: 'Update recovery email address',
                   hint: 'name@gmail.com',
-                  labelStyle: TextStyles.bodyMedium.copyWith(color: AppColors.secondary300),
+                  labelStyle: TextStyles.bodyMedium.copyWith(
+                    color: AppColors.secondary300,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimens.spaceXl),
@@ -98,21 +106,42 @@ class _TechSecurityViewState extends State<TechSecurityView> {
                 child: SizedBox(
                   height: 220.0,
                   child: Scrollbar(
-                    controller: _historyScrollController, 
+                    controller: _historyScrollController,
                     thumbVisibility: true,
                     radius: const Radius.circular(4.0),
                     child: ListView.separated(
-                      controller: _historyScrollController, 
+                      controller: _historyScrollController,
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       itemCount: viewModel.loginHistory.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1.0, color: AppColors.surface600),
+                      separatorBuilder: (_, __) => const Divider(
+                        height: 1.0,
+                        color: AppColors.surface600,
+                      ),
                       itemBuilder: (context, index) {
                         final item = viewModel.loginHistory[index];
                         return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                          title: Text(item.device, style: TextStyles.bodyLarge.copyWith(color: AppColors.primary500)),
-                          subtitle: Text(item.location, style: TextStyles.label.copyWith(color: AppColors.secondary300)),
-                          trailing: Text(item.date, style: TextStyles.label.copyWith(color: AppColors.secondary500)),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 4.0,
+                          ),
+                          title: Text(
+                            item.device,
+                            style: TextStyles.bodyLarge.copyWith(
+                              color: AppColors.primary500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            item.location,
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.secondary300,
+                            ),
+                          ),
+                          trailing: Text(
+                            item.date,
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.secondary500,
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -153,7 +182,10 @@ class _TechSecurityViewState extends State<TechSecurityView> {
   }
 
   // border secondary100
-  Widget _buildGroupWrapper({required Widget child, EdgeInsetsGeometry? padding}) {
+  Widget _buildGroupWrapper({
+    required Widget child,
+    EdgeInsetsGeometry? padding,
+  }) {
     return Container(
       padding: padding ?? const EdgeInsets.all(16.0),
       decoration: BoxDecoration(

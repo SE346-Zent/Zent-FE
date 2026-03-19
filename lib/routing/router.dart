@@ -39,9 +39,9 @@ class RbacTokenStore {
   static String? get token => _token;
 }
 
-UserRole _getRoleFromToken()
-{
-  return UserRole.technician; // <-- Hardcoded for demo purposes. Replace with actual token parsing logic.
+UserRole _getRoleFromToken() {
+  return UserRole
+      .technician; // <-- Hardcoded for demo purposes. Replace with actual token parsing logic.
 }
 
 /*UserRole _getRoleFromToken() {

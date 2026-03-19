@@ -40,10 +40,10 @@ class TechProfileView extends StatelessWidget {
             children: [
               ProfileAvatar(name: viewModel.userInfo.userName),
               const SizedBox(height: AppDimens.spaceMd),
-              
+
               ProfileUserInfo(userInfo: viewModel.userInfo),
               const SizedBox(height: AppDimens.spaceXl),
-              
+
               const ProfileMenuOptions(),
               const SizedBox(height: AppDimens.spaceXl),
             ],

@@ -113,7 +113,7 @@ class _TechSecurityViewState extends State<TechSecurityView> {
                       controller: _historyScrollController,
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       itemCount: viewModel.loginHistory.length,
-                      separatorBuilder: (_, __) => const Divider(
+                      separatorBuilder: (_, _) => const Divider(
                         height: 1.0,
                         color: AppColors.surface600,
                       ),

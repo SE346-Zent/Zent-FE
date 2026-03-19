@@ -43,7 +43,8 @@ abstract final class Routes {
   static const completeWorkOrder = 'complete-work-order';
   static const addNewPart = 'add-new-part';
   static const inventorySearch = 'inventory-search';
-  static const securityNotifications = 'security-notifications';
+  static const techSecuritySettings = 'tech-security-settings';
+  static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
 
   static const myProducts = 'my-products';

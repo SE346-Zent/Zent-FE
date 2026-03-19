@@ -13,6 +13,12 @@ import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/common/core/layouts/admin_main_layout.dart';
+import '../presentation/technician/account/tech_profile_screen.dart';
+import '../presentation/technician/account/personal_info_screen.dart';
+import '../presentation/technician/account/notifications_screen.dart';
+import '../presentation/technician/account/security_screen.dart';
+import '../presentation/technician/account/tech_work_order_screen.dart';
+import '../presentation/common/core/layouts/tech_main_layout.dart';
 import 'package:zent_fe/domain/entities/enums/user_role.dart' show UserRole;
 import './routes.dart' show Routes;
 
@@ -33,7 +39,12 @@ class RbacTokenStore {
   static String? get token => _token;
 }
 
-UserRole _getRoleFromToken() {
+UserRole _getRoleFromToken()
+{
+  return UserRole.technician; // <-- Hardcoded for demo purposes. Replace with actual token parsing logic.
+}
+
+/*UserRole _getRoleFromToken() {
   final token = RbacTokenStore.token;
   if (token == null) return UserRole.unauthenticated;
   try {
@@ -52,7 +63,7 @@ UserRole _getRoleFromToken() {
   } catch (_) {
     return UserRole.unauthenticated;
   }
-}
+}*/
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
@@ -279,7 +290,7 @@ final GoRouter appRouter = GoRouter(
     // Technician top level routes
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return Scaffold(body: navigationShell);
+        return TechMainLayout(navigationShell: navigationShell);
       },
       branches: [
         StatefulShellBranch(
@@ -297,9 +308,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: 'techWorkOrder',
               path: Routes.techWorkOrder,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Tech Work Order Screen')),
-              ),
+              builder: (context, state) => const TechWorkOrderScreen(),
             ),
           ],
         ),
@@ -319,8 +328,27 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: 'techMe',
               path: Routes.techMe,
-              builder: (context, state) =>
-                  const Scaffold(body: Center(child: Text('Tech Me Screen'))),
+              builder: (context, state) => const TechProfileScreen(),
+              routes: [
+                GoRoute(
+                  name: 'techPersonalInfo',
+                  path: Routes.personalInfo,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PersonalInfoScreen(),
+                ),
+                GoRoute(
+                  name: 'techNotifications',
+                  path: Routes.notifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const TechNotificationsScreen(),
+                ),
+                GoRoute(
+                  name: 'techSecuritySettings',
+                  path: Routes.techSecuritySettings,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const TechSecurityScreen(),
+                ),
+              ],
             ),
           ],
         ),

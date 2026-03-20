@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/entities/enums/user_roles.dart';
+import 'package:zent_fe/domain/repositories/auth_repository.dart';
+import 'package:zent_fe/domain/entities/user.dart';
+import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
 import '../models/auth_response_model.dart';

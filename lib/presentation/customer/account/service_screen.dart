@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/service_viewmodel.dart';
+import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_action_card.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/service_header.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -40,17 +41,7 @@ class _ServiceScreenContent extends StatelessWidget {
       body: Stack(
         children: [
           // Background Logo Layer
-          Center(
-            child: Opacity(
-              opacity: 0.5,
-              child: Image.asset(
-                'assets/images/ZentLogo.webp',
-                width: 158.0,
-                height: 189.0,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
-              ),
-            ),
-          ),
+          const Background(opacity: 0.5, width: 158.0, height: 189.0),
 
           // Foreground Layer
           SafeArea(

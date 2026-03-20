@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomerProfileViewModel extends ChangeNotifier {
   final String userName = "Hung dep zai";
-  final String userRole = "Senior electrician";
+  final String userEmail = "hung.depzai@gmail.com";
   final String? avatarUrl = null;
 
   final List<Map<String, dynamic>> menuItems = [

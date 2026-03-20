@@ -45,7 +45,7 @@ class _PersonalInfoScreenContent extends StatelessWidget {
                       builder: (context, viewModel, _) =>
                           PersonalInfoAvatarGroup(
                             fullName: viewModel.fullName,
-                            role: 'Senior electrician',
+                            email: viewModel.emailAddress,
                           ),
                     ),
                     const SizedBox(height: AppDimens.spaceXl),

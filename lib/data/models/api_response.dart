@@ -2,8 +2,14 @@ class ApiResponse<T> {
   final dynamic statusCode;
   final dynamic message;
   final T? data;
+  final dynamic meta;
 
-  ApiResponse({required this.statusCode, required this.message, this.data});
+  ApiResponse({
+    required this.statusCode,
+    required this.message,
+    this.data,
+    this.meta,
+  });
 
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
@@ -17,6 +23,7 @@ class ApiResponse<T> {
               json['data'] != null)
           ? fromJsonT(json['data'])
           : null,
+      meta: json['meta'],
     );
   }
 

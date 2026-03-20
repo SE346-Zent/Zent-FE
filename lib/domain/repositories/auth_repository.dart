@@ -1,5 +1,5 @@
-import '../../domain/entities/user.dart';
-import '../../domain/entities/enums/user_roles.dart';
+import 'package:zent_fe/domain/entities/user.dart';
+import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 
 abstract class AuthRepository {
   Future<User> login({required String email, required String password});

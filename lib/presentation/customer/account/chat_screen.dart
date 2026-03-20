@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/customer/account/blocs/chat_bloc.dart';
 import 'package:zent_fe/presentation/customer/account/blocs/chat_event.dart';
-import 'package:zent_fe/presentation/customer/account/widgets/chat_background.dart';
+import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/chat_header.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/chat_list.dart';
 
@@ -32,7 +32,7 @@ class _ChatScreenContent extends StatelessWidget {
       backgroundColor: AppColors.surface100,
       body: Stack(
         children: [
-          const ChatBackground(),
+          const Background(opacity: 0.1, width: 109.0, height: 129.0),
           SafeArea(
             child: Column(
               children: [

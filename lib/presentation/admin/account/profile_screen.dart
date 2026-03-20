@@ -46,6 +46,7 @@ class _ProfileScreenContent extends StatelessWidget {
                 showDivider: false,
                 horizontalPadding: 0,
                 verticalPadding: 0,
+                showLeading: false,
               ),
               const SizedBox(height: AppDimens.spaceLg),
               Avatar(name: viewModel.userInfo.userName),

@@ -126,7 +126,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
+  initialLocation: Routes.customerMe,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -237,20 +237,20 @@ final GoRouter appRouter = GoRouter(
               builder: (context, state) => const ProfileScreen(),
               routes: [
                 GoRoute(
-                  name: RouteNames.securitySettings,
-                  path: Routes.securitySettings,
+                  name: RouteNames.adminSecuritySettings,
+                  path: Routes.adminSecuritySettings,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const SecuritySettingsScreen(),
                 ),
                 GoRoute(
-                  name: RouteNames.userManagement,
-                  path: Routes.userManagement,
+                  name: RouteNames.adminUserManagement,
+                  path: Routes.adminUserManagement,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const UserManagementScreen(),
                   routes: [
                     GoRoute(
-                      name: RouteNames.chooseRoleCreateAccount,
-                      path: Routes.chooseRoleCreateAccount,
+                      name: RouteNames.adminChooseRoleCreateAccount,
+                      path: Routes.adminChooseRoleCreateAccount,
                       builder: (context, state) => const Scaffold(
                         body: Center(
                           child: Text('Choose Role Create Account Screen'),
@@ -258,8 +258,8 @@ final GoRouter appRouter = GoRouter(
                       ),
                       routes: [
                         GoRoute(
-                          name: RouteNames.createAccount,
-                          path: Routes.createAccount,
+                          name: RouteNames.adminCreateAccount,
+                          path: Routes.adminCreateAccount,
                           builder: (context, state) => const Scaffold(
                             body: Center(child: Text('Create Account Screen')),
                           ),
@@ -269,8 +269,8 @@ final GoRouter appRouter = GoRouter(
                   ],
                 ),
                 GoRoute(
-                  name: RouteNames.systemLog,
-                  path: Routes.systemLog,
+                  name: RouteNames.adminSystemLog,
+                  path: Routes.adminSystemLog,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('System Log Screen')),

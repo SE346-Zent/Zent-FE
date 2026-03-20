@@ -52,13 +52,13 @@ class ProfileViewModel extends ChangeNotifier {
     debugPrint("action triggered: Viewmodel logic navigated to $menuName");
     switch (menuName) {
       case 'User Management':
-        context.goNamed('userManagement');
+        context.goNamed('adminUserManagement');
         break;
       case 'Security Settings':
-        context.goNamed('securitySettings');
+        context.goNamed('adminSecuritySettings');
         break;
       case 'System Log':
-        context.goNamed('systemLog');
+        context.goNamed('adminSystemLog');
         break;
       default:
         break;

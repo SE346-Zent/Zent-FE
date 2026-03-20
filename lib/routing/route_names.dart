@@ -30,11 +30,12 @@ abstract final class RouteNames {
   static const String customerMe = 'customerMe';
 
   // all sub routes
-  static const String userManagement = 'userManagement';
-  static const String securitySettings = 'securitySettings';
-  static const String systemLog = 'systemLog';
-  static const String chooseRoleCreateAccount = 'chooseRoleCreateAccount';
-  static const String createAccount = 'createAccount';
+  static const String adminUserManagement = 'adminUserManagement';
+  static const String adminSecuritySettings = 'adminSecuritySettings';
+  static const String adminSystemLog = 'adminSystemLog';
+  static const String adminChooseRoleCreateAccount =
+      'adminChooseRoleCreateAccount';
+  static const String adminCreateAccount = 'adminCreateAccount';
 
   static const String customerMyProducts = 'customerMyProducts';
   static const String customerRequestService = 'customerRequestService';

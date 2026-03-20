@@ -5,12 +5,12 @@ import 'package:zent_fe/presentation/customer/account/widgets/profile_user_info.
 
 class PersonalInfoAvatarGroup extends StatelessWidget {
   final String fullName;
-  final String role;
+  final String email;
 
   const PersonalInfoAvatarGroup({
     super.key,
     required this.fullName,
-    required this.role,
+    required this.email,
   });
 
   @override
@@ -19,7 +19,7 @@ class PersonalInfoAvatarGroup extends StatelessWidget {
       children: [
         Avatar(name: fullName),
         const SizedBox(height: AppDimens.spaceMd),
-        ProfileUserInfo(name: fullName, role: role),
+        ProfileUserInfo(name: fullName, email: email),
       ],
     );
   }

@@ -58,20 +58,21 @@ class _ProfileScreenContent extends StatelessWidget {
                 showDivider: false,
                 horizontalPadding: 0,
                 verticalPadding: 0,
+                showLeading: false,
               ),
               const SizedBox(height: AppDimens.spaceLg),
               Avatar(name: viewModel.userName, imageUrl: viewModel.avatarUrl),
               const SizedBox(height: AppDimens.spaceMd),
               ProfileUserInfo(
                 name: viewModel.userName,
-                role: viewModel.userRole,
+                email: viewModel.userEmail,
               ),
               const SizedBox(height: AppDimens.spaceXl),
               ...List.generate(viewModel.menuItems.length, (index) {
                 final item = viewModel.menuItems[index];
                 return Padding(
                   padding: const EdgeInsets.only(
-                    bottom: AppDimens.spaceMd,
+                    bottom: AppDimens.spaceSm,
                     left: AppDimens.spaceMd,
                     right: AppDimens.spaceMd,
                   ),

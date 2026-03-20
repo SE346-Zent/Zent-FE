@@ -21,19 +21,14 @@ class UserModel extends User {
 
   //* from json -> model
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    String parseRole(String beRole) {
-      if (beRole == 'SUPER_ADMIN') return 'SUPERADMIN';
-      if (beRole == 'TECHNICIAN') return 'TECHNICIAN';
-      if (beRole == 'CUSTOMER') return 'CUSTOMER';
-      return 'ADMIN';
-    }
-
     return UserModel(
       id: json['id'] as String? ?? 'temp_id',
       email: json['email'] as String? ?? 'temp_email',
       name: json['fullName'] as String? ?? "abc",
       role: UserRoles.values.firstWhere(
-        (e) => e.name.toUpperCase() == parseRole(json['role'] as String? ?? ''),
+        (e) =>
+            e.name.toUpperCase() ==
+            (json['role'] as String? ?? '').toUpperCase(),
         orElse: () => UserRoles.admin, // Fallback
       ),
     );

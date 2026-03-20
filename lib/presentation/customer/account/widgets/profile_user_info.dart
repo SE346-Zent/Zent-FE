@@ -4,9 +4,9 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class ProfileUserInfo extends StatelessWidget {
   final String name;
-  final String role;
+  final String email;
 
-  const ProfileUserInfo({super.key, required this.name, required this.role});
+  const ProfileUserInfo({super.key, required this.name, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class ProfileUserInfo extends StatelessWidget {
         ),
         //const SizedBox(height: AppDimens.spaceXs),
         Text(
-          role,
+          email,
           style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

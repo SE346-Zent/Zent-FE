@@ -40,20 +40,20 @@ class ServiceActionCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 50.0,
-                  height: 50.0,
+                  width: 60.0,
+                  height: 60.0,
                   decoration: BoxDecoration(
                     color: AppColors.tertiary50,
                     borderRadius: BorderRadius.circular(AppDimens.boraSm),
                   ),
                   alignment: Alignment.center,
                   child: SizedBox(
-                    width: 32.0,
-                    height: 32.0,
+                    width: 40.0,
+                    height: 40.0,
                     child: Icon(
                       iconData,
                       color: AppColors.tertiary500,
-                      size: 32.0,
+                      size: 40.0,
                     ),
                   ),
                 ),

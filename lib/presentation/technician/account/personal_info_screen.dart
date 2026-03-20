@@ -115,7 +115,10 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
               ),
 
               Padding(
-                padding: const EdgeInsets.only(top: AppDimens.spaceSm, left: AppDimens.spaceXs),
+                padding: const EdgeInsets.only(
+                  top: AppDimens.spaceSm,
+                  left: AppDimens.spaceXs,
+                ),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(

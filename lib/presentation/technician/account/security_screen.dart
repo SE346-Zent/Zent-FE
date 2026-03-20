@@ -82,7 +82,7 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
                         color: AppColors.primary500,
                       ),
                     ),
-                    const SizedBox(height: AppDimens.spaceMd), 
+                    const SizedBox(height: AppDimens.spaceMd),
                     TechTextField(
                       label: 'New Password',
                       hint: '••••••••',
@@ -130,7 +130,9 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
                     radius: const Radius.circular(AppDimens.boraXs),
                     child: ListView.separated(
                       controller: _historyScrollController,
-                      padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceSm),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppDimens.spaceSm,
+                      ),
                       itemCount: viewModel.loginHistory.length,
                       separatorBuilder: (_, _) => const Divider(
                         height: 1.0,

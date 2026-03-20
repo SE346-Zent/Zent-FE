@@ -21,7 +21,7 @@ class TechMainLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: navigationShell,
-      
+
       floatingActionButton: GestureDetector(
         onTap: () {
           debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
@@ -46,7 +46,7 @@ class TechMainLayout extends StatelessWidget {
           child: const Icon(Icons.build, color: Colors.white, size: 24.0),
         ),
       ),
-      
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       bottomNavigationBar: _TechBottomNavBar(
@@ -61,10 +61,7 @@ class _TechBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const _TechBottomNavBar({
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const _TechBottomNavBar({required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +138,10 @@ class _NavBarItem extends StatelessWidget {
               child: Icon(icon, size: 24.0, color: color),
             ),
             const SizedBox(height: 4.0),
-            Text(label, style: TextStyles.bodyMedium.copyWith(color: color, fontSize: 12)),
+            Text(
+              label,
+              style: TextStyles.bodyMedium.copyWith(color: color, fontSize: 12),
+            ),
           ],
         ),
       ),

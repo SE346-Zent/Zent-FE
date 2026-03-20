@@ -34,7 +34,10 @@ class TechTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: AppDimens.spaceSm, left: AppDimens.spaceXs),
+          padding: const EdgeInsets.only(
+            bottom: AppDimens.spaceSm,
+            left: AppDimens.spaceXs,
+          ),
           child: Text(
             label,
             style:

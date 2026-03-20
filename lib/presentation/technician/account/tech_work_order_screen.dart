@@ -76,9 +76,7 @@ class _TechWorkOrderView extends StatelessWidget {
                       size: 20.0,
                     ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
                   ),
                 ),
               ),
@@ -100,17 +98,25 @@ class _TechWorkOrderView extends StatelessWidget {
                     onTap: () => viewModel.setFilter(index),
                     child: Container(
                       margin: const EdgeInsets.only(right: AppDimens.spaceSm),
-                      padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimens.spaceMd,
+                      ),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.tertiary500 : Colors.white,
+                        color: isSelected
+                            ? AppColors.tertiary500
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
-                        border: isSelected ? null : Border.all(color: AppColors.secondary100),
+                        border: isSelected
+                            ? null
+                            : Border.all(color: AppColors.secondary100),
                       ),
                       child: Text(
                         viewModel.filters[index],
                         style: TextStyles.bodyLarge.copyWith(
-                          color: isSelected ? Colors.white : AppColors.secondary500,
+                          color: isSelected
+                              ? Colors.white
+                              : AppColors.secondary500,
                         ),
                       ),
                     ),

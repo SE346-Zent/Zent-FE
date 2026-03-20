@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Themes
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
-// Components
+// Feature-specific Widgets
 import 'profile_menu_item.dart';
 
 // ViewModel

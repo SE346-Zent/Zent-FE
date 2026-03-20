@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-// Themes
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
@@ -63,8 +64,8 @@ class ProfileAvatar extends StatelessWidget {
               : null,
         ),
         Positioned(
-          bottom: 4.0,
-          right: 4.0,
+          bottom: AppDimens.spaceXs,
+          right: AppDimens.spaceXs,
           child: Container(
             width: 20.0,
             height: 20.0,

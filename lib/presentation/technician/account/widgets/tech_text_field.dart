@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -32,7 +34,7 @@ class TechTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+          padding: const EdgeInsets.only(bottom: AppDimens.spaceSm, left: AppDimens.spaceXs),
           child: Text(
             label,
             style:
@@ -59,7 +61,7 @@ class TechTextField extends StatelessWidget {
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
+                horizontal: AppDimens.spaceMd,
                 vertical: 12.0,
               ),
               hintText: hint,

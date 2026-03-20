@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showBackButton;
-  // 💡 1. THÊM BIẾN NÀY ĐỂ TÙY CHỈNH ẨN/HIỆN
   final bool showBottomDivider;
 
   const TechAppBar({

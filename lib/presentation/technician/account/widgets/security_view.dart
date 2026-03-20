@@ -187,7 +187,7 @@ class _TechSecurityViewState extends State<TechSecurityView> {
     EdgeInsetsGeometry? padding,
   }) {
     return Container(
-      padding: padding ?? const EdgeInsets.all(16.0),
+      padding: padding ?? const EdgeInsets.all(AppDimens.spaceMd),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),

@@ -30,7 +30,7 @@ class TechProfileViewModel extends ChangeNotifier {
         break;
 
       case 'Help me':
-        // TODO: Thêm Route cho Help
+        // Add Route for Help
         break;
 
       case 'Security':

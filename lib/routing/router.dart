@@ -332,7 +332,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'techPersonalInfo',
                   path: Routes.personalInfo,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const PersonalInfoScreen(),
+                  builder: (context, state) => const TechPersonalInfoScreen(),
                 ),
                 GoRoute(
                   name: 'techNotifications',

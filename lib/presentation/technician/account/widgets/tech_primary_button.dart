@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -24,7 +26,7 @@ class TechPrimaryButton extends StatelessWidget {
       children: [
         if (icon != null && !isLoading)
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.only(right: AppDimens.spaceSm),
             child: Icon(icon, color: Colors.white, size: 20),
           ),
         isLoading

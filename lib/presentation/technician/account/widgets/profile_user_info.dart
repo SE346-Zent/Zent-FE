@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Themes
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 

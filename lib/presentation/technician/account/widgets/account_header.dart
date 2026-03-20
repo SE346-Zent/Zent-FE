@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-// Themes
+// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -47,7 +47,7 @@ class AccountHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 40.0), // Balance the row
+        const SizedBox(width: 40.0),
       ],
     );
 

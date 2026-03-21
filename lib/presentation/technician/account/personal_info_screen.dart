@@ -1,0 +1,164 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// Core Dependency Injection
+import 'package:zent_fe/di/injection_container.dart';
+
+// Core Theming
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+
+// Shared Tech Components
+import 'widgets/tech_app_bar.dart';
+import 'widgets/tech_text_field.dart';
+import 'widgets/tech_primary_button.dart';
+
+// Feature-specific Widgets
+import 'widgets/profile_avatar.dart';
+
+// ViewModel
+import 'view_models/personal_info_viewmodel.dart';
+
+class TechPersonalInfoScreen extends StatelessWidget {
+  const TechPersonalInfoScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => sl<TechPersonalInfoViewModel>(),
+      child: const _TechPersonalInfoView(),
+    );
+  }
+}
+
+class _TechPersonalInfoView extends StatefulWidget {
+  const _TechPersonalInfoView();
+
+  @override
+  State<_TechPersonalInfoView> createState() => _TechPersonalInfoViewState();
+}
+
+class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _employeeIdController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: 'Hung dep zai');
+    _employeeIdController = TextEditingController(text: 'TECH-1234');
+    _emailController = TextEditingController(text: 'hungdepzai@zent.com');
+    _phoneController = TextEditingController(text: '12355678');
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _employeeIdController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<TechPersonalInfoViewModel>();
+
+    return Scaffold(
+      backgroundColor: AppColors.background500,
+
+      appBar: const TechAppBar(title: 'Personal Info', showBackButton: true),
+
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppDimens.spaceMd),
+          child: Column(
+            children: [
+              ProfileAvatar(name: viewModel.fullName),
+              const SizedBox(height: AppDimens.spaceSm),
+
+              Text(
+                'Hung dep zai',
+                style: TextStyles.display.copyWith(
+                  color: Colors.black,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: AppDimens.spaceXs),
+              Text(
+                'Senior electrician',
+                style: TextStyles.bodyMedium.copyWith(
+                  color: AppColors.secondary500,
+                ),
+              ),
+
+              const SizedBox(height: AppDimens.spaceXl),
+
+              TechTextField(
+                label: 'Full name',
+                hint: 'Enter your name',
+                controller: _nameController,
+                prefixIcon: Icons.person_outline,
+              ),
+              const SizedBox(height: AppDimens.spaceLg),
+
+              TechTextField(
+                label: 'Employee ID',
+                hint: 'Enter your employee ID',
+                controller: _employeeIdController,
+                readOnly: true,
+                prefixIcon: Icons.work_outline,
+                suffixIcon: Icons.lock,
+              ),
+
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: AppDimens.spaceSm,
+                  left: AppDimens.spaceXs,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Contact admin to change your Employee ID',
+                    style: TextStyles.bodyMedium.copyWith(
+                      color: AppColors.secondary500,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppDimens.spaceMd),
+
+              TechTextField(
+                label: 'Email Address',
+                hint: 'Enter your email address',
+                controller: _emailController,
+                prefixIcon: Icons.email_outlined,
+              ),
+              const SizedBox(height: AppDimens.spaceLg),
+
+              TechTextField(
+                label: 'Phone number',
+                hint: 'Enter your phone number',
+                controller: _phoneController,
+                prefixIcon: Icons.phone_outlined,
+              ),
+              const SizedBox(height: AppDimens.spaceXl),
+
+              TechPrimaryButton(
+                text: 'Save Changes',
+                icon: Icons.topic_outlined,
+                onPressed: () {
+                  debugPrint('Đã bấm nút Save Changes!');
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

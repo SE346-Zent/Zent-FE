@@ -20,6 +20,13 @@ import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.d
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
 
+// Tech
+import 'package:zent_fe/presentation/technician/account/view_models/tech_profile_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/view_models/personal_info_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/view_models/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/view_models/security_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/view_models/tech_work_order_viewmodel.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -40,6 +47,13 @@ Future<void> init() async {
   sl.registerFactory(() => CustomerProfileViewModel());
   sl.registerFactory(() => PersonalInfoViewModel());
   sl.registerFactory(() => ServiceViewModel());
+
+  // Tech ViewModels
+  sl.registerFactory(() => TechProfileViewModel());
+  sl.registerFactory(() => TechPersonalInfoViewModel());
+  sl.registerFactory(() => TechNotificationsViewModel());
+  sl.registerFactory(() => TechSecurityViewModel());
+  sl.registerFactory(() => TechWorkOrderViewModel());
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(

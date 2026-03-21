@@ -18,6 +18,12 @@ import '../presentation/customer/account/profile_screen.dart';
 import 'package:zent_fe/presentation/customer/account/personal_info_screen.dart';
 import 'package:zent_fe/presentation/common/core/layouts/admin_main_layout.dart';
 import 'package:zent_fe/presentation/common/core/layouts/customer_main_layout.dart';
+import '../presentation/technician/account/tech_profile_screen.dart';
+import '../presentation/technician/account/personal_info_screen.dart';
+import '../presentation/technician/account/notifications_screen.dart';
+import '../presentation/technician/account/security_screen.dart';
+import '../presentation/technician/account/tech_work_order_screen.dart';
+import '../presentation/common/core/layouts/tech_main_layout.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
@@ -126,7 +132,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerMe,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -286,7 +292,7 @@ final GoRouter appRouter = GoRouter(
     // Technician top level routes
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return Scaffold(body: navigationShell);
+        return TechMainLayout(navigationShell: navigationShell);
       },
       branches: [
         StatefulShellBranch(
@@ -304,9 +310,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.techWorkOrder,
               path: Routes.techWorkOrder,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Tech Work Order Screen')),
-              ),
+              builder: (context, state) => const TechWorkOrderScreen(),
             ),
           ],
         ),
@@ -326,8 +330,27 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.techMe,
               path: Routes.techMe,
-              builder: (context, state) =>
-                  const Scaffold(body: Center(child: Text('Tech Me Screen'))),
+              builder: (context, state) => const TechProfileScreen(),
+              routes: [
+                GoRoute(
+                  name: 'techPersonalInfo',
+                  path: Routes.personalInfo,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const TechPersonalInfoScreen(),
+                ),
+                GoRoute(
+                  name: 'techNotifications',
+                  path: Routes.notifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const TechNotificationsScreen(),
+                ),
+                GoRoute(
+                  name: 'techSecuritySettings',
+                  path: Routes.techSecuritySettings,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const TechSecurityScreen(),
+                ),
+              ],
             ),
           ],
         ),

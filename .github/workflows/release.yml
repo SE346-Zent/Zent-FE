@@ -8,11 +8,6 @@
 #       - test
 
 # jobs:
-  # ==========================================
-  # JOB 2: BUILD & RELEASE (Currently Commented Out)
-  # Best Practice: Move this to a separate 'release.yml' 
-  # that triggers on: push -> branches: [ main ]
-  # ==========================================
   # build_release:
   #   name: Build and Create GitHub Release
   #   needs: check_code # Ensures code passes before building
@@ -47,3 +42,16 @@
   #         files: build/app/outputs/flutter-apk/app-release.apk
   #       env:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+name: Hello World Action
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest 
+    
+    steps:
+      - name: Print the greeting
+        run: echo "Hello, World!"

@@ -19,6 +19,7 @@ import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -40,6 +41,7 @@ Future<void> init() async {
   sl.registerFactory(() => CustomerProfileViewModel());
   sl.registerFactory(() => PersonalInfoViewModel());
   sl.registerFactory(() => ServiceViewModel());
+  sl.registerFactory(() => ChatViewModel());
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(

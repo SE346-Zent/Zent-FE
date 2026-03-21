@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/entities/enums/user_status.dart';
-// Enum removed as it's replaced by Bloc states. String values are used for mock data.
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 
 class UserManagementViewModel extends ChangeNotifier {
   int _activeTabIndex = 0;
@@ -36,18 +36,27 @@ class UserManagementViewModel extends ChangeNotifier {
     },
   ];
 
+  late Map<String, UserStatus> _userStatuses;
+
+  UserManagementViewModel() {
+    _userStatuses = {};
+    for (var user in _techniciansData) {
+      _userStatuses[user['userName'] as String] = user['status'] as UserStatus;
+    }
+    for (var user in _adminsData) {
+      _userStatuses[user['userName'] as String] = user['status'] as UserStatus;
+    }
+  }
+
   List<Map<String, dynamic>> get activeData =>
       _activeTabIndex == 0 ? _techniciansData : _adminsData;
 
-  Map<String, UserStatus> get initialStatusMap {
-    final map = <String, UserStatus>{};
-    for (var user in _techniciansData) {
-      map[user['userName'] as String] = user['status'] as UserStatus;
-    }
-    for (var user in _adminsData) {
-      map[user['userName'] as String] = user['status'] as UserStatus;
-    }
-    return map;
+  UserStatus getStatusFor(String userName) =>
+      _userStatuses[userName] ?? UserStatus.active;
+
+  void updateUserStatus(String userName, UserStatus status) {
+    _userStatuses[userName] = status;
+    notifyListeners();
   }
 
   void changeTab(int index) {
@@ -64,5 +73,39 @@ class UserManagementViewModel extends ChangeNotifier {
 
   void editUser(int index) {
     debugPrint("action triggered: Viewmodel logic editUser for user $index");
+  }
+
+  // --- Status color helpers ---
+  static Color getBackgroundColor(UserStatus status) {
+    switch (status) {
+      case UserStatus.active:
+        return AppColors.success50;
+      case UserStatus.away:
+        return AppColors.warning50;
+      case UserStatus.inactive:
+        return AppColors.secondary50;
+    }
+  }
+
+  static Color getTextColor(UserStatus status) {
+    switch (status) {
+      case UserStatus.active:
+        return AppColors.success500;
+      case UserStatus.away:
+        return AppColors.warning500;
+      case UserStatus.inactive:
+        return AppColors.secondary500;
+    }
+  }
+
+  static Color getDotColor(UserStatus status) {
+    switch (status) {
+      case UserStatus.active:
+        return AppColors.success500;
+      case UserStatus.away:
+        return AppColors.warning500;
+      case UserStatus.inactive:
+        return AppColors.secondary500;
+    }
   }
 }

@@ -24,16 +24,49 @@ class TechMainLayout extends StatelessWidget {
       backgroundColor: AppColors.background500,
       body: navigationShell,
 
-      floatingActionButton: GestureDetector(
+      floatingActionButton: _AnimatedFAB(
         onTap: () {
           debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sẵn sàng sửa chữa! 🔧')),
-          );
         },
+      ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
+      bottomNavigationBar: _TechBottomNavBar(
+        currentIndex: navigationShell.currentIndex,
+        onTap: _goBranch,
+      ),
+    );
+  }
+}
+
+class _AnimatedFAB extends StatefulWidget {
+  final VoidCallback onTap;
+  const _AnimatedFAB({required this.onTap});
+
+  @override
+  State<_AnimatedFAB> createState() => _AnimatedFABState();
+}
+
+class _AnimatedFABState extends State<_AnimatedFAB> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.9 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInOut,
         child: Container(
-          width: 70.0,
-          height: 70.0,
+          width: 60.0,
+          height: 60.0,
           decoration: BoxDecoration(
             color: AppColors.tertiary500,
             shape: BoxShape.circle,
@@ -42,13 +75,6 @@ class TechMainLayout extends StatelessWidget {
           ),
           child: const Icon(Icons.build, color: Colors.white, size: 30.0),
         ),
-      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      bottomNavigationBar: _TechBottomNavBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: _goBranch,
       ),
     );
   }
@@ -85,7 +111,7 @@ class _TechBottomNavBar extends StatelessWidget {
             onTap: () => onTap(1),
           ),
 
-          const SizedBox(width: 80.0),
+          const SizedBox(width: 70.0),
 
           _NavBarItem(
             icon: Icons.send_outlined,
@@ -129,12 +155,17 @@ class _NavBarItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 30.0,
-              height: 30.0,
-              child: Icon(icon, size: 30.0, color: color),
+            AnimatedScale(
+              scale: isSelected ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: SizedBox(
+                width: 30.0,
+                height: 30.0,
+                child: Icon(icon, size: 30.0, color: color),
+              ),
             ),
-            const SizedBox(height: 4.0),
+            const SizedBox(height: 2.0),
             Text(
               label,
               style: TextStyles.bodyMedium.copyWith(color: color, fontSize: 12),

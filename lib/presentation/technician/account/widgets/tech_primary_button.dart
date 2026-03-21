@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-
-// Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
-class TechPrimaryButton extends StatelessWidget {
+class TechPrimaryButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
   final IconData? icon;
@@ -20,16 +18,23 @@ class TechPrimaryButton extends StatelessWidget {
   });
 
   @override
+  State<TechPrimaryButton> createState() => _TechPrimaryButtonState();
+}
+
+class _TechPrimaryButtonState extends State<TechPrimaryButton> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
     final buttonChild = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (icon != null && !isLoading)
+        if (widget.icon != null && !widget.isLoading)
           Padding(
-            padding: const EdgeInsets.only(right: AppDimens.spaceSm),
-            child: Icon(icon, color: Colors.white, size: 20),
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Icon(widget.icon, color: Colors.white, size: 20),
           ),
-        isLoading
+        widget.isLoading
             ? const SizedBox(
                 height: 20,
                 width: 20,
@@ -38,23 +43,42 @@ class TechPrimaryButton extends StatelessWidget {
                   strokeWidth: 2,
                 ),
               )
-            : Text(text, style: TextStyles.title.copyWith(color: Colors.white)),
+            : Text(
+                widget.text,
+                style: TextStyles.title.copyWith(color: Colors.white),
+              ),
       ],
     );
 
-    return Container(
-      width: double.infinity,
-      height: 50.0,
-      decoration: BoxDecoration(
-        color: AppColors.tertiary500,
-        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading ? null : onPressed,
-          borderRadius: BorderRadius.circular(AppDimens.boraMd),
-          child: Center(child: buttonChild),
+    return GestureDetector(
+      onTapDown: widget.isLoading
+          ? null
+          : (_) => setState(() => _isPressed = true),
+      onTapUp: widget.isLoading
+          ? null
+          : (_) {
+              setState(() => _isPressed = false);
+              Future.delayed(
+                const Duration(milliseconds: 100),
+                widget.onPressed,
+              );
+            },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: Container(
+          width: double.infinity,
+          height: 50.0,
+          decoration: BoxDecoration(
+            color: AppColors.tertiary500,
+            borderRadius: BorderRadius.circular(AppDimens.boraMd),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: Center(child: buttonChild),
+          ),
         ),
       ),
     );

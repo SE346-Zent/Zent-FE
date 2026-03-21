@@ -34,8 +34,12 @@ class ProfileMenuItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
         ),
         child: InkWell(
-          onTap: onTap,
+          onTap: () {
+            Future.delayed(const Duration(milliseconds: 150), onTap);
+          },
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
+          splashColor: AppColors.secondary100.withValues(alpha: 0.5),
+          highlightColor: AppColors.secondary50.withValues(alpha: 0.3),
           child: Container(
             width: double.infinity,
             height: 60.0,

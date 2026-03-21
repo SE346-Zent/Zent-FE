@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/common/intro/on_boarding_screen.dart';
@@ -62,7 +64,7 @@ UserRoles _getRoleFromToken() {
   } catch (_) {
     return UserRoles.unauthenticated;
   }
-}*/
+}
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
@@ -130,7 +132,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerMe,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes

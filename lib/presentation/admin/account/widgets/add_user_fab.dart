@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class AddUserFab extends StatelessWidget {
   final VoidCallback onPressed;

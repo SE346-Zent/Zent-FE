@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/user_list_item.dart';
+import 'package:zent_fe/domain/entities/enums/user_status.dart';
+// Enum removed as it's replaced by Bloc states. String values are used for mock data.
 
 class UserManagementViewModel extends ChangeNotifier {
   int _activeTabIndex = 0;
@@ -7,13 +8,13 @@ class UserManagementViewModel extends ChangeNotifier {
 
   final List<Map<String, dynamic>> _techniciansData = [
     {
-      'userName': 'John Doe (Tech)',
+      'userName': 'John Doe',
       'userRole': 'Senior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=11',
       'status': UserStatus.active,
     },
     {
-      'userName': 'Jane Smith (Tech)',
+      'userName': 'Jane Smith',
       'userRole': 'Junior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=5',
       'status': UserStatus.away,
@@ -37,6 +38,17 @@ class UserManagementViewModel extends ChangeNotifier {
 
   List<Map<String, dynamic>> get activeData =>
       _activeTabIndex == 0 ? _techniciansData : _adminsData;
+
+  Map<String, UserStatus> get initialStatusMap {
+    final map = <String, UserStatus>{};
+    for (var user in _techniciansData) {
+      map[user['userName'] as String] = user['status'] as UserStatus;
+    }
+    for (var user in _adminsData) {
+      map[user['userName'] as String] = user['status'] as UserStatus;
+    }
+    return map;
+  }
 
   void changeTab(int index) {
     if (_activeTabIndex != index) {

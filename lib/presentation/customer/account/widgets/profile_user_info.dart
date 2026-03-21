@@ -1,0 +1,31 @@
+import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+
+class ProfileUserInfo extends StatelessWidget {
+  final String name;
+  final String email;
+
+  const ProfileUserInfo({super.key, required this.name, required this.email});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          name,
+          style: TextStyles.headline.copyWith(color: AppColors.primary500),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        //const SizedBox(height: AppDimens.spaceXs),
+        Text(
+          email,
+          style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+}

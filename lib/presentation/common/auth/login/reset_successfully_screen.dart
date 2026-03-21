@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
-import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -87,7 +86,7 @@ class ResetSuccessfullyScreen extends StatelessWidget {
                                   ],
                                 ),
                                 child: ElevatedButton.icon(
-                                  onPressed: () => context.go(Routes.login),
+                                  onPressed: () => context.goNamed('login'),
                                   icon: const Icon(
                                     Icons.login,
                                     color: Colors.white,

@@ -84,4 +84,8 @@ class AppColors {
   static const Color success700 = Color(0xFF0F5B2B);
   static const Color success800 = Color(0xFF0C4622);
   static const Color success900 = Color(0xFF09361A);
+
+  // Warning
+  static const Color warning50 = Color(0xFFFFFAEC);
+  static const Color warning500 = Color(0xFFFBBC05);
 }

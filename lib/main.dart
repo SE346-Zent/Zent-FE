@@ -1,26 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/login_view_model.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/forgot_password_view_model.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/reset_password_view_model.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/verify_otp_view_model.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/profile_viewmodel.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
+//import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zent_fe/routing/router.dart';
+import 'di/injection_container.dart' as di;
 
-void main() {
+import 'presentation/common/auth/login/view_models/login_view_model.dart';
+import 'presentation/common/auth/login/view_models/forgot_password_view_model.dart';
+import 'presentation/common/auth/login/view_models/reset_password_view_model.dart';
+import 'presentation/common/auth/login/view_models/verify_otp_view_model.dart';
+import 'presentation/admin/account/viewmodel/user_management_viewmodel.dart';
+import 'presentation/admin/account/viewmodel/profile_viewmodel.dart';
+import 'presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
+  //await dotenv.load(fileName: ".env");
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LoginViewModel()),
-        ChangeNotifierProvider(create: (_) => ForgotPasswordViewModel()),
-        ChangeNotifierProvider(create: (_) => ResetPasswordViewModel()),
-        ChangeNotifierProvider(create: (_) => VerifyOtpViewModel()),
+        ChangeNotifierProvider(create: (_) => di.sl<LoginViewModel>()),
+        ChangeNotifierProvider(create: (_) => di.sl<ForgotPasswordViewModel>()),
+        ChangeNotifierProvider(create: (_) => di.sl<ResetPasswordViewModel>()),
+        ChangeNotifierProvider(create: (_) => di.sl<VerifyOtpViewModel>()),
 
-        ChangeNotifierProvider(create: (_) => UserManagementViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
-        ChangeNotifierProvider(create: (_) => SecuritySettingsViewModel()),
+        ChangeNotifierProvider(create: (_) => di.sl<UserManagementViewModel>()),
+        ChangeNotifierProvider(create: (_) => di.sl<ProfileViewModel>()),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<SecuritySettingsViewModel>(),
+        ),
       ],
       child: const MyApp(),
     ),

@@ -48,3 +48,20 @@ app.*.map.json
 .env
 tasks/
 analyze_out.txt
+analyze_utf8.txt
+analyze.txt
+
+# Platform specific generated files
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugins.cmake
+**/macos/Runner/GeneratedPluginRegistrant.swift
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugins.cmake
+**/ios/Runner/GeneratedPluginRegistrant.h
+**/ios/Runner/GeneratedPluginRegistrant.m
+**/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+linux/flutter/generated_plugin_registrant.cc
+flutter_analyze.txt
+replace.dart
+replacer.py
+replacer2.py

@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
-import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
-import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
+import 'package:zent_fe/presentation/common/intro/blocs/on_boarding_cubit.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
-class OnBoardingScreen extends StatefulWidget {
+import 'widgets/on_boarding_page_content.dart';
+import 'widgets/on_boarding_bottom_controls.dart';
+
+class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
 
   @override
-  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => OnBoardingCubit(),
+      child: const _OnBoardingScreenContent(),
+    );
+  }
 }
 
-class _OnBoardingScreenState extends State<OnBoardingScreen> {
+class _OnBoardingScreenContent extends StatefulWidget {
+  const _OnBoardingScreenContent();
+
+  @override
+  State<_OnBoardingScreenContent> createState() =>
+      _OnBoardingScreenContentState();
+}
+
+class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
 
   final List<Map<String, String>> _data = [
     {
@@ -40,167 +54,63 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     },
   ];
 
-  void _onNextPressed() {
-    if (_currentPage < _data.length - 1) {
+  void _onNextPressed(int currentPage) {
+    if (currentPage < _data.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      context.go(Routes.login);
+      context.goNamed(RouteNames.login);
     }
   }
 
   void _onSkipPressed() {
-    context.go(Routes.login);
+    context.goNamed(RouteNames.login);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isLastPage = _currentPage == _data.length - 1;
+    return BlocBuilder<OnBoardingCubit, OnBoardingState>(
+      builder: (context, state) {
+        int currentPage = state.currentPage;
+        bool isLastPage = currentPage == _data.length - 1;
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                allowImplicitScrolling: true,
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: _data.length,
-                itemBuilder: (context, index) => _buildPageContent(index),
-              ),
-            ),
-
-            _buildBottomControls(isLastPage),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPageContent(int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            _data[index]["image"]!,
-            width: 270,
-            height: 245,
-            cacheWidth: 540,
-            cacheHeight: 490,
-          ),
-          const SizedBox(height: 60),
-          Builder(
-            builder: (context) {
-              final title = _data[index]["title"]!;
-              final firstSpaceIndex = title.indexOf(' ');
-              final firstWord = firstSpaceIndex != -1
-                  ? title.substring(0, firstSpaceIndex)
-                  : title;
-              final restOfTitle = firstSpaceIndex != -1
-                  ? title.substring(firstSpaceIndex)
-                  : '';
-
-              return RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: TextStyles.display,
-                  children: [
-                    TextSpan(
-                      text: firstWord,
-                      style: TextStyle(color: AppColors.tertiary500),
+        return Scaffold(
+          backgroundColor: AppColors.background500,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    allowImplicitScrolling: true,
+                    onPageChanged: (index) =>
+                        context.read<OnBoardingCubit>().setPage(index),
+                    itemCount: _data.length,
+                    itemBuilder: (context, index) => OnBoardingPageContent(
+                      data: _data[index],
+                      totalPages: _data.length,
                     ),
-                    TextSpan(
-                      text: restOfTitle,
-                      style: TextStyle(color: AppColors.primary500),
-                    ),
-                  ],
+                  ),
                 ),
-              );
-            },
-          ),
-          const SizedBox(height: AppDimens.spaceMd),
-          Text(
-            _data[index]["desc"]!,
-            textAlign: TextAlign.center,
-            style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
-          ),
-          const SizedBox(height: 40),
-          _buildPageIndicator(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        _data.length,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
-          width: _currentPage == index ? AppDimens.spaceLg : AppDimens.spaceSm,
-          height: AppDimens.spaceSm,
-          decoration: BoxDecoration(
-            color: _currentPage == index
-                ? AppColors.tertiary500
-                : AppColors.background600,
-            borderRadius: BorderRadius.circular(AppDimens.boraXs),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomControls(bool isLastPage) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Row(
-        mainAxisAlignment: isLastPage
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.spaceBetween,
-        children: [
-          if (!isLastPage)
-            InkWell(
-              onTap: _onSkipPressed,
-              child: Text(
-                "SKIP",
-                style: TextStyles.bodyLarge.copyWith(
-                  color: AppColors.secondary300,
+                OnBoardingBottomControls(
+                  isLastPage: isLastPage,
+                  onNextPressed: () => _onNextPressed(currentPage),
+                  onSkipPressed: _onSkipPressed,
                 ),
-              ),
-            ),
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [BoxShadowStyles.raised],
-              borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            ),
-            child: ElevatedButton(
-              onPressed: _onNextPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.tertiary500,
-                minimumSize: Size(isLastPage ? 229 : 170, 45),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                isLastPage ? "Get Started →" : "Continue",
-                style: TextStyles.title.copyWith(color: AppColors.surface100),
-              ),
+                const SizedBox(height: 30),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

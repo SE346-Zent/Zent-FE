@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
-import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
@@ -18,14 +17,28 @@ import 'widgets/back_to_sign_in_button.dart';
 
 // ViewModel
 import 'view_models/forgot_password_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => di.sl<ForgotPasswordViewModel>(),
+      child: const _ForgotPasswordScreenContent(),
+    );
+  }
+}
+
+class _ForgotPasswordScreenContent extends StatelessWidget {
+  const _ForgotPasswordScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final viewModel = context.watch<ForgotPasswordViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -62,8 +75,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                                 const SizedBox(height: AppDimens.spaceXl),
                                 AuthPrimaryButton(
                                   text: 'Send OTP Code',
-                                  onPressed: () => context.push(
-                                    '${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}',
+                                  onPressed: () => context.goNamed(
+                                    'forgotPasswordVerifyOtp',
                                   ),
                                 ),
                                 const SizedBox(height: AppDimens.spaceLg),

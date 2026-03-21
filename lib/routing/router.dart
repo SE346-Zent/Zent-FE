@@ -12,8 +12,14 @@ import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
-import '../presentation/common/core/layouts/admin_main_layout.dart';
-import 'package:zent_fe/domain/entities/enums/user_role.dart' show UserRole;
+import '../presentation/customer/account/service_screen.dart';
+import '../presentation/customer/account/chat_screen.dart';
+import '../presentation/customer/account/profile_screen.dart';
+import 'package:zent_fe/presentation/customer/account/personal_info_screen.dart';
+import 'package:zent_fe/presentation/common/core/layouts/admin_main_layout.dart';
+import 'package:zent_fe/presentation/common/core/layouts/customer_main_layout.dart';
+import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
+import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
 
 // ---------------------------------------------------------------------------
@@ -33,29 +39,30 @@ class RbacTokenStore {
   static String? get token => _token;
 }
 
-UserRole _getRoleFromToken() {
+UserRoles _getRoleFromToken() {
   final token = RbacTokenStore.token;
-  if (token == null) return UserRole.unauthenticated;
+  if (token == null) return UserRoles.unauthenticated;
   try {
     final parts = token.split('.');
-    if (parts.length != 3) return UserRole.unauthenticated;
+    if (parts.length != 3) return UserRoles.unauthenticated;
     // Base64Url-decode the payload (middle segment) and parse claims.
     final normalized = base64Url.normalize(parts[1]);
     final decoded = utf8.decode(base64Url.decode(normalized));
     final claims = jsonDecode(decoded) as Map<String, dynamic>;
     return switch (claims['role'] as String?) {
-      'admin' => UserRole.admin,
-      'technician' => UserRole.technician,
-      'customer' => UserRole.customer,
-      _ => UserRole.unauthenticated,
+      'admin' => UserRoles.admin,
+      'technician' => UserRoles.technician,
+      'customer' => UserRoles.customer,
+      _ => UserRoles.unauthenticated,
     };
   } catch (_) {
-    return UserRole.unauthenticated;
+    return UserRoles.unauthenticated;
   }
 }
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
+// ignore: unused_element
 String? _rbacRedirect(BuildContext context, GoRouterState state) {
   final location = state.matchedLocation;
   final role = _getRoleFromToken();
@@ -65,7 +72,7 @@ String? _rbacRedirect(BuildContext context, GoRouterState state) {
   );
 
   // ── Unauthenticated ─────────────────────────────────────────────────────
-  if (role == UserRole.unauthenticated) {
+  if (role == UserRoles.unauthenticated) {
     // Allow public routes; everything else goes to login.
     return isPublic ? null : Routes.login;
   }
@@ -74,10 +81,10 @@ String? _rbacRedirect(BuildContext context, GoRouterState state) {
   // Redirect straight to the role's home screen.
   if (isPublic) {
     return switch (role) {
-      UserRole.admin => Routes.adminDashboard,
-      UserRole.technician => Routes.techHome,
-      UserRole.customer => Routes.customerServices,
-      UserRole.unauthenticated => null,
+      UserRoles.admin => Routes.adminDashboard,
+      UserRoles.technician => Routes.techHome,
+      UserRoles.customer => Routes.customerServices,
+      UserRoles.unauthenticated => null,
     };
   }
 
@@ -86,26 +93,26 @@ String? _rbacRedirect(BuildContext context, GoRouterState state) {
   final isTechRoute = location.startsWith('/tech');
   final isCustomerRoute = location.startsWith('/customer');
 
-  if (isAdminRoute && role != UserRole.admin) {
+  if (isAdminRoute && role != UserRoles.admin) {
     return switch (role) {
-      UserRole.technician => Routes.techHome,
-      UserRole.customer => Routes.customerServices,
+      UserRoles.technician => Routes.techHome,
+      UserRoles.customer => Routes.customerServices,
       _ => Routes.login,
     };
   }
 
-  if (isTechRoute && role != UserRole.technician) {
+  if (isTechRoute && role != UserRoles.technician) {
     return switch (role) {
-      UserRole.admin => Routes.adminDashboard,
-      UserRole.customer => Routes.customerServices,
+      UserRoles.admin => Routes.adminDashboard,
+      UserRoles.customer => Routes.customerServices,
       _ => Routes.login,
     };
   }
 
-  if (isCustomerRoute && role != UserRole.customer) {
+  if (isCustomerRoute && role != UserRoles.customer) {
     return switch (role) {
-      UserRole.admin => Routes.adminDashboard,
-      UserRole.technician => Routes.techHome,
+      UserRoles.admin => Routes.adminDashboard,
+      UserRoles.technician => Routes.techHome,
       _ => Routes.login,
     };
   }
@@ -119,43 +126,43 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
-  redirect: _rbacRedirect,
+  initialLocation: Routes.customerMe,
+  //redirect: _rbacRedirect,
   routes: [
     // Main routes
     GoRoute(
-      name: 'splash',
+      name: RouteNames.splash,
       path: Routes.splash,
       builder: (context, state) => const AppSplashScreen(),
     ),
     GoRoute(
-      name: 'onBoarding',
+      name: RouteNames.onBoarding,
       path: Routes.onBoarding,
       builder: (context, state) => const OnBoardingScreen(),
     ),
     GoRoute(
-      name: 'login',
+      name: RouteNames.login,
       path: Routes.login,
       builder: (context, state) => const LoginScreen(),
       routes: [
         // Sub routes for password recovery flow
         GoRoute(
-          name: 'forgotPassword',
+          name: RouteNames.forgotPassword,
           path: Routes.forgetPassword,
           builder: (context, state) => const ForgotPasswordScreen(),
           routes: [
             GoRoute(
-              name: 'forgotPasswordVerifyOtp',
+              name: RouteNames.forgotPasswordVerifyOtp,
               path: Routes.verifyOtp,
               builder: (context, state) => const VerifyOtpScreen(),
               routes: [
                 GoRoute(
-                  name: 'resetPassword',
+                  name: RouteNames.resetPassword,
                   path: Routes.resetPassword,
                   builder: (context, state) => const ResetPasswordScreen(),
                   routes: [
                     GoRoute(
-                      name: 'resetSuccessfully',
+                      name: RouteNames.resetSuccessfully,
                       path: Routes.resetSuccessfully,
                       builder: (context, state) =>
                           const ResetSuccessfullyScreen(),
@@ -167,13 +174,13 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
         GoRoute(
-          name: 'signUp',
+          name: RouteNames.signUp,
           path: Routes.signUp,
           builder: (context, state) =>
               const Scaffold(body: Center(child: Text('Sign Up Screen'))),
           routes: [
             GoRoute(
-              name: 'signUpVerifyOtp',
+              name: RouteNames.signUpVerifyOtp,
               path: Routes.verifyOtp,
               builder: (context, state) => const Scaffold(
                 body: Center(child: Text('Sign Up Verify OTP Screen')),
@@ -193,7 +200,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'adminDashboard',
+              name: RouteNames.adminDashboard,
               path: Routes.adminDashboard,
               builder: (context, state) => const Scaffold(
                 body: Center(child: Text('Admin Dashboard Screen')),
@@ -204,7 +211,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'adminReports',
+              name: RouteNames.adminReports,
               path: Routes.adminReports,
               builder: (context, state) => const Scaffold(
                 body: Center(child: Text('Admin Reports Screen')),
@@ -215,7 +222,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'adminTeam',
+              name: RouteNames.adminTeam,
               path: Routes.adminTeam,
               builder: (context, state) =>
                   const Scaffold(body: Center(child: Text('Team Screen'))),
@@ -225,25 +232,25 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'adminMe',
+              name: RouteNames.adminMe,
               path: Routes.adminMe,
               builder: (context, state) => const ProfileScreen(),
               routes: [
                 GoRoute(
-                  name: 'securitySettings',
-                  path: Routes.securitySettings,
+                  name: RouteNames.adminSecuritySettings,
+                  path: Routes.adminSecuritySettings,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const SecuritySettingsScreen(),
                 ),
                 GoRoute(
-                  name: 'userManagement',
-                  path: Routes.userManagement,
+                  name: RouteNames.adminUserManagement,
+                  path: Routes.adminUserManagement,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const UserManagementScreen(),
                   routes: [
                     GoRoute(
-                      name: 'chooseRoleCreateAccount',
-                      path: Routes.chooseRoleCreateAccount,
+                      name: RouteNames.adminChooseRoleCreateAccount,
+                      path: Routes.adminChooseRoleCreateAccount,
                       builder: (context, state) => const Scaffold(
                         body: Center(
                           child: Text('Choose Role Create Account Screen'),
@@ -251,8 +258,8 @@ final GoRouter appRouter = GoRouter(
                       ),
                       routes: [
                         GoRoute(
-                          name: 'createAccount',
-                          path: Routes.createAccount,
+                          name: RouteNames.adminCreateAccount,
+                          path: Routes.adminCreateAccount,
                           builder: (context, state) => const Scaffold(
                             body: Center(child: Text('Create Account Screen')),
                           ),
@@ -262,8 +269,8 @@ final GoRouter appRouter = GoRouter(
                   ],
                 ),
                 GoRoute(
-                  name: 'systemLog',
-                  path: Routes.systemLog,
+                  name: RouteNames.adminSystemLog,
+                  path: Routes.adminSystemLog,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('System Log Screen')),
@@ -285,7 +292,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'techHome', //
+              name: RouteNames.techHome, //
               path: Routes.techHome,
               builder: (context, state) =>
                   const Scaffold(body: Center(child: Text('Tech Home Screen'))),
@@ -295,7 +302,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'techWorkOrder',
+              name: RouteNames.techWorkOrder,
               path: Routes.techWorkOrder,
               builder: (context, state) => const Scaffold(
                 body: Center(child: Text('Tech Work Order Screen')),
@@ -306,7 +313,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'techMessage',
+              name: RouteNames.techMessage,
               path: Routes.techMessage,
               builder: (context, state) => const Scaffold(
                 body: Center(child: Text('Tech Message Screen')),
@@ -317,7 +324,7 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'techMe',
+              name: RouteNames.techMe,
               path: Routes.techMe,
               builder: (context, state) =>
                   const Scaffold(body: Center(child: Text('Tech Me Screen'))),
@@ -330,28 +337,28 @@ final GoRouter appRouter = GoRouter(
     // Customer top level routes
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return Scaffold(body: navigationShell);
+        return CustomerMainLayout(navigationShell: navigationShell);
       },
       branches: [
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'customerServices',
+              name: RouteNames.customerServices,
               path: Routes.customerServices,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Customer Services Screen')),
-              ),
+              builder: (context, state) => const CustomerServiceScreen(),
               routes: [
                 GoRoute(
-                  name: 'customerMyProducts',
+                  name: RouteNames.customerMyProducts,
                   path: Routes.myProducts,
+                  parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('Customer My Products Screen')),
                   ),
                 ),
                 GoRoute(
-                  name: 'customerRequestService',
+                  name: RouteNames.customerRequestService,
                   path: Routes.requestService,
+                  parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(
                       child: Text('Customer Request Service Screen'),
@@ -359,8 +366,9 @@ final GoRouter appRouter = GoRouter(
                   ),
                 ),
                 GoRoute(
-                  name: 'customerActiveRepairs',
+                  name: RouteNames.customerActiveRepairs,
                   path: Routes.activeRepairs,
+                  parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('Customer Active Repairs Screen')),
                   ),
@@ -372,22 +380,27 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'customerMessages',
+              name: RouteNames.customerMessages,
               path: Routes.customerMessages,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Customer Messages Screen')),
-              ),
+              builder: (context, state) => const CustomerChatScreen(),
             ),
           ],
         ),
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'customerMe',
+              name: RouteNames.customerMe,
               path: Routes.customerMe,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Customer Me Screen')),
-              ),
+              builder: (context, state) => const CustomerProfileScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.customerPersonalInfo,
+                  path: Routes.personalInfo,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      const CustomerPersonalInfoScreen(),
+                ),
+              ],
             ),
           ],
         ),

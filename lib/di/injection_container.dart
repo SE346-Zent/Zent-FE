@@ -19,13 +19,7 @@ import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
-import 'package:get_it/get_it.dart';
 
-// Auth
-import 'package:zent_fe/presentation/common/auth/login/view_models/login_view_model.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/forgot_password_view_model.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/reset_password_view_model.dart';
-import 'package:zent_fe/presentation/common/auth/login/view_models/verify_otp_view_model.dart';
 // Tech
 import 'package:zent_fe/presentation/technician/account/view_models/tech_profile_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/personal_info_viewmodel.dart';

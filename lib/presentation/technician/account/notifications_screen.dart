@@ -36,7 +36,7 @@ class _TechNotificationsView extends StatelessWidget {
     final viewModel = context.watch<TechNotificationsViewModel>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background500,
       appBar: const TechAppBar(
         title: 'Settings',
         showBackButton: true,

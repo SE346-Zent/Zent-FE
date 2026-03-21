@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+// Core Theming
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
+import '../themes/boxshadow.dart';
 
 class TechMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -30,20 +32,15 @@ class TechMainLayout extends StatelessWidget {
           );
         },
         child: Container(
-          width: 48.0,
-          height: 48.0,
-          decoration: const BoxDecoration(
+          width: 70.0,
+          height: 70.0,
+          decoration: BoxDecoration(
             color: AppColors.tertiary500,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              ),
-            ],
+            border: Border.all(color: AppColors.tertiary200, width: 2.0),
+            boxShadow: [BoxShadowStyles.raised],
           ),
-          child: const Icon(Icons.build, color: Colors.white, size: 24.0),
+          child: const Icon(Icons.build, color: Colors.white, size: 30.0),
         ),
       ),
 
@@ -74,7 +71,6 @@ class _TechBottomNavBar extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavBarItem(
             icon: Icons.home_outlined,
@@ -89,7 +85,7 @@ class _TechBottomNavBar extends StatelessWidget {
             onTap: () => onTap(1),
           ),
 
-          const SizedBox(width: 48.0),
+          const SizedBox(width: 80.0),
 
           _NavBarItem(
             icon: Icons.send_outlined,
@@ -129,18 +125,21 @@ class _NavBarItem extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: Icon(icon, size: 24.0, color: color),
+              width: 30.0,
+              height: 30.0,
+              child: Icon(icon, size: 30.0, color: color),
             ),
             const SizedBox(height: 4.0),
             Text(
               label,
               style: TextStyles.bodyMedium.copyWith(color: color, fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

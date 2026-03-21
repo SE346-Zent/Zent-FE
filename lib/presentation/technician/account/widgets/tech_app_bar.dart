@@ -20,7 +20,8 @@ class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.surface100,
+      backgroundColor: AppColors.background500,
+      scrolledUnderElevation: 0,
       elevation: 0,
       automaticallyImplyLeading: showBackButton,
       leading: showBackButton
@@ -34,13 +35,6 @@ class TechAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: TextStyles.title.copyWith(color: AppColors.primary500),
       ),
       centerTitle: true,
-
-      flexibleSpace: Container(
-        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.black, width: 1.0)),
-        ),
-      ),
 
       bottom: showBottomDivider
           ? const PreferredSize(

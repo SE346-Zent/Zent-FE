@@ -38,7 +38,7 @@ class _TechWorkOrderView extends StatelessWidget {
     final viewModel = context.watch<TechWorkOrderViewModel>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background500,
       appBar: const TechAppBar(
         title: 'Work Orders',
         showBackButton: false,

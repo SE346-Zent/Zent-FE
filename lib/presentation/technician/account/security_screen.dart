@@ -57,7 +57,7 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
     final viewModel = context.watch<TechSecurityViewModel>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background500,
       appBar: const TechAppBar(
         title: 'Security Settings',
         showBackButton: true,

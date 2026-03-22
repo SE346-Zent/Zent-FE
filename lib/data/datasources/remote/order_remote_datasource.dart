@@ -19,7 +19,7 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
     "BASE_URL",
     fallback: "http://localhost:3000/api",
   );
-  
+
   static final Duration _timeOut = Duration(
     seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
   );
@@ -42,7 +42,9 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
     final url = Uri.parse('$_baseURL/work_order/single_wo?Id=$id');
     try {
       final headers = await _getHeaders();
-      final response = await client.get(url, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(
@@ -53,7 +55,9 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!;
       } else {
-        throw Exception(apiResponse.message ?? 'Failed to fetch single work order');
+        throw Exception(
+          apiResponse.message ?? 'Failed to fetch single work order',
+        );
       }
     } catch (e) {
       throw Exception('Error fetching single work order: $e');
@@ -65,18 +69,19 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
     final url = Uri.parse('$_baseURL/work_order/many_wo?userId=$userId');
     try {
       final headers = await _getHeaders();
-      final response = await client.get(url, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
 
       final jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(
-        jsonMap,
-        (data) {
-          if (data is List) {
-            return data.map((e) => WorkOrderModel.fromJson(e)).toList();
-          }
-          return [];
-        },
-      );
+      final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
+        data,
+      ) {
+        if (data is List) {
+          return data.map((e) => WorkOrderModel.fromJson(e)).toList();
+        }
+        return [];
+      });
 
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!;

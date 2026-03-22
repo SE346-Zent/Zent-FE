@@ -5,7 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/admin/account/blocs/user_status_bloc.dart';
 import 'package:zent_fe/presentation/admin/account/blocs/user_status_state.dart';
-import 'package:zent_fe/domain/entities/enums/user_status.dart';
+import 'package:zent_fe/domain/entities/enums/account_status.dart';
 
 class UserListItem extends StatelessWidget {
   final String userName;
@@ -23,7 +23,7 @@ class UserListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<UserStatusBloc, UserStatusState, UserStatus>(
+    return BlocSelector<UserStatusBloc, UserStatusState, AccountStatus>(
       selector: (state) => state.getStatusFor(userName),
       builder: (context, status) {
         return Container(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/entities/enums/user_status.dart';
+import 'package:zent_fe/domain/entities/enums/account_status.dart';
 // Enum removed as it's replaced by Bloc states. String values are used for mock data.
 
 class UserManagementViewModel extends ChangeNotifier {
@@ -11,13 +11,13 @@ class UserManagementViewModel extends ChangeNotifier {
       'userName': 'John Doe',
       'userRole': 'Senior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=11',
-      'status': UserStatus.active,
+      'status': AccountStatus.active,
     },
     {
       'userName': 'Jane Smith',
       'userRole': 'Junior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=5',
-      'status': UserStatus.away,
+      'status': AccountStatus.away,
     },
   ];
 
@@ -26,26 +26,26 @@ class UserManagementViewModel extends ChangeNotifier {
       'userName': 'Alice Admin',
       'userRole': 'System Administrator',
       'avatarUrl': 'https://i.pravatar.cc/150?img=1',
-      'status': UserStatus.active,
+      'status': AccountStatus.active,
     },
     {
       'userName': 'Bob Manager',
       'userRole': 'Regional Manager',
       'avatarUrl': 'https://i.pravatar.cc/150?img=13',
-      'status': UserStatus.inactive,
+      'status': AccountStatus.inactive,
     },
   ];
 
   List<Map<String, dynamic>> get activeData =>
       _activeTabIndex == 0 ? _techniciansData : _adminsData;
 
-  Map<String, UserStatus> get initialStatusMap {
-    final map = <String, UserStatus>{};
+  Map<String, AccountStatus> get initialStatusMap {
+    final map = <String, AccountStatus>{};
     for (var user in _techniciansData) {
-      map[user['userName'] as String] = user['status'] as UserStatus;
+      map[user['userName'] as String] = user['status'] as AccountStatus;
     }
     for (var user in _adminsData) {
-      map[user['userName'] as String] = user['status'] as UserStatus;
+      map[user['userName'] as String] = user['status'] as AccountStatus;
     }
     return map;
   }

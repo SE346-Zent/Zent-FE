@@ -42,42 +42,26 @@ class WorkOrderModel extends WorkOrder {
     return WorkOrderModel(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
-      addressString:
-          json['address_string'] as String? ??
-          json['addressString'] as String? ??
-          '',
+      addressString: json['addressString'] as String? ?? '',
       status: _parseStatus(
         json['status_id'] as int? ?? json['statusId'] as int?,
       ),
       description: json['description'] as String? ?? '',
-      rejectReason:
-          json['reject_reason'] as String? ??
-          json['rejectReason'] as String? ??
-          '',
+      rejectReason: json['rejectReason'] as String? ?? '',
       priority: json['priority'] as int? ?? 0,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : (json['createdAt'] != null
-                ? DateTime.parse(json['createdAt'])
-                : DateTime.now()),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : (json['updatedAt'] != null
-                ? DateTime.parse(json['updatedAt'])
-                : DateTime.now()),
-      closedAt: json['closed_at'] != null
-          ? DateTime.parse(json['closed_at'])
-          : (json['closedAt'] != null
-                ? DateTime.parse(json['closedAt'])
-                : null),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
+      closedAt: json['closedAt'] != null
+          ? DateTime.parse(json['closedAt'])
+          : null,
       version: json['version'] as int? ?? 0,
-      adminId: json['admin_id'] as String? ?? json['adminId'] as String? ?? '',
-      customerId:
-          json['customer_id'] as String? ?? json['customerId'] as String? ?? '',
-      technicianId:
-          json['technician_id'] as String? ??
-          json['technicianId'] as String? ??
-          '',
+      adminId: json['adminId'] as String? ?? '',
+      customerId: json['customerId'] as String? ?? '',
+      technicianId: json['technicianId'] as String? ?? '',
     );
   }
 

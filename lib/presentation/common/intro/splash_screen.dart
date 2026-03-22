@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:zent_fe/presentation/common/intro/on_boarding_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
+import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
 class AppSplashScreen extends StatefulWidget {
   const AppSplashScreen({super.key});
@@ -52,37 +55,18 @@ class _AppSplashScreenState extends State<AppSplashScreen> {
 
     FlutterNativeSplash.remove();
 
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const OnBoardingScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(0.0, 0.05);
-            const end = Offset.zero;
-            const curve = Curves.easeOutCubic;
+    final authLocal = di.sl<AuthLocalDataSource>();
+    final isFirstTime = await authLocal.isFirstTime();
 
-            var slideTween = Tween(
-              begin: begin,
-              end: end,
-            ).chain(CurveTween(curve: curve));
-            var fadeTween = Tween(begin: 0.0, end: 1.0).chain(
-              CurveTween(
-                curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-              ),
-            );
-            return FadeTransition(
-              opacity: animation.drive(fadeTween),
-              child: SlideTransition(
-                position: animation.drive(slideTween),
-                child: child,
-              ),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 1200),
-        ),
-      );
+    if (isFirstTime) {
+      await authLocal.setFirstTimeDone();
+      if (mounted) {
+        context.goNamed(RouteNames.onBoarding);
+      }
+    } else {
+      if (mounted) {
+        context.goNamed(RouteNames.login);
+      }
     }
   }
 

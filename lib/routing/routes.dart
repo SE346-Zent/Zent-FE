@@ -33,17 +33,19 @@ abstract final class Routes {
   static const resetSuccessfully = 'reset-successfully';
   static const signUp = 'sign-up';
 
-  static const userManagement = 'user-management';
-  static const securitySettings = 'security-settings';
-  static const systemLog = 'system-log';
-  static const chooseRoleCreateAccount = 'choose-role-create-account';
-  static const createAccount = 'create-account';
+  static const adminUserManagement = 'admin-user-management';
+  static const adminSecuritySettings = 'admin-security-settings';
+  static const adminSystemLog = 'admin-system-log';
+  static const adminChooseRoleCreateAccount =
+      'admin-choose-role-create-account';
+  static const adminCreateAccount = 'admin-create-account';
 
   static const techWorkOrderDetails = 'work-order-details/:workOrderId';
   static const completeWorkOrder = 'complete-work-order';
   static const addNewPart = 'add-new-part';
   static const inventorySearch = 'inventory-search';
-  static const securityNotifications = 'security-notifications';
+  static const techSecuritySettings = 'tech-security-settings';
+  static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
 
   static const myProducts = 'my-products';

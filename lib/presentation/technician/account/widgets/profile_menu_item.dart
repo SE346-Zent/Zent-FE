@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
-import '../../../common/core/themes/text_styles.dart';
-import '../../../common/core/themes/boxshadow.dart';
+
+// Core Theming
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class ProfileMenuItem extends StatelessWidget {
   final String title;
@@ -32,10 +34,14 @@ class ProfileMenuItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
         ),
         child: InkWell(
-          onTap: onTap,
+          onTap: () {
+            Future.delayed(const Duration(milliseconds: 150), onTap);
+          },
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
+          splashColor: AppColors.secondary100.withValues(alpha: 0.5),
+          highlightColor: AppColors.secondary50.withValues(alpha: 0.3),
           child: Container(
-            width: 364.0,
+            width: double.infinity,
             height: 60.0,
             padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
             child: Row(

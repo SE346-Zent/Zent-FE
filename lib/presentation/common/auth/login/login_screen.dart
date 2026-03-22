@@ -8,7 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 // Shared Auth Components
 import 'widgets/auth_header.dart';
 import 'widgets/auth_text_field.dart';
-import 'widgets/auth_primary_button.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
 import 'widgets/auth_footer_link.dart';
 
 // Feature-specific Widgets
@@ -18,14 +18,36 @@ import 'widgets/social_login_section.dart';
 
 // ViewModel
 import 'view_models/login_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => di.sl<LoginViewModel>(),
+      child: const _LoginScreenContent(),
+    );
+  }
+}
+
+class _LoginScreenContent extends StatelessWidget {
+  const _LoginScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final viewModel = context.watch<LoginViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+
+    // Automatically show error if it exists
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (viewModel.errorMessage != null && context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
+      }
+    });
 
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -42,7 +64,6 @@ class LoginScreen extends StatelessWidget {
                   width: double.infinity,
                   child: const LoginBackground(),
                 ),
-
                 Container(
                   margin: EdgeInsets.only(top: screenHeight * 0.25),
                   padding: const EdgeInsets.symmetric(
@@ -65,35 +86,40 @@ class LoginScreen extends StatelessWidget {
                             'Log in your Zent account to experience the wonderful app',
                         showLogo: false,
                       ),
-
                       const SizedBox(height: AppDimens.spaceLg),
 
-                      const AuthTextField(
+                      AuthTextField(
                         label: 'Email Address',
                         hintText: 'name@gmail.com',
                         keyboardType: TextInputType.emailAddress,
+                        controller: viewModel.emailController,
                       ),
-
                       const SizedBox(height: AppDimens.spaceMd),
 
-                      const AuthTextField(
+                      AuthTextField(
                         label: 'Password',
                         hintText: 'Enter your password',
                         isPassword: true,
+                        controller: viewModel.passwordController,
                       ),
-
                       const ForgotPasswordButton(),
-
                       const SizedBox(height: AppDimens.spaceMd),
 
-                      AuthPrimaryButton(text: 'Sign In', onPressed: () {}),
+                      viewModel.isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : AuthPrimaryButton(
+                              text: 'Sign In',
+                              onPressed: () async {
+                                final success = await viewModel.login();
+                                if (success && context.mounted) {
+                                  // Router will pick up the change if it listens to token store
+                                }
+                              },
+                            ),
 
                       const SizedBox(height: AppDimens.spaceLg),
-
                       const SocialLoginSection(),
-
                       const SizedBox(height: AppDimens.spaceLg),
-
                       AuthFooterLink(
                         text: "Don't have an account?",
                         linkText: 'Sign Up',

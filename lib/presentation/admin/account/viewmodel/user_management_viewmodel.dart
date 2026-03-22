@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/user_list_item.dart';
+import 'package:zent_fe/domain/entities/enums/account_status.dart';
+// Enum removed as it's replaced by Bloc states. String values are used for mock data.
 
 class UserManagementViewModel extends ChangeNotifier {
   int _activeTabIndex = 0;
@@ -7,16 +8,16 @@ class UserManagementViewModel extends ChangeNotifier {
 
   final List<Map<String, dynamic>> _techniciansData = [
     {
-      'userName': 'John Doe (Tech)',
+      'userName': 'John Doe',
       'userRole': 'Senior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=11',
-      'status': UserStatus.active,
+      'status': AccountStatus.active,
     },
     {
-      'userName': 'Jane Smith (Tech)',
+      'userName': 'Jane Smith',
       'userRole': 'Junior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=5',
-      'status': UserStatus.away,
+      'status': AccountStatus.away,
     },
   ];
 
@@ -25,18 +26,29 @@ class UserManagementViewModel extends ChangeNotifier {
       'userName': 'Alice Admin',
       'userRole': 'System Administrator',
       'avatarUrl': 'https://i.pravatar.cc/150?img=1',
-      'status': UserStatus.active,
+      'status': AccountStatus.active,
     },
     {
       'userName': 'Bob Manager',
       'userRole': 'Regional Manager',
       'avatarUrl': 'https://i.pravatar.cc/150?img=13',
-      'status': UserStatus.inactive,
+      'status': AccountStatus.inactive,
     },
   ];
 
   List<Map<String, dynamic>> get activeData =>
       _activeTabIndex == 0 ? _techniciansData : _adminsData;
+
+  Map<String, AccountStatus> get initialStatusMap {
+    final map = <String, AccountStatus>{};
+    for (var user in _techniciansData) {
+      map[user['userName'] as String] = user['status'] as AccountStatus;
+    }
+    for (var user in _adminsData) {
+      map[user['userName'] as String] = user['status'] as AccountStatus;
+    }
+    return map;
+  }
 
   void changeTab(int index) {
     if (_activeTabIndex != index) {

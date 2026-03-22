@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
-import 'package:zent_fe/presentation/customer/account/blocs/chat_bloc.dart';
-import 'package:zent_fe/presentation/customer/account/blocs/chat_event.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/chat_header.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/chat_list.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class CustomerChatScreen extends StatelessWidget {
   const CustomerChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ChatBloc()..add(ChatDataFetchRequested()),
+    return ChangeNotifierProvider(
+      create: (_) => di.sl<ChatViewModel>()..fetchChats(),
       child: const _ChatScreenContent(),
     );
   }
@@ -32,7 +32,11 @@ class _ChatScreenContent extends StatelessWidget {
       backgroundColor: AppColors.surface100,
       body: Stack(
         children: [
-          const Background(opacity: 0.1, width: 109.0, height: 129.0),
+          const Background(
+            opacity: 0.1,
+            width: 109.0,
+            height: 129.0,
+          ),
           SafeArea(
             child: Column(
               children: [

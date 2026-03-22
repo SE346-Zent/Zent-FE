@@ -8,8 +8,6 @@ import 'package:zent_fe/presentation/admin/account/widgets/add_user_fab.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/user_management_list.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/user_role_tabs.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/user_search_bar.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zent_fe/presentation/admin/account/blocs/user_status_bloc.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 class UserManagementScreen extends StatelessWidget {
@@ -17,13 +15,9 @@ class UserManagementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = di.sl<UserManagementViewModel>();
-    return ChangeNotifierProvider.value(
-      value: viewModel,
-      child: BlocProvider(
-        create: (context) => UserStatusBloc(viewModel.initialStatusMap),
-        child: const _UserManagementScreenContent(),
-      ),
+    return ChangeNotifierProvider(
+      create: (_) => di.sl<UserManagementViewModel>(),
+      child: const _UserManagementScreenContent(),
     );
   }
 }

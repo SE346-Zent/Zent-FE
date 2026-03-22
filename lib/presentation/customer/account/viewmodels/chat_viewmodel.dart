@@ -1,22 +1,43 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'chat_event.dart';
-import 'chat_state.dart';
+import 'package:flutter/material.dart';
 
-class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  ChatBloc() : super(ChatInitial()) {
-    on<ChatDataFetchRequested>(_onChatDataFetchRequested);
-  }
+class ChatPreview {
+  final String id;
+  final String name;
+  final String lastMessage;
+  final String time;
+  final int unreadCount;
+  final String? avatarUrl;
 
-  Future<void> _onChatDataFetchRequested(
-    ChatDataFetchRequested event,
-    Emitter<ChatState> emit,
-  ) async {
-    emit(ChatLoading());
+  const ChatPreview({
+    required this.id,
+    required this.name,
+    required this.lastMessage,
+    required this.time,
+    required this.unreadCount,
+    this.avatarUrl,
+  });
+}
+
+class ChatViewModel extends ChangeNotifier {
+  List<ChatPreview> _chats = [];
+  List<ChatPreview> get chats => _chats;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  Future<void> fetchChats() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
     try {
-      final mockData = [
+      _chats = [
         const ChatPreview(
           id: '1',
           name: 'Bae Suzy',
@@ -46,9 +67,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           unreadCount: 0,
         ),
       ];
-      emit(ChatLoadSuccess(mockData));
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
-      emit(ChatLoadFailure(e.toString()));
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }

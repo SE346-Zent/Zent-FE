@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zent_fe/presentation/customer/account/blocs/chat_bloc.dart';
-import 'package:zent_fe/presentation/customer/account/blocs/chat_state.dart';
+import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/chat_list_item.dart';
 
 class ChatList extends StatelessWidget {
@@ -13,24 +12,21 @@ class ChatList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ChatBloc, ChatState>(
-      builder: (context, state) {
-        if (state is ChatLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is ChatLoadFailure) {
-          return Center(child: Text("Error: ${state.errorMessage}"));
-        } else if (state is ChatLoadSuccess) {
-          final chats = state.chats;
-          return ListView.builder(
-            itemCount: chats.length,
-            itemBuilder: (context, index) {
-              final chat = chats[index];
-              return ChatListItem(chat: chat, onTap: () => _onChatTapped(chat));
-            },
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
+    final viewModel = context.watch<ChatViewModel>();
+
+    if (viewModel.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (viewModel.errorMessage != null) {
+      return Center(child: Text("Error: ${viewModel.errorMessage}"));
+    } else if (viewModel.chats.isNotEmpty) {
+      return ListView.builder(
+        itemCount: viewModel.chats.length,
+        itemBuilder: (context, index) {
+          final chat = viewModel.chats[index];
+          return ChatListItem(chat: chat, onTap: () => _onChatTapped(chat));
+        },
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

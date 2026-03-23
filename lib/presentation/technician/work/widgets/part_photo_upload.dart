@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'part_photo_empty_state.dart';
@@ -20,11 +21,11 @@ class PartPhotoUpload extends StatelessWidget {
     this.title = "Part Photo",
   });
 
-  Future<void> _navigateToCamera(BuildContext context) async {
-    final String? result = await context.pushNamed<String>('appCamera');
-    if (result != null) {
-      onPhotoAdded(result);
-    }
+  void _navigateToCamera(BuildContext context) {
+    context.goNamed(
+      RouteNames.appCamera,
+      extra: {'onPhotoCaptured': (String path) => onPhotoAdded(path)},
+    );
   }
 
   @override

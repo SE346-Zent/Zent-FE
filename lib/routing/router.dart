@@ -137,7 +137,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.techMe,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -202,9 +202,15 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
     GoRoute(
-      name: 'appCamera',
+      name: RouteNames.appCamera,
       path: '/app-camera',
-      builder: (context, state) => const AppCameraScreen(),
+      builder: (context, state) {
+        final Map<String, dynamic>? extra =
+            state.extra as Map<String, dynamic>?;
+        final onPhotoCaptured =
+            extra?['onPhotoCaptured'] as void Function(String)?;
+        return AppCameraScreen(onPhotoCaptured: onPhotoCaptured);
+      },
     ),
 
     // Admin top level routes using StatefulShellRoute

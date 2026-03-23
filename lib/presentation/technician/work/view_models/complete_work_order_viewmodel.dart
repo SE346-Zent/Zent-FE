@@ -65,13 +65,44 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
         diagnosticNotesController.text = draft.diagnosticNotes;
 
         notifyListeners();
+      } else {
+        // Fallback to mock data if no draft exists
+        _setInitialMockData();
       }
     } finally {
       _isLoading = false;
     }
   }
 
-  void _saveDraft() {
+  void _setInitialMockData() {
+    _uninstalledParts.clear();
+    _uninstalledParts.addAll([
+      TechWorkOrderPart(
+        id: 'P-101',
+        name: 'Laptop Lenovo',
+        serialNumber: '1234567',
+        quantity: 1,
+      ),
+      TechWorkOrderPart(
+        id: 'P-102',
+        name: 'Laptop Lenovo',
+        serialNumber: '1234567',
+        quantity: 1,
+      ),
+    ]);
+    _installedParts.clear();
+    _installedParts.addAll([
+      TechWorkOrderPart(
+        id: 'P-201',
+        name: 'Laptop Lenovo',
+        serialNumber: '1234567',
+        quantity: 1,
+      ),
+    ]);
+    notifyListeners();
+  }
+
+  Future<void> _saveDraft() async {
     if (_isLoading) return;
 
     final draft = WorkOrderCompletionDraft(
@@ -85,7 +116,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
       duringPhotos: _duringPhotos,
       postPhotos: _postPhotos,
     );
-    saveWorkOrderDraftUseCase.execute(draft);
+    await saveWorkOrderDraftUseCase.execute(draft);
   }
 
   // Machine Information (now controlled by listeners, but keeping setters for backwards compatibility/API)
@@ -96,30 +127,10 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   String get diagnosticNotes => diagnosticNotesController.text;
 
   // Parts Sections
-  final List<TechWorkOrderPart> _uninstalledParts = [
-    TechWorkOrderPart(
-      id: 'P-101',
-      name: 'Laptop Lenovo',
-      serialNumber: '1234567',
-      quantity: 1,
-    ),
-    TechWorkOrderPart(
-      id: 'P-102',
-      name: 'Laptop Lenovo',
-      serialNumber: '1234567',
-      quantity: 1,
-    ),
-  ];
+  final List<TechWorkOrderPart> _uninstalledParts = [];
   List<TechWorkOrderPart> get uninstalledParts => _uninstalledParts;
 
-  final List<TechWorkOrderPart> _installedParts = [
-    TechWorkOrderPart(
-      id: 'P-201',
-      name: 'Laptop Lenovo',
-      serialNumber: '1234567',
-      quantity: 1,
-    ),
-  ];
+  final List<TechWorkOrderPart> _installedParts = [];
   List<TechWorkOrderPart> get installedParts => _installedParts;
 
   // Evidence Photos

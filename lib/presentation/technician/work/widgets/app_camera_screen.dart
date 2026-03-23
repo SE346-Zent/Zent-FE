@@ -5,7 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class AppCameraScreen extends StatefulWidget {
-  const AppCameraScreen({super.key});
+  final void Function(String)? onPhotoCaptured;
+  const AppCameraScreen({super.key, this.onPhotoCaptured});
 
   @override
   State<AppCameraScreen> createState() => _AppCameraScreenState();
@@ -58,11 +59,12 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
                           single: (single) {
                             if (single.file != null &&
                                 _capturedFilePath == null) {
-                              Future.microtask(
-                                () => setState(
+                              Future.microtask(() {
+                                if (!mounted) return;
+                                setState(
                                   () => _capturedFilePath = single.file!.path,
-                                ),
-                              );
+                                );
+                              });
                             }
                           },
                         );
@@ -151,10 +153,14 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
                         onTap: () => setState(() => _capturedFilePath = null),
                         color: Colors.black54,
                       ),
-                      // Approve Button
                       _buildActionCircle(
                         icon: Icons.check_rounded,
-                        onTap: () => context.pop(_capturedFilePath),
+                        onTap: () {
+                          if (widget.onPhotoCaptured != null) {
+                            widget.onPhotoCaptured!(_capturedFilePath!);
+                          }
+                          context.pop(_capturedFilePath);
+                        },
                         color: Colors.black54,
                       ),
                     ],

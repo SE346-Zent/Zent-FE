@@ -180,10 +180,12 @@ class EvidencePhotosSection extends StatelessWidget {
     );
   }
 
-  void _openCamera(BuildContext context, String phase) async {
-    final result = await context.pushNamed(RouteNames.appCamera);
-    if (result != null && result is String) {
-      viewModel.addPhoto(result, phase);
-    }
+  void _openCamera(BuildContext context, String phase) {
+    context.goNamed(
+      RouteNames.appCamera,
+      extra: {
+        'onPhotoCaptured': (String path) => viewModel.addPhoto(path, phase),
+      },
+    );
   }
 }

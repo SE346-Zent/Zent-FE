@@ -5,17 +5,20 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../data/datasources/local/auth_local_datasource.dart';
 import '../data/datasources/remote/auth_remote_datasource.dart';
+import '../data/datasources/remote/order_remote_datasource.dart';
+import '../data/datasources/local/work_order_local_datasource.dart';
 import '../data/repositories/auth_repository_impl.dart';
+import '../data/repositories/work_order_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
+import '../domain/repositories/work_order_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
 import '../domain/usecases/auth/check_first_time_usecase.dart';
 import '../domain/usecases/auth/set_first_time_done_usecase.dart';
 import '../domain/usecases/work_order/get_work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/save_work_order_draft_usecase.dart';
-import '../domain/repositories/work_order_repository.dart';
-import '../data/repositories/work_order_repository_impl.dart';
-import '../data/datasources/local/work_order_local_datasource.dart';
+import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
+import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
@@ -54,6 +57,8 @@ Future<void> init() async {
   // Work Order Use Cases
   sl.registerLazySingleton(() => SaveWorkOrderDraftUseCase(sl()));
   sl.registerLazySingleton(() => GetWorkOrderDraftUseCase(sl()));
+  sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
 
   // ViewModels
   sl.registerFactory(() => SplashViewModel(sl(), sl()));
@@ -94,7 +99,8 @@ Future<void> init() async {
         AuthRepositoryImpl(authRemoteService: sl(), authLocalDataSource: sl()),
   );
   sl.registerLazySingleton<WorkOrderRepository>(
-    () => WorkOrderRepositoryImpl(localDataSource: sl()),
+    () =>
+        WorkOrderRepositoryImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
 
   // Data sources
@@ -106,6 +112,9 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<WorkOrderLocalDataSource>(
     () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
+  );
+  sl.registerLazySingleton<OrderRemoteDataSource>(
+    () => OrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
   );
 
   // --- External ---

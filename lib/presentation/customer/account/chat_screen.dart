@@ -32,11 +32,7 @@ class _ChatScreenContent extends StatelessWidget {
       backgroundColor: AppColors.surface100,
       body: Stack(
         children: [
-          const Background(
-            opacity: 0.1,
-            width: 109.0,
-            height: 129.0,
-          ),
+          const Background(opacity: 0.1, width: 109.0, height: 129.0),
           SafeArea(
             child: Column(
               children: [

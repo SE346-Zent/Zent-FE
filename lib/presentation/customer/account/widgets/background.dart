@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart' show AppAssets;
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class Background extends StatelessWidget {
   final double opacity;

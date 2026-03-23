@@ -22,9 +22,7 @@ class OnBoardingPageIndicator extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
-          width: currentPage == index
-              ? AppDimens.spaceLg
-              : AppDimens.spaceSm,
+          width: currentPage == index ? AppDimens.spaceLg : AppDimens.spaceSm,
           height: AppDimens.spaceSm,
           decoration: BoxDecoration(
             color: currentPage == index

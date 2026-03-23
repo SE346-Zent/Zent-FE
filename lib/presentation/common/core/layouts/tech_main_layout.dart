@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
+import '../../../technician/account/widgets/tech_sidebar.dart';
 
 class TechMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -22,6 +23,11 @@ class TechMainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background500,
+      drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
+      drawer: const TechSidebar(
+        userName: 'Hung dep zai',
+        employeeId: 'TECH-1234',
+      ),
       body: navigationShell,
 
       floatingActionButton: _AnimatedFAB(

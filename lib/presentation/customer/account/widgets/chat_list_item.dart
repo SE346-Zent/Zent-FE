@@ -3,7 +3,8 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/chat_viewmodel.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart' show AppAssets;
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class ChatListItem extends StatelessWidget {
   final ChatPreview chat;

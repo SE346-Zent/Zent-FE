@@ -21,6 +21,9 @@ class AccountHeader extends StatelessWidget {
   /// The text displayed as the screen title.
   final String title;
 
+  /// Optional subtitle displayed below the title.
+  final String? subtitle;
+
   /// Optional callback for the back button.
   /// If null, defaults to `context.pop()`.
   final VoidCallback? onBackPressed;
@@ -46,8 +49,9 @@ class AccountHeader extends StatelessWidget {
   const AccountHeader({
     super.key,
     required this.title,
+    this.subtitle,
     this.onBackPressed,
-    this.showDivider = true,
+    this.showDivider = false,
     this.horizontalPadding = AppDimens.spaceMd,
     this.verticalPadding = AppDimens.spaceSm,
     this.showLeading = true,
@@ -81,9 +85,22 @@ class AccountHeader extends StatelessWidget {
           const SizedBox(width: 40.0), // Balance the row when no leading
         Expanded(
           child: Center(
-            child: Text(
-              title,
-              style: TextStyles.headline.copyWith(color: AppColors.primary500),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyles.headline.copyWith(color: AppColors.primary500),
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: TextStyles.label.copyWith(
+                      color: AppColors.secondary500,
+                      height: 1.1, // tighter spacing
+                    ),
+                  ),
+              ],
             ),
           ),
         ),

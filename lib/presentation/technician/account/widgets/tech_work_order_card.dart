@@ -6,6 +6,8 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
 // ViewModel
 import '../view_models/tech_work_order_viewmodel.dart';
 
@@ -37,7 +39,7 @@ class WorkOrderCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
       padding: const EdgeInsets.all(AppDimens.spaceMd),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         border: Border.all(color: AppColors.secondary50),
         boxShadow: [BoxShadowStyles.raised],
@@ -111,6 +113,12 @@ class WorkOrderCard extends StatelessWidget {
               text: 'View Details',
               textColor: AppColors.tertiary500,
               bgColor: AppColors.tertiary50,
+              onPressed: () {
+                context.pushNamed(
+                  RouteNames.techWorkOrderDetails,
+                  pathParameters: {'workOrderId': order.id},
+                );
+              },
             )
           else
             Row(
@@ -118,8 +126,14 @@ class WorkOrderCard extends StatelessWidget {
                 Expanded(
                   child: _buildActionButton(
                     text: isPending ? 'Start Job' : 'Complete',
-                    textColor: Colors.white,
+                    textColor: AppColors.surface100,
                     bgColor: AppColors.tertiary500,
+                    onPressed: () {
+                      context.pushNamed(
+                        RouteNames.techWorkOrderDetails,
+                        pathParameters: {'workOrderId': order.id},
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 12.0),
@@ -127,7 +141,7 @@ class WorkOrderCard extends StatelessWidget {
                   height: 44.0,
                   width: 44.0,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface100,
                     borderRadius: BorderRadius.circular(AppDimens.boraSm),
                     border: Border.all(color: AppColors.secondary50),
                   ),
@@ -163,22 +177,21 @@ class WorkOrderCard extends StatelessWidget {
     required String text,
     required Color textColor,
     required Color bgColor,
+    required VoidCallback onPressed,
   }) {
-    return Container(
-      height: 44.0,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(AppDimens.boraSm),
+      child: Container(
+        height: 44.0,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(AppDimens.boraSm),
+          boxShadow: [BoxShadowStyles.subtle],
+        ),
+        alignment: Alignment.center,
+        child: Text(text, style: TextStyles.title.copyWith(color: textColor)),
       ),
-      alignment: Alignment.center,
-      child: Text(text, style: TextStyles.title.copyWith(color: textColor)),
     );
   }
 }

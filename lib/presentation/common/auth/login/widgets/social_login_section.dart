@@ -28,7 +28,7 @@ class SocialLoginSection extends StatelessWidget {
         // Google Button
         SocialLoginButton(
           onPressed: () {
-            // TODO: Handle Google Login logic
+            // Handle Google Login logic
           },
         ),
       ],

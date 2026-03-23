@@ -9,6 +9,14 @@ import '../data/repositories/auth_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
+import '../domain/usecases/auth/check_first_time_usecase.dart';
+import '../domain/usecases/auth/set_first_time_done_usecase.dart';
+import '../domain/usecases/work_order/get_work_order_draft_usecase.dart';
+import '../domain/usecases/work_order/save_work_order_draft_usecase.dart';
+import '../domain/repositories/work_order_repository.dart';
+import '../data/repositories/work_order_repository_impl.dart';
+import '../data/datasources/local/work_order_local_datasource.dart';
+import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
 import '../presentation/common/auth/login/view_models/reset_password_view_model.dart';
@@ -25,6 +33,10 @@ import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/tech_profile_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/personal_info_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/view_models/technician_home_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_details_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/add_new_part_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/complete_work_order_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/security_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/tech_work_order_viewmodel.dart';
 
@@ -36,8 +48,15 @@ Future<void> init() async {
   // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => CheckFirstTimeUseCase(sl()));
+  sl.registerLazySingleton(() => SetFirstTimeDoneUseCase(sl()));
+
+  // Work Order Use Cases
+  sl.registerLazySingleton(() => SaveWorkOrderDraftUseCase(sl()));
+  sl.registerLazySingleton(() => GetWorkOrderDraftUseCase(sl()));
 
   // ViewModels
+  sl.registerFactory(() => SplashViewModel(sl(), sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
   sl.registerFactory(() => ForgotPasswordViewModel());
   sl.registerFactory(() => ResetPasswordViewModel());
@@ -51,16 +70,31 @@ Future<void> init() async {
   sl.registerFactory(() => ChatViewModel());
 
   // Tech ViewModels
+  sl.registerFactory(() => TechnicianHomeViewModel());
+  sl.registerFactory(() => TechWorkOrderViewModel());
+  sl.registerFactoryParam<TechWorkOrderDetailsViewModel, String, void>(
+    (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
+  );
+  sl.registerFactory(() => AddNewPartViewModel());
+  sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
+    (workOrderId, _) => CompleteWorkOrderViewModel(
+      workOrderId: workOrderId,
+      getWorkOrderDraftUseCase: sl(),
+      saveWorkOrderDraftUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => TechProfileViewModel());
   sl.registerFactory(() => TechPersonalInfoViewModel());
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(() => TechSecurityViewModel());
-  sl.registerFactory(() => TechWorkOrderViewModel());
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
     () =>
         AuthRepositoryImpl(authRemoteService: sl(), authLocalDataSource: sl()),
+  );
+  sl.registerLazySingleton<WorkOrderRepository>(
+    () => WorkOrderRepositoryImpl(localDataSource: sl()),
   );
 
   // Data sources
@@ -69,6 +103,9 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(secureStorage: sl(), sharedPreferences: sl()),
+  );
+  sl.registerLazySingleton<WorkOrderLocalDataSource>(
+    () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
   );
 
   // --- External ---

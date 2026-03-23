@@ -3,7 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart' show AppAssets;
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class ServiceHeader extends StatelessWidget {
   final String userName;

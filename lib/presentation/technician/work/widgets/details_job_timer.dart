@@ -24,8 +24,14 @@ class DetailsJobTimer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildTimerBox(viewModel.hours.toString().padLeft(2, '0'), "Hours"),
-            _buildTimerBox(viewModel.minutes.toString().padLeft(2, '0'), "Minutes"),
-            _buildTimerBox(viewModel.seconds.toString().padLeft(2, '0'), "Seconds"),
+            _buildTimerBox(
+              viewModel.minutes.toString().padLeft(2, '0'),
+              "Minutes",
+            ),
+            _buildTimerBox(
+              viewModel.seconds.toString().padLeft(2, '0'),
+              "Seconds",
+            ),
           ],
         ),
       ],
@@ -47,9 +53,7 @@ class DetailsJobTimer extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             value,
-            style: TextStyles.display.copyWith(
-              color: AppColors.primary500,
-            ),
+            style: TextStyles.display.copyWith(color: AppColors.primary500),
           ),
         ),
         const SizedBox(height: AppDimens.spaceXs),

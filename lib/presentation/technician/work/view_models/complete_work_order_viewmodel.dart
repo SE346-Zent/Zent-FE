@@ -11,7 +11,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   // Controllers for text fields to ensure reliable persistence & UI sync
   final TextEditingController mtmController = TextEditingController();
   final TextEditingController serialNumberController = TextEditingController();
-  final TextEditingController diagnosticNotesController = TextEditingController();
+  final TextEditingController diagnosticNotesController =
+      TextEditingController();
 
   bool _isLoading = true;
 
@@ -24,7 +25,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
     mtmController.addListener(_saveDraft);
     serialNumberController.addListener(_saveDraft);
     diagnosticNotesController.addListener(_saveDraft);
-    
+
     _loadDraft();
   }
 
@@ -47,7 +48,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
         // Update parts and photos first (they don't trigger listeners)
         _uninstalledParts.clear();
         _uninstalledParts.addAll(draft.uninstalledParts);
-        
+
         _installedParts.clear();
         _installedParts.addAll(draft.installedParts);
 
@@ -62,7 +63,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
         mtmController.text = draft.mtm;
         serialNumberController.text = draft.serialNumber;
         diagnosticNotesController.text = draft.diagnosticNotes;
-        
+
         notifyListeners();
       }
     } finally {
@@ -72,7 +73,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
 
   void _saveDraft() {
     if (_isLoading) return;
-    
+
     final draft = WorkOrderCompletionDraft(
       workOrderId: workOrderId,
       mtm: mtmController.text,
@@ -96,13 +97,28 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
 
   // Parts Sections
   final List<TechWorkOrderPart> _uninstalledParts = [
-    TechWorkOrderPart(id: 'P-101', name: 'Laptop Lenovo', serialNumber: '1234567', quantity: 1),
-    TechWorkOrderPart(id: 'P-102', name: 'Laptop Lenovo', serialNumber: '1234567', quantity: 1),
+    TechWorkOrderPart(
+      id: 'P-101',
+      name: 'Laptop Lenovo',
+      serialNumber: '1234567',
+      quantity: 1,
+    ),
+    TechWorkOrderPart(
+      id: 'P-102',
+      name: 'Laptop Lenovo',
+      serialNumber: '1234567',
+      quantity: 1,
+    ),
   ];
   List<TechWorkOrderPart> get uninstalledParts => _uninstalledParts;
 
   final List<TechWorkOrderPart> _installedParts = [
-    TechWorkOrderPart(id: 'P-201', name: 'Laptop Lenovo', serialNumber: '1234567', quantity: 1),
+    TechWorkOrderPart(
+      id: 'P-201',
+      name: 'Laptop Lenovo',
+      serialNumber: '1234567',
+      quantity: 1,
+    ),
   ];
   List<TechWorkOrderPart> get installedParts => _installedParts;
 
@@ -120,10 +136,17 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   void addPhoto(String path, String phase) {
     List<String> target;
     switch (phase) {
-      case 'pre': target = _prePhotos; break;
-      case 'during': target = _duringPhotos; break;
-      case 'post': target = _postPhotos; break;
-      default: return;
+      case 'pre':
+        target = _prePhotos;
+        break;
+      case 'during':
+        target = _duringPhotos;
+        break;
+      case 'post':
+        target = _postPhotos;
+        break;
+      default:
+        return;
     }
     if (target.length < 5) {
       target.add(path);
@@ -135,10 +158,17 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   void removePhoto(int index, String phase) {
     List<String> target;
     switch (phase) {
-      case 'pre': target = _prePhotos; break;
-      case 'during': target = _duringPhotos; break;
-      case 'post': target = _postPhotos; break;
-      default: return;
+      case 'pre':
+        target = _prePhotos;
+        break;
+      case 'during':
+        target = _duringPhotos;
+        break;
+      case 'post':
+        target = _postPhotos;
+        break;
+      default:
+        return;
     }
     if (index >= 0 && index < target.length) {
       target.removeAt(index);
@@ -161,7 +191,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   }
 
   void submitReport() {
-    debugPrint("action triggered: Submit Completion Report for WO: $workOrderId");
+    debugPrint(
+      "action triggered: Submit Completion Report for WO: $workOrderId",
+    );
     // Clear draft on success?
   }
 }

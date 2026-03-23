@@ -90,7 +90,9 @@ class AccountHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyles.headline.copyWith(color: AppColors.primary500),
+                  style: TextStyles.headline.copyWith(
+                    color: AppColors.primary500,
+                  ),
                 ),
                 if (subtitle != null)
                   Text(

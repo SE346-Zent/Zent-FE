@@ -19,7 +19,9 @@ class WorkOrderLocalDataSourceImpl implements WorkOrderLocalDataSource {
   }
 
   @override
-  Future<WorkOrderCompletionDraftModel?> getWorkOrderDraft(String workOrderId) async {
+  Future<WorkOrderCompletionDraftModel?> getWorkOrderDraft(
+    String workOrderId,
+  ) async {
     final jsonString = sharedPreferences.getString(_getKey(workOrderId));
     if (jsonString != null) {
       return WorkOrderCompletionDraftModel.fromJson(json.decode(jsonString));

@@ -47,7 +47,8 @@ class _CompleteWorkOrderContent extends StatelessWidget {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppDimens.spaceMd),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch, // Kept for consistency with other sections
+                  crossAxisAlignment: CrossAxisAlignment
+                      .stretch, // Kept for consistency with other sections
                   children: [
                     MachineInfoSection(viewModel: viewModel),
                     const SizedBox(height: AppDimens.spaceLg),
@@ -57,10 +58,12 @@ class _CompleteWorkOrderContent extends StatelessWidget {
                     const SizedBox(height: AppDimens.spaceLg),
                     EvidencePhotosSection(viewModel: viewModel),
                     const SizedBox(height: AppDimens.spaceXl),
-                    
+
                     // Submit Button inside ScrollView for better accessibility
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceSm),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimens.spaceSm,
+                      ),
                       child: PrimaryActionButton(
                         label: "Submit Completion Report",
                         width: double.infinity,

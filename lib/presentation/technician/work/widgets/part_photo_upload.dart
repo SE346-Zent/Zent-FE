@@ -58,9 +58,7 @@ class PartPhotoUpload extends StatelessWidget {
                   onAddTap: () => _navigateToCamera(context),
                   onRemoveTap: onPhotoRemoved,
                 )
-              : PartPhotoEmptyState(
-                  onTap: () => _navigateToCamera(context),
-                ),
+              : PartPhotoEmptyState(onTap: () => _navigateToCamera(context)),
         ),
       ],
     );

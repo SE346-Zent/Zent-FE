@@ -51,11 +51,15 @@ class ProfileInputField extends StatelessWidget {
             onChanged: onChanged,
             maxLines: isMultiline ? null : 1,
             expands: isMultiline,
-            textAlignVertical: isMultiline ? TextAlignVertical.top : TextAlignVertical.center,
+            textAlignVertical: isMultiline
+                ? TextAlignVertical.top
+                : TextAlignVertical.center,
             style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: TextStyles.bodyMedium.copyWith(color: AppColors.secondary100),
+              hintStyle: TextStyles.bodyMedium.copyWith(
+                color: AppColors.secondary100,
+              ),
               border: InputBorder.none,
               isDense: true,
               contentPadding: EdgeInsets.symmetric(

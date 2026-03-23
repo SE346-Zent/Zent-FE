@@ -73,7 +73,11 @@ class MachineInfoSection extends StatelessWidget {
         boxShadow: [BoxShadowStyles.glowing],
       ),
       child: TextButton.icon(
-        icon: const Icon(Icons.qr_code_scanner, color: AppColors.surface100, size: 31),
+        icon: const Icon(
+          Icons.qr_code_scanner,
+          color: AppColors.surface100,
+          size: 31,
+        ),
         label: Text(
           "Scanner",
           style: TextStyles.middle.copyWith(color: AppColors.surface100),

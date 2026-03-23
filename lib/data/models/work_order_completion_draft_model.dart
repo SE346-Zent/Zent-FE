@@ -49,7 +49,9 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
     super.postPhotos,
   });
 
-  factory WorkOrderCompletionDraftModel.fromEntity(WorkOrderCompletionDraft entity) {
+  factory WorkOrderCompletionDraftModel.fromEntity(
+    WorkOrderCompletionDraft entity,
+  ) {
     return WorkOrderCompletionDraftModel(
       workOrderId: entity.workOrderId,
       mtm: entity.mtm,
@@ -70,10 +72,14 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       serialNumber: json['serialNumber'] as String? ?? "",
       diagnosticNotes: json['diagnosticNotes'] as String? ?? "",
       uninstalledParts: (json['uninstalledParts'] as List? ?? [])
-          .map((e) => TechWorkOrderPartModel.fromJson(e as Map<String, dynamic>))
+          .map(
+            (e) => TechWorkOrderPartModel.fromJson(e as Map<String, dynamic>),
+          )
           .toList(),
       installedParts: (json['installedParts'] as List? ?? [])
-          .map((e) => TechWorkOrderPartModel.fromJson(e as Map<String, dynamic>))
+          .map(
+            (e) => TechWorkOrderPartModel.fromJson(e as Map<String, dynamic>),
+          )
           .toList(),
       prePhotos: List<String>.from(json['prePhotos'] as List? ?? []),
       duringPhotos: List<String>.from(json['duringPhotos'] as List? ?? []),

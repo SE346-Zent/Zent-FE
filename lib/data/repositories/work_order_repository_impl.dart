@@ -15,7 +15,9 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
-  Future<WorkOrderCompletionDraft?> getWorkOrderDraft(String workOrderId) async {
+  Future<WorkOrderCompletionDraft?> getWorkOrderDraft(
+    String workOrderId,
+  ) async {
     return await localDataSource.getWorkOrderDraft(workOrderId);
   }
 }

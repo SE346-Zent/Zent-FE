@@ -30,7 +30,9 @@ class DetailsJobInfo extends StatelessWidget {
             children: [
               Text(
                 viewModel.jobName,
-                style: TextStyles.headline.copyWith(color: AppColors.primary500),
+                style: TextStyles.headline.copyWith(
+                  color: AppColors.primary500,
+                ),
               ),
               Row(
                 children: [
@@ -45,7 +47,9 @@ class DetailsJobInfo extends StatelessWidget {
                   const SizedBox(width: AppDimens.spaceXs),
                   Text(
                     viewModel.status,
-                    style: TextStyles.label.copyWith(color: AppColors.tertiary500),
+                    style: TextStyles.label.copyWith(
+                      color: AppColors.tertiary500,
+                    ),
                   ),
                 ],
               ),
@@ -69,22 +73,34 @@ class DetailsJobInfo extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person_outline, size: 16, color: AppColors.secondary300),
+                        const Icon(
+                          Icons.person_outline,
+                          size: 16,
+                          color: AppColors.secondary300,
+                        ),
                         const SizedBox(width: AppDimens.spaceXs),
                         Text(
                           viewModel.customerName,
-                          style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary300),
+                          style: TextStyles.bodyMedium.copyWith(
+                            color: AppColors.secondary300,
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 16, color: AppColors.secondary300),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: AppColors.secondary300,
+                        ),
                         const SizedBox(width: AppDimens.spaceXs),
                         Expanded(
                           child: Text(
                             viewModel.customerAddress,
-                            style: TextStyles.label.copyWith(color: AppColors.secondary300),
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.secondary300,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

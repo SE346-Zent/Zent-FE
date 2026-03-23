@@ -46,14 +46,24 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier {
   // Checklist state
   final List<TaskChecklistItem> _checklist = [
     TaskChecklistItem(title: "Check valid serial number", isCompleted: true),
-    TaskChecklistItem(title: "Use tester to check the status", isCompleted: true),
-    TaskChecklistItem(title: "Use tester to check the status", isCompleted: false),
-    TaskChecklistItem(title: "Use tester to check the status", isCompleted: false),
+    TaskChecklistItem(
+      title: "Use tester to check the status",
+      isCompleted: true,
+    ),
+    TaskChecklistItem(
+      title: "Use tester to check the status",
+      isCompleted: false,
+    ),
+    TaskChecklistItem(
+      title: "Use tester to check the status",
+      isCompleted: false,
+    ),
   ];
 
   List<TaskChecklistItem> get checklist => _checklist;
 
-  int get completedTasksCount => _checklist.where((item) => item.isCompleted).length;
+  int get completedTasksCount =>
+      _checklist.where((item) => item.isCompleted).length;
   int get totalTasksCount => _checklist.length;
 
   // Artifacts state

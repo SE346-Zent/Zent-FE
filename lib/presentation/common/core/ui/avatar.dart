@@ -26,7 +26,12 @@ class Avatar extends StatelessWidget {
   /// Whether to show the edit badge. Defaults to true.
   final bool showEditIcon;
 
-  const Avatar({super.key, this.imageUrl, required this.name, this.showEditIcon = true});
+  const Avatar({
+    super.key,
+    this.imageUrl,
+    required this.name,
+    this.showEditIcon = true,
+  });
 
   String get _initials {
     if (name.isEmpty) return 'U';

@@ -64,15 +64,15 @@ class _DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final RRect rrect = RRect.fromLTRBR(
-      0, 
-      0, 
-      size.width, 
-      size.height, 
+      0,
+      0,
+      size.width,
+      size.height,
       Radius.circular(borderRadius),
     );
 
     final Path path = Path()..addRRect(rrect);
-    
+
     final Path dashPath = Path();
     for (final PathMetric metric in path.computeMetrics()) {
       double distance = 0;
@@ -84,7 +84,7 @@ class _DashedBorderPainter extends CustomPainter {
         distance += dashWidth + dashGap;
       }
     }
-    
+
     canvas.drawPath(dashPath, paint);
   }
 

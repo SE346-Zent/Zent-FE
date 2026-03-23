@@ -23,7 +23,8 @@ class DetailsArtifactList extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: viewModel.artifacts.length,
-          separatorBuilder: (_, index) => const SizedBox(height: AppDimens.spaceSm),
+          separatorBuilder: (_, index) =>
+              const SizedBox(height: AppDimens.spaceSm),
           itemBuilder: (context, index) {
             final artifact = viewModel.artifacts[index];
             return Container(
@@ -41,11 +42,15 @@ class DetailsArtifactList extends StatelessWidget {
                       children: [
                         Text(
                           artifact.name,
-                          style: TextStyles.title.copyWith(color: AppColors.primary500),
+                          style: TextStyles.title.copyWith(
+                            color: AppColors.primary500,
+                          ),
                         ),
                         Text(
                           artifact.type,
-                          style: TextStyles.label.copyWith(color: AppColors.secondary300),
+                          style: TextStyles.label.copyWith(
+                            color: AppColors.secondary300,
+                          ),
                         ),
                       ],
                     ),

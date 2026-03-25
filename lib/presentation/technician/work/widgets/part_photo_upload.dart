@@ -22,7 +22,7 @@ class PartPhotoUpload extends StatelessWidget {
   });
 
   void _navigateToCamera(BuildContext context) {
-    context.goNamed(
+    context.pushNamed(
       RouteNames.appCamera,
       extra: {'onPhotoCaptured': (String path) => onPhotoAdded(path)},
     );

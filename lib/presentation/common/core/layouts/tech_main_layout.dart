@@ -38,9 +38,12 @@ class TechMainLayout extends StatelessWidget {
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      bottomNavigationBar: _TechBottomNavBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: _goBranch,
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: _TechBottomNavBar(
+          currentIndex: navigationShell.currentIndex,
+          onTap: _goBranch,
+        ),
       ),
     );
   }

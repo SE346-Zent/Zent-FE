@@ -13,10 +13,8 @@ import '../domain/repositories/auth_repository.dart';
 import '../domain/repositories/work_order_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
-import '../domain/usecases/auth/check_first_time_usecase.dart';
-import '../domain/usecases/auth/set_first_time_done_usecase.dart';
-import '../domain/usecases/work_order/get_work_order_draft_usecase.dart';
-import '../domain/usecases/work_order/save_work_order_draft_usecase.dart';
+import '../domain/usecases/auth/first_time_usecase.dart';
+import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
@@ -41,7 +39,7 @@ import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order
 import 'package:zent_fe/presentation/technician/work/view_models/add_new_part_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/work/view_models/complete_work_order_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/security_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/account/view_models/tech_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -51,17 +49,15 @@ Future<void> init() async {
   // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
-  sl.registerLazySingleton(() => CheckFirstTimeUseCase(sl()));
-  sl.registerLazySingleton(() => SetFirstTimeDoneUseCase(sl()));
+  sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
 
   // Work Order Use Cases
-  sl.registerLazySingleton(() => SaveWorkOrderDraftUseCase(sl()));
-  sl.registerLazySingleton(() => GetWorkOrderDraftUseCase(sl()));
+  sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
   sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
 
   // ViewModels
-  sl.registerFactory(() => SplashViewModel(sl(), sl()));
+  sl.registerFactory(() => SplashViewModel(sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
   sl.registerFactory(() => ForgotPasswordViewModel());
   sl.registerFactory(() => ResetPasswordViewModel());
@@ -84,8 +80,8 @@ Future<void> init() async {
   sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
     (workOrderId, _) => CompleteWorkOrderViewModel(
       workOrderId: workOrderId,
-      getWorkOrderDraftUseCase: sl(),
-      saveWorkOrderDraftUseCase: sl(),
+      workOrderDraftUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
     ),
   );
   sl.registerFactory(() => TechProfileViewModel());

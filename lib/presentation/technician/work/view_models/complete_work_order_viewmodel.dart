@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../domain/entities/work_order_completion_draft.dart';
-import '../../../../domain/usecases/work_order/get_work_order_draft_usecase.dart';
-import '../../../../domain/usecases/work_order/save_work_order_draft_usecase.dart';
+import '../../../../domain/usecases/work_order/work_order_draft_usecase.dart';
+import '../../../../domain/usecases/work_order/get_single_work_order_usecase.dart';
 
 class CompleteWorkOrderViewModel extends ChangeNotifier {
+  bool _isDisposed = false;
+
   final String workOrderId;
-  final GetWorkOrderDraftUseCase getWorkOrderDraftUseCase;
-  final SaveWorkOrderDraftUseCase saveWorkOrderDraftUseCase;
+  final WorkOrderDraftUseCase workOrderDraftUseCase;
+  final GetSingleWorkOrderUseCase getSingleWorkOrderUseCase;
 
   // Controllers for text fields to ensure reliable persistence & UI sync
   final TextEditingController mtmController = TextEditingController();
@@ -18,8 +20,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
 
   CompleteWorkOrderViewModel({
     required this.workOrderId,
-    required this.getWorkOrderDraftUseCase,
-    required this.saveWorkOrderDraftUseCase,
+    required this.workOrderDraftUseCase,
+    required this.getSingleWorkOrderUseCase,
   }) {
     // Initialize listeners to save on every stroke
     mtmController.addListener(_saveDraft);
@@ -31,6 +33,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
     mtmController.removeListener(_saveDraft);
     serialNumberController.removeListener(_saveDraft);
     diagnosticNotesController.removeListener(_saveDraft);
@@ -40,10 +43,17 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
     super.dispose();
   }
 
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
+
   Future<void> _loadDraft() async {
     _isLoading = true;
     try {
-      final draft = await getWorkOrderDraftUseCase.execute(workOrderId);
+      final draft = await workOrderDraftUseCase.get(workOrderId);
       if (draft != null) {
         // Update parts and photos first (they don't trigger listeners)
         _uninstalledParts.clear();
@@ -116,7 +126,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
       duringPhotos: _duringPhotos,
       postPhotos: _postPhotos,
     );
-    await saveWorkOrderDraftUseCase.execute(draft);
+    await workOrderDraftUseCase.save(draft);
   }
 
   // Machine Information (now controlled by listeners, but keeping setters for backwards compatibility/API)

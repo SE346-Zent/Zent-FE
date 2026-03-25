@@ -22,7 +22,7 @@ import '../presentation/technician/account/tech_profile_screen.dart';
 import '../presentation/technician/account/personal_info_screen.dart';
 import '../presentation/technician/account/notifications_screen.dart';
 import '../presentation/technician/account/security_screen.dart';
-import '../presentation/technician/account/tech_work_order_screen.dart';
+import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
 import '../presentation/technician/account/technician_home_screen.dart';
@@ -137,7 +137,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
+  initialLocation: Routes.techMe,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes

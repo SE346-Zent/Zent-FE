@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/entities/enums/user_status.dart';
+import 'package:zent_fe/domain/entities/enums/account_status.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 
 class UserManagementViewModel extends ChangeNotifier {
@@ -11,13 +11,13 @@ class UserManagementViewModel extends ChangeNotifier {
       'userName': 'John Doe',
       'userRole': 'Senior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=11',
-      'status': UserStatus.active,
+      'status': AccountStatus.active,
     },
     {
       'userName': 'Jane Smith',
       'userRole': 'Junior Electrician',
       'avatarUrl': 'https://i.pravatar.cc/150?img=5',
-      'status': UserStatus.away,
+      'status': AccountStatus.away,
     },
   ];
 
@@ -26,35 +26,35 @@ class UserManagementViewModel extends ChangeNotifier {
       'userName': 'Alice Admin',
       'userRole': 'System Administrator',
       'avatarUrl': 'https://i.pravatar.cc/150?img=1',
-      'status': UserStatus.active,
+      'status': AccountStatus.active,
     },
     {
       'userName': 'Bob Manager',
       'userRole': 'Regional Manager',
       'avatarUrl': 'https://i.pravatar.cc/150?img=13',
-      'status': UserStatus.inactive,
+      'status': AccountStatus.inactive,
     },
   ];
 
-  late Map<String, UserStatus> _userStatuses;
+  late Map<String, AccountStatus> _userStatuses;
 
   UserManagementViewModel() {
     _userStatuses = {};
     for (var user in _techniciansData) {
-      _userStatuses[user['userName'] as String] = user['status'] as UserStatus;
+      _userStatuses[user['userName'] as String] = user['status'] as AccountStatus;
     }
     for (var user in _adminsData) {
-      _userStatuses[user['userName'] as String] = user['status'] as UserStatus;
+      _userStatuses[user['userName'] as String] = user['status'] as AccountStatus;
     }
   }
 
   List<Map<String, dynamic>> get activeData =>
       _activeTabIndex == 0 ? _techniciansData : _adminsData;
 
-  UserStatus getStatusFor(String userName) =>
-      _userStatuses[userName] ?? UserStatus.active;
+  AccountStatus getStatusFor(String userName) =>
+      _userStatuses[userName] ?? AccountStatus.active;
 
-  void updateUserStatus(String userName, UserStatus status) {
+  void updateUserStatus(String userName, AccountStatus status) {
     _userStatuses[userName] = status;
     notifyListeners();
   }
@@ -76,36 +76,48 @@ class UserManagementViewModel extends ChangeNotifier {
   }
 
   // --- Status color helpers ---
-  static Color getBackgroundColor(UserStatus status) {
+  static Color getBackgroundColor(AccountStatus status) {
     switch (status) {
-      case UserStatus.active:
+      case AccountStatus.active:
         return AppColors.success50;
-      case UserStatus.away:
+      case AccountStatus.away:
         return AppColors.warning50;
-      case UserStatus.inactive:
+      case AccountStatus.inactive:
         return AppColors.secondary50;
+      case AccountStatus.terminated:
+        return AppColors.error50;
+      case AccountStatus.pending:
+        return AppColors.tertiary50;
     }
   }
 
-  static Color getTextColor(UserStatus status) {
+  static Color getTextColor(AccountStatus status) {
     switch (status) {
-      case UserStatus.active:
+      case AccountStatus.active:
         return AppColors.success500;
-      case UserStatus.away:
+      case AccountStatus.away:
         return AppColors.warning500;
-      case UserStatus.inactive:
+      case AccountStatus.inactive:
         return AppColors.secondary500;
+      case AccountStatus.terminated:
+        return AppColors.error500;
+      case AccountStatus.pending:
+        return AppColors.tertiary500;
     }
   }
 
-  static Color getDotColor(UserStatus status) {
+  static Color getDotColor(AccountStatus status) {
     switch (status) {
-      case UserStatus.active:
+      case AccountStatus.active:
         return AppColors.success500;
-      case UserStatus.away:
+      case AccountStatus.away:
         return AppColors.warning500;
-      case UserStatus.inactive:
+      case AccountStatus.inactive:
         return AppColors.secondary500;
+      case AccountStatus.terminated:
+        return AppColors.error500;
+      case AccountStatus.pending:
+        return AppColors.tertiary500;
     }
   }
 }

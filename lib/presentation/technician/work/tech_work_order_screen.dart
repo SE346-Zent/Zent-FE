@@ -10,12 +10,12 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 // Shared Tech Components
-import 'widgets/tech_app_bar.dart';
+import 'package:zent_fe/presentation/technician/account/widgets/tech_app_bar.dart';
 
-// Feature-specific Widgets
+// Feature-specific Widgets (Internal to work folder)
 import 'widgets/tech_work_order_card.dart';
 
-// ViewModel
+// ViewModel (Internal to work folder)
 import 'view_models/tech_work_order_viewmodel.dart';
 
 class TechWorkOrderScreen extends StatelessWidget {

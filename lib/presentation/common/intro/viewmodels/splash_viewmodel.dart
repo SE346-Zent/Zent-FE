@@ -1,17 +1,15 @@
 import 'package:flutter/foundation.dart';
-import 'package:zent_fe/domain/usecases/auth/check_first_time_usecase.dart';
-import 'package:zent_fe/domain/usecases/auth/set_first_time_done_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/first_time_usecase.dart';
 
 class SplashViewModel extends ChangeNotifier {
-  final CheckFirstTimeUseCase _checkFirstTimeUseCase;
-  final SetFirstTimeDoneUseCase _setFirstTimeDoneUseCase;
+  final FirstTimeUseCase _firstTimeUseCase;
 
-  SplashViewModel(this._checkFirstTimeUseCase, this._setFirstTimeDoneUseCase);
+  SplashViewModel(this._firstTimeUseCase);
 
   Future<bool> resolveFirstTimeFlow() async {
-    final isFirstTime = await _checkFirstTimeUseCase();
+    final isFirstTime = await _firstTimeUseCase.check();
     if (isFirstTime) {
-      await _setFirstTimeDoneUseCase();
+      await _firstTimeUseCase.setDone();
     }
     return isFirstTime;
   }

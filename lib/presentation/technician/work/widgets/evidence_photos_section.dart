@@ -181,7 +181,7 @@ class EvidencePhotosSection extends StatelessWidget {
   }
 
   void _openCamera(BuildContext context, String phase) {
-    context.goNamed(
+    context.pushNamed(
       RouteNames.appCamera,
       extra: {
         'onPhotoCaptured': (String path) => viewModel.addPhoto(path, phase),

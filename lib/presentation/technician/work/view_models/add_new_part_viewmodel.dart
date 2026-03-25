@@ -1,6 +1,21 @@
 import 'package:flutter/foundation.dart';
 
 class AddNewPartViewModel extends ChangeNotifier {
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
+
   final List<String> _photos = [];
   List<String> get photos => _photos;
 

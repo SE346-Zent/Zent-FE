@@ -41,10 +41,12 @@ class UserManagementViewModel extends ChangeNotifier {
   UserManagementViewModel() {
     _userStatuses = {};
     for (var user in _techniciansData) {
-      _userStatuses[user['userName'] as String] = user['status'] as AccountStatus;
+      _userStatuses[user['userName'] as String] =
+          user['status'] as AccountStatus;
     }
     for (var user in _adminsData) {
-      _userStatuses[user['userName'] as String] = user['status'] as AccountStatus;
+      _userStatuses[user['userName'] as String] =
+          user['status'] as AccountStatus;
     }
   }
 

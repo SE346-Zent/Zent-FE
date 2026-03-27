@@ -34,9 +34,11 @@ class PartSearchViewModel extends ChangeNotifier {
   List<PartSearchItemModel> get _filteredParts {
     if (_searchQuery.isEmpty) return _parts;
     return _parts
-        .where((part) =>
-            part.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            part.partNo.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (part) =>
+              part.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              part.partNo.toLowerCase().contains(_searchQuery.toLowerCase()),
+        )
         .toList();
   }
 

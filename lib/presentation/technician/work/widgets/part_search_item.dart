@@ -9,11 +9,7 @@ class PartSearchItem extends StatelessWidget {
   final PartSearchItemModel part;
   final VoidCallback onTap;
 
-  const PartSearchItem({
-    super.key,
-    required this.part,
-    required this.onTap,
-  });
+  const PartSearchItem({super.key, required this.part, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

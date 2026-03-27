@@ -38,10 +38,7 @@ class _PartSearchScreenContent extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              const AccountHeader(
-                title: 'Part Search',
-                showDivider: true,
-              ),
+              const AccountHeader(title: 'Part Search', showDivider: true),
               const SizedBox(height: AppDimens.spaceLg),
               Padding(
                 padding: const EdgeInsets.symmetric(

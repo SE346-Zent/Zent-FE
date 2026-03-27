@@ -80,7 +80,7 @@ class _AnimatedFABState extends State<_AnimatedFAB> {
             color: AppColors.tertiary500,
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.tertiary200, width: 2.0),
-            boxShadow: [BoxShadowStyles.raised],
+            boxShadow: [BoxShadowStyles.glowing],
           ),
           child: const Icon(Icons.build, color: Colors.white, size: 30.0),
         ),

@@ -29,6 +29,7 @@ import '../presentation/technician/account/technician_home_screen.dart';
 import '../presentation/technician/work/add_new_part_screen.dart';
 import '../presentation/common/core/layouts/tech_main_layout.dart';
 import '../presentation/technician/work/widgets/app_camera_screen.dart';
+import '../presentation/technician/work/part_search_screen.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
@@ -323,6 +324,12 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.addNewPart,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const AddNewPartScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.techPartSearch,
+                  path: Routes.inventorySearch,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PartSearchScreen(),
                 ),
               ],
             ),

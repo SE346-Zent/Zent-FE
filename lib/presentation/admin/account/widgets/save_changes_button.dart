@@ -17,7 +17,7 @@ class SaveChangesButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.tertiary500,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        boxShadow: [BoxShadowStyles.subtle],
+        boxShadow: [BoxShadowStyles.glowing],
       ),
       child: Material(
         color: Colors.transparent,

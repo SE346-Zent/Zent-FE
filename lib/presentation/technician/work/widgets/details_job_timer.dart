@@ -23,14 +23,20 @@ class DetailsJobTimer extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTimerBox(viewModel.hours.toString().padLeft(2, '0'), "Hours"),
+            _buildTimerBox(
+              viewModel.hours.toString().padLeft(2, '0'),
+              "Hours",
+              false,
+            ),
             _buildTimerBox(
               viewModel.minutes.toString().padLeft(2, '0'),
               "Minutes",
+              false,
             ),
             _buildTimerBox(
               viewModel.seconds.toString().padLeft(2, '0'),
               "Seconds",
+              true,
             ),
           ],
         ),
@@ -38,7 +44,7 @@ class DetailsJobTimer extends StatelessWidget {
     );
   }
 
-  Widget _buildTimerBox(String value, String label) {
+  Widget _buildTimerBox(String value, String label, bool isLast) {
     return Column(
       children: [
         Container(
@@ -47,19 +53,25 @@ class DetailsJobTimer extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraXs),
-            border: Border.all(color: AppColors.secondary100),
+            border: Border.all(
+              color: isLast ? AppColors.tertiary500 : AppColors.secondary100,
+            ),
             boxShadow: [BoxShadowStyles.subtle],
           ),
           alignment: Alignment.center,
           child: Text(
             value,
-            style: TextStyles.display.copyWith(color: AppColors.primary500),
+            style: TextStyles.headline.copyWith(
+              color: isLast ? AppColors.tertiary500 : AppColors.primary500,
+            ),
           ),
         ),
         const SizedBox(height: AppDimens.spaceXs),
         Text(
           label,
-          style: TextStyles.label.copyWith(color: AppColors.secondary200),
+          style: TextStyles.bodyLarge.copyWith(
+            color: isLast ? AppColors.tertiary500 : AppColors.secondary200,
+          ),
         ),
       ],
     );

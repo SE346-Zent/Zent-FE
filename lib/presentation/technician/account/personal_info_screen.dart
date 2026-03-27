@@ -78,7 +78,7 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
           child: Column(
             children: [
               ProfileAvatar(name: viewModel.fullName),
-              const SizedBox(height: AppDimens.spaceSm),
+              const SizedBox(height: AppDimens.spaceMd),
 
               Text(
                 'Hung dep zai',
@@ -87,7 +87,6 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
                   fontSize: 24,
                 ),
               ),
-              const SizedBox(height: AppDimens.spaceXs),
               Text(
                 'Senior electrician',
                 style: TextStyles.bodyMedium.copyWith(
@@ -103,7 +102,7 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
                 controller: _nameController,
                 prefixIcon: Icons.person_outline,
               ),
-              const SizedBox(height: AppDimens.spaceLg),
+              const SizedBox(height: AppDimens.spaceSm),
 
               TechTextField(
                 label: 'Employee ID',
@@ -114,23 +113,7 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
                 suffixIcon: Icons.lock,
               ),
 
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: AppDimens.spaceSm,
-                  left: AppDimens.spaceXs,
-                ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Contact admin to change your Employee ID',
-                    style: TextStyles.bodyMedium.copyWith(
-                      color: AppColors.secondary500,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppDimens.spaceMd),
+              const SizedBox(height: AppDimens.spaceSm),
 
               TechTextField(
                 label: 'Email Address',
@@ -138,7 +121,7 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
                 controller: _emailController,
                 prefixIcon: Icons.email_outlined,
               ),
-              const SizedBox(height: AppDimens.spaceLg),
+              const SizedBox(height: AppDimens.spaceSm),
 
               TechTextField(
                 label: 'Phone number',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
@@ -56,6 +57,13 @@ class _TechnicianHomeContent extends StatelessWidget {
                     onMenuTapped: () {
                       Scaffold.of(context).openDrawer();
                     },
+                    onProfileTapped: () {
+                      try {
+                        StatefulNavigationShell.of(context).goBranch(3);
+                      } catch (e) {
+                        debugPrint('Error navigating to profile: $e');
+                      }
+                    },
                   ),
                 ),
                 Expanded(
@@ -67,7 +75,6 @@ class _TechnicianHomeContent extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppDimens.spaceMd,
-                            vertical: AppDimens.spaceMd,
                           ),
                           itemCount: viewModel.todaySchedule.length,
                           itemBuilder: (context, index) {
@@ -82,7 +89,7 @@ class _TechnicianHomeContent extends StatelessWidget {
                             );
                           },
                         ),
-                        const SizedBox(height: AppDimens.spaceSm),
+                        const SizedBox(height: AppDimens.spaceLg),
                         TechStatsRow(
                           jobsDone: viewModel.jobsDone,
                           averageRating: viewModel.averageRating,

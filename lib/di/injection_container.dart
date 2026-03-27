@@ -46,6 +46,7 @@ import 'package:zent_fe/presentation/technician/work/view_models/add_new_part_vi
 import 'package:zent_fe/presentation/technician/work/view_models/complete_work_order_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/security_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/part_search_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -97,6 +98,7 @@ Future<void> init() async {
   sl.registerFactory(() => TechPersonalInfoViewModel());
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(() => TechSecurityViewModel());
+  sl.registerFactory(() => PartSearchViewModel());
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(

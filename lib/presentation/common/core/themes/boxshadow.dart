@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'colors.dart';
 
 class BoxShadowStyles {
   static BoxShadow subtle = BoxShadow(
@@ -17,5 +18,12 @@ class BoxShadowStyles {
     color: const Color(0xFF000000).withValues(alpha: 0.15),
     blurRadius: 24.0,
     offset: const Offset(0, 8),
+  );
+
+  static BoxShadow glowing = BoxShadow(
+    color: AppColors.tertiary200.withValues(alpha: 0.5),
+    blurRadius: 10.0,
+    offset: const Offset(0, 2),
+    spreadRadius: 1.0,
   );
 }

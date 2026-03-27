@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class Background extends StatelessWidget {
   final double opacity;
@@ -18,7 +20,7 @@ class Background extends StatelessWidget {
       child: Opacity(
         opacity: opacity,
         child: Image.asset(
-          'assets/images/BlackLogo.webp',
+          AppAssets.blackLogo,
           width: width,
           height: height,
           errorBuilder: (context, error, stackTrace) => const SizedBox(),

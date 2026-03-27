@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../themes/colors.dart';
 import '../themes/dimens.dart';
 import '../themes/text_styles.dart';
+import '../themes/boxshadow.dart';
 
 /// A standardized input field with a label and leading icon.
 ///
@@ -30,8 +31,8 @@ class InputField extends StatefulWidget {
   /// Callback triggered whenever the input text changes.
   final ValueChanged<String>? onChanged;
 
-  /// Required icon displayed at the start of the field.
-  final IconData leadingIcon;
+  /// Optional icon displayed at the start of the field.
+  final IconData? leadingIcon;
 
   /// Whether the field is disabled for editing.
   /// Displays a lock icon and grey background.
@@ -64,12 +65,21 @@ class InputField extends StatefulWidget {
   /// Alignment of the text within the field.
   final TextAlign textAlign;
 
+  /// Maximum number of lines for multiline input.
+  final int? maxLines;
+
+  /// Custom color for the field label.
+  final Color? labelColor;
+
+  /// Custom child to replace the default TextFormField.
+  final Widget? customInputChild;
+
   const InputField({
     super.key,
     required this.label,
     this.initialValue,
     this.onChanged,
-    required this.leadingIcon,
+    this.leadingIcon,
     this.isReadOnly = false,
     this.helperText,
     this.controller,
@@ -80,6 +90,9 @@ class InputField extends StatefulWidget {
     this.focusNode,
     this.onTap,
     this.textAlign = TextAlign.start,
+    this.maxLines = 1,
+    this.labelColor,
+    this.customInputChild,
   });
 
   @override
@@ -120,65 +133,92 @@ class _InputFieldState extends State<InputField> {
       children: [
         Text(
           widget.label,
-          style: TextStyles.middle.copyWith(color: AppColors.secondary500),
+          style: TextStyles.middle.copyWith(
+            color: widget.labelColor ?? AppColors.secondary500,
+          ),
         ),
         const SizedBox(
           height: AppDimens.spaceXs,
         ), // 8px bottom margin from label
         Container(
-          height: 48.0,
+          constraints: const BoxConstraints(minHeight: 45.0),
           decoration: BoxDecoration(
             color: widget.isReadOnly
                 ? AppColors.secondary50
-                : Colors.transparent,
+                : AppColors.surface100,
             borderRadius: BorderRadius.circular(
               AppDimens.boraMd,
             ), // Assuming standard radius
             border: Border.all(color: AppColors.secondary200, width: 1.0),
+            boxShadow: [BoxShadowStyles.subtle], // Added shadow
           ),
           child: Row(
+            crossAxisAlignment: widget.maxLines != null && widget.maxLines! > 1
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: AppDimens.spaceMd,
-                  right: 8.0,
+              if (widget.leadingIcon != null)
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: AppDimens.spaceMd,
+                    right: 8.0,
+                    top: widget.maxLines != null && widget.maxLines! > 1
+                        ? 12.0
+                        : 0.0,
+                  ),
+                  child: Icon(
+                    widget.leadingIcon,
+                    color: AppColors.secondary300,
+                    size: 20.0,
+                  ),
                 ),
-                child: Icon(
-                  widget.leadingIcon,
-                  color: AppColors.secondary300,
-                  size: 20.0,
-                ),
-              ),
+              if (widget.leadingIcon == null)
+                const SizedBox(width: AppDimens.spaceMd),
               Expanded(
-                child: TextFormField(
-                  controller: _controller,
-                  onChanged: widget.onChanged,
-                  readOnly: widget.isReadOnly,
-                  obscureText: widget.isPassword,
-                  keyboardType: widget.keyboardType,
-                  focusNode: widget.focusNode,
-                  onTap: widget.onTap,
-                  textAlign: widget.textAlign,
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: widget.hintText,
-                    hintStyle: TextStyles.bodyLarge.copyWith(
-                      color: AppColors.secondary300,
+                child:
+                    widget.customInputChild ??
+                    TextFormField(
+                      controller: _controller,
+                      onChanged: widget.onChanged,
+                      readOnly: widget.isReadOnly,
+                      obscureText: widget.isPassword,
+                      keyboardType: widget.keyboardType,
+                      focusNode: widget.focusNode,
+                      onTap: widget.onTap,
+                      textAlign: widget.textAlign,
+                      maxLines: widget.maxLines,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: widget.hintText,
+                        hintStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary300,
+                        ),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical:
+                              widget.maxLines != null && widget.maxLines! > 1
+                              ? 12.0
+                              : 12.0,
+                        ),
+                      ),
                     ),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
-                  ),
-                ),
               ),
               if (widget.suffixIcon != null)
                 Padding(
-                  padding: const EdgeInsets.only(right: AppDimens.spaceMd),
+                  padding: EdgeInsets.only(
+                    right: AppDimens.spaceMd,
+                    top: widget.maxLines != null && widget.maxLines! > 1
+                        ? 12.0
+                        : 0.0,
+                  ),
                   child: widget.suffixIcon,
                 ),
-              if (widget.isReadOnly && widget.suffixIcon == null)
+              if (widget.isReadOnly &&
+                  widget.suffixIcon == null &&
+                  widget.customInputChild == null)
                 const Padding(
                   padding: EdgeInsets.only(right: AppDimens.spaceMd),
                   child: SizedBox(

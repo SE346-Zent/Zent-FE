@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/customer/account/blocs/chat_state.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/chat_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/app_assets.dart'
+    show AppAssets;
 
 class ChatListItem extends StatelessWidget {
   final ChatPreview chat;
@@ -40,7 +42,7 @@ class ChatListItem extends StatelessWidget {
                       )
                     : const DecorationImage(
                         image: AssetImage(
-                          "assets/images/OnBoarding1.webp",
+                          AppAssets.onboarding1,
                         ), // Fallback mock image
                         fit: BoxFit.cover,
                       ),

@@ -41,12 +41,13 @@ abstract final class Routes {
   static const adminCreateAccount = 'admin-create-account';
 
   static const techWorkOrderDetails = 'work-order-details/:workOrderId';
-  static const completeWorkOrder = 'complete-work-order';
+  static const completeWorkOrder = 'complete-work-order/:workOrderId';
   static const addNewPart = 'add-new-part';
   static const inventorySearch = 'inventory-search';
   static const techSecuritySettings = 'tech-security-settings';
   static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
+  static const appCamera = 'app-camera';
 
   static const myProducts = 'my-products';
   static const requestService = 'request-service';

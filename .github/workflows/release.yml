@@ -5,6 +5,8 @@ on:
     workflows: ["Check merge code"]
     types:
       - completed
+    branches:
+      - test
   workflow_dispatch:
     
 

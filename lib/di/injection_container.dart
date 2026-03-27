@@ -17,6 +17,12 @@ import '../domain/usecases/auth/first_time_usecase.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../domain/usecases/work_order/create_work_order_usecase.dart';
+import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
+import '../domain/usecases/product/get_my_products_usecase.dart';
+import '../domain/repositories/product_repository.dart';
+import '../data/repositories/product_repository_impl.dart';
+import '../data/datasources/remote/product_remote_datasource.dart';
 import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
@@ -55,6 +61,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
   sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
+  sl.registerLazySingleton(() => CreateWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetActiveRepairsUseCase(sl()));
+  sl.registerLazySingleton(() => GetMyProductsUseCase(sl()));
 
   // ViewModels
   sl.registerFactory(() => SplashViewModel(sl()));
@@ -98,6 +107,9 @@ Future<void> init() async {
     () =>
         WorkOrderRepositoryImpl(localDataSource: sl(), remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(remoteDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDatasource>(
@@ -111,6 +123,9 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<OrderRemoteDataSource>(
     () => OrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
+  );
+  sl.registerLazySingleton<ProductRemoteDataSource>(
+    () => ProductRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
   );
 
   // --- External ---

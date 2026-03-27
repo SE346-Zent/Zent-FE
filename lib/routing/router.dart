@@ -203,7 +203,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       name: RouteNames.appCamera,
-      path: '/app-camera',
+      path: Routes.appCamera,
       builder: (context, state) {
         final Map<String, dynamic>? extra =
             state.extra as Map<String, dynamic>?;

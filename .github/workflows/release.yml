@@ -5,19 +5,19 @@ on:
     workflows: ["Check merge code"]
     types:
       - completed
-    branches: 
-      - test
   workflow_dispatch:
     
 
 jobs:
   build_release:
     name: Build and Create GitHub Release
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
   
       - name: Set up Java
         uses: actions/setup-java@v3

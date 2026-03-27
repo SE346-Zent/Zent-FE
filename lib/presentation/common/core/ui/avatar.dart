@@ -23,7 +23,15 @@ class Avatar extends StatelessWidget {
   /// The user's name, used to generate initials and background color.
   final String name;
 
-  const Avatar({super.key, this.imageUrl, required this.name});
+  /// Whether to show the edit badge. Defaults to true.
+  final bool showEditIcon;
+
+  const Avatar({
+    super.key,
+    this.imageUrl,
+    required this.name,
+    this.showEditIcon = true,
+  });
 
   String get _initials {
     if (name.isEmpty) return 'U';
@@ -75,24 +83,25 @@ class Avatar extends StatelessWidget {
                 )
               : null,
         ),
-        Positioned(
-          bottom: 4.0,
-          right: 4.0,
-          child: Container(
-            width: 20.0,
-            height: 20.0,
-            decoration: BoxDecoration(
-              color: AppColors.tertiary500,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.surface100, width: 2.0),
-            ),
-            child: const Icon(
-              Icons.edit_outlined,
-              size: 10.0,
-              color: AppColors.surface100,
+        if (showEditIcon)
+          Positioned(
+            bottom: 4.0,
+            right: 4.0,
+            child: Container(
+              width: 20.0,
+              height: 20.0,
+              decoration: BoxDecoration(
+                color: AppColors.tertiary500,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.surface100, width: 2.0),
+              ),
+              child: const Icon(
+                Icons.edit_outlined,
+                size: 10.0,
+                color: AppColors.surface100,
+              ),
             ),
           ),
-        ),
       ],
     );
   }

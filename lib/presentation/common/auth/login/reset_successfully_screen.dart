@@ -24,7 +24,6 @@ class ResetSuccessfullyScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            Container(height: 1.0, width: double.infinity, color: Colors.black),
             const AuthAppBar(title: 'Reset Password', showBackButton: false),
             Container(
               height: 1.0,
@@ -86,7 +85,22 @@ class ResetSuccessfullyScreen extends StatelessWidget {
                                   ],
                                 ),
                                 child: ElevatedButton.icon(
-                                  onPressed: () => context.goNamed('login'),
+                                  onPressed: () {
+                                    context.goNamed('login');
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Password updated successfully',
+                                        ),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            AppDimens.boraSm,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                   icon: const Icon(
                                     Icons.login,
                                     color: Colors.white,

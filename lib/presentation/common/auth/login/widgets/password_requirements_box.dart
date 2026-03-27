@@ -18,7 +18,6 @@ class PasswordRequirementsBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // 💡 YÊU CẦU 3: Giảm thụt lề bên trong hộp (Từ spaceLg -> spaceMd)
       padding: const EdgeInsets.all(AppDimens.spaceMd),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -65,12 +64,14 @@ class PasswordRequirementsBox extends StatelessWidget {
         Icon(
           isMet ? Icons.check_circle : Icons.circle_outlined,
           size: 16,
-          color: isMet ? Colors.green : AppColors.secondary400,
+          color: isMet ? AppColors.success500 : Colors.black,
         ),
         const SizedBox(width: AppDimens.spaceSm),
         Text(
           text,
-          style: TextStyles.label.copyWith(color: AppColors.secondary500),
+          style: TextStyles.label.copyWith(
+            color: isMet ? AppColors.success500 : Colors.black,
+          ),
         ),
       ],
     );

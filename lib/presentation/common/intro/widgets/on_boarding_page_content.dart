@@ -7,11 +7,13 @@ import 'on_boarding_page_indicator.dart';
 class OnBoardingPageContent extends StatelessWidget {
   final Map<String, String> data;
   final int totalPages;
+  final int currentPage;
 
   const OnBoardingPageContent({
     super.key,
     required this.data,
     required this.totalPages,
+    required this.currentPage,
   });
 
   @override
@@ -65,7 +67,10 @@ class OnBoardingPageContent extends StatelessWidget {
             style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
           ),
           const SizedBox(height: 40),
-          OnBoardingPageIndicator(totalPages: totalPages),
+          OnBoardingPageIndicator(
+            totalPages: totalPages,
+            currentPage: currentPage,
+          ),
         ],
       ),
     );

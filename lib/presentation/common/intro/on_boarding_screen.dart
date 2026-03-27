@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
-import 'package:zent_fe/presentation/common/intro/blocs/on_boarding_cubit.dart';
 import 'package:zent_fe/routing/route_names.dart';
 
 import 'widgets/on_boarding_page_content.dart';
 import 'widgets/on_boarding_bottom_controls.dart';
 
-class OnBoardingScreen extends StatelessWidget {
+class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => OnBoardingCubit(),
-      child: const _OnBoardingScreenContent(),
-    );
-  }
+  State<OnBoardingScreen> createState() => _OnBoardingScreenState();
 }
 
-class _OnBoardingScreenContent extends StatefulWidget {
-  const _OnBoardingScreenContent();
-
-  @override
-  State<_OnBoardingScreenContent> createState() =>
-      _OnBoardingScreenContentState();
-}
-
-class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
+class _OnBoardingScreenState extends State<OnBoardingScreen> {
   final PageController _pageController = PageController();
+  int _currentPage = 0;
 
   final List<Map<String, String>> _data = [
     {
@@ -54,8 +40,8 @@ class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
     },
   ];
 
-  void _onNextPressed(int currentPage) {
-    if (currentPage < _data.length - 1) {
+  void _onNextPressed() {
+    if (_currentPage < _data.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -77,40 +63,37 @@ class _OnBoardingScreenContentState extends State<_OnBoardingScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OnBoardingCubit, OnBoardingState>(
-      builder: (context, state) {
-        int currentPage = state.currentPage;
-        bool isLastPage = currentPage == _data.length - 1;
+    final bool isLastPage = _currentPage == _data.length - 1;
 
-        return Scaffold(
-          backgroundColor: AppColors.background500,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    allowImplicitScrolling: true,
-                    onPageChanged: (index) =>
-                        context.read<OnBoardingCubit>().setPage(index),
-                    itemCount: _data.length,
-                    itemBuilder: (context, index) => OnBoardingPageContent(
-                      data: _data[index],
-                      totalPages: _data.length,
-                    ),
-                  ),
+    return Scaffold(
+      backgroundColor: AppColors.background500,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                allowImplicitScrolling: true,
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
+                },
+                itemCount: _data.length,
+                itemBuilder: (context, index) => OnBoardingPageContent(
+                  data: _data[index],
+                  totalPages: _data.length,
+                  currentPage: _currentPage,
                 ),
-                OnBoardingBottomControls(
-                  isLastPage: isLastPage,
-                  onNextPressed: () => _onNextPressed(currentPage),
-                  onSkipPressed: _onSkipPressed,
-                ),
-                const SizedBox(height: 30),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            OnBoardingBottomControls(
+              isLastPage: isLastPage,
+              onNextPressed: _onNextPressed,
+              onSkipPressed: _onSkipPressed,
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
     );
   }
 }

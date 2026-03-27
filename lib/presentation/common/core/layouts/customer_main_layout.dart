@@ -20,9 +20,12 @@ class CustomerMainLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: navigationShell,
-      bottomNavigationBar: _CustomerBottomNavBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: _onNavTap,
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: _CustomerBottomNavBar(
+          currentIndex: navigationShell.currentIndex,
+          onTap: _onNavTap,
+        ),
       ),
     );
   }

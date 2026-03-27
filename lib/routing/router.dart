@@ -22,8 +22,13 @@ import '../presentation/technician/account/tech_profile_screen.dart';
 import '../presentation/technician/account/personal_info_screen.dart';
 import '../presentation/technician/account/notifications_screen.dart';
 import '../presentation/technician/account/security_screen.dart';
-import '../presentation/technician/account/tech_work_order_screen.dart';
+import '../presentation/technician/work/tech_work_order_screen.dart';
+import '../presentation/technician/work/complete_work_order_screen.dart';
+import '../presentation/technician/work/tech_work_order_details_screen.dart';
+import '../presentation/technician/account/technician_home_screen.dart';
+import '../presentation/technician/work/add_new_part_screen.dart';
 import '../presentation/common/core/layouts/tech_main_layout.dart';
+import '../presentation/technician/work/widgets/app_camera_screen.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
@@ -132,7 +137,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
+  initialLocation: Routes.techMe,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -160,12 +165,29 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.forgotPasswordVerifyOtp,
               path: Routes.verifyOtp,
-              builder: (context, state) => const VerifyOtpScreen(),
+              builder: (context, state) {
+                final extra = state.extra;
+                String email = '';
+
+                if (extra is String) {
+                  email = extra;
+                } else if (extra is Map<String, dynamic>) {
+                  email = extra['email'] as String? ?? '';
+                }
+
+                return VerifyOtpScreen(email: email);
+              },
               routes: [
                 GoRoute(
                   name: RouteNames.resetPassword,
                   path: Routes.resetPassword,
-                  builder: (context, state) => const ResetPasswordScreen(),
+                  builder: (context, state) {
+                    final extra = state.extra as Map<String, dynamic>? ?? {};
+                    final email = extra['email'] as String? ?? '';
+                    final token = extra['token'] as String? ?? '';
+
+                    return ResetPasswordScreen(email: email, token: token);
+                  },
                   routes: [
                     GoRoute(
                       name: RouteNames.resetSuccessfully,
@@ -195,6 +217,17 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      name: RouteNames.appCamera,
+      path: Routes.appCamera,
+      builder: (context, state) {
+        final Map<String, dynamic>? extra =
+            state.extra as Map<String, dynamic>?;
+        final onPhotoCaptured =
+            extra?['onPhotoCaptured'] as void Function(String)?;
+        return AppCameraScreen(onPhotoCaptured: onPhotoCaptured);
+      },
     ),
 
     // Admin top level routes using StatefulShellRoute
@@ -300,8 +333,15 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.techHome, //
               path: Routes.techHome,
-              builder: (context, state) =>
-                  const Scaffold(body: Center(child: Text('Tech Home Screen'))),
+              builder: (context, state) => const TechnicianHomeScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.techAddNewPart,
+                  path: Routes.addNewPart,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const AddNewPartScreen(),
+                ),
+              ],
             ),
           ],
         ),
@@ -311,6 +351,26 @@ final GoRouter appRouter = GoRouter(
               name: RouteNames.techWorkOrder,
               path: Routes.techWorkOrder,
               builder: (context, state) => const TechWorkOrderScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.techWorkOrderDetails,
+                  path: Routes.techWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return TechWorkOrderDetailsScreen(workOrderId: workOrderId);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.techCompleteWorkOrder,
+                  path: Routes.completeWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return CompleteWorkOrderScreen(workOrderId: workOrderId);
+                  },
+                ),
+              ],
             ),
           ],
         ),

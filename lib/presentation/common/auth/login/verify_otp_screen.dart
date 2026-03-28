@@ -27,7 +27,11 @@ class VerifyOtpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<VerifyOtpViewModel>(param1: email),
+      create: (_) {
+        final viewModel = di.sl<VerifyOtpViewModel>();
+        viewModel.init(email: email);
+        return viewModel;
+      },
       child: const _VerifyOtpScreenContent(),
     );
   }
@@ -76,7 +80,7 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                                   countdown: viewModel.countdownSeconds,
                                   canResend: viewModel.canResendOTP,
                                   onResend: () async {
-                                    await viewModel.resendOTP();
+                                    await viewModel.submitOtp();
                                     if (context.mounted &&
                                         viewModel.errorMessage != null) {
                                       ScaffoldMessenger.of(
@@ -100,15 +104,15 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                                       ? null
                                       : () async {
                                           FocusScope.of(context).unfocus();
-                                          final token = await viewModel
-                                              .verifyOTP();
-                                          if (token != null &&
-                                              context.mounted) {
+                                          final isSuccess = await viewModel
+                                              .submitOtp();
+
+                                          if (isSuccess && context.mounted) {
                                             context.goNamed(
                                               'resetPassword',
                                               extra: {
                                                 'email': viewModel.email,
-                                                'token': token,
+                                                'token': viewModel.otp,
                                               },
                                             );
                                           } else if (viewModel.errorMessage !=

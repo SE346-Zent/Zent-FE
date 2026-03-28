@@ -14,6 +14,8 @@ import '../domain/repositories/work_order_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
 import '../domain/usecases/auth/first_time_usecase.dart';
+import '../domain/usecases/auth/reset_password_usecase.dart';
+import '../domain/usecases/auth/verify_otp_usecase.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
@@ -50,6 +52,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
 
   // Work Order Use Cases
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
@@ -60,12 +64,8 @@ Future<void> init() async {
   sl.registerFactory(() => SplashViewModel(sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
   sl.registerFactory(() => ForgotPasswordViewModel());
-  sl.registerFactoryParam<ResetPasswordViewModel, String, String>(
-    (email, token) => ResetPasswordViewModel(email: email, token: token),
-  );
-  sl.registerFactoryParam<VerifyOtpViewModel, String, void>(
-    (email, _) => VerifyOtpViewModel(email: email),
-  );
+  sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
+  sl.registerFactory(() => VerifyOtpViewModel(verifyOtpUseCase: sl()));
   sl.registerFactory(() => UserManagementViewModel());
   sl.registerFactory(() => ProfileViewModel(sl()));
   sl.registerFactory(() => SecuritySettingsViewModel());

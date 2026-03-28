@@ -1,25 +1,30 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/usecases/auth/verify_otp_usecase.dart';
 
 class VerifyOtpViewModel extends ChangeNotifier {
-  final String email;
+  final VerifyOtpUseCase verifyOtpUseCase;
 
-  VerifyOtpViewModel({required this.email}) {
-    startResendTimer();
-  }
-
+  String? _email;
   String _otp = '';
   bool _isLoading = false;
   String? _errorMessage;
-
   int _countdownSeconds = 30;
   Timer? _resendTimer;
 
+  VerifyOtpViewModel({required this.verifyOtpUseCase});
+
+  String get email => _email ?? '';
   String get otp => _otp;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int get countdownSeconds => _countdownSeconds;
   bool get canResendOTP => _countdownSeconds == 0;
+
+  void init({required String email}) {
+    _email = email;
+    startResendTimer();
+  }
 
   void setOtp(String value) {
     _otp = value.trim();
@@ -30,8 +35,6 @@ class VerifyOtpViewModel extends ChangeNotifier {
   void startResendTimer() {
     _countdownSeconds = 30;
     _resendTimer?.cancel();
-    notifyListeners();
-
     _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdownSeconds > 0) {
         _countdownSeconds--;
@@ -42,38 +45,25 @@ class VerifyOtpViewModel extends ChangeNotifier {
     });
   }
 
-  Future<void> resendOTP() async {
-    if (!canResendOTP) return;
+  Future<bool> submitOtp() async {
+    if (_otp.isEmpty || _email == null) return false;
 
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      await verifyOtpUseCase.call(email: _email!, otp: _otp);
 
-    _isLoading = false;
-    startResendTimer();
-  }
-
-  Future<String?> verifyOTP() async {
-    if (_otp.isEmpty) return null;
-
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (_otp == '0000') {
-      _errorMessage = "Invalid OTP";
       _isLoading = false;
       notifyListeners();
-      return null;
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return "MOCK_SECURE_TOKEN_123";
   }
 
   @override

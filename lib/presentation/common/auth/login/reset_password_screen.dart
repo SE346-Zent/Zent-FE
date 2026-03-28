@@ -33,8 +33,11 @@ class ResetPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          di.sl<ResetPasswordViewModel>(param1: email, param2: token),
+      create: (_) {
+        final viewModel = di.sl<ResetPasswordViewModel>();
+        viewModel.init(email: email, token: token);
+        return viewModel;
+      },
       child: const _ResetPasswordScreenContent(),
     );
   }

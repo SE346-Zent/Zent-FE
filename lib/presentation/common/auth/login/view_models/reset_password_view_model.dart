@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/usecases/auth/reset_password_usecase.dart';
 
 class ResetPasswordViewModel extends ChangeNotifier {
-  final String email;
-  final String token;
+  final ResetPasswordUseCase resetPasswordUseCase;
 
-  ResetPasswordViewModel({required this.email, required this.token});
+  ResetPasswordViewModel({required this.resetPasswordUseCase});
+
+  String? _email;
+  String? _token;
+
+  void init({required String email, required String token}) {
+    _email = email;
+    _token = token;
+  }
 
   String _newPassword = '';
   String _confirmPassword = '';
@@ -53,16 +61,27 @@ class ResetPasswordViewModel extends ChangeNotifier {
   }
 
   Future<bool> submitNewPassword() async {
-    if (!doPasswordsMatch) return false;
+    if (!doPasswordsMatch || _email == null || _token == null) return false;
 
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final success = await resetPasswordUseCase.call(
+        email: _email!,
+        token: _token!,
+        newPassword: _newPassword,
+      );
 
-    _isLoading = false;
-    notifyListeners();
-    return true;
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 }

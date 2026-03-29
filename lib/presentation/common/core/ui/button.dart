@@ -74,7 +74,10 @@ class PrimaryActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolvedTextStyle =
         textStyle ?? TextStyles.title.copyWith(color: foregroundColor);
-    final resolvedShadow = shadow ?? BoxShadowStyles.subtle;
+    final isTertiary500 = backgroundColor == AppColors.tertiary500;
+    final resolvedShadow =
+        shadow ??
+        (isTertiary500 ? BoxShadowStyles.glowing : BoxShadowStyles.subtle);
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(borderRadius),
     );

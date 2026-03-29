@@ -9,6 +9,11 @@ import '../local/auth_local_datasource.dart';
 abstract class OrderRemoteDataSource {
   Future<WorkOrderModel> getSingleWorkOrder(String id);
   Future<List<WorkOrderModel>> getManyWorkOrders(String userId);
+  Future<void> createWorkOrder({
+    required String productId,
+    required String description,
+    required String customerId,
+  });
 }
 
 class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
@@ -90,6 +95,36 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
       }
     } catch (e) {
       throw Exception('Error fetching many work orders: $e');
+    }
+  }
+
+  @override
+  Future<void> createWorkOrder({
+    required String productId,
+    required String description,
+    required String customerId,
+  }) async {
+    final url = Uri.parse('$_baseURL/work_order/create');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode({
+        'productId': productId,
+        'description': description,
+        'customerId': customerId,
+      });
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<void>.fromJson(jsonMap, (_) {});
+
+      if (!apiResponse.isSuccessful) {
+        throw Exception(apiResponse.message ?? 'Failed to create work order');
+      }
+    } catch (e) {
+      throw Exception('Error creating work order: $e');
     }
   }
 }

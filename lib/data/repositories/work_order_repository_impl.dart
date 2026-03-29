@@ -36,4 +36,17 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   ) async {
     return await localDataSource.getWorkOrderDraft(workOrderId);
   }
+
+  @override
+  Future<void> createWorkOrder({
+    required String productId,
+    required String description,
+    required String customerId,
+  }) async {
+    await remoteDataSource.createWorkOrder(
+      productId: productId,
+      description: description,
+      customerId: customerId,
+    );
+  }
 }

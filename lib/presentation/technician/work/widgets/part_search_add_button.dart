@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
-class AddUserFab extends StatelessWidget {
+class PartSearchAddButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const AddUserFab({super.key, required this.onPressed});
+  const PartSearchAddButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

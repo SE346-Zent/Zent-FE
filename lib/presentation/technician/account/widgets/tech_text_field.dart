@@ -35,7 +35,7 @@ class TechTextField extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(
-            bottom: AppDimens.spaceSm,
+            bottom: AppDimens.spaceXs,
             left: AppDimens.spaceXs,
           ),
           child: Text(
@@ -64,7 +64,7 @@ class TechTextField extends StatelessWidget {
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppDimens.spaceMd,
+                horizontal: AppDimens.spaceSm,
                 vertical: 12.0,
               ),
               hintText: hint,

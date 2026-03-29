@@ -26,6 +26,7 @@ abstract final class RouteNames {
   static const String techAddNewPart = 'techAddNewPart';
   static const String techCompleteWorkOrder = 'techCompleteWorkOrder';
   static const String techWorkOrderDetails = 'techWorkOrderDetails';
+  static const String techPartSearch = 'techPartSearch';
   static const String appCamera = 'appCamera';
 
   // customer top level

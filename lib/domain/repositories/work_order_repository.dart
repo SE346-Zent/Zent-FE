@@ -8,4 +8,10 @@ abstract class WorkOrderRepository {
 
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft);
   Future<WorkOrderCompletionDraft?> getWorkOrderDraft(String workOrderId);
+
+  Future<void> createWorkOrder({
+    required String productId,
+    required String description,
+    required String customerId,
+  });
 }

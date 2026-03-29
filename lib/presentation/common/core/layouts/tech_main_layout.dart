@@ -23,27 +23,48 @@ class TechMainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background500,
+      resizeToAvoidBottomInset: false,
       drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
       drawer: const TechSidebar(
         userName: 'Hung dep zai',
         employeeId: 'TECH-1234',
       ),
-      body: navigationShell,
-
-      floatingActionButton: _AnimatedFAB(
-        onTap: () {
-          debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
-        },
-      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      bottomNavigationBar: SafeArea(
-        bottom: true,
-        child: _TechBottomNavBar(
-          currentIndex: navigationShell.currentIndex,
-          onTap: _goBranch,
-        ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
+            ),
+            child: navigationShell,
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              color: AppColors.surface100,
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.paddingOf(context).bottom,
+              ),
+              child: _TechBottomNavBar(
+                currentIndex: navigationShell.currentIndex,
+                onTap: _goBranch,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: MediaQuery.paddingOf(context).bottom + 70.0 - 30.0,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: _AnimatedFAB(
+                onTap: () {
+                  debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -39,6 +39,7 @@ class _TechWorkOrderView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background500,
+      resizeToAvoidBottomInset: false,
       appBar: const TechAppBar(
         title: 'Work Orders',
         showBackButton: false,

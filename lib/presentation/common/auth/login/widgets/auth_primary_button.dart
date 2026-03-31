@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/themes/colors.dart';
 import '../../../core/themes/dimens.dart';
 import '../../../core/themes/text_styles.dart';
+import '../../../core/themes/boxshadow.dart';
 
 class AuthPrimaryButton extends StatelessWidget {
   final String text;
@@ -33,14 +34,7 @@ class AuthPrimaryButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-          boxShadow: [
-            if (!isDisabled)
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 2.0,
-                offset: const Offset(0, 2),
-              ),
-          ],
+          boxShadow: [BoxShadowStyles.glowing],
         ),
         child: ElevatedButton(
           onPressed: isLoading ? null : onPressed,

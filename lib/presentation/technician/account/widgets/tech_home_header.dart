@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
 
 class TechHomeHeader extends StatelessWidget {
   final String userName;
   final VoidCallback onMenuTapped;
+  final VoidCallback onProfileTapped;
 
   const TechHomeHeader({
     super.key,
     required this.userName,
     required this.onMenuTapped,
+    required this.onProfileTapped,
   });
 
   @override
@@ -46,7 +49,25 @@ class TechHomeHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              const Icon(Icons.notifications_none, color: AppColors.surface100),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.notifications_none,
+                    color: AppColors.surface100,
+                  ),
+                  const SizedBox(width: AppDimens.spaceSm),
+                  GestureDetector(
+                    onTap: onProfileTapped,
+                    child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: FittedBox(
+                        child: Avatar(name: userName, showEditIcon: false),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

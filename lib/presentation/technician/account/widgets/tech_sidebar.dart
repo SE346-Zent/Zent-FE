@@ -107,7 +107,8 @@ class TechSidebar extends StatelessWidget {
                       ),
                       isActive: false,
                       onTap: () {
-                        debugPrint("action triggered: Part Search");
+                        Navigator.pop(context);
+                        context.goNamed(RouteNames.techPartSearch);
                       },
                     ),
                     const SizedBox(height: AppDimens.spaceSm),

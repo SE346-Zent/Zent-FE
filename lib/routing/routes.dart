@@ -47,7 +47,7 @@ abstract final class Routes {
   static const techSecuritySettings = 'tech-security-settings';
   static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
-  static const appCamera = 'app-camera';
+  static const appCamera = '/app-camera';
 
   static const myProducts = 'my-products';
   static const requestService = 'request-service';

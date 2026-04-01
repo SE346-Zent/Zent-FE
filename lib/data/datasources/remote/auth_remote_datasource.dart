@@ -18,6 +18,12 @@ abstract class AuthRemoteDatasource {
   Future<void> resendOtp(String email);
   Future<void> logout(String email, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
+  Future<void> forgotPassword(String email);
+  Future<bool> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+  });
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -229,6 +235,68 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       case 'ADMIN':
       default:
         return 'ADMIN';
+    }
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    final url = Uri.parse('$_baseURL/auth/forgot-password');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(_timeOut);
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+
+      if (!apiResponse.isSuccessful) {
+        throw Exception(apiResponse.message ?? 'Forgot Password Failed');
+      }
+    } catch (e) {
+      throw Exception('Forgot password error: $e');
+    }
+  }
+
+  @override
+  Future<bool> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/reset-password');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'email': email,
+              'token': token,
+              'password': newPassword,
+            }),
+          )
+          .timeout(_timeOut);
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+
+      if (apiResponse.isSuccessful) {
+        return true;
+      } else {
+        throw Exception(apiResponse.message ?? 'Reset Password Failed');
+      }
+    } catch (e) {
+      throw Exception('Reset password error: $e');
     }
   }
 }

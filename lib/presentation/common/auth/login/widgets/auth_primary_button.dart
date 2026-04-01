@@ -6,28 +6,38 @@ import '../../../core/themes/boxshadow.dart';
 
 class AuthPrimaryButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
   const AuthPrimaryButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isDisabled = isLoading || onPressed == null;
+    final Color backgroundColor = isDisabled
+        ? AppColors.secondary100
+        : AppColors.tertiary500;
+
+    final Color textColor = isDisabled
+        ? AppColors.secondary400
+        : AppColors.surface50;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Container(
         width: double.infinity,
         height: 48,
         decoration: BoxDecoration(
-          color: AppColors.tertiary500,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
           boxShadow: [BoxShadowStyles.glowing],
         ),
         child: ElevatedButton(
-          onPressed: onPressed,
+          onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
@@ -36,10 +46,16 @@ class AuthPrimaryButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
             ),
           ),
-          child: Text(
-            text,
-            style: TextStyles.title.copyWith(color: AppColors.surface50),
-          ),
+          child: isLoading
+              ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.surface50,
+                  ),
+                )
+              : Text(text, style: TextStyles.title.copyWith(color: textColor)),
         ),
       ),
     );

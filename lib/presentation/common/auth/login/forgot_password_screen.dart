@@ -36,7 +36,6 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
     final viewModel = context.watch<ForgotPasswordViewModel>();
 
     return GestureDetector(
@@ -47,11 +46,6 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              Container(
-                height: 1.0,
-                width: double.infinity,
-                color: AppColors.primary900,
-              ),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
@@ -68,17 +62,49 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                               children: [
                                 const ForgotPasswordHeader(),
                                 const SizedBox(height: AppDimens.spaceXl),
-                                const AuthTextField(
+
+                                AuthTextField(
                                   hintText: 'Enter your new email address',
                                   keyboardType: TextInputType.emailAddress,
+                                  onChanged: viewModel.setEmail,
                                 ),
+
                                 const SizedBox(height: AppDimens.spaceXl),
+
                                 AuthPrimaryButton(
                                   text: 'Send OTP Code',
-                                  onPressed: () => context.goNamed(
-                                    'forgotPasswordVerifyOtp',
-                                  ),
+                                  isLoading: viewModel.isLoading,
+                                  onPressed: !viewModel.isEmailValid
+                                      ? null
+                                      : () async {
+                                          FocusScope.of(context).unfocus();
+
+                                          final isSuccess = await viewModel
+                                              .requestOTP();
+
+                                          if (isSuccess && context.mounted) {
+                                            context.goNamed(
+                                              'forgotPasswordVerifyOtp',
+                                              extra: viewModel.email,
+                                            );
+                                          } else if (viewModel.errorMessage !=
+                                                  null &&
+                                              context.mounted) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  viewModel.errorMessage!,
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.error500,
+                                              ),
+                                            );
+                                          }
+                                        },
                                 ),
+
                                 const SizedBox(height: AppDimens.spaceLg),
                                 const BackToSignInButton(),
                                 const Spacer(),

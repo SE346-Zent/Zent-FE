@@ -138,7 +138,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.techMe,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -166,12 +166,29 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.forgotPasswordVerifyOtp,
               path: Routes.verifyOtp,
-              builder: (context, state) => const VerifyOtpScreen(),
+              builder: (context, state) {
+                final extra = state.extra;
+                String email = '';
+
+                if (extra is String) {
+                  email = extra;
+                } else if (extra is Map<String, dynamic>) {
+                  email = extra['email'] as String? ?? '';
+                }
+
+                return VerifyOtpScreen(email: email);
+              },
               routes: [
                 GoRoute(
                   name: RouteNames.resetPassword,
                   path: Routes.resetPassword,
-                  builder: (context, state) => const ResetPasswordScreen(),
+                  builder: (context, state) {
+                    final extra = state.extra as Map<String, dynamic>? ?? {};
+                    final email = extra['email'] as String? ?? '';
+                    final token = extra['token'] as String? ?? '';
+
+                    return ResetPasswordScreen(email: email, token: token);
+                  },
                   routes: [
                     GoRoute(
                       name: RouteNames.resetSuccessfully,

@@ -23,4 +23,12 @@ abstract class AuthRepository {
   Future<bool> isFirstTime();
 
   Future<void> setFirstTimeDone();
+
+  Future<void> forgotPassword(String email);
+
+  Future<bool> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+  });
 }

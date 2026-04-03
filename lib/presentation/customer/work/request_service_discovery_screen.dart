@@ -73,7 +73,7 @@ class _RequestServiceDiscoveryScreenState
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: productsVM.products.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const SizedBox(height: AppDimens.spaceMd),
                   itemBuilder: (context, index) {
                     final product = productsVM.products[index];

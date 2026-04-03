@@ -207,17 +207,6 @@ class RequestServiceViewModel extends ChangeNotifier {
   }
 
   void submitTicket(BuildContext context) {
-    print('--- SUBMITTING TICKET ---');
-    print('Serial Number: $selectedSerialNumber');
-    print('Symptom: $symptom');
-    print('Ticket Ref: $ticketRef');
-    print('Description: $description');
-    print('Appointment: $appointmentDate');
-    print('Name: $firstName $lastName');
-    print('Email: $email');
-    print('Phone: $phone');
-    print('Location: $address, $building, $city, $state, $country');
-
     // Go to step 5 on success
     currentStep = 5;
     notifyListeners();

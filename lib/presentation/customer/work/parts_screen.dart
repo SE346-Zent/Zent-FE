@@ -178,7 +178,7 @@ class _PartsView extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: viewModel.filteredParts.length,
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, _) =>
                     const SizedBox(height: AppDimens.spaceMd),
                 itemBuilder: (context, index) {
                   final part = viewModel.filteredParts[index];

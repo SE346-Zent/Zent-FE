@@ -58,7 +58,7 @@ class _DetailedChatView extends StatelessWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.all(AppDimens.spaceMd),
                   itemCount: viewModel.messages.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const SizedBox(height: AppDimens.spaceMd),
                   itemBuilder: (context, index) {
                     final msg = viewModel.messages[index];

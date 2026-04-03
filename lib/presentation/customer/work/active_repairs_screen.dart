@@ -172,7 +172,7 @@ class _ActiveRepairsView extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const AlwaysScrollableScrollPhysics(),
                       itemCount: viewModel.recentCompleted.length,
-                      separatorBuilder: (_, __) => const Divider(
+                      separatorBuilder: (_, _) => const Divider(
                         height: 1,
                         color: AppColors.secondary100,
                       ),

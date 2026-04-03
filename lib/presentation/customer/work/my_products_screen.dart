@@ -129,7 +129,7 @@ class _MyProductsView extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: viewModel.products.length,
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, _) =>
                     const SizedBox(height: AppDimens.spaceLg),
                 itemBuilder: (context, index) {
                   final product = viewModel.products[index];

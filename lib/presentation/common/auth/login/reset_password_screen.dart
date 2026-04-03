@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
@@ -10,7 +11,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'widgets/auth_app_bar.dart';
 import 'widgets/auth_header.dart';
 import 'widgets/auth_text_field.dart';
-import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
+import 'widgets/auth_primary_button.dart';
 import 'widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
@@ -122,7 +123,7 @@ class _ResetPasswordScreenContent extends StatelessWidget {
 
                                           if (isSuccess && context.mounted) {
                                             context.goNamed(
-                                              'resetSuccessfully',
+                                              RouteNames.resetSuccessfully,
                                             );
                                           } else if (viewModel.errorMessage !=
                                                   null &&

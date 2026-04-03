@@ -37,6 +37,15 @@ import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.d
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/security_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/notifications_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/products_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/active_repairs_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/device_registration_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/parts_viewmodel.dart';
 
 // Tech
 import 'package:zent_fe/presentation/technician/account/view_models/tech_profile_viewmodel.dart';
@@ -83,6 +92,15 @@ Future<void> init() async {
   sl.registerFactory(() => PersonalInfoViewModel());
   sl.registerFactory(() => ServiceViewModel());
   sl.registerFactory(() => ChatViewModel());
+  sl.registerFactory(() => CustomerSecurityViewModel());
+  sl.registerFactory(() => CustomerNotificationsViewModel());
+  sl.registerFactory(() => ProductsViewModel());
+  sl.registerFactory(() => DetailedProductViewModel());
+  sl.registerFactory(() => RequestServiceViewModel());
+  sl.registerFactory(() => ActiveRepairsViewModel());
+  sl.registerFactory(() => DetailedChatViewModel());
+  sl.registerFactory(() => DeviceRegistrationViewModel());
+  sl.registerFactory(() => PartsViewModel());
 
   // Tech ViewModels
   sl.registerFactory(() => TechnicianHomeViewModel());

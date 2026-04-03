@@ -8,7 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Auth Components
 import 'widgets/auth_app_bar.dart';
-import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
+import 'widgets/auth_primary_button.dart';
 import 'widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
@@ -20,18 +20,34 @@ import 'widgets/resend_otp_text.dart';
 import 'view_models/verify_otp_view_model.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
-class VerifyOtpScreen extends StatelessWidget {
+class VerifyOtpScreen extends StatefulWidget {
   final String email;
   const VerifyOtpScreen({super.key, required this.email});
 
   @override
+  State<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
+}
+
+class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
+  late final VerifyOtpViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = di.sl<VerifyOtpViewModel>();
+    _viewModel.init(email: widget.email);
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        final viewModel = di.sl<VerifyOtpViewModel>();
-        viewModel.init(email: email);
-        return viewModel;
-      },
+    return ChangeNotifierProvider.value(
+      value: _viewModel,
       child: const _VerifyOtpScreenContent(),
     );
   }

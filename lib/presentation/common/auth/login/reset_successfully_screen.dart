@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -86,7 +87,7 @@ class ResetSuccessfullyScreen extends StatelessWidget {
                                 ),
                                 child: ElevatedButton.icon(
                                   onPressed: () {
-                                    context.goNamed('login');
+                                    context.goNamed(RouteNames.login);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: const Text(

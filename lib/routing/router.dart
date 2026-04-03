@@ -16,6 +16,15 @@ import '../presentation/customer/account/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
 import 'package:zent_fe/presentation/customer/account/personal_info_screen.dart';
+import '../presentation/customer/account/security_screen.dart';
+import '../presentation/customer/account/notifications_screen.dart';
+import '../presentation/customer/account/detailed_chat_screen.dart';
+import '../presentation/customer/work/my_products_screen.dart';
+import '../presentation/customer/work/my_detailed_product_screen.dart';
+import '../presentation/customer/work/request_service_screen.dart';
+import '../presentation/customer/work/active_repairs_screen.dart';
+import '../presentation/customer/work/device_registration_screen.dart';
+import '../presentation/customer/work/parts_screen.dart';
 import 'package:zent_fe/presentation/common/core/layouts/admin_main_layout.dart';
 import 'package:zent_fe/presentation/common/core/layouts/customer_main_layout.dart';
 import '../presentation/technician/account/tech_profile_screen.dart';
@@ -138,7 +147,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
+  initialLocation: Routes.customerServices,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -441,27 +450,52 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.customerMyProducts,
                   path: Routes.myProducts,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Customer My Products Screen')),
-                  ),
+                  builder: (context, state) => const MyProductsScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.customerDeviceRegistration,
+                      path: 'register-device',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) =>
+                          const DeviceRegistrationScreen(),
+                    ),
+                    GoRoute(
+                      name: RouteNames.customerDetailedProduct,
+                      path: Routes.customerDetailedProduct,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final serialNumber =
+                            state.pathParameters['serialNumber']!;
+                        return MyDetailedProductScreen(
+                          serialNumber: serialNumber,
+                        );
+                      },
+                      routes: [
+                        GoRoute(
+                          name: RouteNames.customerDetailedProductParts,
+                          path: 'parts',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          builder: (context, state) {
+                            final serialNumber =
+                                state.pathParameters['serialNumber']!;
+                            return PartsScreen(serialNumber: serialNumber);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 GoRoute(
                   name: RouteNames.customerRequestService,
                   path: Routes.requestService,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(
-                      child: Text('Customer Request Service Screen'),
-                    ),
-                  ),
+                  builder: (context, state) => const RequestServiceScreen(),
                 ),
                 GoRoute(
                   name: RouteNames.customerActiveRepairs,
                   path: Routes.activeRepairs,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Customer Active Repairs Screen')),
-                  ),
+                  builder: (context, state) => const ActiveRepairsScreen(),
                 ),
               ],
             ),
@@ -473,6 +507,17 @@ final GoRouter appRouter = GoRouter(
               name: RouteNames.customerMessages,
               path: Routes.customerMessages,
               builder: (context, state) => const CustomerChatScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.customerDetailedChat,
+                  path: 'detailed-chat/:chatId',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final chatId = state.pathParameters['chatId']!;
+                    return DetailedChatScreen(chatId: chatId);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -489,6 +534,19 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) =>
                       const CustomerPersonalInfoScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.customerSecuritySettings,
+                  path: Routes.customerSecuritySettings,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const CustomerSecurityScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.customerNotifications,
+                  path: Routes.customerNotifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      const CustomerNotificationsScreen(),
                 ),
               ],
             ),

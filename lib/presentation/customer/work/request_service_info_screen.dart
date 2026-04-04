@@ -5,6 +5,7 @@ import '../../../../presentation/common/core/themes/dimens.dart';
 import '../../../../presentation/common/core/themes/text_styles.dart';
 import '../../../../presentation/common/core/themes/boxshadow.dart';
 import 'widgets/customer_text_field.dart';
+import 'widgets/customer_dropdown_field.dart';
 import 'widgets/appointment_mask.dart';
 import 'viewmodels/request_service_viewmodel.dart';
 
@@ -17,7 +18,7 @@ class RequestServiceInfoScreen extends StatefulWidget {
 }
 
 class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
-  final TextEditingController symptomCtrl = TextEditingController();
+  String? selectedSymptom;
   final TextEditingController ticketCtrl = TextEditingController();
   final TextEditingController descCtrl = TextEditingController();
   final AppointmentMaskController appointmentCtrl = AppointmentMaskController();
@@ -25,7 +26,7 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
   final FocusNode appointmentFocus = FocusNode();
 
   bool get isNextEnabled =>
-      symptomCtrl.text.isNotEmpty &&
+      selectedSymptom != null &&
       appointmentCtrl.text.length == AppointmentInputFormatter.mask.length &&
       !appointmentCtrl.text.contains('-');
 
@@ -33,12 +34,11 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
   void initState() {
     super.initState();
     final vm = context.read<RequestServiceViewModel>();
-    symptomCtrl.text = vm.symptom ?? '';
+    selectedSymptom = vm.symptom?.isEmpty == true ? null : vm.symptom;
     ticketCtrl.text = vm.ticketRef ?? '';
     descCtrl.text = vm.description ?? '';
     appointmentCtrl.text = vm.appointmentDate ?? '';
 
-    symptomCtrl.addListener(() => setState(() {}));
     appointmentCtrl.addListener(() => setState(() {}));
 
     appointmentFocus.addListener(() {
@@ -61,7 +61,6 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
 
   @override
   void dispose() {
-    symptomCtrl.dispose();
     ticketCtrl.dispose();
     descCtrl.dispose();
     appointmentCtrl.dispose();
@@ -71,7 +70,7 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
 
   void _onNext(RequestServiceViewModel viewModel) {
     viewModel.saveInfo(
-      symptomVal: symptomCtrl.text,
+      symptomVal: selectedSymptom ?? '',
       ticketRefVal: ticketCtrl.text,
       descriptionVal: descCtrl.text,
       appointmentDateVal: appointmentCtrl.text,
@@ -109,17 +108,23 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
           ),
           const SizedBox(height: AppDimens.spaceXl),
 
-          CustomerTextField(
+          CustomerDropdownField<String>(
             label: 'Symptom',
-            hint: 'Select Category',
-            suffixIcon: const Icon(
-              Icons.keyboard_arrow_down,
-              color: AppColors.secondary100,
-            ),
-            controller: symptomCtrl,
+            value: selectedSymptom,
+            items: [
+              'Screen Broken',
+              'Battery Issue',
+              'Software Glitch',
+              'Hardware Damage',
+              'Other',
+            ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            onChanged: (v) {
+              setState(() {
+                selectedSymptom = v;
+              });
+            },
             isRequired: true,
           ),
-          const SizedBox(height: AppDimens.spaceLg),
 
           CustomerTextField(
             label: 'Ticket Reference Number',

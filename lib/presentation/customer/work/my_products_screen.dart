@@ -67,7 +67,7 @@ class _MyProductsView extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                  boxShadow: [BoxShadowStyles.raised],
+                  boxShadow: [BoxShadowStyles.glowing],
                 ),
                 child: ElevatedButton(
                   onPressed: () {
@@ -91,13 +91,11 @@ class _MyProductsView extends StatelessWidget {
                               'Register a new Device',
                               style: TextStyles.title.copyWith(
                                 color: Colors.white,
-                                fontSize: 20,
                               ),
                             ),
-                            const SizedBox(height: 4),
                             Text(
                               'Add a new device to your service profile',
-                              style: TextStyles.bodyMedium.copyWith(
+                              style: TextStyles.label.copyWith(
                                 color: Colors.white,
                               ),
                             ),
@@ -106,16 +104,17 @@ class _MyProductsView extends StatelessWidget {
                       ),
                       const SizedBox(width: AppDimens.spaceMd),
                       Container(
-                        width: 24,
-                        height: 24,
+                        width: 28,
+                        height: 28,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2.5),
+                          border: Border.all(color: Colors.white, width: 2.0),
                         ),
                         child: const Icon(
                           Icons.add,
                           color: Colors.white,
-                          size: 16,
+                          size: 24,
                         ),
                       ),
                     ],

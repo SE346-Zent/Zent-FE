@@ -34,190 +34,240 @@ class _ActiveRepairsView extends StatelessWidget {
         showBackButton: true,
         showBottomDivider: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppDimens.spaceMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Tiêu đề
-            Text(
-              'Tracking Work Order',
-              style: TextStyles.display.copyWith(
-                color: Colors.black,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+      body: CustomScrollView(
+        slivers: [
+          // Title & Tracking Card
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: AppDimens.spaceMd,
+                left: AppDimens.spaceMd,
+                right: AppDimens.spaceMd,
               ),
-            ),
-            const SizedBox(height: AppDimens.spaceXs),
-            Text(
-              'Tracking your ongoing industrial service in real-time',
-              style: TextStyles.bodyLarge.copyWith(
-                color: AppColors.secondary500,
-              ),
-            ),
-            const SizedBox(height: AppDimens.spaceLg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tracking Work Order',
+                    style: TextStyles.display.copyWith(
+                      color: Colors.black,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimens.spaceXs),
+                  Text(
+                    'Tracking your ongoing industrial service in real-time',
+                    style: TextStyles.bodyLarge.copyWith(
+                      color: AppColors.secondary500,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimens.spaceLg),
 
-            // Tracking Card
-            IntrinsicHeight(
+                  // Tracking Card
+                  IntrinsicHeight(
+                    child: Container(
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                        boxShadow: [BoxShadowStyles.raised],
+                        border: const Border(
+                          top: BorderSide(
+                            color: AppColors.secondary300,
+                            width: 1,
+                          ),
+                          bottom: BorderSide(
+                            color: AppColors.secondary300,
+                            width: 1,
+                          ),
+                          right: BorderSide(
+                            color: AppColors.secondary300,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    AppDimens.spaceMd,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'WO-1234',
+                                        style: TextStyles.bodyLarge.copyWith(
+                                          color: AppColors.secondary400,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Mainboard Inspection',
+                                        style: TextStyles.headline.copyWith(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Scheduled time: 14h30',
+                                        style: TextStyles.bodyMedium.copyWith(
+                                          color: AppColors.secondary500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppDimens.spaceXl),
+                                      _buildStepper(
+                                        viewModel.currentStatusStep,
+                                      ),
+                                      const SizedBox(height: AppDimens.spaceXl),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _buildActionButton(
+                                              'Cancel',
+                                              AppColors.surface600,
+                                              AppColors.secondary500,
+                                              BoxShadowStyles.subtle,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: AppDimens.spaceMd,
+                                          ),
+                                          Expanded(
+                                            child: _buildActionButton(
+                                              'Edit',
+                                              AppColors.tertiary500,
+                                              Colors.white,
+                                              BoxShadowStyles.glowing,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 8,
+                              decoration: const BoxDecoration(
+                                color: AppColors.secondary700,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(AppDimens.boraMd),
+                                  bottomLeft: Radius.circular(AppDimens.boraMd),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppDimens.spaceXl),
+                ],
+              ),
+            ),
+          ),
+
+          // Recent Completed List
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: AppDimens.spaceMd,
+                right: AppDimens.spaceMd,
+                bottom: AppDimens.spaceMd,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                  boxShadow: [BoxShadowStyles.raised],
+                  boxShadow: [BoxShadowStyles.subtle],
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.secondary700,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(AppDimens.boraMd),
-                          bottomLeft: Radius.circular(AppDimens.boraMd),
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimens.spaceMd,
+                        vertical: AppDimens.spaceSm,
                       ),
+                      child: Text('Recent Completed', style: TextStyles.middle),
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppDimens.spaceLg),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'WO-1234',
-                              style: TextStyles.bodyLarge.copyWith(
-                                color: AppColors.secondary400,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Mainboard Inspection',
-                              style: TextStyles.headline.copyWith(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Scheduled time: 14h30',
-                              style: TextStyles.bodyMedium.copyWith(
-                                color: AppColors.secondary500,
-                              ),
-                            ),
-                            const SizedBox(height: AppDimens.spaceXl),
+                    const Divider(height: 1, color: AppColors.secondary50),
 
-                            // Custom Stepper
-                            _buildStepper(viewModel.currentStatusStep),
-
-                            const SizedBox(height: AppDimens.spaceXl),
-
-                            // Action Buttons
-                            Row(
+                    // List item
+                    Column(
+                      children: [
+                        for (
+                          int i = 0;
+                          i < viewModel.recentCompleted.length;
+                          i++
+                        ) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppDimens.spaceMd,
+                              vertical: AppDimens.spaceSm,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded(
-                                  child: _buildActionButton(
-                                    'Cancel',
-                                    AppColors.surface600,
-                                    AppColors.secondary500,
-                                    BoxShadowStyles.subtle,
-                                  ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      viewModel.recentCompleted[i].title,
+                                      style: TextStyles.bodyLarge.copyWith(
+                                        color: AppColors.secondary500,
+                                      ),
+                                    ),
+                                    Text(
+                                      viewModel.recentCompleted[i].woNumber,
+                                      style: TextStyles.label.copyWith(
+                                        color: AppColors.secondary300,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: AppDimens.spaceMd),
-                                Expanded(
-                                  child: _buildActionButton(
-                                    'Edit',
-                                    AppColors.tertiary500,
-                                    Colors.white,
-                                    BoxShadowStyles.glowing,
+                                Text(
+                                  viewModel.recentCompleted[i].date,
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary500,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+
+                          if (i < viewModel.recentCompleted.length - 1)
+                            const Divider(
+                              height: 1,
+                              color: AppColors.secondary50,
+                            ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: AppDimens.spaceXl),
-
-            // Recent Completed List
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                boxShadow: [BoxShadowStyles.subtle],
-                border: Border.all(color: AppColors.secondary100),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(AppDimens.spaceMd),
-                    child: Text(
-                      'Recent Completed',
-                      style: TextStyles.headline.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const Divider(height: 1, color: AppColors.secondary100),
-
-                  SizedBox(
-                    height: 220,
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount: viewModel.recentCompleted.length,
-                      separatorBuilder: (_, _) => const Divider(
-                        height: 1,
-                        color: AppColors.secondary100,
-                      ),
-                      itemBuilder: (context, index) {
-                        final item = viewModel.recentCompleted[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(AppDimens.spaceMd),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: TextStyles.bodyLarge.copyWith(
-                                      color: AppColors.secondary700,
-                                    ),
-                                  ),
-                                  Text(
-                                    item.woNumber,
-                                    style: TextStyles.label.copyWith(
-                                      color: AppColors.secondary400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                item.date,
-                                style: TextStyles.bodyMedium.copyWith(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

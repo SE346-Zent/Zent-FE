@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ServiceTypeData {
   final String id;
@@ -52,32 +54,47 @@ class RequestServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Mock Dropdown Data
   final List<String> countries = ['VIET NAM'];
-  final List<String> states = ['An Giang', 'Hà Nội', 'Hồ Chí Minh'];
-  final Map<String, List<String>> _citiesByState = {
-    'An Giang': [
-      'Thành phố Châu Đốc',
-      'Thành phố Long Xuyên',
-      'Thị xã Tân Châu',
-    ],
-    'Hà Nội': ['Ba Đình', 'Hoàn Kiếm', 'Đống Đa', 'Tây Hồ', 'Cầu Giấy'],
-    'Hồ Chí Minh': [
-      'Quận 1',
-      'Quận 3',
-      'Quận 5',
-      'Quận 7',
-      'Thành phố Thủ Đức',
-    ],
-  };
+  final List<String> states = [];
+  final Map<String, List<String>> _citiesByState = {};
+
+  Future<void> loadLocationData() async {
+    if (states.isNotEmpty) return;
+
+    try {
+      final String response = await rootBundle.loadString(
+        'assets/data/vietnam_location.json',
+      );
+      final List<dynamic> data = json.decode(response);
+
+      states.clear();
+      _citiesByState.clear();
+
+      for (var item in data) {
+        final stateName = item['name'] as String;
+        final citiesList = (item['cities'] as List)
+            .map((e) => e.toString())
+            .toList();
+
+        states.add(stateName);
+        _citiesByState[stateName] = citiesList;
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Lỗi tải file địa giới hành chính: $e");
+    }
+  }
 
   List<String> get availableCities =>
       state != null ? (_citiesByState[state!] ?? []) : [];
 
   void updateState(String newState) {
-    state = newState;
-    city = null; // reset city when state changes
-    notifyListeners();
+    if (state != newState) {
+      state = newState;
+      city = null;
+      notifyListeners();
+    }
   }
 
   void updateCity(String newCity) {
@@ -123,6 +140,7 @@ class RequestServiceViewModel extends ChangeNotifier {
   }
 
   void initContactInfo() {
+    loadLocationData();
     // Auto-fill from UserProvider mock if not set
     firstName ??= 'Hung';
     lastName ??= 'dep zai';

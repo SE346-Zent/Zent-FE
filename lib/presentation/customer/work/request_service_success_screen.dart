@@ -93,7 +93,7 @@ class RequestServiceSuccessScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.tertiary500,
                         borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                        boxShadow: [BoxShadowStyles.raised],
+                        boxShadow: [BoxShadowStyles.glowing],
                       ),
                       child: ElevatedButton(
                         onPressed: () {
@@ -112,7 +112,7 @@ class RequestServiceSuccessScreen extends StatelessWidget {
                         ),
                         child: Text(
                           'Go to Services',
-                          style: TextStyles.title.copyWith(
+                          style: TextStyles.middle.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.normal,
                           ),

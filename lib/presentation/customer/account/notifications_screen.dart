@@ -107,13 +107,13 @@ class _CustomerNotificationsView extends StatelessWidget {
                   border: Border.all(color: AppColors.tertiary500),
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.info_outline,
                       color: AppColors.tertiary500,
                     ),
-                    const SizedBox(width: 12.0),
+                    const SizedBox(width: AppDimens.spaceSm),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +127,7 @@ class _CustomerNotificationsView extends StatelessWidget {
                           const SizedBox(height: AppDimens.spaceXs),
                           Text(
                             'To receive these alerts, ensure notifications are enabled in your device settings',
-                            style: TextStyles.bodyMedium.copyWith(
+                            style: TextStyles.label.copyWith(
                               color: AppColors.secondary300,
                             ),
                           ),

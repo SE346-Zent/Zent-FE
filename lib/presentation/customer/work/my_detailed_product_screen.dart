@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
@@ -55,288 +54,295 @@ class _DetailedProductView extends StatelessWidget {
         showBackButton: true,
         showBottomDivider: true,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                  boxShadow: [BoxShadowStyles.raised],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Product Image
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(AppDimens.boraMd),
-                        topRight: Radius.circular(AppDimens.boraMd),
-                      ),
-                      child: Image.asset(
-                        viewModel.product?.imagePath ?? AppAssets.laptopA,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(
+          left: AppDimens.spaceMd,
+          right: AppDimens.spaceMd,
+          top: AppDimens.spaceMd,
+          bottom: AppDimens.spaceMd,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                boxShadow: [BoxShadowStyles.raised],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                    child: Image.asset(
+                      viewModel.product?.imagePath ?? AppAssets.laptopA,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(AppDimens.spaceLg),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Product Info
-                          Text(
-                            'IdeaPad 5 Pro 16ARH7 - Type 82SN',
-                            style: TextStyles.headline.copyWith(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(AppDimens.spaceLg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Product Info
+                        Text(
+                          'IdeaPad 5 Pro 16ARH7 - Type 82SN',
+                          style: TextStyles.headline.copyWith(
+                            color: Colors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            height: 1.3,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimens.spaceMd),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'S/N: ${viewModel.product?.serialNumber ?? viewModel.currentSerialNumber ?? 'NA'}',
+                              style: TextStyles.bodyLarge.copyWith(
+                                color: AppColors.secondary500,
+                              ),
+                            ),
+                            Text(
+                              'MTM: abc12345',
+                              style: TextStyles.bodyLarge.copyWith(
+                                color: AppColors.secondary500,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: AppDimens.spaceMd,
+                          ),
+                          child: Divider(
+                            height: 1,
+                            color: AppColors.secondary50,
+                          ),
+                        ),
+
+                        // Warranty Section Title
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.verified_user_outlined,
                               color: Colors.black,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              height: 1.3,
+                              size: 24,
                             ),
-                          ),
-                          const SizedBox(height: AppDimens.spaceMd),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'S/N: ${viewModel.product?.serialNumber ?? viewModel.currentSerialNumber ?? 'NA'}',
-                                style: TextStyles.bodyLarge.copyWith(
-                                  color: AppColors.secondary500,
-                                ),
+                            const SizedBox(width: AppDimens.spaceSm),
+                            Text(
+                              'Warranty',
+                              style: TextStyles.headline.copyWith(
+                                color: AppColors.primary500,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                               ),
-                              Text(
-                                'MTM: abc12345',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppDimens.spaceMd),
+
+                        // Warranty Status Texts
+                        RichText(
+                          text: TextSpan(
+                            text: 'Warranty Status: ',
+                            style: TextStyles.bodyLarge.copyWith(
+                              color: AppColors.secondary500,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'In Warranty',
                                 style: TextStyles.bodyLarge.copyWith(
-                                  color: AppColors.secondary500,
+                                  color: AppColors.success500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppDimens.spaceXl),
-
-                          // Warranty Section Title
-                          Row(
+                        ),
+                        const SizedBox(height: AppDimens.spaceXs),
+                        RichText(
+                          text: TextSpan(
+                            text: 'Support Status: ',
+                            style: TextStyles.bodyLarge.copyWith(
+                              color: AppColors.secondary500,
+                            ),
                             children: [
-                              const Icon(
-                                Icons.verified_user_outlined,
-                                color: Colors.black,
-                                size: 24,
-                              ),
-                              const SizedBox(width: AppDimens.spaceSm),
-                              Text(
-                                'Warranty',
-                                style: TextStyles.headline.copyWith(
-                                  color: AppColors.primary500,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                              TextSpan(
+                                text: '100 days remaining',
+                                style: TextStyles.bodyLarge.copyWith(
+                                  color: AppColors.success500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppDimens.spaceMd),
+                        ),
+                        const SizedBox(height: AppDimens.spaceXl),
 
-                          // Warranty Status Texts
-                          RichText(
-                            text: TextSpan(
-                              text: 'Warranty Status: ',
-                              style: TextStyles.bodyLarge.copyWith(
-                                color: AppColors.secondary500,
-                              ),
+                        // Progress Bar
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // 'Today' label
+                            Row(
                               children: [
-                                TextSpan(
-                                  text: 'In Warranty',
-                                  style: TextStyles.bodyLarge.copyWith(
-                                    color: AppColors.success500,
+                                Expanded(
+                                  flex: 6,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: FractionalTranslation(
+                                      translation: const Offset(0.5, 0),
+                                      child: Text(
+                                        'Today',
+                                        style: TextStyles.label.copyWith(
+                                          color: AppColors.secondary400,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
+                                const Expanded(flex: 4, child: SizedBox()),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: AppDimens.spaceXs),
-                          RichText(
-                            text: TextSpan(
-                              text: 'Support Status: ',
-                              style: TextStyles.bodyLarge.copyWith(
-                                color: AppColors.secondary500,
+                            const SizedBox(height: 4),
+                            // Bar
+                            Container(
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: AppColors.secondary100,
+                                borderRadius: BorderRadius.circular(6),
                               ),
-                              children: [
-                                TextSpan(
-                                  text: '100 days remaining',
-                                  style: TextStyles.bodyLarge.copyWith(
-                                    color: AppColors.success500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: AppDimens.spaceXl),
-
-                          // Progress Bar
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // 'Today' label
-                              Row(
+                              child: Row(
                                 children: [
                                   Expanded(
-                                    flex: 6,
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
-                                      child: FractionalTranslation(
-                                        translation: const Offset(0.5, 0),
-                                        child: Text(
-                                          'Today',
-                                          style: TextStyles.label.copyWith(
-                                            color: AppColors.secondary400,
-                                          ),
-                                        ),
+                                    flex: 6, // Green part
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.success300,
+                                        borderRadius: BorderRadius.circular(6),
                                       ),
                                     ),
                                   ),
                                   const Expanded(flex: 4, child: SizedBox()),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              // Bar
-                              Container(
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: AppColors.secondary100,
-                                  borderRadius: BorderRadius.circular(6),
+                            ),
+                            const SizedBox(height: 8),
+                            // Dates
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Nov 10,\n2025',
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                                Text(
+                                  (viewModel.product?.warrantyDate ??
+                                          'Mar 30, 2026')
+                                      .replaceAll(', ', ',\n'),
+                                  textAlign: TextAlign.right,
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppDimens.spaceXl),
+
+                        // Warranty History
+                        Text(
+                          'Warranty History',
+                          style: TextStyles.bodyLarge.copyWith(
+                            color: AppColors.secondary500,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimens.spaceSm),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                              AppDimens.boraMd,
+                            ),
+                            border: Border.all(color: AppColors.secondary100),
+                            color: Colors.white,
+                            boxShadow: [BoxShadowStyles.subtle],
+                          ),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: viewModel.history.length,
+                            separatorBuilder: (_, _) => const Divider(
+                              height: 1,
+                              color: AppColors.secondary100,
+                            ),
+                            itemBuilder: (context, index) {
+                              final item = viewModel.history[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(
+                                  AppDimens.spaceMd,
                                 ),
                                 child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Expanded(
-                                      flex: 6, // Green part
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.success300,
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ),
-                                        ),
+                                    Text(
+                                      item.orderNumber,
+                                      style: TextStyles.bodyLarge.copyWith(
+                                        color: AppColors.secondary500,
                                       ),
                                     ),
-                                    const Expanded(flex: 4, child: SizedBox()),
+                                    Text(
+                                      item.date,
+                                      style: TextStyles.label.copyWith(
+                                        color: AppColors.secondary300,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              // Dates
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Nov 10,\n2025',
-                                    style: TextStyles.label.copyWith(
-                                      color: AppColors.secondary400,
-                                    ),
-                                  ),
-                                  Text(
-                                    (viewModel.product?.warrantyDate ??
-                                            'Mar 30, 2026')
-                                        .replaceAll(', ', ',\n'),
-                                    textAlign: TextAlign.right,
-                                    style: TextStyles.label.copyWith(
-                                      color: AppColors.secondary400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              );
+                            },
                           ),
-                          const SizedBox(height: AppDimens.spaceXl),
-
-                          // Warranty History
-                          Text(
-                            'Warranty History',
-                            style: TextStyles.bodyLarge.copyWith(
-                              color: AppColors.secondary500,
-                            ),
-                          ),
-                          const SizedBox(height: AppDimens.spaceSm),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                AppDimens.boraMd,
-                              ),
-                              border: Border.all(color: AppColors.secondary100),
-                              color: Colors.white,
-                              boxShadow: [BoxShadowStyles.subtle],
-                            ),
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: viewModel.history.length,
-                              separatorBuilder: (_, _) => const Divider(
-                                height: 1,
-                                color: AppColors.secondary100,
-                              ),
-                              itemBuilder: (context, index) {
-                                final item = viewModel.history[index];
-                                return Padding(
-                                  padding: const EdgeInsets.all(
-                                    AppDimens.spaceMd,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        item.orderNumber,
-                                        style: TextStyles.bodyLarge.copyWith(
-                                          color: AppColors.secondary500,
-                                        ),
-                                      ),
-                                      Text(
-                                        item.date,
-                                        style: TextStyles.label.copyWith(
-                                          color: AppColors.secondary300,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: AppDimens.spaceXl),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildBottomButton('Repair Status', () {
-                      context.pushNamed(RouteNames.customerActiveRepairs);
-                    }),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    child: _buildBottomButton('Parts', () {
-                      context.pushNamed(
-                        RouteNames.customerDetailedProductParts,
-                        pathParameters: {
-                          'serialNumber':
-                              viewModel.product?.serialNumber ??
-                              viewModel.currentSerialNumber ??
-                              'NA',
-                        },
-                      );
-                    }),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: AppDimens.spaceXl),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: _buildBottomButton('Repair Status', () {
+                    context.pushNamed(RouteNames.customerActiveRepairs);
+                  }),
+                ),
+                const SizedBox(width: AppDimens.spaceMd),
+                Expanded(
+                  child: _buildBottomButton('Parts', () {
+                    context.pushNamed(
+                      RouteNames.customerDetailedProductParts,
+                      pathParameters: {
+                        'serialNumber':
+                            viewModel.product?.serialNumber ??
+                            viewModel.currentSerialNumber ??
+                            'NA',
+                      },
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

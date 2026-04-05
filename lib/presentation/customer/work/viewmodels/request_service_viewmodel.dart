@@ -17,7 +17,9 @@ class ServiceTypeData {
 }
 
 class RequestServiceViewModel extends ChangeNotifier {
-  int currentStep = 1;
+  int _currentStep = 1;
+
+  int get currentStep => _currentStep;
 
   // Selected information for Step 2
   String? symptom;
@@ -212,26 +214,26 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   void nextStep() {
     if (currentStep < 5) {
-      currentStep++;
+      _currentStep++;
       notifyListeners();
     }
   }
 
   void previousStep() {
     if (currentStep > 1) {
-      currentStep--;
+      _currentStep--;
       notifyListeners();
     }
   }
 
   void submitTicket(BuildContext context) {
     // Go to step 5 on success
-    currentStep = 5;
+    _currentStep = 5;
     notifyListeners();
   }
 
   void reset() {
-    currentStep = 1;
+    _currentStep = 1;
     symptom = null;
     ticketRef = null;
     description = null;

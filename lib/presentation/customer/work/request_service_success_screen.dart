@@ -74,7 +74,7 @@ class RequestServiceSuccessScreen extends StatelessWidget {
                             ),
                             TextSpan(
                               text: viewModel.email ?? 'example@gmail.com',
-                              style: TextStyles.bodyLarge.copyWith(
+                              style: TextStyles.bodyMedium.copyWith(
                                 color: AppColors.tertiary500,
                               ),
                             ),

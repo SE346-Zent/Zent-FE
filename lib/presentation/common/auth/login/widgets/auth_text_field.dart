@@ -10,6 +10,7 @@ class AuthTextField extends StatefulWidget {
   final bool isPassword;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
 
   const AuthTextField({
     super.key,
@@ -19,6 +20,7 @@ class AuthTextField extends StatefulWidget {
     this.isPassword = false,
     this.controller,
     this.keyboardType,
+    this.onChanged,
   });
 
   @override
@@ -57,6 +59,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             controller: widget.controller,
             obscureText: widget.isPassword ? _obscureText : false,
             keyboardType: widget.keyboardType,
+            onChanged: widget.onChanged,
             style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
             decoration: InputDecoration(
               hintText: widget.hintText,

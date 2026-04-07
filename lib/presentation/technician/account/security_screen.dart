@@ -131,7 +131,7 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
                     child: ListView.separated(
                       controller: _historyScrollController,
                       padding: const EdgeInsets.symmetric(
-                        vertical: AppDimens.spaceSm,
+                        vertical: AppDimens.spaceXs,
                       ),
                       itemCount: viewModel.loginHistory.length,
                       separatorBuilder: (_, _) => const Divider(
@@ -143,7 +143,6 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
                         return ListTile(
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: AppDimens.spaceMd,
-                            vertical: AppDimens.spaceXs,
                           ),
                           title: Text(
                             item.device,

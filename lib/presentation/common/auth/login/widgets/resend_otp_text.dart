@@ -4,13 +4,20 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class ResendOtpText extends StatelessWidget {
   final VoidCallback onResend;
+  final int countdown;
+  final bool canResend;
 
-  const ResendOtpText({super.key, required this.onResend});
+  const ResendOtpText({
+    super.key,
+    required this.onResend,
+    required this.countdown,
+    required this.canResend,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onResend,
+      onTap: canResend ? onResend : null,
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
@@ -18,10 +25,15 @@ class ResendOtpText extends StatelessWidget {
           children: [
             const TextSpan(text: 'Haven\'t received OTP Code? '),
             TextSpan(
-              text: 'Resend',
-              style: const TextStyle(
-                color: AppColors.tertiary500,
+              text: canResend ? 'Resend' : 'Resend in ${countdown}s',
+              style: TextStyle(
+                color: canResend
+                    ? AppColors.tertiary500
+                    : AppColors.secondary300,
                 fontWeight: FontWeight.bold,
+                decoration: canResend
+                    ? TextDecoration.underline
+                    : TextDecoration.none,
               ),
             ),
           ],

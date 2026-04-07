@@ -20,9 +20,12 @@ class AdminMainLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: navigationShell,
-      bottomNavigationBar: _AdminBottomNavBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: _onNavTap,
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: _AdminBottomNavBar(
+          currentIndex: navigationShell.currentIndex,
+          onTap: _onNavTap,
+        ),
       ),
     );
   }

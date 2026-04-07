@@ -23,6 +23,11 @@ abstract final class RouteNames {
   static const String techWorkOrder = 'techWorkOrder';
   static const String techMessage = 'techMessage';
   static const String techMe = 'techMe';
+  static const String techAddNewPart = 'techAddNewPart';
+  static const String techCompleteWorkOrder = 'techCompleteWorkOrder';
+  static const String techWorkOrderDetails = 'techWorkOrderDetails';
+  static const String techPartSearch = 'techPartSearch';
+  static const String appCamera = 'appCamera';
 
   // customer top level
   static const String customerServices = 'customerServices';
@@ -41,4 +46,11 @@ abstract final class RouteNames {
   static const String customerRequestService = 'customerRequestService';
   static const String customerActiveRepairs = 'customerActiveRepairs';
   static const String customerPersonalInfo = 'customerPersonalInfo';
+  static const String customerSecuritySettings = 'customerSecuritySettings';
+  static const String customerNotifications = 'customerNotifications';
+  static const String customerDetailedProduct = 'customerDetailedProduct';
+  static const String customerDetailedChat = 'customerDetailedChat';
+  static const String customerDeviceRegistration = 'customerDeviceRegistration';
+  static const String customerDetailedProductParts =
+      'customerDetailedProductParts';
 }

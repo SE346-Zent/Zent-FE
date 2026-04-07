@@ -59,11 +59,11 @@ class _TechNotificationsView extends StatelessWidget {
               const SizedBox(height: AppDimens.spaceSm),
               Text(
                 'Manage how you receive updates about jobs, inventory and messages.',
-                style: TextStyles.bodyMedium.copyWith(
-                  color: AppColors.secondary300,
+                style: TextStyles.bodyLarge.copyWith(
+                  color: AppColors.secondary500,
                 ),
               ),
-              const SizedBox(height: AppDimens.spaceXl),
+              const SizedBox(height: AppDimens.spaceMd),
 
               // Section: Job Alerts
               _buildSectionTitle('Job Alerts'),
@@ -79,7 +79,6 @@ class _TechNotificationsView extends StatelessWidget {
                 value: viewModel.urgentDispatches,
                 onChanged: (val) => viewModel.toggleSetting('urgent', val),
               ),
-              const SizedBox(height: AppDimens.spaceMd),
 
               // Section: Inventory & Resources
               _buildSectionTitle('Inventory & Resources'),
@@ -89,7 +88,6 @@ class _TechNotificationsView extends StatelessWidget {
                 value: viewModel.equipmentMaintenance,
                 onChanged: (val) => viewModel.toggleSetting('equipment', val),
               ),
-              const SizedBox(height: AppDimens.spaceMd),
 
               // Section: Communication
               _buildSectionTitle('Communication'),
@@ -105,7 +103,7 @@ class _TechNotificationsView extends StatelessWidget {
                 value: viewModel.customerFeedback,
                 onChanged: (val) => viewModel.toggleSetting('feedback', val),
               ),
-              const SizedBox(height: AppDimens.spaceXl),
+              const SizedBox(height: AppDimens.spaceLg),
 
               // Info Box: Push Permissions
               Container(

@@ -6,7 +6,9 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class OtpInputSection extends StatefulWidget {
-  const OtpInputSection({super.key});
+  final ValueChanged<String>? onChanged;
+
+  const OtpInputSection({super.key, this.onChanged});
 
   @override
   State<OtpInputSection> createState() => _OtpInputSectionState();
@@ -47,7 +49,10 @@ class _OtpInputSectionState extends State<OtpInputSection> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(_otpLength),
             ],
-            onChanged: (value) => setState(() {}),
+            onChanged: (value) {
+              setState(() {});
+              widget.onChanged?.call(value);
+            },
           ),
         ),
 

@@ -108,4 +108,32 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception("No tokens found to refresh");
     }
   }
+
+  @override
+  Future<bool> isFirstTime() async {
+    return await authLocalDataSource.isFirstTime();
+  }
+
+  @override
+  Future<void> setFirstTimeDone() async {
+    await authLocalDataSource.setFirstTimeDone();
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    await authRemoteService.forgotPassword(email);
+  }
+
+  @override
+  Future<bool> resetPassword({
+    required String email,
+    required String token,
+    required String newPassword,
+  }) async {
+    return await authRemoteService.resetPassword(
+      email: email,
+      token: token,
+      newPassword: newPassword,
+    );
+  }
 }

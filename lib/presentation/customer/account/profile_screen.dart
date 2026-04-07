@@ -29,6 +29,10 @@ class _ProfileScreenContent extends StatelessWidget {
   void _onMenuItemTapped(BuildContext context, int index) {
     if (index == 0) {
       context.goNamed('customerPersonalInfo');
+    } else if (index == 1) {
+      context.goNamed('customerSecuritySettings');
+    } else if (index == 2) {
+      context.goNamed('customerNotifications');
     } else {
       debugPrint("action triggered: tap on menu item $index");
     }

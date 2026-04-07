@@ -6,14 +6,26 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../data/datasources/local/auth_local_datasource.dart';
 import '../data/datasources/remote/auth_remote_datasource.dart';
 import '../data/datasources/remote/order_remote_datasource.dart';
+import '../data/datasources/local/work_order_local_datasource.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../data/repositories/work_order_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../domain/repositories/work_order_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
+import '../domain/usecases/auth/first_time_usecase.dart';
+import '../domain/usecases/auth/reset_password_usecase.dart';
+import '../domain/usecases/auth/verify_otp_usecase.dart';
+import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../domain/usecases/work_order/create_work_order_usecase.dart';
+import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
+import '../domain/usecases/product/get_my_products_usecase.dart';
+import '../domain/repositories/product_repository.dart';
+import '../data/repositories/product_repository_impl.dart';
+import '../data/datasources/remote/product_remote_datasource.dart';
+import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
 import '../presentation/common/auth/login/view_models/reset_password_view_model.dart';
@@ -24,13 +36,28 @@ import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/security_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/notifications_viewmodel.dart';
+import '../presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/products_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/active_repairs_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/device_registration_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/parts_viewmodel.dart';
 
 // Tech
 import 'package:zent_fe/presentation/technician/account/view_models/tech_profile_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/personal_info_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/view_models/technician_home_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_details_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/add_new_part_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/complete_work_order_viewmodel.dart';
 import 'package:zent_fe/presentation/technician/account/view_models/security_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/account/view_models/tech_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/view_models/part_search_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -40,27 +67,60 @@ Future<void> init() async {
   // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
+
+  // Work Order Use Cases
+  sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
   sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
+  sl.registerLazySingleton(() => CreateWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetActiveRepairsUseCase(sl()));
+  sl.registerLazySingleton(() => GetMyProductsUseCase(sl()));
 
   // ViewModels
+  sl.registerFactory(() => SplashViewModel(sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
   sl.registerFactory(() => ForgotPasswordViewModel());
-  sl.registerFactory(() => ResetPasswordViewModel());
-  sl.registerFactory(() => VerifyOtpViewModel());
+  sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
+  sl.registerFactory(() => VerifyOtpViewModel(verifyOtpUseCase: sl()));
   sl.registerFactory(() => UserManagementViewModel());
   sl.registerFactory(() => ProfileViewModel(sl()));
   sl.registerFactory(() => SecuritySettingsViewModel());
   sl.registerFactory(() => CustomerProfileViewModel());
   sl.registerFactory(() => PersonalInfoViewModel());
   sl.registerFactory(() => ServiceViewModel());
+  sl.registerFactory(() => ChatViewModel());
+  sl.registerFactory(() => CustomerSecurityViewModel());
+  sl.registerFactory(() => CustomerNotificationsViewModel());
+  sl.registerFactory(() => ProductsViewModel());
+  sl.registerFactory(() => DetailedProductViewModel());
+  sl.registerFactory(() => RequestServiceViewModel());
+  sl.registerFactory(() => ActiveRepairsViewModel());
+  sl.registerFactory(() => DetailedChatViewModel());
+  sl.registerFactory(() => DeviceRegistrationViewModel());
+  sl.registerFactory(() => PartsViewModel());
 
   // Tech ViewModels
+  sl.registerFactory(() => TechnicianHomeViewModel());
+  sl.registerFactory(() => TechWorkOrderViewModel());
+  sl.registerFactoryParam<TechWorkOrderDetailsViewModel, String, void>(
+    (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
+  );
+  sl.registerFactory(() => AddNewPartViewModel());
+  sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
+    (workOrderId, _) => CompleteWorkOrderViewModel(
+      workOrderId: workOrderId,
+      workOrderDraftUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => TechProfileViewModel());
   sl.registerFactory(() => TechPersonalInfoViewModel());
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(() => TechSecurityViewModel());
-  sl.registerFactory(() => TechWorkOrderViewModel());
+  sl.registerFactory(() => PartSearchViewModel());
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -68,7 +128,11 @@ Future<void> init() async {
         AuthRepositoryImpl(authRemoteService: sl(), authLocalDataSource: sl()),
   );
   sl.registerLazySingleton<WorkOrderRepository>(
-    () => WorkOrderRepositoryImpl(remoteDataSource: sl()),
+    () =>
+        WorkOrderRepositoryImpl(localDataSource: sl(), remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(remoteDataSource: sl()),
   );
 
   // Data sources
@@ -78,8 +142,14 @@ Future<void> init() async {
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(secureStorage: sl(), sharedPreferences: sl()),
   );
+  sl.registerLazySingleton<WorkOrderLocalDataSource>(
+    () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
+  );
   sl.registerLazySingleton<OrderRemoteDataSource>(
     () => OrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
+  );
+  sl.registerLazySingleton<ProductRemoteDataSource>(
+    () => ProductRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
   );
 
   // --- External ---

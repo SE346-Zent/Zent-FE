@@ -16,7 +16,7 @@ class AddUserFab extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.tertiary400,
         shape: BoxShape.circle,
-        boxShadow: [BoxShadowStyles.raised],
+        boxShadow: [BoxShadowStyles.glowing],
       ),
       child: Material(
         color: Colors.transparent,

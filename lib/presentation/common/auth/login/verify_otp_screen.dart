@@ -8,7 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Auth Components
 import 'widgets/auth_app_bar.dart';
-import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
+import 'widgets/auth_primary_button.dart';
 import 'widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
@@ -20,13 +20,34 @@ import 'widgets/resend_otp_text.dart';
 import 'view_models/verify_otp_view_model.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
-class VerifyOtpScreen extends StatelessWidget {
-  const VerifyOtpScreen({super.key});
+class VerifyOtpScreen extends StatefulWidget {
+  final String email;
+  const VerifyOtpScreen({super.key, required this.email});
+
+  @override
+  State<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
+}
+
+class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
+  late final VerifyOtpViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = di.sl<VerifyOtpViewModel>();
+    _viewModel.init(email: widget.email);
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => di.sl<VerifyOtpViewModel>(),
+    return ChangeNotifierProvider.value(
+      value: _viewModel,
       child: const _VerifyOtpScreenContent(),
     );
   }
@@ -37,7 +58,6 @@ class _VerifyOtpScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
     final viewModel = context.watch<VerifyOtpViewModel>();
 
     return GestureDetector(
@@ -48,11 +68,6 @@ class _VerifyOtpScreenContent extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              Container(
-                height: 1.0,
-                width: double.infinity,
-                color: Colors.black,
-              ),
               const AuthAppBar(title: 'Verification'),
               Container(
                 height: 1.0,
@@ -73,16 +88,65 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const VerifyOtpHeader(email: 'name@gmail.com'),
+                                VerifyOtpHeader(email: viewModel.email),
                                 const SizedBox(height: AppDimens.spaceXl),
-                                const OtpInputSection(),
+                                OtpInputSection(onChanged: viewModel.setOtp),
                                 const SizedBox(height: AppDimens.spaceXl),
-                                ResendOtpText(onResend: () {}),
+                                ResendOtpText(
+                                  countdown: viewModel.countdownSeconds,
+                                  canResend: viewModel.canResendOTP,
+                                  onResend: () async {
+                                    await viewModel.submitOtp();
+                                    if (context.mounted &&
+                                        viewModel.errorMessage != null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            viewModel.errorMessage!,
+                                          ),
+                                          backgroundColor: AppColors.error500,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
                                 const SizedBox(height: AppDimens.spaceXl),
                                 AuthPrimaryButton(
                                   text: 'Send →',
-                                  onPressed: () =>
-                                      context.goNamed('resetPassword'),
+                                  isLoading: viewModel.isLoading,
+                                  onPressed: viewModel.otp.isEmpty
+                                      ? null
+                                      : () async {
+                                          FocusScope.of(context).unfocus();
+                                          final isSuccess = await viewModel
+                                              .submitOtp();
+
+                                          if (isSuccess && context.mounted) {
+                                            context.goNamed(
+                                              'resetPassword',
+                                              extra: {
+                                                'email': viewModel.email,
+                                                'token': viewModel.otp,
+                                              },
+                                            );
+                                          } else if (viewModel.errorMessage !=
+                                                  null &&
+                                              context.mounted) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  viewModel.errorMessage!,
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.error500,
+                                              ),
+                                            );
+                                          }
+                                        },
                                 ),
                                 const Spacer(),
                                 const Padding(

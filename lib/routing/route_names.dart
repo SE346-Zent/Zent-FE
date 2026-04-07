@@ -46,4 +46,11 @@ abstract final class RouteNames {
   static const String customerRequestService = 'customerRequestService';
   static const String customerActiveRepairs = 'customerActiveRepairs';
   static const String customerPersonalInfo = 'customerPersonalInfo';
+  static const String customerSecuritySettings = 'customerSecuritySettings';
+  static const String customerNotifications = 'customerNotifications';
+  static const String customerDetailedProduct = 'customerDetailedProduct';
+  static const String customerDetailedChat = 'customerDetailedChat';
+  static const String customerDeviceRegistration = 'customerDeviceRegistration';
+  static const String customerDetailedProductParts =
+      'customerDetailedProductParts';
 }

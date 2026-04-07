@@ -9,35 +9,36 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
-// Shared Tech Components
-import 'widgets/tech_app_bar.dart';
-import 'widgets/tech_custom_switch.dart';
+// Shared Customer Components
+import 'widgets/customer_app_bar.dart';
+import 'widgets/customer_custom_switch.dart';
+import 'widgets/customer_primary_button.dart';
 
 // ViewModel
-import 'view_models/notifications_viewmodel.dart';
+import 'viewmodels/notifications_viewmodel.dart';
 
-class TechNotificationsScreen extends StatelessWidget {
-  const TechNotificationsScreen({super.key});
+class CustomerNotificationsScreen extends StatelessWidget {
+  const CustomerNotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<TechNotificationsViewModel>(),
-      child: const _TechNotificationsView(),
+      create: (_) => sl<CustomerNotificationsViewModel>(),
+      child: const _CustomerNotificationsView(),
     );
   }
 }
 
-class _TechNotificationsView extends StatelessWidget {
-  const _TechNotificationsView();
+class _CustomerNotificationsView extends StatelessWidget {
+  const _CustomerNotificationsView();
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<TechNotificationsViewModel>();
+    final viewModel = context.watch<CustomerNotificationsViewModel>();
 
     return Scaffold(
       backgroundColor: AppColors.background500,
-      appBar: const TechAppBar(
+      appBar: const CustomerAppBar(
         title: 'Settings',
         showBackButton: true,
         showBottomDivider: true,
@@ -58,36 +59,12 @@ class _TechNotificationsView extends StatelessWidget {
               ),
               const SizedBox(height: AppDimens.spaceSm),
               Text(
-                'Manage how you receive updates about jobs, inventory and messages.',
+                'Manage how you receive updates about my notifications.',
                 style: TextStyles.bodyLarge.copyWith(
                   color: AppColors.secondary500,
                 ),
               ),
               const SizedBox(height: AppDimens.spaceMd),
-
-              // Section: Job Alerts
-              _buildSectionTitle('Job Alerts'),
-              _buildSwitchRow(
-                title: 'New Job Assignments',
-                subtitle: 'Get notified when you are assigned a job',
-                value: viewModel.newJobAssignments,
-                onChanged: (val) => viewModel.toggleSetting('newJob', val),
-              ),
-              _buildSwitchRow(
-                title: 'Urgent dispatches',
-                subtitle: 'High priority emergency service calls',
-                value: viewModel.urgentDispatches,
-                onChanged: (val) => viewModel.toggleSetting('urgent', val),
-              ),
-
-              // Section: Inventory & Resources
-              _buildSectionTitle('Inventory & Resources'),
-              _buildSwitchRow(
-                title: 'Equipment Maintenance',
-                subtitle: 'Reminders for tool servicing',
-                value: viewModel.equipmentMaintenance,
-                onChanged: (val) => viewModel.toggleSetting('equipment', val),
-              ),
 
               // Section: Communication
               _buildSectionTitle('Communication'),
@@ -97,11 +74,27 @@ class _TechNotificationsView extends StatelessWidget {
                 value: viewModel.directMessage,
                 onChanged: (val) => viewModel.toggleSetting('directMsg', val),
               ),
+
+              // Section: Work Order
+              _buildSectionTitle('Work Order'),
               _buildSwitchRow(
-                title: 'Customer Feedback',
-                subtitle: 'Reviews and ratings from completed jobs',
-                value: viewModel.customerFeedback,
-                onChanged: (val) => viewModel.toggleSetting('feedback', val),
+                title: 'Tracking',
+                subtitle: 'Follows the active work orders',
+                value: viewModel.tracking,
+                onChanged: (val) => viewModel.toggleSetting('tracking', val),
+              ),
+              _buildSwitchRow(
+                title: 'Appointment reminders',
+                subtitle: 'Follows the active work orders',
+                value: viewModel.appointmentReminders,
+                onChanged: (val) =>
+                    viewModel.toggleSetting('appointmentReminders', val),
+              ),
+              _buildSwitchRow(
+                title: 'Invoice',
+                subtitle: 'Receive digital receipts reminders',
+                value: viewModel.invoice,
+                onChanged: (val) => viewModel.toggleSetting('invoice', val),
               ),
               const SizedBox(height: AppDimens.spaceLg),
 
@@ -114,13 +107,13 @@ class _TechNotificationsView extends StatelessWidget {
                   border: Border.all(color: AppColors.tertiary500),
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.info_outline,
                       color: AppColors.tertiary500,
                     ),
-                    const SizedBox(width: 12.0),
+                    const SizedBox(width: AppDimens.spaceSm),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +127,7 @@ class _TechNotificationsView extends StatelessWidget {
                           const SizedBox(height: AppDimens.spaceXs),
                           Text(
                             'To receive these alerts, ensure notifications are enabled in your device settings',
-                            style: TextStyles.bodyMedium.copyWith(
+                            style: TextStyles.label.copyWith(
                               color: AppColors.secondary300,
                             ),
                           ),
@@ -145,6 +138,14 @@ class _TechNotificationsView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppDimens.spaceXl),
+
+              // Save Button
+              CustomerPrimaryButton(
+                text: 'Save Settings',
+                icon: Icons.save_outlined,
+                onPressed: () => viewModel.saveSettings(context),
+              ),
+              const SizedBox(height: AppDimens.spaceLg),
             ],
           ),
         ),
@@ -195,7 +196,7 @@ class _TechNotificationsView extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppDimens.spaceMd),
-          TechCustomSwitch(value: value, onChanged: onChanged),
+          CustomerCustomSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

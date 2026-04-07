@@ -8,12 +8,14 @@ class AuthPrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
+  final List<BoxShadow>? boxShadow;
 
   const AuthPrimaryButton({
     super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
+    this.boxShadow,
   });
 
   @override
@@ -34,7 +36,7 @@ class AuthPrimaryButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-          boxShadow: [BoxShadowStyles.glowing],
+          boxShadow: boxShadow ?? [BoxShadowStyles.glowing],
         ),
         child: ElevatedButton(
           onPressed: isLoading ? null : onPressed,

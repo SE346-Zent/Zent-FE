@@ -8,7 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 // Shared Auth Components
 import 'widgets/auth_header.dart';
 import 'widgets/auth_text_field.dart';
-import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
+import 'widgets/auth_primary_button.dart';
 import 'widgets/auth_footer_link.dart';
 
 // Feature-specific Widgets

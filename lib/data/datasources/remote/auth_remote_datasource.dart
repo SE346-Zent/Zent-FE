@@ -40,7 +40,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<AuthResponseModel> login(String email, String password) async {
-    final url = Uri.parse('$_baseURL/auth/signin');
+    final url = Uri.parse('$_baseURL/auth/login');
     try {
       final response = await client
           .post(
@@ -50,8 +50,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
-      final jsonMap = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Login Failed (Code: ${response.statusCode})');
+      }
 
+      final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
         jsonMap,
         (data) => AuthResponseModel.fromJson(data),
@@ -63,6 +70,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Login Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Login error: $e');
     }
   }
@@ -75,25 +83,30 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String password,
     required String role,
   }) async {
-    final url = Uri.parse('$_baseURL/auth/signup/initiate');
+    final url = Uri.parse('$_baseURL/auth/register');
     try {
-      final mappedRole = adaptRoleFromFEToBE(role);
       final response = await client
           .post(
             url,
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'email': email,
-              'phonenumber': phone,
+              'phoneNumber': phone,
               'fullName': fullName,
               'password': password,
-              'userRoles': mappedRole,
             }),
           )
           .timeout(_timeOut);
 
-      final jsonMap = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Signup Failed (Code: ${response.statusCode})');
+      }
 
+      final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
         (data) => data,
@@ -102,6 +115,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Signup Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Sign up error: $e');
     }
   }
@@ -118,6 +132,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Verify OTP Failed (Code: ${response.statusCode})');
+      }
+
       final jsonMap = jsonDecode(response.body);
 
       final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
@@ -131,6 +153,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Verify OTP Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Verify OTP error: $e');
     }
   }
@@ -147,6 +170,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Resend OTP Failed (Code: ${response.statusCode})');
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
@@ -157,6 +188,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Resend OTP Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Resend OTP error: $e');
     }
   }
@@ -176,6 +208,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Logout Failed (Code: ${response.statusCode})');
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
@@ -186,6 +226,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Logout Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Logout error: $e');
     }
   }
@@ -208,6 +249,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Refresh token Failed (Code: ${response.statusCode})');
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
         jsonMap,
@@ -220,6 +269,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Refresh token Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Refresh token error: $e');
     }
   }
@@ -250,6 +300,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Forgot Password Failed (Code: ${response.statusCode})');
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
@@ -260,6 +318,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Forgot Password Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Forgot password error: $e');
     }
   }
@@ -284,6 +343,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+        }
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Reset Password Failed (Code: ${response.statusCode})');
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
@@ -296,6 +363,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Reset Password Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Reset password error: $e');
     }
   }

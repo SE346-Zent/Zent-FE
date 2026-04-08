@@ -47,6 +47,8 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
     super.prePhotos,
     super.duringPhotos,
     super.postPhotos,
+    super.currentStep,
+    super.signaturePoints,
   });
 
   factory WorkOrderCompletionDraftModel.fromEntity(
@@ -62,6 +64,8 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       prePhotos: entity.prePhotos,
       duringPhotos: entity.duringPhotos,
       postPhotos: entity.postPhotos,
+      currentStep: entity.currentStep,
+      signaturePoints: entity.signaturePoints,
     );
   }
 
@@ -84,6 +88,10 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       prePhotos: List<String>.from(json['prePhotos'] as List? ?? []),
       duringPhotos: List<String>.from(json['duringPhotos'] as List? ?? []),
       postPhotos: List<String>.from(json['postPhotos'] as List? ?? []),
+      currentStep: json['currentStep'] as int? ?? 0,
+      signaturePoints: (json['signaturePoints'] as List? ?? [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
     );
   }
 
@@ -102,6 +110,8 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       'prePhotos': prePhotos,
       'duringPhotos': duringPhotos,
       'postPhotos': postPhotos,
+      'currentStep': currentStep,
+      'signaturePoints': signaturePoints,
     };
   }
 }

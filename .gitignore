@@ -67,3 +67,6 @@ replacer.py
 replacer2.py
 
 tasks/
+api-1.json
+.gitignore
+api-1.yaml

@@ -9,6 +9,7 @@ import '../presentation/common/auth/login/forgot_password_screen.dart';
 import '../presentation/common/auth/login/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
+import '../presentation/common/auth/register/register_screen.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
@@ -147,7 +148,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerServices,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -214,8 +215,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           name: RouteNames.signUp,
           path: Routes.signUp,
-          builder: (context, state) =>
-              const Scaffold(body: Center(child: Text('Sign Up Screen'))),
+          builder: (context, state) => const RegisterScreen(),
           routes: [
             GoRoute(
               name: RouteNames.signUpVerifyOtp,

@@ -52,10 +52,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Login Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ?? 'Login Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -100,10 +104,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Signup Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ?? 'Signup Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -134,10 +142,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Verify OTP Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ??
+              'Verify OTP Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -172,10 +185,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Resend OTP Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ??
+              'Resend OTP Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -210,10 +228,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Logout Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ?? 'Logout Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -251,10 +273,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Refresh token Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ??
+              'Refresh token Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -302,10 +329,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Forgot Password Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ??
+              'Forgot Password Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -345,10 +377,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
       if (response.statusCode != 200) {
         if (response.body.isEmpty) {
-          throw Exception('Server returned empty response (Status: ${response.statusCode})');
+          throw Exception(
+            'Server returned empty response (Status: ${response.statusCode})',
+          );
         }
         final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Reset Password Failed (Code: ${response.statusCode})');
+        throw Exception(
+          errorMap['message'] ??
+              'Reset Password Failed (Code: ${response.statusCode})',
+        );
       }
 
       final jsonMap = jsonDecode(response.body);

@@ -107,7 +107,7 @@ Future<void> init() async {
   sl.registerFactory(() => DetailedChatViewModel());
   sl.registerFactory(() => DeviceRegistrationViewModel());
   sl.registerFactory(() => PartsViewModel());
- 
+
   // Tech ViewModels
   sl.registerFactory(() => TechnicianHomeViewModel());
   sl.registerFactory(() => TechWorkOrderViewModel());

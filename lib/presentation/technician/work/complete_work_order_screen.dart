@@ -146,25 +146,6 @@ class _CompleteWorkOrderContent extends StatelessWidget {
         ),
         const SizedBox(height: AppDimens.spaceLg),
         SinglePhaseEvidencePhotos(
-          phaseLabel: "Disassembled (Ảnh đang tháo)",
-          photos: viewModel.duringPhotos,
-          phaseKey: 'during',
-          maxPhotosNote: "Max photos: 5",
-          maxPhotosPosition: MaxPhotosPosition.inline,
-          onPhotoAdded: (path) => viewModel.addPhoto(path, 'during'),
-          onPhotoRemoved: (index) => viewModel.removePhoto(index, 'during'),
-        ),
-      ],
-    );
-  }
-
-  /// Step 4: Diagnostic Section + Evidence photos (Post-assembly - inline max)
-  Widget _buildStep4(CompleteWorkOrderViewModel viewModel) {
-    return Column(
-      children: [
-        DiagnosticSection(viewModel: viewModel),
-        const SizedBox(height: AppDimens.spaceLg),
-        SinglePhaseEvidencePhotos(
           phaseLabel: "Post-assembly (Ảnh hoàn thiện)",
           photos: viewModel.postPhotos,
           phaseKey: 'post',
@@ -175,6 +156,11 @@ class _CompleteWorkOrderContent extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Step 4: Diagnostic Section + Evidence photos (Post-assembly - inline max)
+  Widget _buildStep4(CompleteWorkOrderViewModel viewModel) {
+    return Column(children: [DiagnosticSection(viewModel: viewModel)]);
   }
 
   /// Step 5: Customer Signature

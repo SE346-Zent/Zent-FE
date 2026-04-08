@@ -26,18 +26,17 @@ class StepIndicator extends StatelessWidget {
         Row(
           children: List.generate(totalSteps, (index) {
             final isActive = index <= currentStep;
-            return Expanded(
-              child: Container(
-                margin: EdgeInsets.only(
-                  right: index < totalSteps - 1 ? AppDimens.spaceXs : 0,
-                ),
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? AppColors.tertiary500
-                      : AppColors.background600,
-                  borderRadius: BorderRadius.circular(AppDimens.boraLg),
-                ),
+            return Container(
+              margin: EdgeInsets.only(
+                right: index < totalSteps - 1 ? AppDimens.spaceXs : 0,
+              ),
+              width: 26.7,
+              height: 5,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? AppColors.tertiary500
+                    : AppColors.background600,
+                borderRadius: BorderRadius.circular(AppDimens.boraLg),
               ),
             );
           }),

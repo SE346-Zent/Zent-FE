@@ -32,7 +32,7 @@ class UserModel extends User {
   static UserRoles _mapRole(dynamic roleStr, dynamic roleId) {
     if (roleId != null) {
       final id = int.tryParse(roleId.toString());
-      // Based on API: 1 & 2 are Admins/SuperAdmins, 3 is Technician, 4 is Customer
+      // Based on API: 1 & 2 are Admins/SuperAdmins, 3 is Customer, 4 is Technician
       if (id == 1 || id == 2) return UserRoles.admin;
       if (id == 3) return UserRoles.customer;
       if (id == 4) return UserRoles.technician;

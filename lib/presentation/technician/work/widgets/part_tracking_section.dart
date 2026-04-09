@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/technician/work/view_models/complete_work_order_viewmodel.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart' as import_router;
 
 /// Display mode for the part tracking section.
 enum PartTrackingMode {
@@ -36,7 +38,7 @@ class PartTrackingSection extends StatelessWidget {
           title: "Part Uninstalled",
           icon: _buildBoxIcon(isDown: true),
           parts: viewModel.uninstalledParts,
-          onScanPressed: _onScanUninstalledPressed,
+          onScanPressed: () => _onScanUninstalledPressed(context),
           onManualPressed: _onManualUninstalledPressed,
           isUninstalled: true,
         );
@@ -45,7 +47,7 @@ class PartTrackingSection extends StatelessWidget {
           title: "Part Installed",
           icon: _buildBoxIcon(isDown: false),
           parts: viewModel.installedParts,
-          onScanPressed: _onScanInstalledPressed,
+          onScanPressed: () => _onScanInstalledPressed(context),
           onManualPressed: _onManualInstalledPressed,
           isUninstalled: false,
         );
@@ -56,7 +58,7 @@ class PartTrackingSection extends StatelessWidget {
               title: "Part Uninstalled",
               icon: _buildBoxIcon(isDown: true),
               parts: viewModel.uninstalledParts,
-              onScanPressed: _onScanUninstalledPressed,
+              onScanPressed: () => _onScanUninstalledPressed(context),
               onManualPressed: _onManualUninstalledPressed,
               isUninstalled: true,
             ),
@@ -65,7 +67,7 @@ class PartTrackingSection extends StatelessWidget {
               title: "Part Installed",
               icon: _buildBoxIcon(isDown: false),
               parts: viewModel.installedParts,
-              onScanPressed: _onScanInstalledPressed,
+              onScanPressed: () => _onScanInstalledPressed(context),
               onManualPressed: _onManualInstalledPressed,
               isUninstalled: false,
             ),
@@ -74,16 +76,30 @@ class PartTrackingSection extends StatelessWidget {
     }
   }
 
-  void _onScanUninstalledPressed() {
-    debugPrint("action triggered: scan uninstalled part");
+  void _onScanUninstalledPressed(BuildContext context) {
+    context.pushNamed(
+      import_router.RouteNames.qrScanner,
+      extra: {
+        'onScanned': (String result) {
+          debugPrint('Scanned Uninstalled Part SN: $result');
+        },
+      },
+    );
   }
 
   void _onManualUninstalledPressed() {
     debugPrint("action triggered: manual add uninstalled part");
   }
 
-  void _onScanInstalledPressed() {
-    debugPrint("action triggered: scan installed part");
+  void _onScanInstalledPressed(BuildContext context) {
+    context.pushNamed(
+      import_router.RouteNames.qrScanner,
+      extra: {
+        'onScanned': (String result) {
+          debugPrint('Scanned Installed Part SN: $result');
+        },
+      },
+    );
   }
 
   void _onManualInstalledPressed() {

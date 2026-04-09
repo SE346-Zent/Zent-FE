@@ -71,4 +71,4 @@ api-1.json
 .gitignore
 api-1.yaml
 
-docs/business_logic/
+docs/

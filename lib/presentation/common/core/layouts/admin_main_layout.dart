@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+// Core Theming
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
+import '../themes/boxshadow.dart';
+import '../../../admin/account/widgets/admin_sidebar.dart';
+import '../../../../routing/route_names.dart';
 
 class AdminMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const AdminMainLayout({super.key, required this.navigationShell});
 
-  void _onNavTap(int index) {
+  void _goBranch(int index) {
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
@@ -19,12 +24,91 @@ class AdminMainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background500,
-      body: navigationShell,
-      bottomNavigationBar: SafeArea(
-        bottom: true,
-        child: _AdminBottomNavBar(
-          currentIndex: navigationShell.currentIndex,
-          onTap: _onNavTap,
+      resizeToAvoidBottomInset: false,
+      drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
+      drawer: const AdminSidebar(
+        userName: 'Hung dep zai',
+        adminId: 'ADMIN-1234',
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: 110.0 + MediaQuery.paddingOf(context).bottom,
+            ),
+            child: navigationShell,
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              color: AppColors.surface100,
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.paddingOf(context).bottom,
+              ),
+              child: _AdminBottomNavBar(
+                currentIndex: navigationShell.currentIndex,
+                onTap: _goBranch,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: MediaQuery.paddingOf(context).bottom + 70.0 - 30.0,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: _AnimatedFAB(
+                onTap: () {
+                  context.pushNamed(RouteNames.adminOperationalQueue);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedFAB extends StatefulWidget {
+  final VoidCallback onTap;
+  const _AnimatedFAB({required this.onTap});
+
+  @override
+  State<_AnimatedFAB> createState() => _AnimatedFABState();
+}
+
+class _AnimatedFABState extends State<_AnimatedFAB> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.9 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInOut,
+        child: Container(
+          width: 60.0,
+          height: 60.0,
+          decoration: BoxDecoration(
+            color: AppColors.tertiary500,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.tertiary200, width: 2.0),
+            boxShadow: [BoxShadowStyles.glowing],
+          ),
+          child: const Icon(
+            Icons.assignment_outlined,
+            color: Colors.white,
+            size: 30.0,
+          ),
         ),
       ),
     );
@@ -47,37 +131,36 @@ class _AdminBottomNavBar extends StatelessWidget {
           top: BorderSide(color: AppColors.surface700, width: 1.0),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavBarItem(
-              icon: Icons.grid_view_outlined,
-              label: 'Dashboard',
-              isSelected: currentIndex == 0,
-              onTap: () => onTap(0),
-            ),
-            _NavBarItem(
-              icon: Icons.insert_chart_outlined, // Changed to linear chart
-              label: 'Reports',
-              isSelected: currentIndex == 1,
-              onTap: () => onTap(1),
-            ),
-            _NavBarItem(
-              icon: Icons.groups_outlined,
-              label: 'Team',
-              isSelected: currentIndex == 2,
-              onTap: () => onTap(2),
-            ),
-            _NavBarItem(
-              icon: Icons.person_outline, // Changed to businessperson type icon
-              label: 'Admin',
-              isSelected: currentIndex == 3,
-              onTap: () => onTap(3),
-            ),
-          ],
-        ),
+      child: Row(
+        children: [
+          _NavBarItem(
+            icon: Icons.grid_view_outlined,
+            label: 'Dashboard',
+            isSelected: currentIndex == 0,
+            onTap: () => onTap(0),
+          ),
+          _NavBarItem(
+            icon: Icons.insert_chart_outlined,
+            label: 'Reports',
+            isSelected: currentIndex == 1,
+            onTap: () => onTap(1),
+          ),
+
+          const SizedBox(width: 70.0),
+
+          _NavBarItem(
+            icon: Icons.send_outlined,
+            label: 'Messages',
+            isSelected: currentIndex == 2,
+            onTap: () => onTap(2),
+          ),
+          _NavBarItem(
+            icon: Icons.person_outline,
+            label: 'Admin',
+            isSelected: currentIndex == 3,
+            onTap: () => onTap(3),
+          ),
+        ],
       ),
     );
   }
@@ -98,20 +181,32 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? AppColors.tertiary300 : AppColors.secondary300;
+    final color = isSelected ? AppColors.tertiary500 : AppColors.secondary300;
 
     return Expanded(
       child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: Icon(icon, size: 24.0, color: color),
+            AnimatedScale(
+              scale: isSelected ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: SizedBox(
+                width: 30.0,
+                height: 30.0,
+                child: Icon(icon, size: 30.0, color: color),
+              ),
             ),
-            Text(label, style: TextStyles.bodyMedium.copyWith(color: color)),
+            const SizedBox(height: 2.0),
+            Text(
+              label,
+              style: TextStyles.bodyMedium.copyWith(color: color, fontSize: 12),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),

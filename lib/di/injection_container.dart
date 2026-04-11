@@ -33,6 +33,15 @@ import '../presentation/common/auth/login/view_models/verify_otp_view_model.dart
 import '../presentation/admin/account/viewmodel/user_management_viewmodel.dart';
 import '../presentation/admin/account/viewmodel/profile_viewmodel.dart';
 import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
+import '../presentation/admin/account/viewmodel/part_request_viewmodel.dart';
+import '../presentation/admin/account/viewmodel/inventory_assets_viewmodel.dart';
+import '../presentation/admin/account/viewmodel/detail_request_viewmodel.dart';
+import '../presentation/admin/account/viewmodel/choose_role_viewmodel.dart';
+import '../presentation/admin/account/viewmodel/create_account_viewmodel.dart';
+import '../presentation/admin/dashboard/viewmodels/admin_dashboard_viewmodel.dart';
+import '../presentation/admin/reports/viewmodels/admin_reports_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/operational_queue_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
@@ -86,8 +95,19 @@ Future<void> init() async {
   sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
   sl.registerFactory(() => VerifyOtpViewModel(verifyOtpUseCase: sl()));
   sl.registerFactory(() => UserManagementViewModel());
+  sl.registerFactory(() => AdminDashboardViewModel());
+  sl.registerFactory(() => AdminReportsViewModel());
+  sl.registerFactory(() => OperationalQueueViewModel());
+  sl.registerFactory(() => WorkOrderDetailViewModel());
+  sl.registerFactory(() => ChooseRoleViewModel());
+  sl.registerFactoryParam<CreateAccountViewModel, String, void>(
+    (role, _) => CreateAccountViewModel(basicRole: role),
+  );
   sl.registerFactory(() => ProfileViewModel(sl()));
   sl.registerFactory(() => SecuritySettingsViewModel());
+  sl.registerFactory(() => PartRequestsViewModel());
+  sl.registerFactory(() => InventoryAssetsViewModel());
+  sl.registerFactory(() => DetailRequestViewModel());
   sl.registerFactory(() => CustomerProfileViewModel());
   sl.registerFactory(() => PersonalInfoViewModel());
   sl.registerFactory(() => ServiceViewModel());

@@ -57,8 +57,14 @@ class ProfileViewModel extends ChangeNotifier {
       case 'Security Settings':
         context.goNamed('adminSecuritySettings');
         break;
-      case 'System Log':
-        context.goNamed('adminSystemLog');
+      case 'Add Part Request':
+        context.goNamed('adminPartRequests');
+        break;
+      case 'Available Roles':
+        context.goNamed('adminAvailableRoles');
+        break;
+      case 'Inventory Assets':
+        context.goNamed('adminInventoryAssets');
         break;
       default:
         break;

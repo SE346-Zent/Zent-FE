@@ -32,12 +32,32 @@ class ProfileMenuOptions extends StatelessWidget {
         ),
         const SizedBox(height: AppDimens.spaceSm),
         MenuItem(
-          title: 'System Log',
-          subtitle: 'Security & Biomaker',
-          iconData: Icons.person_outline,
+          title: 'Add Part Request',
+          subtitle: 'Request new components',
+          iconData: Icons.local_offer_outlined,
           onTap: () => context.read<ProfileViewModel>().handleMenuTap(
             context,
-            'System Log',
+            'Add Part Request',
+          ),
+        ),
+        const SizedBox(height: AppDimens.spaceSm),
+        MenuItem(
+          title: 'Available Roles',
+          subtitle: 'Configure the detailed roles of users',
+          iconData: Icons.domain_outlined,
+          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
+            context,
+            'Available Roles',
+          ),
+        ),
+        const SizedBox(height: AppDimens.spaceSm),
+        MenuItem(
+          title: 'Inventory Assets',
+          subtitle: 'Manage product and part in the warehouse',
+          iconData: Icons.inventory_2_outlined,
+          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
+            context,
+            'Inventory Assets',
           ),
         ),
       ],

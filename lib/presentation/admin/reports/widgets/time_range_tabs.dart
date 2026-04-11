@@ -4,11 +4,11 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
-class UserRoleTabs extends StatelessWidget {
+class TimeRangeTabs extends StatelessWidget {
   final int activeIndex;
   final ValueChanged<int> onTabChanged;
 
-  const UserRoleTabs({
+  const TimeRangeTabs({
     super.key,
     required this.activeIndex,
     required this.onTabChanged,
@@ -48,8 +48,8 @@ class UserRoleTabs extends StatelessWidget {
               ),
               Row(
                 children: [
-                  _buildTab(context, title: 'Technicians', index: 0),
-                  _buildTab(context, title: 'Admin', index: 1),
+                  _buildTab(context, title: 'Last 7 days', index: 0),
+                  _buildTab(context, title: 'Last 30 days', index: 1),
                 ],
               ),
             ],

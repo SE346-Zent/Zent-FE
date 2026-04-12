@@ -100,9 +100,7 @@ Future<void> init() async {
   sl.registerFactory(() => OperationalQueueViewModel());
   sl.registerFactory(() => WorkOrderDetailViewModel());
   sl.registerFactory(() => ChooseRoleViewModel());
-  sl.registerFactoryParam<CreateAccountViewModel, String, void>(
-    (role, _) => CreateAccountViewModel(basicRole: role),
-  );
+  sl.registerFactory(() => CreateAccountViewModel());
   sl.registerFactory(() => ProfileViewModel(sl()));
   sl.registerFactory(() => SecuritySettingsViewModel());
   sl.registerFactory(() => PartRequestsViewModel());

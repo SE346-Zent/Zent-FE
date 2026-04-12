@@ -261,26 +261,33 @@ class _OperationalQueueScreenContent extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.warning500,
-                                shape: BoxShape.circle,
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.warning500,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: AppDimens.spaceXs),
-                            Text(
-                              job['status'],
-                              style: TextStyles.middle.copyWith(
-                                color: AppColors.secondary500,
+                              const SizedBox(width: AppDimens.spaceXs),
+                              Expanded(
+                                child: Text(
+                                  job['status'],
+                                  style: TextStyles.middle.copyWith(
+                                    color: AppColors.secondary500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: AppDimens.spaceSm),
                         GestureDetector(
                           onTap: () {
                             context.pushNamed(

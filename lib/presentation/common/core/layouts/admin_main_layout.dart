@@ -22,6 +22,9 @@ class AdminMainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUri = GoRouterState.of(context).uri.toString();
+    final isQueueScreen = currentUri.toLowerCase().contains('queue');
+    final displayIndex = isQueueScreen ? -1 : navigationShell.currentIndex;
     return Scaffold(
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
@@ -48,7 +51,7 @@ class AdminMainLayout extends StatelessWidget {
                 bottom: MediaQuery.paddingOf(context).bottom,
               ),
               child: _AdminBottomNavBar(
-                currentIndex: navigationShell.currentIndex,
+                currentIndex: displayIndex,
                 onTap: _goBranch,
               ),
             ),

@@ -19,7 +19,7 @@ class CreateAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<CreateAccountViewModel>(param1: role),
+      create: (_) => di.sl<CreateAccountViewModel>()..initRole(role),
       child: const _CreateAccountScreenContent(),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CreateAccountViewModel extends ChangeNotifier {
-  final String basicRole;
+  String basicRole = '';
 
   final fullNameController = TextEditingController();
   final emailController = TextEditingController();
@@ -17,8 +17,13 @@ class CreateAccountViewModel extends ChangeNotifier {
   String? _selectedSpecificRole;
   String? get selectedSpecificRole => _selectedSpecificRole;
 
-  CreateAccountViewModel({required this.basicRole}) {
-    debugPrint('Init CreateAccountViewModel with role $basicRole');
+  CreateAccountViewModel() {
+    debugPrint('Init CreateAccountViewModel');
+  }
+
+  void initRole(String role) {
+    basicRole = role;
+    debugPrint('Role initialized to: $basicRole');
   }
 
   void setSpecificRole(String? role) {

@@ -31,7 +31,7 @@ class DeviceRegistrationViewModel extends ChangeNotifier {
     final serial = serialController.text.trim();
     if (serial.isEmpty) return;
 
-    /* TODO: Uncomment when API is ready
+    /* 
     try {
       // API check serial number
       final isValid = await apiService.verifySerialNumber(serial);

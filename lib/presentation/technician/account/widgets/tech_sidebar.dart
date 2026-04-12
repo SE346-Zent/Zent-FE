@@ -84,7 +84,15 @@ class TechSidebar extends StatelessWidget {
                       ),
                       isActive: true,
                       onTap: () {
-                        debugPrint("action triggered: QR Code Scanner");
+                        Navigator.pop(context); // Close the drawer first
+                        context.pushNamed(
+                          RouteNames.qrScanner,
+                          extra: {
+                            'onScanned': (String result) {
+                              debugPrint('Sidebar QR Scanned: $result');
+                            },
+                          },
+                        );
                       },
                     ),
                     SidebarMenuItem(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class ProfileInputField extends StatelessWidget {
   final String label;
@@ -13,6 +14,7 @@ class ProfileInputField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final ValueChanged<String>? onChanged;
+  final bool showSubtleShadow;
 
   const ProfileInputField({
     super.key,
@@ -25,6 +27,7 @@ class ProfileInputField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.onChanged,
+    this.showSubtleShadow = false,
   });
 
   @override
@@ -45,6 +48,7 @@ class ProfileInputField extends StatelessWidget {
             color: AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraSm),
             border: Border.all(color: AppColors.primary50),
+            boxShadow: showSubtleShadow ? [BoxShadowStyles.subtle] : null,
           ),
           child: TextField(
             controller: controller,

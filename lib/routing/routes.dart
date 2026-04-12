@@ -50,6 +50,7 @@ abstract final class Routes {
   static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
   static const appCamera = '/app-camera';
+  static const qrScanner = '/qr-scanner';
 
   static const myProducts = 'my-products';
   static const customerDetailedProduct = ':serialNumber';

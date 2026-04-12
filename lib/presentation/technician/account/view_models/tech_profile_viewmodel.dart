@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 import 'package:zent_fe/routing/routes.dart';
 
 class UserProfileInfo {
@@ -15,11 +16,33 @@ class UserProfileInfo {
 }
 
 class TechProfileViewModel extends ChangeNotifier {
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+
+  TechProfileViewModel(this.getCurrentUserUseCase) {
+    _loadUserInfo();
+  }
+
   UserProfileInfo userInfo = UserProfileInfo(
-    userName: 'Hung dep zai',
-    role: 'Senior Electrician',
+    userName: 'Loading...',
+    role: '',
     avatarUrl: 'https://picsum.photos/200',
   );
+
+  Future<void> _loadUserInfo() async {
+    try {
+      final user = await getCurrentUserUseCase.execute();
+      if (user != null) {
+        userInfo = UserProfileInfo(
+          userName: user.name,
+          role: 'Technician', // Or map from user.role
+          avatarUrl: 'https://picsum.photos/200',
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error loading tech profile: $e");
+    }
+  }
 
   void handleMenuTap(BuildContext context, String menuName) {
     debugPrint("action triggered: Viewmodel logic navigated to $menuName");

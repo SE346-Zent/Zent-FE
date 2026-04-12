@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../domain/entities/work_order_completion_draft.dart';
-import '../../../../domain/usecases/work_order/work_order_draft_usecase.dart';
-import '../../../../domain/usecases/work_order/get_single_work_order_usecase.dart';
+import 'package:zent_fe/domain/entities/work_order_completion_draft.dart';
+import 'package:zent_fe/domain/usecases/work_order/work_order_draft_usecase.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
 
 class CompleteWorkOrderViewModel extends ChangeNotifier {
   bool _isDisposed = false;
@@ -17,6 +17,34 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
       TextEditingController();
 
   bool _isLoading = true;
+
+  // Step Management (0-indexed, 0-4 for steps 1-5)
+  static const int totalSteps = 5;
+  int _currentStep = 0;
+  int get currentStep => _currentStep;
+
+  // Mock technician name
+  String get technicianName => "Hung dep zai";
+
+  // Current formatted date
+  String get currentDate {
+    final now = DateTime.now();
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return "${months[now.month - 1]} ${now.day}, ${now.year}";
+  }
 
   CompleteWorkOrderViewModel({
     required this.workOrderId,
@@ -50,6 +78,33 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
     }
   }
 
+  // --- Step Navigation Events ---
+
+  void nextStepPressed() {
+    if (_currentStep < totalSteps - 1) {
+      _currentStep++;
+      _saveDraft();
+      notifyListeners();
+    }
+  }
+
+  void backStepPressed() {
+    if (_currentStep > 0) {
+      _currentStep--;
+      _saveDraft();
+      notifyListeners();
+    }
+  }
+
+  void submitPressed() {
+    debugPrint(
+      "action triggered: Submit Completion Report for WO: $workOrderId",
+    );
+    // Clear draft on success?
+  }
+
+  // --- Draft Persistence ---
+
   Future<void> _loadDraft() async {
     _isLoading = true;
     try {
@@ -68,6 +123,13 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
         _duringPhotos.addAll(draft.duringPhotos);
         _postPhotos.clear();
         _postPhotos.addAll(draft.postPhotos);
+
+        // Restore step
+        _currentStep = draft.currentStep.clamp(0, totalSteps - 1);
+
+        // Restore signature points
+        _signaturePoints.clear();
+        _signaturePoints.addAll(draft.signaturePoints);
 
         // Update controllers (this triggers listeners, but is guarded by _isLoading)
         mtmController.text = draft.mtm;
@@ -125,6 +187,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
       prePhotos: _prePhotos,
       duringPhotos: _duringPhotos,
       postPhotos: _postPhotos,
+      currentStep: _currentStep,
+      signaturePoints: _signaturePoints,
     );
     await workOrderDraftUseCase.save(draft);
   }
@@ -152,6 +216,16 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
 
   final List<String> _postPhotos = [];
   List<String> get postPhotos => _postPhotos;
+
+  // Signature Points
+  final List<Map<String, dynamic>> _signaturePoints = [];
+  List<Map<String, dynamic>> get signaturePoints => _signaturePoints;
+
+  void signaturePointsUpdated(List<Map<String, dynamic>> points) {
+    _signaturePoints.clear();
+    _signaturePoints.addAll(points);
+    _saveDraft();
+  }
 
   // Photo Management
   void addPhoto(String path, String phase) {
@@ -209,12 +283,5 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
     _installedParts.removeWhere((p) => p.id == id);
     _saveDraft();
     notifyListeners();
-  }
-
-  void submitReport() {
-    debugPrint(
-      "action triggered: Submit Completion Report for WO: $workOrderId",
-    );
-    // Clear draft on success?
   }
 }

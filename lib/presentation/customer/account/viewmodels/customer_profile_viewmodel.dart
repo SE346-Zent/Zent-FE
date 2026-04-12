@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 
 class CustomerProfileViewModel extends ChangeNotifier {
-  final String userName = "Hung dep zai";
-  final String userEmail = "hung.depzai@gmail.com";
-  final String? avatarUrl = null;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+
+  CustomerProfileViewModel(this.getCurrentUserUseCase) {
+    _loadUserInfo();
+  }
+
+  String userName = "Loading...";
+  String userEmail = "";
+  String? avatarUrl;
+
+  Future<void> _loadUserInfo() async {
+    try {
+      final user = await getCurrentUserUseCase.execute();
+      if (user != null) {
+        userName = user.name;
+        userEmail = user.email;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error loading customer profile: $e");
+    }
+  }
 
   final List<Map<String, dynamic>> menuItems = [
     {

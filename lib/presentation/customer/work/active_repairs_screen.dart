@@ -371,7 +371,7 @@ class _ActiveRepairsView extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
           ),
         ),
-        onPressed: () {}, // TODO: Handle action
+        onPressed: () {},
         child: Text(title, style: TextStyles.title.copyWith(color: textColor)),
       ),
     );

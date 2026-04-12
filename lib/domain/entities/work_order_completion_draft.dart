@@ -22,6 +22,8 @@ class WorkOrderCompletionDraft {
   final List<String> prePhotos;
   final List<String> duringPhotos;
   final List<String> postPhotos;
+  final int currentStep;
+  final List<Map<String, dynamic>> signaturePoints;
 
   WorkOrderCompletionDraft({
     required this.workOrderId,
@@ -33,5 +35,7 @@ class WorkOrderCompletionDraft {
     this.prePhotos = const [],
     this.duringPhotos = const [],
     this.postPhotos = const [],
+    this.currentStep = 0,
+    this.signaturePoints = const [],
   });
 }

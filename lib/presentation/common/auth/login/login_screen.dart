@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 
 // Core Routing & Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -110,9 +114,28 @@ class _LoginScreenContent extends StatelessWidget {
                           : AuthPrimaryButton(
                               text: 'Sign In',
                               onPressed: () async {
-                                final success = await viewModel.login();
-                                if (success && context.mounted) {
-                                  // Router will pick up the change if it listens to token store
+                                final user = await viewModel.login();
+                                if (user != null && context.mounted) {
+                                  context.read<AuthViewModel>().setLoggedInUser(
+                                    user,
+                                  );
+                                  switch (user.role) {
+                                    case UserRoles.admin:
+                                      context.goNamed(
+                                        RouteNames.adminDashboard,
+                                      );
+                                      break;
+                                    case UserRoles.technician:
+                                      context.goNamed(RouteNames.techHome);
+                                      break;
+                                    case UserRoles.customer:
+                                      context.goNamed(
+                                        RouteNames.customerServices,
+                                      );
+                                      break;
+                                    default:
+                                      break;
+                                  }
                                 }
                               },
                             ),
@@ -123,7 +146,7 @@ class _LoginScreenContent extends StatelessWidget {
                       AuthFooterLink(
                         text: "Don't have an account?",
                         linkText: 'Sign Up',
-                        onTap: () {},
+                        onTap: () => context.goNamed(RouteNames.signUp),
                       ),
                     ],
                   ),

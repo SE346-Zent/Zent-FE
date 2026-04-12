@@ -35,6 +35,9 @@ jobs:
           channel: 'stable'
           cache: true
   
+      - name: Create .env from GitHub Secrets
+        run: echo "BASE_URL=${{ secrets.BASE_URL }}" > .env
+
       - name: Install Dependencies
         run: flutter pub get
   

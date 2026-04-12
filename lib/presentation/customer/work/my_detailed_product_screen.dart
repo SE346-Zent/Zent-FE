@@ -360,14 +360,19 @@ class _DetailedProductView extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
           ),
         ),
         onPressed: onPressed,
-        child: Text(
-          title,
-          style: TextStyles.middle.copyWith(color: Colors.white),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            title,
+            maxLines: 1,
+            style: TextStyles.middle.copyWith(color: Colors.white),
+          ),
         ),
       ),
     );

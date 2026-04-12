@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'profile_input_field.dart';
 import '../view_models/complete_work_order_viewmodel.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart' as import_router;
 
 class MachineInfoSection extends StatelessWidget {
   final CompleteWorkOrderViewModel viewModel;
@@ -43,6 +45,7 @@ class MachineInfoSection extends StatelessWidget {
                   hintText: "e.g 234931043",
                   controller: viewModel.mtmController,
                   labelColor: AppColors.secondary400,
+                  showSubtleShadow: true,
                 ),
               ),
               const SizedBox(width: AppDimens.spaceMd),
@@ -52,18 +55,19 @@ class MachineInfoSection extends StatelessWidget {
                   hintText: "e.g 123456",
                   controller: viewModel.serialNumberController,
                   labelColor: AppColors.secondary400,
+                  showSubtleShadow: true,
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppDimens.spaceLg),
-          _buildLongScannerButton(),
+          _buildLongScannerButton(context),
         ],
       ),
     );
   }
 
-  Widget _buildLongScannerButton() {
+  Widget _buildLongScannerButton(BuildContext context) {
     return Container(
       width: double.infinity,
       height: 48,
@@ -83,7 +87,14 @@ class MachineInfoSection extends StatelessWidget {
           style: TextStyles.middle.copyWith(color: AppColors.surface100),
         ),
         onPressed: () {
-          // Scanner logic
+          context.pushNamed(
+            import_router.RouteNames.qrScanner,
+            extra: {
+              'onScanned': (String result) {
+                viewModel.serialNumberController.text = result;
+              },
+            },
+          );
         },
       ),
     );

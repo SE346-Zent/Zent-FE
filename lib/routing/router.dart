@@ -9,6 +9,7 @@ import '../presentation/common/auth/login/forgot_password_screen.dart';
 import '../presentation/common/auth/login/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
+import '../presentation/common/auth/register/register_screen.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
@@ -47,6 +48,7 @@ import '../presentation/technician/account/technician_home_screen.dart';
 import '../presentation/technician/work/add_new_part_screen.dart';
 import '../presentation/common/core/layouts/tech_main_layout.dart';
 import '../presentation/technician/work/widgets/app_camera_screen.dart';
+import '../presentation/common/core/scanner/app_qr_scanner_screen.dart';
 import '../presentation/technician/work/part_search_screen.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
@@ -223,8 +225,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           name: RouteNames.signUp,
           path: Routes.signUp,
-          builder: (context, state) =>
-              const Scaffold(body: Center(child: Text('Sign Up Screen'))),
+          builder: (context, state) => const RegisterScreen(),
           routes: [
             GoRoute(
               name: RouteNames.signUpVerifyOtp,
@@ -246,6 +247,16 @@ final GoRouter appRouter = GoRouter(
         final onPhotoCaptured =
             extra?['onPhotoCaptured'] as void Function(String)?;
         return AppCameraScreen(onPhotoCaptured: onPhotoCaptured);
+      },
+    ),
+    GoRoute(
+      name: RouteNames.qrScanner,
+      path: Routes.qrScanner,
+      builder: (context, state) {
+        final Map<String, dynamic>? extra =
+            state.extra as Map<String, dynamic>?;
+        final onScanned = extra?['onScanned'] as void Function(String)?;
+        return AppQrScannerScreen(onScanned: onScanned);
       },
     ),
 

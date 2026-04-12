@@ -28,7 +28,14 @@ class AuthRepositoryImpl implements AuthRepository {
       response.refreshToken,
     );
 
+    await authLocalDataSource.saveUser(response.user);
+
     return response.user;
+  }
+
+  @override
+  Future<User?> getCurrentUser() async {
+    return await authLocalDataSource.getUser();
   }
 
   @override
@@ -43,6 +50,8 @@ class AuthRepositoryImpl implements AuthRepository {
         response.accessToken,
         response.refreshToken,
       );
+
+      await authLocalDataSource.saveUser(response.user);
 
       return response.user;
     } catch (e, stacktrace) {

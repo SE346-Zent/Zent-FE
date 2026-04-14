@@ -70,7 +70,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                   const Icon(
                     Icons.info_outline,
                     color: AppColors.tertiary500,
-                    size: 24,
+                    size: 32,
                   ),
                   const SizedBox(width: AppDimens.spaceMd),
                   Expanded(
@@ -101,6 +101,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
               label: 'Part Name',
               hint: '',
               controller: viewModel.partNameController,
+              readOnly: true,
             ),
             const SizedBox(height: AppDimens.spaceMd),
             Text(
@@ -113,7 +114,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                 horizontal: AppDimens.spaceSm,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surface100,
+                color: AppColors.secondary50,
                 borderRadius: BorderRadius.circular(AppDimens.boraMd),
                 border: Border.all(color: AppColors.secondary100, width: 1.0),
                 boxShadow: [BoxShadowStyles.subtle],
@@ -122,22 +123,19 @@ class _DetailRequestScreenContent extends StatelessWidget {
                 child: DropdownButton<String>(
                   value: viewModel.selectedCategory,
                   isExpanded: true,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: AppColors.secondary400,
-                  ),
+                  icon: const SizedBox.shrink(),
                   items: viewModel.categories.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(
                         value,
                         style: TextStyles.bodyLarge.copyWith(
-                          color: AppColors.primary500,
+                          color: AppColors.secondary200,
                         ),
                       ),
                     );
                   }).toList(),
-                  onChanged: viewModel.setCategory,
+                  onChanged: null,
                 ),
               ),
             ),
@@ -149,6 +147,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                     label: 'MTM',
                     hint: '',
                     controller: viewModel.mtmController,
+                    readOnly: true,
                   ),
                 ),
                 const SizedBox(width: AppDimens.spaceMd),
@@ -157,6 +156,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                     label: 'Serial Number',
                     hint: '',
                     controller: viewModel.serialNumberController,
+                    readOnly: true,
                   ),
                 ),
               ],
@@ -167,6 +167,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
               hint: '',
               controller: viewModel.descriptionController,
               maxLines: 4,
+              readOnly: true,
             ),
             const SizedBox(height: AppDimens.spaceLg),
             Row(
@@ -248,7 +249,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                 child: TextButton(
                   onPressed: () {},
                   child: Text(
-                    'Approve Request',
+                    'Approve',
                     style: TextStyles.title.copyWith(color: Colors.white),
                   ),
                 ),

@@ -86,7 +86,7 @@ class _ChooseRoleScreenContent extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.tertiary500,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [BoxShadowStyles.subtle],
+                  boxShadow: [BoxShadowStyles.glowing],
                 ),
                 child: Material(
                   color: Colors.transparent,
@@ -99,7 +99,7 @@ class _ChooseRoleScreenContent extends StatelessWidget {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                       child: Center(
                         child: Text(
                           'Continue',

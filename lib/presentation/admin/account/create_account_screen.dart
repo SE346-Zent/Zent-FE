@@ -93,26 +93,26 @@ class _CreateAccountScreenContent extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: AppDimens.spaceXl),
+                      const SizedBox(height: AppDimens.spaceLg),
                       AdminTextField(
                         label: 'Full Name',
                         hint: 'hung dep zai',
                         controller: viewModel.fullNameController,
                       ),
-                      const SizedBox(height: AppDimens.spaceLg),
+                      const SizedBox(height: AppDimens.spaceMd),
                       AdminTextField(
                         label: 'Email Address',
                         hint: 'name@gmail.com',
                         controller: viewModel.emailController,
                       ),
-                      const SizedBox(height: AppDimens.spaceLg),
+                      const SizedBox(height: AppDimens.spaceMd),
                       AdminTextField(
                         label: 'Phone Number',
                         hint: '01234567',
                         controller: viewModel.phoneController,
                       ),
                       if (isTech) ...[
-                        const SizedBox(height: AppDimens.spaceLg),
+                        const SizedBox(height: AppDimens.spaceSm),
                         Padding(
                           padding: const EdgeInsets.only(
                             bottom: AppDimens.spaceXs,
@@ -178,7 +178,7 @@ class _CreateAccountScreenContent extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.tertiary500,
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: [BoxShadowStyles.subtle],
+                          boxShadow: [BoxShadowStyles.glowing],
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -189,7 +189,7 @@ class _CreateAccountScreenContent extends StatelessWidget {
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 16.0,
+                                vertical: 12.0,
                               ),
                               child: Center(
                                 child: Text(

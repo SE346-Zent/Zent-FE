@@ -36,7 +36,7 @@ class InventoryAssetCard extends StatelessWidget {
                   children: [
                     Image.asset(
                       asset.imagePath,
-                      height: 160,
+                      height: 100,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),

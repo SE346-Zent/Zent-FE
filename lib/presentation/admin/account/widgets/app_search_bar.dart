@@ -3,19 +3,20 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
-class UserSearchBar extends StatelessWidget {
-  const UserSearchBar({super.key});
+class AppSearchBar extends StatelessWidget {
+  final String hintText;
+  final Widget? trailingIcon;
+
+  const AppSearchBar({super.key, required this.hintText, this.trailingIcon});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 364.0,
+      width: double.infinity,
       height: 42.0,
       decoration: BoxDecoration(
         color: AppColors.surface100,
-        borderRadius: BorderRadius.circular(
-          AppDimens.boraSm,
-        ), // Standard text field radius
+        borderRadius: BorderRadius.circular(AppDimens.boraSm),
         border: Border.all(color: AppColors.secondary200, width: 1.0),
       ),
       padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
@@ -26,7 +27,7 @@ class UserSearchBar extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search users by name or ID',
+                hintText: hintText,
                 hintStyle: TextStyles.bodyLarge.copyWith(
                   color: AppColors.secondary300,
                 ),
@@ -37,6 +38,10 @@ class UserSearchBar extends StatelessWidget {
               style: TextStyles.bodyLarge.copyWith(color: AppColors.primary500),
             ),
           ),
+          if (trailingIcon != null) ...[
+            const SizedBox(width: AppDimens.spaceSm),
+            trailingIcon!,
+          ],
         ],
       ),
     );

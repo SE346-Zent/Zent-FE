@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'widgets/change_password_section.dart';
 import 'widgets/save_changes_button.dart';
 import 'widgets/two_factor_section.dart';
+import 'widgets/recovery_email_section.dart';
+import 'widgets/login_history_section.dart';
 import 'package:provider/provider.dart';
 import 'viewmodel/security_settings_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -49,6 +51,9 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
                         onToggle: (value) => viewModel.toggleTwoFactor(value),
                       ),
                       const SizedBox(height: AppDimens.spaceXl),
+                      const RecoveryEmailSection(),
+                      const SizedBox(height: AppDimens.spaceXl),
+                      const LoginHistorySection(),
                     ],
                   ),
                 ),

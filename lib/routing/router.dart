@@ -13,6 +13,15 @@ import '../presentation/common/auth/register/register_screen.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
+import '../presentation/admin/account/choose_role_screen.dart';
+import '../presentation/admin/account/create_account_screen.dart';
+import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
+import '../presentation/admin/queue/operational_queue_screen.dart';
+import '../presentation/admin/queue/work_order_detail_screen.dart';
+import '../presentation/admin/reports/admin_reports_screen.dart';
+import '../presentation/admin/account/part_requests_screen.dart';
+import '../presentation/admin/account/inventory_assets_screen.dart';
+import '../presentation/admin/account/detail_request_screen.dart';
 import '../presentation/customer/account/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
@@ -149,7 +158,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
+  initialLocation: Routes.adminMe,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -262,9 +271,20 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.adminDashboard,
               path: Routes.adminDashboard,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Admin Dashboard Screen')),
-              ),
+              builder: (context, state) => const AdminDashboardScreen(),
+            ),
+            GoRoute(
+              name: RouteNames.adminOperationalQueue,
+              path: Routes.adminOperationalQueue,
+              builder: (context, state) => const OperationalQueueScreen(),
+            ),
+            GoRoute(
+              name: RouteNames.adminWorkOrderDetails,
+              path: Routes.adminWorkOrderDetails,
+              builder: (context, state) {
+                final id = state.pathParameters['workOrderId'] ?? '';
+                return WorkOrderDetailScreen(workOrderId: id);
+              },
             ),
           ],
         ),
@@ -273,9 +293,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.adminReports,
               path: Routes.adminReports,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Admin Reports Screen')),
-              ),
+              builder: (context, state) => const AdminReportsScreen(),
             ),
           ],
         ),
@@ -311,18 +329,20 @@ final GoRouter appRouter = GoRouter(
                     GoRoute(
                       name: RouteNames.adminChooseRoleCreateAccount,
                       path: Routes.adminChooseRoleCreateAccount,
-                      builder: (context, state) => const Scaffold(
-                        body: Center(
-                          child: Text('Choose Role Create Account Screen'),
-                        ),
-                      ),
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const ChooseRoleScreen(),
                       routes: [
                         GoRoute(
                           name: RouteNames.adminCreateAccount,
                           path: Routes.adminCreateAccount,
-                          builder: (context, state) => const Scaffold(
-                            body: Center(child: Text('Create Account Screen')),
-                          ),
+                          parentNavigatorKey: _rootNavigatorKey,
+                          builder: (context, state) {
+                            final extra =
+                                state.extra as Map<String, dynamic>? ?? {};
+                            final role =
+                                extra['role'] as String? ?? 'Technicians';
+                            return CreateAccountScreen(role: role);
+                          },
                         ),
                       ],
                     ),
@@ -335,6 +355,26 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('System Log Screen')),
                   ),
+                ),
+                GoRoute(
+                  name: RouteNames.adminPartRequests,
+                  path: Routes.adminPartRequests,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PartRequestsScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminDetailRequest,
+                      path: Routes.adminDetailRequest,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const DetailRequestScreen(),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminInventoryAssets,
+                  path: Routes.adminInventoryAssets,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const InventoryAssetsScreen(),
                 ),
               ],
             ),

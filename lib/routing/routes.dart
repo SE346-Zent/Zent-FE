@@ -11,6 +11,8 @@ abstract final class Routes {
   // admin top level
   static const adminDashboard = '/admin/dashboard';
   static const adminReports = '/admin/reports';
+  static const adminOperationalQueue = '/admin/operational-queue';
+  static const adminWorkOrderDetails = '/admin/work-order-details/:workOrderId';
   static const adminTeam = '/admin/team';
   static const adminMe = '/admin/me';
 
@@ -39,6 +41,9 @@ abstract final class Routes {
   static const adminChooseRoleCreateAccount =
       'admin-choose-role-create-account';
   static const adminCreateAccount = 'admin-create-account';
+  static const adminPartRequests = 'admin-part-requests';
+  static const adminInventoryAssets = 'admin-inventory-assets';
+  static const adminDetailRequest = 'detail-request';
 
   static const techWorkOrderDetails = 'work-order-details/:workOrderId';
   static const completeWorkOrder = 'complete-work-order/:workOrderId';

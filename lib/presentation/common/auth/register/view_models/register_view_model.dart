@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/usecases/auth/register_usecase.dart';
+import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 
 class RegisterViewModel extends ChangeNotifier {
+  final RegisterUseCase registerUseCase;
+
+  RegisterViewModel({required this.registerUseCase});
+
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -31,12 +37,14 @@ class RegisterViewModel extends ChangeNotifier {
         return false;
       }
 
-      // Currently a mock delay placeholders
-      debugPrint(
-        "action triggered: register with name=$fullName, email=$email, phone=$phone",
+      await registerUseCase.signup(
+        fullName: fullName,
+        email: email,
+        phoneNumber: phone,
+        password: password,
+        role: UserRoles.customer,
       );
 
-      await Future.delayed(const Duration(seconds: 1));
       return true;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');

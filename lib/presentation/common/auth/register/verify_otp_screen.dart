@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
 // Core Routing & Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Auth Components
-import 'widgets/auth_app_bar.dart';
-import 'widgets/auth_primary_button.dart';
-import 'widgets/zent_bottom_logo.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/auth_app_bar.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/zent_bottom_logo.dart';
 
 // Feature-specific Widgets
-import 'widgets/verify_otp_header.dart';
-import 'widgets/otp_input_section.dart';
-import 'widgets/resend_otp_text.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/verify_otp_header.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/otp_input_section.dart';
+import 'package:zent_fe/presentation/common/auth/login/widgets/resend_otp_text.dart';
 
 // ViewModel
 import 'view_models/verify_otp_view_model.dart';
@@ -22,7 +23,12 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 
 class VerifyOtpScreen extends StatefulWidget {
   final String email;
-  const VerifyOtpScreen({super.key, required this.email});
+  final bool isRegistration;
+  const VerifyOtpScreen({
+    super.key,
+    required this.email,
+    this.isRegistration = false,
+  });
 
   @override
   State<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
@@ -35,7 +41,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   void initState() {
     super.initState();
     _viewModel = di.sl<VerifyOtpViewModel>();
-    _viewModel.init(email: widget.email);
+    _viewModel.init(email: widget.email, isRegistration: widget.isRegistration);
   }
 
   @override
@@ -96,7 +102,7 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                                   countdown: viewModel.countdownSeconds,
                                   canResend: viewModel.canResendOTP,
                                   onResend: () async {
-                                    await viewModel.submitOtp();
+                                    await viewModel.resendOtp();
                                     if (context.mounted &&
                                         viewModel.errorMessage != null) {
                                       ScaffoldMessenger.of(
@@ -124,13 +130,17 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                                               .submitOtp();
 
                                           if (isSuccess && context.mounted) {
-                                            context.goNamed(
-                                              'resetPassword',
-                                              extra: {
-                                                'email': viewModel.email,
-                                                'token': viewModel.otp,
-                                              },
-                                            );
+                                            if (viewModel.isRegistration) {
+                                              context.goNamed(RouteNames.login);
+                                            } else {
+                                              context.goNamed(
+                                                RouteNames.resetPassword,
+                                                extra: {
+                                                  'email': viewModel.email,
+                                                  'token': viewModel.otp,
+                                                },
+                                              );
+                                            }
                                           } else if (viewModel.errorMessage !=
                                                   null &&
                                               context.mounted) {

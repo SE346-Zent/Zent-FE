@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
 // Core Theming & Assets
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -160,7 +161,13 @@ class _RegisterScreenContent extends StatelessWidget {
                 onPressed: () async {
                   final success = await viewModel.register();
                   if (success && context.mounted) {
-                    // Navigate to verify OTP or home
+                    context.goNamed(
+                      RouteNames.signUpVerifyOtp,
+                      extra: {
+                        'email': viewModel.emailController.text.trim(),
+                        'isRegistration': true,
+                      },
+                    );
                   }
                 },
               ),

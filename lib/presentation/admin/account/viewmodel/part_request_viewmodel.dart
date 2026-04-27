@@ -41,9 +41,21 @@ class PartRequestsViewModel extends ChangeNotifier {
       status: 'Rejected',
     ),
   ];
+  List<PartRequestItem> get filteredRequests {
+    if (searchQuery.isEmpty) return requests;
+    return requests
+        .where(
+          (request) =>
+              request.partName.toLowerCase().contains(
+                searchQuery.toLowerCase(),
+              ) ||
+              request.woId.toLowerCase().contains(searchQuery.toLowerCase()),
+        )
+        .toList();
+  }
+
   void onSearchChanged(String query) {
     searchQuery = query;
-    // TODO: Add filtering logic based on searchQuery
     notifyListeners();
   }
 }

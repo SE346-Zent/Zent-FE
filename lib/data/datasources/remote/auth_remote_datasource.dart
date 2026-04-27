@@ -14,7 +14,7 @@ abstract class AuthRemoteDatasource {
     required String password,
     required String role,
   });
-  Future<AuthResponseModel> verifyOtp(String email, String otp);
+  Future<void> verifyOtp(String email, String otp);
   Future<void> resendOtp(String email);
   Future<void> logout(String email, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
@@ -102,7 +102,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           )
           .timeout(_timeOut);
 
-      if (response.statusCode != 200) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
         if (response.body.isEmpty) {
           throw Exception(
             'Server returned empty response (Status: ${response.statusCode})',
@@ -129,14 +129,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<AuthResponseModel> verifyOtp(String email, String otp) async {
-    final url = Uri.parse('$_baseURL/auth/signup/finish');
+  Future<void> verifyOtp(String email, String otp) async {
+    final url = Uri.parse('$_baseURL/auth/verify-otp');
     try {
       final response = await client
           .post(
             url,
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'otp': otp, 'email': email}),
+            body: jsonEncode({'otpCode': otp, 'email': email}),
           )
           .timeout(_timeOut);
 
@@ -154,15 +154,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       }
 
       final jsonMap = jsonDecode(response.body);
-
-      final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
+      final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
-        (data) => AuthResponseModel.fromJson(data),
+        (data) => data,
       );
 
-      if (apiResponse.isSuccessful && apiResponse.data != null) {
-        return apiResponse.data!;
-      } else {
+      if (!apiResponse.isSuccessful) {
         throw Exception(apiResponse.message ?? 'Verify OTP Failed');
       }
     } catch (e) {
@@ -173,7 +170,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<void> resendOtp(String email) async {
-    final url = Uri.parse('$_baseURL/auth/signup/resend-otp');
+    final url = Uri.parse('$_baseURL/auth/resend-otp');
     try {
       final response = await client
           .post(

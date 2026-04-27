@@ -15,8 +15,8 @@ import '../domain/usecases/auth/login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
 import '../domain/usecases/auth/first_time_usecase.dart';
 import '../domain/usecases/auth/reset_password_usecase.dart';
-import '../domain/usecases/auth/verify_otp_usecase.dart';
 import '../domain/usecases/auth/get_current_user_usecase.dart';
+import '../domain/usecases/auth/register_usecase.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
@@ -30,7 +30,7 @@ import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
 import '../presentation/common/auth/login/view_models/reset_password_view_model.dart';
-import '../presentation/common/auth/login/view_models/verify_otp_view_model.dart';
+import '../presentation/common/auth/register/view_models/verify_otp_view_model.dart';
 import '../presentation/admin/account/viewmodel/user_management_viewmodel.dart';
 import '../presentation/admin/account/viewmodel/profile_viewmodel.dart';
 import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
@@ -81,8 +81,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
-  sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
+  sl.registerLazySingleton(() => RegisterUseCase(sl()));
 
   // Work Order Use Cases
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
@@ -96,10 +96,12 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AuthViewModel());
   sl.registerFactory(() => SplashViewModel(sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
-  sl.registerFactory(() => RegisterViewModel());
+  sl.registerFactory(() => RegisterViewModel(registerUseCase: sl()));
   sl.registerFactory(() => ForgotPasswordViewModel());
   sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
-  sl.registerFactory(() => VerifyOtpViewModel(verifyOtpUseCase: sl()));
+  sl.registerFactory(
+    () => VerifyOtpViewModel(registerUseCase: sl(), logoutUseCase: sl()),
+  );
   sl.registerFactory(() => UserManagementViewModel());
   sl.registerFactory(() => AdminDashboardViewModel());
   sl.registerFactory(() => AdminReportsViewModel());

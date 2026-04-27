@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/usecases/auth/verify_otp_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/register_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
 
 class VerifyOtpViewModel extends ChangeNotifier {
-  final VerifyOtpUseCase verifyOtpUseCase;
+  final RegisterUseCase registerUseCase;
+  final LogoutUseCase logoutUseCase;
 
   String? _email;
   String _otp = '';
@@ -12,7 +14,12 @@ class VerifyOtpViewModel extends ChangeNotifier {
   int _countdownSeconds = 30;
   Timer? _resendTimer;
 
-  VerifyOtpViewModel({required this.verifyOtpUseCase});
+  bool _isRegistration = false;
+
+  VerifyOtpViewModel({
+    required this.registerUseCase,
+    required this.logoutUseCase,
+  });
 
   String get email => _email ?? '';
   String get otp => _otp;
@@ -21,8 +28,11 @@ class VerifyOtpViewModel extends ChangeNotifier {
   int get countdownSeconds => _countdownSeconds;
   bool get canResendOTP => _countdownSeconds == 0;
 
-  void init({required String email}) {
+  bool get isRegistration => _isRegistration;
+
+  void init({required String email, bool isRegistration = false}) {
     _email = email;
+    _isRegistration = isRegistration;
     startResendTimer();
   }
 
@@ -53,7 +63,7 @@ class VerifyOtpViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await verifyOtpUseCase.call(email: _email!, otp: _otp);
+      await registerUseCase.verifyOtp(email: _email!, otp: _otp);
 
       _isLoading = false;
       notifyListeners();
@@ -63,6 +73,21 @@ class VerifyOtpViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<void> resendOtp() async {
+    if (_email == null || !canResendOTP) return;
+
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await registerUseCase.resendOtp(_email!);
+      startResendTimer();
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
     }
   }
 

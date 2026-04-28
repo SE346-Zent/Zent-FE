@@ -39,21 +39,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User> verifyOtp({required String email, required String otp}) async {
+  Future<void> verifyOtp({required String email, required String otp}) async {
     try {
-      final AuthResponseModel response = await authRemoteService.verifyOtp(
-        email,
-        otp,
-      );
-
-      await authLocalDataSource.saveCredentials(
-        response.accessToken,
-        response.refreshToken,
-      );
-
-      await authLocalDataSource.saveUser(response.user);
-
-      return response.user;
+      await authRemoteService.verifyOtp(email, otp);
     } catch (e, stacktrace) {
       debugPrint("Stacktrace: $stacktrace");
       rethrow;

@@ -17,9 +17,11 @@ class ApiResponse<T> {
   ) {
     return ApiResponse<T>(
       statusCode: json['statusCode'],
-      message: json['message'] as String?,
+      message: json['message']?.toString(),
       data:
-          ((json['statusCode'] == 1 || json['statusCode'] == 200) &&
+          ((json['statusCode'] == 1 ||
+                  json['statusCode'] == 200 ||
+                  json['statusCode'] == 201) &&
               json['data'] != null)
           ? fromJsonT(json['data'])
           : null,
@@ -27,5 +29,6 @@ class ApiResponse<T> {
     );
   }
 
-  bool get isSuccessful => statusCode == 1 || statusCode == 200;
+  bool get isSuccessful =>
+      statusCode == 1 || statusCode == 200 || statusCode == 201;
 }

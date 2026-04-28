@@ -13,7 +13,7 @@ abstract class AuthRepository {
     required String phoneNumber,
   });
 
-  Future<User> verifyOtp({required String email, required String otp});
+  Future<void> verifyOtp({required String email, required String otp});
 
   Future<void> resendOtp(String email);
 

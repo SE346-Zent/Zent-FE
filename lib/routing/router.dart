@@ -6,7 +6,7 @@ import '../presentation/common/intro/on_boarding_screen.dart';
 import '../presentation/common/intro/splash_screen.dart';
 import '../presentation/common/auth/login/login_screen.dart';
 import '../presentation/common/auth/login/forgot_password_screen.dart';
-import '../presentation/common/auth/login/verify_otp_screen.dart';
+import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/common/auth/register/register_screen.dart';
@@ -158,7 +158,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.adminMe,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -230,9 +230,17 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.signUpVerifyOtp,
               path: Routes.verifyOtp,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Sign Up Verify OTP Screen')),
-              ),
+              builder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>? ?? {};
+                final email = extra['email'] as String? ?? '';
+                final isRegistration =
+                    extra['isRegistration'] as bool? ?? false;
+
+                return VerifyOtpScreen(
+                  email: email,
+                  isRegistration: isRegistration,
+                );
+              },
             ),
           ],
         ),

@@ -6,6 +6,7 @@ import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
 import '../models/auth_response_model.dart';
+import '../../routing/rbac_token_store.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -27,6 +28,8 @@ class AuthRepositoryImpl implements AuthRepository {
       response.accessToken,
       response.refreshToken,
     );
+
+    RbacTokenStore.setToken(response.accessToken);
 
     await authLocalDataSource.saveUser(response.user);
 
@@ -83,6 +86,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     await authLocalDataSource.clearCredentials();
+    RbacTokenStore.clearToken();
   }
 
   @override
@@ -101,6 +105,8 @@ class AuthRepositoryImpl implements AuthRepository {
         response.accessToken,
         response.refreshToken,
       );
+
+      RbacTokenStore.setToken(response.accessToken);
     } else {
       throw Exception("No tokens found to refresh");
     }

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../routing/rbac_token_store.dart';
 import '../data/datasources/local/auth_local_datasource.dart';
 import '../data/datasources/remote/auth_remote_datasource.dart';
 import '../data/datasources/remote/order_remote_datasource.dart';
@@ -104,10 +105,7 @@ Future<void> init() async {
   sl.registerFactory(() => ForgotPasswordViewModel());
   sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
   sl.registerFactory(
-    () => VerifyOtpViewModel(
-      verifyOtpUseCase: sl(),
-      resendOtpUseCase: sl(),
-    ),
+    () => VerifyOtpViewModel(verifyOtpUseCase: sl(), resendOtpUseCase: sl()),
   );
   sl.registerFactory(() => UserManagementViewModel());
   sl.registerFactory(() => AdminDashboardViewModel());
@@ -190,4 +188,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => http.Client());
+
+  // --- Load Initial Token ---
+  final authLocalDataSource = sl<AuthLocalDataSource>();
+  final token = await authLocalDataSource.getAccessToken();
+  if (token != null) {
+    RbacTokenStore.setToken(token);
+  }
 }

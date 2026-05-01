@@ -56,10 +56,19 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             'Server returned empty response (Status: ${response.statusCode})',
           );
         }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ?? 'Login Failed (Code: ${response.statusCode})',
-        );
+
+        final contentType = response.headers['content-type'] ?? '';
+        if (contentType.contains('application/json')) {
+          final errorMap = jsonDecode(response.body);
+          throw Exception(
+            errorMap['message'] ??
+                'Login Failed (Code: ${response.statusCode})',
+          );
+        } else {
+          throw Exception(
+            'Server Error: ${response.statusCode}. The server returned a non-JSON response.',
+          );
+        }
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -103,15 +112,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ?? 'Signup Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -141,16 +142,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Verify OTP Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -181,16 +173,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Resend OTP Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -224,15 +207,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ?? 'Logout Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -269,16 +244,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Refresh token Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -325,16 +291,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Forgot Password Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -373,16 +330,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Reset Password Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -399,6 +347,32 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Reset password error: $e');
+    }
+  }
+
+  void _handleErrorResponse(http.Response response) {
+    if (response.body.isEmpty) {
+      throw Exception(
+        'Server returned empty response (Status: ${response.statusCode})',
+      );
+    }
+
+    final contentType = response.headers['content-type'] ?? '';
+    if (contentType.contains('application/json')) {
+      try {
+        final errorMap = jsonDecode(response.body);
+        throw Exception(
+          errorMap['message'] ?? 'Error (Code: ${response.statusCode})',
+        );
+      } catch (_) {
+        throw Exception(
+          'Server Error: ${response.statusCode}. Failed to parse error details.',
+        );
+      }
+    } else {
+      throw Exception(
+        'Server Error: ${response.statusCode}. The server returned a non-JSON response.',
+      );
     }
   }
 }

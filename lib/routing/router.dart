@@ -54,22 +54,7 @@ import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
 
-// ---------------------------------------------------------------------------
-// RBAC — Role-Based Access Control
-// ---------------------------------------------------------------------------
-
-/// Token store.
-/// Call [RbacTokenStore.setToken] from your auth datasource after login and
-/// [RbacTokenStore.clearToken] on logout.
-class RbacTokenStore {
-  RbacTokenStore._();
-
-  static String? _token;
-
-  static void setToken(String token) => _token = token;
-  static void clearToken() => _token = null;
-  static String? get token => _token;
-}
+import './rbac_token_store.dart';
 
 UserRoles _getRoleFromToken() {
   final token = RbacTokenStore.token;
@@ -81,8 +66,9 @@ UserRoles _getRoleFromToken() {
     final normalized = base64Url.normalize(parts[1]);
     final decoded = utf8.decode(base64Url.decode(normalized));
     final claims = jsonDecode(decoded) as Map<String, dynamic>;
-    return switch (claims['role'] as String?) {
-      'admin' => UserRoles.admin,
+    final roleString = (claims['role'] as String?)?.toLowerCase();
+    return switch (roleString) {
+      'admin' || 'super_admin' => UserRoles.admin,
       'technician' => UserRoles.technician,
       'customer' => UserRoles.customer,
       _ => UserRoles.unauthenticated,
@@ -159,7 +145,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: Routes.splash,
-  //redirect: _rbacRedirect,
+  redirect: _rbacRedirect,
   routes: [
     // Main routes
     GoRoute(

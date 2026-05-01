@@ -21,12 +21,4 @@ class RegisterUseCase {
       role: role,
     );
   }
-
-  Future<void> verifyOtp({required String email, required String otp}) async {
-    await repository.verifyOtp(email: email, otp: otp);
-  }
-
-  Future<void> resendOtp(String email) async {
-    await repository.resendOtp(email);
-  }
 }

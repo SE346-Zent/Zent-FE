@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/usecases/auth/register_usecase.dart';
-import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/verify_otp_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/resend_otp_usecase.dart';
 
 class VerifyOtpViewModel extends ChangeNotifier {
-  final RegisterUseCase registerUseCase;
-  final LogoutUseCase logoutUseCase;
+  final VerifyOtpUseCase verifyOtpUseCase;
+  final ResendOtpUseCase resendOtpUseCase;
 
   String? _email;
   String _otp = '';
@@ -17,8 +17,8 @@ class VerifyOtpViewModel extends ChangeNotifier {
   bool _isRegistration = false;
 
   VerifyOtpViewModel({
-    required this.registerUseCase,
-    required this.logoutUseCase,
+    required this.verifyOtpUseCase,
+    required this.resendOtpUseCase,
   });
 
   String get email => _email ?? '';
@@ -63,7 +63,7 @@ class VerifyOtpViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await registerUseCase.verifyOtp(email: _email!, otp: _otp);
+      await verifyOtpUseCase.execute(email: _email!, otp: _otp);
 
       _isLoading = false;
       notifyListeners();
@@ -83,7 +83,7 @@ class VerifyOtpViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await registerUseCase.resendOtp(_email!);
+      await resendOtpUseCase.execute(_email!);
       startResendTimer();
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');

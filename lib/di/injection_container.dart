@@ -99,7 +99,7 @@ Future<void> init() async {
 
   // ViewModels
   sl.registerLazySingleton(() => AuthViewModel());
-  sl.registerFactory(() => SplashViewModel(sl()));
+  sl.registerFactory(() => SplashViewModel(sl(), sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
   sl.registerFactory(() => RegisterViewModel(registerUseCase: sl()));
   sl.registerFactory(() => ForgotPasswordViewModel());

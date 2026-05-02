@@ -1,4 +1,3 @@
-import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import 'package:zent_fe/domain/repositories/auth_repository.dart';
 
 class RegisterUseCase {
@@ -11,14 +10,12 @@ class RegisterUseCase {
     required String phoneNumber,
     required String email,
     required String password,
-    required UserRoles role,
   }) async {
     await repository.signup(
       fullName: fullName,
       phoneNumber: phoneNumber,
       email: email,
       password: password,
-      role: role,
     );
   }
 }

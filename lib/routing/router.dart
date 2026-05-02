@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -57,12 +56,13 @@ import './routes.dart' show Routes;
 import './rbac_token_store.dart';
 
 UserRoles _getRoleFromToken() {
+  /*
+  // Cách cũ: Giải mã JWT để lấy Role (Dùng khi Backend nhúng Role vào Token)
   final token = RbacTokenStore.token;
   if (token == null) return UserRoles.unauthenticated;
   try {
     final parts = token.split('.');
     if (parts.length != 3) return UserRoles.unauthenticated;
-    // Base64Url-decode the payload (middle segment) and parse claims.
     final normalized = base64Url.normalize(parts[1]);
     final decoded = utf8.decode(base64Url.decode(normalized));
     final claims = jsonDecode(decoded) as Map<String, dynamic>;
@@ -73,9 +73,14 @@ UserRoles _getRoleFromToken() {
       'customer' => UserRoles.customer,
       _ => UserRoles.unauthenticated,
     };
-  } catch (_) {
+  } catch (e) {
+    debugPrint("JWT Decode Error: $e");
     return UserRoles.unauthenticated;
   }
+  */
+
+  // Cách mới: Lấy trực tiếp từ Store (Dựa trên roleId Server trả về khi Login)
+  return RbacTokenStore.role;
 }
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];

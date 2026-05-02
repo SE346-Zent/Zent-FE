@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../models/auth_response_model.dart' show AuthResponseModel;
@@ -337,21 +338,30 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     final statusCode = response.statusCode;
     final body = response.body;
 
+    // Log lỗi chi tiết ra Console để lập trình viên theo dõi
+    debugPrint('--- API Error $statusCode ---');
+    debugPrint('Body: $body');
+    debugPrint('-----------------------------');
+
     if (body.isEmpty) {
-      throw Exception('Server Error: $statusCode (Empty response)');
+      throw Exception('Server Error ($statusCode)');
     }
 
     final contentType = response.headers['content-type'] ?? '';
     if (contentType.contains('application/json')) {
       try {
         final errorMap = jsonDecode(body);
-        throw Exception(errorMap['message'] ?? 'Server Error: $statusCode');
+        throw Exception(errorMap['message'] ?? 'Something went wrong ($statusCode)');
       } catch (_) {
-        // If it's supposed to be JSON but parsing fails, show the raw body
-        throw Exception('Server Error $statusCode: $body');
+        // Nếu không parse được JSON, trả về thông báo chung chung
+        throw Exception('Server response error ($statusCode)');
       }
     } else {
-      throw Exception('Server Error $statusCode: $body');
+      // Nếu là HTML hoặc text khác, không hiện lên UI mà chỉ báo lỗi chung
+      if (statusCode == 401) {
+        throw Exception('Invalid email or password');
+      }
+      throw Exception('Server error ($statusCode)');
     }
   }
 }

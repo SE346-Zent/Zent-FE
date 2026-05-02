@@ -12,9 +12,5 @@ class TechPersonalInfoViewModel extends ChangeNotifier {
     debugPrint('Viewmodel logic: Saving changes (Fake data)...');
 
     notifyListeners();
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Successfully updated!')));
   }
 }

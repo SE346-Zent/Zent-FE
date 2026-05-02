@@ -79,7 +79,10 @@ class AuthRepositoryImpl implements AuthRepository {
     final email = (await authLocalDataSource.getUser())?.email ?? '';
     final refreshToken = await authLocalDataSource.getRefreshToken() ?? '';
     if (email.isNotEmpty && refreshToken.isNotEmpty) {
-      final response = await authRemoteService.refreshToken(email, refreshToken);
+      final response = await authRemoteService.refreshToken(
+        email,
+        refreshToken,
+      );
       RbacTokenStore.setToken(response.accessToken);
       await authLocalDataSource.saveCredentials(
         response.accessToken,

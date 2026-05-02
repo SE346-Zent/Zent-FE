@@ -8,7 +8,7 @@ class RbacTokenStore {
 
   static void setToken(String token) => _token = token;
   static void setRole(UserRoles role) => _role = role;
-  
+
   static void clearToken() {
     _token = null;
     _role = UserRoles.unauthenticated;

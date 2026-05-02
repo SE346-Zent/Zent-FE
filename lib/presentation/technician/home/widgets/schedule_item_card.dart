@@ -3,7 +3,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import '../view_models/technician_home_viewmodel.dart';
+import '../viewmodels/technician_home_viewmodel.dart';
 
 class ScheduleItemCard extends StatelessWidget {
   final TechScheduleItem item;

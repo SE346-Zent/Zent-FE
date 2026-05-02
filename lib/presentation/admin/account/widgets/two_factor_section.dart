@@ -4,7 +4,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'security_card_container.dart';
 import 'security_section_title.dart';
 import 'two_factor_auth_toggle.dart';
-import '../viewmodel/security_settings_viewmodel.dart';
+import '../viewmodels/security_settings_viewmodel.dart';
 
 class TwoFactorSection extends StatelessWidget {
   final SecuritySettingsData securityData;

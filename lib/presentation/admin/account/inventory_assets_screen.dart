@@ -9,7 +9,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 // Widgets
 import 'widgets/app_search_bar.dart';
 import 'widgets/inventory_asset_card.dart';
-import 'viewmodel/inventory_assets_viewmodel.dart';
+import 'viewmodels/inventory_assets_viewmodel.dart';
 
 class InventoryAssetsScreen extends StatelessWidget {
   const InventoryAssetsScreen({super.key});

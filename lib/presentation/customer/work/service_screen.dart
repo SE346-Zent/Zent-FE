@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
-import 'package:zent_fe/presentation/customer/account/viewmodels/service_viewmodel.dart';
+import 'package:zent_fe/presentation/customer/work/viewmodels/service_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
-import 'package:zent_fe/presentation/customer/account/widgets/service_action_card.dart';
-import 'package:zent_fe/presentation/customer/account/widgets/service_header.dart';
+import 'package:zent_fe/presentation/customer/work/widgets/service_action_card.dart';
+import 'package:zent_fe/presentation/customer/work/widgets/service_header.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 class CustomerServiceScreen extends StatelessWidget {

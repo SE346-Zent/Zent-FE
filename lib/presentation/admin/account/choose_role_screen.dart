@@ -7,7 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
-import 'viewmodel/choose_role_viewmodel.dart';
+import 'viewmodels/choose_role_viewmodel.dart';
 
 class ChooseRoleScreen extends StatelessWidget {
   const ChooseRoleScreen({super.key});

@@ -7,7 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'dashed_border_container.dart';
-import '../view_models/complete_work_order_viewmodel.dart';
+import '../viewmodels/complete_work_order_viewmodel.dart';
 
 class EvidencePhotosSection extends StatelessWidget {
   final CompleteWorkOrderViewModel viewModel;

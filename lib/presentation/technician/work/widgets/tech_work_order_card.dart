@@ -9,7 +9,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
 // ViewModel
-import '../view_models/tech_work_order_viewmodel.dart';
+import '../viewmodels/tech_work_order_viewmodel.dart';
 
 class WorkOrderCard extends StatelessWidget {
   final MockWorkOrder order;

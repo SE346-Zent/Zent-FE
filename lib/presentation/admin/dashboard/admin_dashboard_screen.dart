@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -9,6 +11,8 @@ import 'package:zent_fe/presentation/common/core/app_assets.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/admin_dashboard_viewmodel.dart';
+import 'widgets/admin_dashboard_quick_actions.dart';
+import 'widgets/admin_dashboard_stat_card.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -45,7 +49,9 @@ class _AdminDashboardScreenContent extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              context.pushNamed(RouteNames.adminNotifications);
+            },
           ),
           Container(
             margin: const EdgeInsets.only(right: 16.0),
@@ -100,258 +106,27 @@ class _AdminDashboardScreenContent extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimens.spaceLg),
 
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary500,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  boxShadow: [BoxShadowStyles.subtle],
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    onTap: () {},
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12.0,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.person_add_alt_1,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ),
-                                          const SizedBox(width: 8.0),
-                                          Text(
-                                            'Manage user',
-                                            style: TextStyles.title.copyWith(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: AppDimens.spaceMd),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  boxShadow: [BoxShadowStyles.subtle],
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    onTap: () {},
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12.0,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.assignment_add,
-                                            color: AppColors.primary500,
-                                            size: 20,
-                                          ),
-                                          const SizedBox(width: 8.0),
-                                          Text(
-                                            'Assign Jobs',
-                                            style: TextStyles.title.copyWith(
-                                              color: AppColors.primary500,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        const AdminDashboardQuickActions(),
                         const SizedBox(height: 24.0),
 
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                            boxShadow: [BoxShadowStyles.subtle],
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: IntrinsicHeight(
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 6.0,
-                                  color: AppColors.tertiary500,
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppDimens.spaceMd,
-                                      vertical: 12.0,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'Active jobs',
-                                              style: TextStyles.title.copyWith(
-                                                color: AppColors.secondary500,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: AppDimens.spaceSm,
-                                            ),
-                                            Text(
-                                              '${viewModel.activeJobs}',
-                                              style: TextStyles.display
-                                                  .copyWith(
-                                                    color: Colors.black,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(
-                                              Icons.call_made,
-                                              color: AppColors.success500,
-                                              size: 16,
-                                            ),
-                                            const SizedBox(width: 4.0),
-                                            Text(
-                                              '${viewModel.activeJobsTrend.toInt()}%',
-                                              style: TextStyles.label.copyWith(
-                                                color: AppColors.success500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        AdminDashboardStatCard(
+                          title: 'Active jobs',
+                          value: '${viewModel.activeJobs}',
+                          trendIcon: Icons.call_made,
+                          trendColor: AppColors.success500,
+                          trendValue: '${viewModel.activeJobsTrend.toInt()}%',
+                          leftBarColor: AppColors.tertiary500,
                         ),
                         const SizedBox(height: AppDimens.spaceMd),
 
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                            boxShadow: [BoxShadowStyles.subtle],
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: IntrinsicHeight(
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 6.0,
-                                  color: AppColors.secondary300,
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppDimens.spaceMd,
-                                      vertical: 12.0,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'Overall ratings',
-                                              style: TextStyles.title.copyWith(
-                                                color: AppColors.secondary500,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: AppDimens.spaceSm,
-                                            ),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.baseline,
-                                              textBaseline:
-                                                  TextBaseline.alphabetic,
-                                              children: [
-                                                Text(
-                                                  '${viewModel.overallRating}',
-                                                  style: TextStyles.display
-                                                      .copyWith(
-                                                        color: Colors.black,
-                                                      ),
-                                                ),
-                                                Text(
-                                                  '/5.0',
-                                                  style: TextStyles.title
-                                                      .copyWith(
-                                                        color: AppColors
-                                                            .secondary300,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(
-                                              Icons.call_received,
-                                              color: AppColors.error500,
-                                              size: 16,
-                                            ),
-                                            const SizedBox(width: 4.0),
-                                            Text(
-                                              '${viewModel.ratingTrend.abs().toInt()}%',
-                                              style: TextStyles.label.copyWith(
-                                                color: AppColors.error500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        AdminDashboardStatCard(
+                          title: 'Overall ratings',
+                          value: '${viewModel.overallRating}',
+                          suffix: '/5.0',
+                          trendIcon: Icons.call_received,
+                          trendColor: AppColors.error500,
+                          trendValue: '${viewModel.ratingTrend.abs().toInt()}%',
+                          leftBarColor: AppColors.secondary300,
                         ),
                         const SizedBox(height: AppDimens.spaceLg),
                         Expanded(

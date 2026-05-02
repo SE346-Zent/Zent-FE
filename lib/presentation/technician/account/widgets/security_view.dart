@@ -9,7 +9,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'tech_app_bar.dart';
 import 'tech_text_field.dart';
 import 'tech_primary_button.dart';
-import '../view_models/security_viewmodel.dart';
+import '../viewmodels/security_viewmodel.dart';
 
 class TechSecurityView extends StatefulWidget {
   const TechSecurityView({super.key});

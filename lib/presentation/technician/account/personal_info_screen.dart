@@ -18,7 +18,7 @@ import 'widgets/tech_primary_button.dart';
 import 'widgets/profile_avatar.dart';
 
 // ViewModel
-import 'view_models/personal_info_viewmodel.dart';
+import 'viewmodels/personal_info_viewmodel.dart';
 
 class TechPersonalInfoScreen extends StatelessWidget {
   const TechPersonalInfoScreen({super.key});

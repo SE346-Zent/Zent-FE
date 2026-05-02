@@ -12,7 +12,6 @@ abstract final class Routes {
   static const adminDashboard = '/admin/dashboard';
   static const adminReports = '/admin/reports';
   static const adminOperationalQueue = '/admin/operational-queue';
-  static const adminWorkOrderDetails = '/admin/work-order-details/:workOrderId';
   static const adminTeam = '/admin/team';
   static const adminMe = '/admin/me';
 
@@ -35,6 +34,7 @@ abstract final class Routes {
   static const resetSuccessfully = 'reset-successfully';
   static const signUp = 'sign-up';
 
+  static const adminNotifications = 'admin-notifications';
   static const adminUserManagement = 'admin-user-management';
   static const adminSecuritySettings = 'admin-security-settings';
   static const adminSystemLog = 'admin-system-log';
@@ -44,8 +44,15 @@ abstract final class Routes {
   static const adminPartRequests = 'admin-part-requests';
   static const adminInventoryAssets = 'admin-inventory-assets';
   static const adminDetailRequest = 'detail-request';
+  static const adminWorkOrderDetails = 'work-order-details/:workOrderId';
+  static const adminAssignedWorkOrderDetails =
+      'assigned-work-order-details/:workOrderId';
+  static const adminViewSchedule = 'view-schedule/:techId';
+  static const adminReassignWorkOrder = 'reassign-work-order/:workOrderId';
 
   static const techWorkOrderDetails = 'work-order-details/:workOrderId';
+  static const techPauseWorkOrder = 'tech-pause-work-order/:workOrderId';
+  static const techRejectWorkOrder = 'tech-reject-work-order/:workOrderId';
   static const completeWorkOrder = 'complete-work-order/:workOrderId';
   static const addNewPart = 'add-new-part';
   static const inventorySearch = 'inventory-search';
@@ -61,6 +68,7 @@ abstract final class Routes {
   static const customerDetailedProduct = ':serialNumber';
   static const requestService = 'request-service';
   static const activeRepairs = 'active-repairs';
+  static const customerCancelWorkOrder = 'cancel-work-order/:workOrderId';
 
   // // auth route builders
   // static String getAuthForgetPasswordRoute() => '$login/$forgetPassword';

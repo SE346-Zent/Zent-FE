@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
-import 'view_models/complete_work_order_viewmodel.dart';
+import 'viewmodels/complete_work_order_viewmodel.dart';
 import 'widgets/step_indicator.dart';
 import 'widgets/step_navigation_buttons.dart';
 import 'widgets/machine_info_section.dart';

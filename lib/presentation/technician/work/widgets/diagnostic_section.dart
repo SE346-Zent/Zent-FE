@@ -4,7 +4,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'profile_input_field.dart';
-import '../view_models/complete_work_order_viewmodel.dart';
+import '../viewmodels/complete_work_order_viewmodel.dart';
 
 class DiagnosticSection extends StatelessWidget {
   final CompleteWorkOrderViewModel viewModel;

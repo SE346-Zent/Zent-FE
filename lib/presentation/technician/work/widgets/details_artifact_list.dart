@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import '../view_models/tech_work_order_details_viewmodel.dart';
+import '../viewmodels/tech_work_order_details_viewmodel.dart';
 
 class DetailsArtifactList extends StatelessWidget {
   final TechWorkOrderDetailsViewModel viewModel;

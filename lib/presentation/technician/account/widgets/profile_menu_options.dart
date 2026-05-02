@@ -8,7 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'profile_menu_item.dart';
 
 // ViewModel
-import '../view_models/tech_profile_viewmodel.dart';
+import '../viewmodels/tech_profile_viewmodel.dart';
 
 class ProfileMenuOptions extends StatelessWidget {
   const ProfileMenuOptions({super.key});

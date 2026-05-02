@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/input_field.dart';
 import 'select_box_field.dart';
-import '../view_models/add_new_part_viewmodel.dart';
+import '../viewmodels/add_new_part_viewmodel.dart';
 import 'add_part_info_box.dart';
 import 'part_photo_upload.dart';
 

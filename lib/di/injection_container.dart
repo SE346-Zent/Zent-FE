@@ -31,21 +31,25 @@ import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
 import '../presentation/common/auth/login/view_models/reset_password_view_model.dart';
 import '../presentation/common/auth/register/view_models/verify_otp_view_model.dart';
-import '../presentation/admin/account/viewmodel/user_management_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/profile_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/security_settings_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/part_request_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/inventory_assets_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/detail_request_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/choose_role_viewmodel.dart';
-import '../presentation/admin/account/viewmodel/create_account_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/user_management_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/profile_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/security_settings_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/part_request_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/inventory_assets_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/detail_request_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/choose_role_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/create_account_viewmodel.dart';
 import '../presentation/admin/dashboard/viewmodels/admin_dashboard_viewmodel.dart';
+import '../presentation/admin/dashboard/viewmodels/admin_notifications_viewmodel.dart';
 import '../presentation/admin/reports/viewmodels/admin_reports_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/operational_queue_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/assigned_work_order_detail_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/view_schedule_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/reassign_work_order_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
-import '../presentation/customer/account/viewmodels/service_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/service_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/security_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/notifications_viewmodel.dart';
@@ -54,22 +58,25 @@ import '../presentation/customer/work/viewmodels/products_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/active_repairs_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/customer_cancel_work_order_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/device_registration_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/parts_viewmodel.dart';
 import '../presentation/common/auth/register/view_models/register_view_model.dart';
 import '../presentation/common/auth/auth_view_model.dart';
 
 // Tech
-import 'package:zent_fe/presentation/technician/account/view_models/tech_profile_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/account/view_models/personal_info_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/account/view_models/notifications_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/account/view_models/technician_home_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_details_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/work/view_models/add_new_part_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/work/view_models/complete_work_order_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/account/view_models/security_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/work/view_models/tech_work_order_viewmodel.dart';
-import 'package:zent_fe/presentation/technician/work/view_models/part_search_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/viewmodels/tech_profile_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/viewmodels/personal_info_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/home/viewmodels/technician_home_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/tech_work_order_details_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/tech_pause_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/tech_reject_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/add_new_part_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/complete_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/account/viewmodels/security_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/tech_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/part_search_viewmodel.dart';
 
 final sl = GetIt.instance;
 
@@ -104,9 +111,13 @@ Future<void> init() async {
   );
   sl.registerFactory(() => UserManagementViewModel());
   sl.registerFactory(() => AdminDashboardViewModel());
+  sl.registerFactory(() => AdminNotificationsViewModel());
   sl.registerFactory(() => AdminReportsViewModel());
   sl.registerFactory(() => OperationalQueueViewModel());
   sl.registerFactory(() => WorkOrderDetailViewModel());
+  sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
+  sl.registerFactory(() => ViewScheduleViewModel());
+  sl.registerFactory(() => ReassignWorkOrderViewModel());
   sl.registerFactory(() => ChooseRoleViewModel());
   sl.registerFactory(() => CreateAccountViewModel());
   sl.registerFactory(() => ProfileViewModel(sl(), sl()));
@@ -124,6 +135,7 @@ Future<void> init() async {
   sl.registerFactory(() => DetailedProductViewModel());
   sl.registerFactory(() => RequestServiceViewModel());
   sl.registerFactory(() => ActiveRepairsViewModel());
+  sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(() => DetailedChatViewModel());
   sl.registerFactory(() => DeviceRegistrationViewModel());
   sl.registerFactory(() => PartsViewModel());
@@ -134,6 +146,8 @@ Future<void> init() async {
   sl.registerFactoryParam<TechWorkOrderDetailsViewModel, String, void>(
     (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
   );
+  sl.registerFactory(() => TechPauseWorkOrderViewModel());
+  sl.registerFactory(() => TechRejectWorkOrderViewModel());
   sl.registerFactory(() => AddNewPartViewModel());
   sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
     (workOrderId, _) => CompleteWorkOrderViewModel(

@@ -3,7 +3,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import '../view_models/part_search_viewmodel.dart';
+import '../viewmodels/part_search_viewmodel.dart';
 
 class PartSearchItem extends StatelessWidget {
   final PartSearchItemModel part;

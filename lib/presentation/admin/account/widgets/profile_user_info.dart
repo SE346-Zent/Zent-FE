@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../viewmodel/profile_viewmodel.dart';
+import '../viewmodels/profile_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 

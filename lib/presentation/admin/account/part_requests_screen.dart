@@ -11,7 +11,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 // Widgets
 import 'widgets/app_search_bar.dart';
 import 'widgets/part_request_card.dart';
-import 'viewmodel/part_request_viewmodel.dart';
+import 'viewmodels/part_request_viewmodel.dart';
 
 class PartRequestsScreen extends StatelessWidget {
   const PartRequestsScreen({super.key});
@@ -128,7 +128,10 @@ class _PartRequestsScreenContent extends StatelessWidget {
             style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
           ),
           const SizedBox(height: AppDimens.spaceXs),
-          Text(value, style: TextStyles.headline.copyWith(color: Colors.black)),
+          Text(
+            value,
+            style: TextStyles.headline.copyWith(color: AppColors.tertiary500),
+          ),
         ],
       ),
     );

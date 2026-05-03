@@ -122,10 +122,7 @@ class _PartRequestsScreenContent extends StatelessWidget {
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.subtle],
-        border: Border.all(
-          color: borderColor,
-          width: 1.0,
-        ),
+        border: Border.all(color: borderColor, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

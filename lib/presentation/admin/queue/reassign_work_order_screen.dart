@@ -82,18 +82,15 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                 const SizedBox(height: AppDimens.spaceMd),
                 Row(
                   children: [
-                    Expanded(
-                      child: _buildSearchBar(), 
-                    ),
+                    Expanded(child: _buildSearchBar()),
                     const SizedBox(width: AppDimens.spaceMd),
                     // Icon Filter đặt bên phải
                     GestureDetector(
-                      onTap: () {
-                      },
+                      onTap: () {},
                       child: Container(
                         padding: const EdgeInsets.all(8.0),
                         child: const Icon(
-                          Icons.filter_list, 
+                          Icons.filter_list,
                           color: Colors.black,
                           size: 26,
                         ),

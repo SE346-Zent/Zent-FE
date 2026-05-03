@@ -420,7 +420,7 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.tertiary500,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimens.boraSm),
                 ),

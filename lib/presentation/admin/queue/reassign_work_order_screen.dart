@@ -68,15 +68,9 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Available Technician',
-                      style: TextStyles.headline.copyWith(color: Colors.black),
-                    ),
-                    const Icon(Icons.filter_list, color: Colors.black),
-                  ],
+                Text(
+                  'Available Technician',
+                  style: TextStyles.headline.copyWith(color: Colors.black),
                 ),
                 const SizedBox(height: 4.0),
                 Text(
@@ -86,7 +80,27 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
-                _buildSearchBar(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSearchBar(), 
+                    ),
+                    const SizedBox(width: AppDimens.spaceMd),
+                    // Icon Filter đặt bên phải
+                    GestureDetector(
+                      onTap: () {
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: const Icon(
+                          Icons.filter_list, 
+                          color: Colors.black,
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: AppDimens.spaceLg),
                 ...viewModel.technicians.map(
                   (t) => _buildTechnicianCard(context, t),
@@ -226,7 +240,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'View Schedule',
+                      'View Sched',
                       style: TextStyles.middle.copyWith(
                         color: AppColors.tertiary500,
                       ),

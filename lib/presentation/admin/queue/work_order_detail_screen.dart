@@ -351,7 +351,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
       child: Column(
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 20,
@@ -421,30 +421,37 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    context.pushNamed(
-                      'adminViewSchedule',
-                      pathParameters: {'techId': 'TECH-9999'},
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    side: const BorderSide(
-                      color: AppColors.tertiary500,
-                      width: 1.5,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                    ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                    boxShadow: [BoxShadowStyles.glowing],
                   ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'View Schedule',
-                      style: TextStyles.middle.copyWith(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      context.pushNamed(
+                        'adminViewSchedule',
+                        pathParameters: {'techId': 'TECH-9999'},
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      side: const BorderSide(
                         color: AppColors.tertiary500,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'View Sched',
+                        style: TextStyles.middle.copyWith(
+                          color: AppColors.tertiary500,
+                        ),
                       ),
                     ),
                   ),
@@ -452,23 +459,29 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               ),
               const SizedBox(width: AppDimens.spaceMd),
               Expanded(
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.tertiary500,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    side: const BorderSide(
-                      color: AppColors.tertiary500,
-                      width: 1.5,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                    ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                    boxShadow: [BoxShadowStyles.glowing],
                   ),
-                  child: Text(
-                    'Assign',
-                    style: TextStyles.middle.copyWith(color: Colors.white),
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.tertiary500,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      side: const BorderSide(
+                        color: AppColors.tertiary500,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                      ),
+                    ),
+                    child: Text(
+                      'Assign',
+                      style: TextStyles.middle.copyWith(color: Colors.white),
+                    ),
                   ),
                 ),
               ),

@@ -71,7 +71,7 @@ class _ProfileScreenContent extends StatelessWidget {
                     label: 'Sign Out',
                     width: double.infinity,
                     icon: Icons.logout,
-                    onPressed: () => context.read<ProfileViewModel>().logout(),
+                    onPressed: () => context.read<ProfileViewModel>().logout(context),
                   ),
                 ),
               ],

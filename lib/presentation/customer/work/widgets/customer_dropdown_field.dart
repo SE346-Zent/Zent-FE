@@ -11,6 +11,7 @@ class CustomerDropdownField<T> extends StatelessWidget {
   final ValueChanged<T?> onChanged;
   final bool isRequired;
   final bool readOnly;
+  final String? hint;
 
   const CustomerDropdownField({
     super.key,
@@ -20,6 +21,7 @@ class CustomerDropdownField<T> extends StatelessWidget {
     required this.onChanged,
     this.isRequired = false,
     this.readOnly = false,
+    this.hint,
   });
 
   @override
@@ -58,6 +60,17 @@ class CustomerDropdownField<T> extends StatelessWidget {
             child: DropdownButton<T>(
               isExpanded: true,
               value: value,
+              hint: hint != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 0),
+                      child: Text(
+                        hint!,
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
+                      ),
+                    )
+                  : null,
               items: items,
               onChanged: readOnly ? null : onChanged,
               icon: const Padding(

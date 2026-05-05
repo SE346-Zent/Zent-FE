@@ -6,6 +6,7 @@ class UserModel extends User {
     required super.email,
     required super.id,
     required super.name,
+    required super.phoneNumber,
     required super.role,
   });
 
@@ -15,6 +16,7 @@ class UserModel extends User {
       id: user.id,
       email: user.email,
       name: user.name,
+      phoneNumber: user.phoneNumber,
       role: user.role,
     );
   }
@@ -25,6 +27,7 @@ class UserModel extends User {
       id: json['id'] as String? ?? 'temp_id',
       email: json['email'] as String? ?? 'temp_email',
       name: json['fullName'] as String? ?? "abc",
+      phoneNumber: json['phoneNumber'] as String? ?? json['phone'] as String? ?? '',
       role: _mapRole(json['role'], json['roleId']),
     );
   }
@@ -50,6 +53,12 @@ class UserModel extends User {
 
   //* to json
   Map<String, dynamic> toJson() {
-    return {'id': id, 'email': email, 'fullName': name, 'role': role.name};
+    return {
+      'id': id,
+      'email': email,
+      'fullName': name,
+      'phoneNumber': phoneNumber,
+      'role': role.name,
+    };
   }
 }

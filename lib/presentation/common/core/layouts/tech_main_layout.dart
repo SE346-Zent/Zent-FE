@@ -6,6 +6,8 @@ import '../themes/colors.dart';
 import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
 import '../../../technician/account/widgets/tech_sidebar.dart';
+import '../../../../di/injection_container.dart';
+import '../../auth/auth_view_model.dart';
 
 class TechMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -21,12 +23,13 @@ class TechMainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userName = sl<AuthViewModel>().currentUser?.name ?? 'Technician';
     return Scaffold(
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
       drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: const TechSidebar(
-        userName: 'Hung dep zai',
+      drawer: TechSidebar(
+        userName: userName,
         employeeId: 'TECH-1234',
       ),
       body: Stack(

@@ -110,6 +110,7 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
 
           CustomerDropdownField<String>(
             label: 'Symptom',
+            hint: 'Select Category',
             value: selectedSymptom,
             items: [
               'Screen Broken',

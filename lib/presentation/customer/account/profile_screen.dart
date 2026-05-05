@@ -38,8 +38,8 @@ class _ProfileScreenContent extends StatelessWidget {
     }
   }
 
-  void _onSignOutPressed() {
-    debugPrint("action triggered: sign out");
+  void _onSignOutPressed(BuildContext context, CustomerProfileViewModel viewModel) {
+    viewModel.logout(context);
   }
 
   @override
@@ -97,7 +97,7 @@ class _ProfileScreenContent extends StatelessWidget {
                   label: 'Sign Out',
                   width: double.infinity,
                   icon: Icons.logout,
-                  onPressed: _onSignOutPressed,
+                  onPressed: () => _onSignOutPressed(context, viewModel),
                 ),
               ),
             ],

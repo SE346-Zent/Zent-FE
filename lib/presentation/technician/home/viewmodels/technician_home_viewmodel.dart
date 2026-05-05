@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class TechScheduleItem {
   final String time;
@@ -15,8 +17,7 @@ class TechScheduleItem {
 }
 
 class TechnicianHomeViewModel extends ChangeNotifier {
-  final String _userName = "Hung dep zai";
-  String get userName => _userName;
+  String get userName => sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
   final int _jobsDone = 10;
   int get jobsDone => _jobsDone;

@@ -16,7 +16,7 @@ abstract class AuthRemoteDatasource {
   });
   Future<void> verifyOtp(String email, String otp);
   Future<void> resendOtp(String email);
-  Future<void> logout(String email, String refreshToken);
+  Future<void> logout(String accessToken, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
   Future<void> forgotPassword(String email);
   Future<bool> resetPassword({
@@ -209,7 +209,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void> logout(String email, String refreshToken) async {
+  Future<void> logout(String accessToken, String refreshToken) async {
     final url = Uri.parse('$_baseURL/auth/logout');
     try {
       final response = await client
@@ -217,9 +217,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             url,
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $refreshToken',
+              'Authorization': 'Bearer $accessToken',
             },
-            body: jsonEncode({'email': email}),
+            body: jsonEncode({'refresh_token': refreshToken}),
           )
           .timeout(_timeOut);
 

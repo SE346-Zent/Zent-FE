@@ -74,15 +74,17 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    final accessToken = await authLocalDataSource.getAccessToken();
-    final refreshToken = await authLocalDataSource.getRefreshToken();
-    if (accessToken != null && refreshToken != null) {
-      final decodedToken = JwtDecoder.decode(accessToken);
-      final email = decodedToken['email'];
-      await authRemoteService.logout(email, refreshToken);
+    try {
+      final accessToken = await authLocalDataSource.getAccessToken();
+      final refreshToken = await authLocalDataSource.getRefreshToken();
+      if (accessToken != null && refreshToken != null) {
+        await authRemoteService.logout(accessToken, refreshToken);
+      }
+    } catch (e) {
+      debugPrint("Remote logout failed: $e");
+    } finally {
+      await authLocalDataSource.clearCredentials();
     }
-
-    await authLocalDataSource.clearCredentials();
   }
 
   @override

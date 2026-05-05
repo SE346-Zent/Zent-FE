@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class ServiceTypeData {
   final String id;
@@ -143,10 +145,16 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   void initContactInfo() {
     loadLocationData();
-    // Auto-fill from UserProvider mock if not set
-    firstName ??= 'Hung';
-    lastName ??= 'dep zai';
-    email ??= 'example@gmail.com';
+    // Auto-fill from logged-in user if not set
+    final user = sl<AuthViewModel>().currentUser;
+    if (user != null) {
+      if (firstName == null || firstName!.isEmpty) {
+        final parts = user.name.split(' ');
+        firstName = parts.first;
+        lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      }
+      email ??= user.email;
+    }
   }
 
   void saveContactInfo({

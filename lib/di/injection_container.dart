@@ -125,8 +125,8 @@ Future<void> init() async {
   sl.registerFactory(() => PartRequestsViewModel());
   sl.registerFactory(() => InventoryAssetsViewModel());
   sl.registerFactory(() => DetailRequestViewModel());
-  sl.registerFactory(() => CustomerProfileViewModel(sl()));
-  sl.registerFactory(() => PersonalInfoViewModel());
+  sl.registerFactory(() => CustomerProfileViewModel(sl(), sl()));
+  sl.registerFactory(() => PersonalInfoViewModel(sl()));
   sl.registerFactory(() => ServiceViewModel());
   sl.registerFactory(() => ChatViewModel());
   sl.registerFactory(() => CustomerSecurityViewModel());
@@ -156,8 +156,8 @@ Future<void> init() async {
       getSingleWorkOrderUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => TechProfileViewModel(sl()));
-  sl.registerFactory(() => TechPersonalInfoViewModel());
+  sl.registerFactory(() => TechProfileViewModel(sl(), sl()));
+  sl.registerFactory(() => TechPersonalInfoViewModel(sl()));
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(() => TechSecurityViewModel());
   sl.registerFactory(() => PartSearchViewModel());

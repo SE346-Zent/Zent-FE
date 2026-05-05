@@ -14,7 +14,7 @@ import 'widgets/tech_app_bar.dart';
 import 'widgets/tech_custom_switch.dart';
 
 // ViewModel
-import 'view_models/notifications_viewmodel.dart';
+import 'viewmodels/notifications_viewmodel.dart';
 
 class TechNotificationsScreen extends StatelessWidget {
   const TechNotificationsScreen({super.key});

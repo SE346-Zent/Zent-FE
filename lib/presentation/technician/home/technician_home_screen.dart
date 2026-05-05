@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 import 'package:zent_fe/di/injection_container.dart' as di;
-import 'view_models/technician_home_viewmodel.dart';
+import 'viewmodels/technician_home_viewmodel.dart';
 import 'widgets/tech_home_header.dart';
 import 'widgets/tech_stats_row.dart';
 import 'widgets/schedule_item_card.dart';

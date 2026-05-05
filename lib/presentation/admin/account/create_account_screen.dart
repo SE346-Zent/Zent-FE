@@ -10,7 +10,7 @@ import 'package:zent_fe/presentation/common/auth/login/widgets/zent_bottom_logo.
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'widgets/admin_text_field.dart';
-import 'viewmodel/create_account_viewmodel.dart';
+import 'viewmodels/create_account_viewmodel.dart';
 
 class CreateAccountScreen extends StatelessWidget {
   final String role;

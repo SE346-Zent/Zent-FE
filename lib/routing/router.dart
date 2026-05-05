@@ -16,16 +16,20 @@ import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
 import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
+import '../presentation/admin/dashboard/admin_notifications_screen.dart';
 import '../presentation/admin/queue/operational_queue_screen.dart';
 import '../presentation/admin/queue/work_order_detail_screen.dart';
+import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
+import '../presentation/admin/queue/view_schedule_screen.dart';
+import '../presentation/admin/queue/reassign_work_order_screen.dart';
 import '../presentation/admin/reports/admin_reports_screen.dart';
 import '../presentation/admin/account/part_requests_screen.dart';
 import '../presentation/admin/account/inventory_assets_screen.dart';
 import '../presentation/admin/account/detail_request_screen.dart';
-import '../presentation/customer/account/service_screen.dart';
+import '../presentation/customer/work/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
-import 'package:zent_fe/presentation/customer/account/personal_info_screen.dart';
+import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
 import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
@@ -33,10 +37,11 @@ import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
 import '../presentation/customer/work/request_service_screen.dart';
 import '../presentation/customer/work/active_repairs_screen.dart';
+import '../presentation/customer/work/customer_cancel_work_order_screen.dart';
 import '../presentation/customer/work/device_registration_screen.dart';
 import '../presentation/customer/work/parts_screen.dart';
-import 'package:zent_fe/presentation/common/core/layouts/admin_main_layout.dart';
-import 'package:zent_fe/presentation/common/core/layouts/customer_main_layout.dart';
+import '../presentation/common/core/layouts/admin_main_layout.dart';
+import '../presentation/common/core/layouts/customer_main_layout.dart';
 import '../presentation/technician/account/tech_profile_screen.dart';
 import '../presentation/technician/account/personal_info_screen.dart';
 import '../presentation/technician/account/notifications_screen.dart';
@@ -44,7 +49,9 @@ import '../presentation/technician/account/security_screen.dart';
 import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
-import '../presentation/technician/account/technician_home_screen.dart';
+import '../presentation/technician/work/tech_pause_work_order_screen.dart';
+import '../presentation/technician/work/tech_reject_work_order_screen.dart';
+import '../presentation/technician/home/technician_home_screen.dart';
 import '../presentation/technician/work/add_new_part_screen.dart';
 import '../presentation/common/core/layouts/tech_main_layout.dart';
 import '../presentation/technician/work/widgets/app_camera_screen.dart';
@@ -158,7 +165,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
+  initialLocation: Routes.customerMe,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -280,19 +287,57 @@ final GoRouter appRouter = GoRouter(
               name: RouteNames.adminDashboard,
               path: Routes.adminDashboard,
               builder: (context, state) => const AdminDashboardScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.adminNotifications,
+                  path: Routes.adminNotifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const AdminNotificationsScreen(),
+                ),
+              ],
             ),
             GoRoute(
               name: RouteNames.adminOperationalQueue,
               path: Routes.adminOperationalQueue,
               builder: (context, state) => const OperationalQueueScreen(),
-            ),
-            GoRoute(
-              name: RouteNames.adminWorkOrderDetails,
-              path: Routes.adminWorkOrderDetails,
-              builder: (context, state) {
-                final id = state.pathParameters['workOrderId'] ?? '';
-                return WorkOrderDetailScreen(workOrderId: id);
-              },
+              routes: [
+                GoRoute(
+                  name: RouteNames.adminWorkOrderDetails,
+                  path: Routes.adminWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return WorkOrderDetailScreen(workOrderId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminAssignedWorkOrderDetails,
+                  path: Routes.adminAssignedWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return AssignedWorkOrderDetailScreen(workOrderId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminViewSchedule,
+                  path: Routes.adminViewSchedule,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['techId'] ?? '';
+                    return ViewScheduleScreen(techId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminReassignWorkOrder,
+                  path: Routes.adminReassignWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return ReassignWorkOrderScreen(workOrderId: id);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -437,6 +482,24 @@ final GoRouter appRouter = GoRouter(
                   },
                 ),
                 GoRoute(
+                  name: RouteNames.techPauseWorkOrder,
+                  path: Routes.techPauseWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return TechPauseWorkOrderScreen(workOrderId: workOrderId);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.techRejectWorkOrder,
+                  path: Routes.techRejectWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return TechRejectWorkOrderScreen(workOrderId: workOrderId);
+                  },
+                ),
+                GoRoute(
                   name: RouteNames.techCompleteWorkOrder,
                   path: Routes.completeWorkOrder,
                   parentNavigatorKey: _rootNavigatorKey,
@@ -555,6 +618,17 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.activeRepairs,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const ActiveRepairsScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.customerCancelWorkOrder,
+                  path: Routes.customerCancelWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return CustomerCancelWorkOrderScreen(
+                      workOrderId: workOrderId,
+                    );
+                  },
                 ),
               ],
             ),

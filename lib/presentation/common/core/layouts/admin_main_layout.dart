@@ -37,7 +37,7 @@ class AdminMainLayout extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.only(
-              bottom: 110.0 + MediaQuery.paddingOf(context).bottom,
+              bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
             ),
             child: navigationShell,
           ),

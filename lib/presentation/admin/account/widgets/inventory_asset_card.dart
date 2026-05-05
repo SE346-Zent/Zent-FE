@@ -3,7 +3,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import '../viewmodel/inventory_assets_viewmodel.dart';
+import '../viewmodels/inventory_assets_viewmodel.dart';
 
 class InventoryAssetCard extends StatelessWidget {
   final InventoryAsset asset;

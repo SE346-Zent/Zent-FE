@@ -4,7 +4,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
-import 'view_models/part_search_viewmodel.dart';
+import 'viewmodels/part_search_viewmodel.dart';
 import 'widgets/part_search_item.dart';
 import 'widgets/part_search_bar.dart';
 import 'widgets/part_search_add_button.dart';

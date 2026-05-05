@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../routing/route_names.dart';
 
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -18,7 +19,7 @@ class WorkOrderDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<WorkOrderDetailViewModel>(),
+      create: (_) => di.sl<WorkOrderDetailViewModel>()..initData(workOrderId),
       child: const _WorkOrderDetailScreenContent(),
     );
   }
@@ -148,18 +149,32 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background500,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.pop(),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 1.0),
+        child: Column(
+          children: [
+            AppBar(
+              backgroundColor: AppColors.background500,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => context.pop(),
+              ),
+              title: Text(
+                'Work Order Detail',
+                style: TextStyles.headline.copyWith(
+                  color: AppColors.primary500,
+                ),
+              ),
+              centerTitle: true,
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.secondary50,
+            ),
+          ],
         ),
-        title: Text(
-          'Work Order Detail',
-          style: TextStyles.headline.copyWith(color: AppColors.primary500),
-        ),
-        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -167,82 +182,94 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                  boxShadow: [BoxShadowStyles.raised],
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Container(width: 6.0, color: AppColors.tertiary500),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppDimens.spaceMd),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                viewModel.orderId,
-                                style: TextStyles.middle.copyWith(
-                                  color: AppColors.secondary500,
-                                ),
-                              ),
-                              const SizedBox(height: 4.0),
-                              Text(
-                                viewModel.deviceName,
-                                style: TextStyles.headline.copyWith(
-                                  color: AppColors.primary500,
-                                ),
-                              ),
-                              const SizedBox(height: 4.0),
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 12,
-                                    backgroundColor: AppColors.secondary200,
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
+              GestureDetector(
+                onTap: () {
+                  final cleanId = viewModel.orderId.replaceAll('#', '');
+                  context.pushNamed(
+                    RouteNames.adminAssignedWorkOrderDetails,
+                    pathParameters: {'workOrderId': cleanId},
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                    boxShadow: [BoxShadowStyles.raised],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Container(width: 6.0, color: AppColors.tertiary500),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppDimens.spaceMd),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  viewModel.orderId,
+                                  style: TextStyles.middle.copyWith(
+                                    color: AppColors.secondary500,
                                   ),
-                                  const SizedBox(width: 8.0),
-                                  Text(
-                                    viewModel.customerName,
-                                    style: TextStyles.label.copyWith(
-                                      color: AppColors.secondary400,
-                                    ),
+                                ),
+                                const SizedBox(height: AppDimens.spaceXs),
+                                Text(
+                                  viewModel.deviceName,
+                                  style: TextStyles.headline.copyWith(
+                                    color: AppColors.primary500,
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                const SizedBox(height: AppDimens.spaceXs),
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 12,
+                                      backgroundColor: AppColors.secondary200,
+                                      child: const Icon(
+                                        Icons.person,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8.0),
+                                    Text(
+                                      viewModel.customerName,
+                                      style: TextStyles.label.copyWith(
+                                        color: AppColors.secondary400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: AppDimens.spaceMd),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildInfoCard(
-                      Icons.location_on_outlined,
-                      viewModel.location,
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: _buildInfoCard(
+                        Icons.location_on_outlined,
+                        viewModel.location,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    child: _buildInfoCard(
-                      Icons.calendar_today_outlined,
-                      viewModel.time,
+                    const SizedBox(width: AppDimens.spaceMd),
+                    Expanded(
+                      child: _buildInfoCard(
+                        Icons.calendar_today_outlined,
+                        viewModel.time,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: AppDimens.spaceXl),
               Row(
@@ -258,7 +285,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 4.0),
+              const SizedBox(height: AppDimens.spaceXs),
               Text(
                 'Assign the best-fit specialist based on proximity and experties',
                 style: TextStyles.bodyMedium.copyWith(
@@ -267,7 +294,9 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               ),
 
               const SizedBox(height: AppDimens.spaceLg),
-              ...viewModel.technicians.map((t) => _buildTechnicianCard(t)),
+              ...viewModel.technicians.map(
+                (t) => _buildTechnicianCard(context, t),
+              ),
             ],
           ),
         ),
@@ -302,7 +331,6 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
             child: Text(
               text,
               style: TextStyles.label.copyWith(color: Colors.black),
-              maxLines: 2,
             ),
           ),
         ],
@@ -310,7 +338,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTechnicianCard(Map<String, dynamic> data) {
+  Widget _buildTechnicianCard(BuildContext context, Map<String, dynamic> data) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -323,7 +351,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
       child: Column(
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 20,
@@ -390,26 +418,74 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppDimens.spaceLg),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
-                side: const BorderSide(
-                  color: AppColors.tertiary500,
-                  width: 1.5,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                    boxShadow: [BoxShadowStyles.glowing],
+                  ),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      context.pushNamed(
+                        'adminViewSchedule',
+                        pathParameters: {'techId': 'TECH-9999'},
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      side: const BorderSide(
+                        color: AppColors.tertiary500,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'View Sched',
+                        style: TextStyles.middle.copyWith(
+                          color: AppColors.tertiary500,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              child: Text(
-                'View Schedule',
-                style: TextStyles.title.copyWith(color: AppColors.tertiary500),
+              const SizedBox(width: AppDimens.spaceMd),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                    boxShadow: [BoxShadowStyles.glowing],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.tertiary500,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      side: const BorderSide(
+                        color: AppColors.tertiary500,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                      ),
+                    ),
+                    child: Text(
+                      'Assign',
+                      style: TextStyles.middle.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),

@@ -11,7 +11,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 // Widgets
 import 'widgets/app_search_bar.dart';
 import 'widgets/part_request_card.dart';
-import 'viewmodel/part_request_viewmodel.dart';
+import 'viewmodels/part_request_viewmodel.dart';
 
 class PartRequestsScreen extends StatelessWidget {
   const PartRequestsScreen({super.key});
@@ -61,6 +61,7 @@ class _PartRequestsScreenContent extends StatelessWidget {
                     child: _buildSummaryBox(
                       'PENDING',
                       viewModel.pendingCount.toString(),
+                      AppColors.warning500,
                     ),
                   ),
                   const SizedBox(width: AppDimens.spaceMd),
@@ -68,6 +69,7 @@ class _PartRequestsScreenContent extends StatelessWidget {
                     child: _buildSummaryBox(
                       'APPROVED',
                       viewModel.approvedCount.toString(),
+                      AppColors.success500,
                     ),
                   ),
                   const SizedBox(width: AppDimens.spaceMd),
@@ -75,6 +77,7 @@ class _PartRequestsScreenContent extends StatelessWidget {
                     child: _buildSummaryBox(
                       'REJECTED',
                       viewModel.rejectedCount.toString(),
+                      AppColors.error500,
                     ),
                   ),
                 ],
@@ -109,7 +112,7 @@ class _PartRequestsScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryBox(String label, String value) {
+  Widget _buildSummaryBox(String label, String value, Color borderColor) {
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: AppDimens.spaceMd,
@@ -119,6 +122,7 @@ class _PartRequestsScreenContent extends StatelessWidget {
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.subtle],
+        border: Border.all(color: borderColor, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +132,10 @@ class _PartRequestsScreenContent extends StatelessWidget {
             style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
           ),
           const SizedBox(height: AppDimens.spaceXs),
-          Text(value, style: TextStyles.headline.copyWith(color: Colors.black)),
+          Text(
+            value,
+            style: TextStyles.headline.copyWith(color: AppColors.tertiary500),
+          ),
         ],
       ),
     );

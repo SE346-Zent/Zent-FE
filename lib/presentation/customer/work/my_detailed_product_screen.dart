@@ -69,6 +69,7 @@ class _DetailedProductView extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(AppDimens.boraMd),
                 boxShadow: [BoxShadowStyles.raised],
+                border: Border.all(color: AppColors.secondary200, width: 1.0),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

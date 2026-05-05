@@ -8,7 +8,7 @@ import 'widgets/two_factor_section.dart';
 import 'widgets/recovery_email_section.dart';
 import 'widgets/login_history_section.dart';
 import 'package:provider/provider.dart';
-import 'viewmodel/security_settings_viewmodel.dart';
+import 'viewmodels/security_settings_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 class SecuritySettingsScreen extends StatelessWidget {

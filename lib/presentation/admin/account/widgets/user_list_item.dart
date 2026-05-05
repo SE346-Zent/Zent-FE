@@ -4,7 +4,7 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import 'package:zent_fe/domain/entities/enums/account_status.dart';
 
 class UserListItem extends StatelessWidget {

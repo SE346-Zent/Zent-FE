@@ -17,7 +17,7 @@ import 'widgets/profile_user_info.dart';
 import 'widgets/profile_menu_options.dart';
 
 // ViewModel
-import 'view_models/tech_profile_viewmodel.dart';
+import 'viewmodels/tech_profile_viewmodel.dart';
 
 class TechProfileScreen extends StatelessWidget {
   const TechProfileScreen({super.key});

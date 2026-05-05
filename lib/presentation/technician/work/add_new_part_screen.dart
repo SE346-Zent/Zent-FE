@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
-import 'view_models/add_new_part_viewmodel.dart';
+import 'viewmodels/add_new_part_viewmodel.dart';
 import 'widgets/add_new_part_form.dart';
 
 class AddNewPartScreen extends StatelessWidget {

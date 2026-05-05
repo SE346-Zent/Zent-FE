@@ -5,7 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 // ViewModel
-import '../view_models/tech_profile_viewmodel.dart';
+import '../viewmodels/tech_profile_viewmodel.dart';
 
 class ProfileUserInfo extends StatelessWidget {
   final UserProfileInfo userInfo;

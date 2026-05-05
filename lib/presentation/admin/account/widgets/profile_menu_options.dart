@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/menu_item.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/profile_viewmodel.dart';
+import '../viewmodels/profile_viewmodel.dart';
 
 class ProfileMenuOptions extends StatelessWidget {
   const ProfileMenuOptions({super.key});

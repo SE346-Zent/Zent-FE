@@ -14,9 +14,14 @@ abstract final class RouteNames {
 
   // admin top level
   static const String adminDashboard = 'adminDashboard';
+  static const String adminNotifications = 'adminNotifications';
   static const String adminReports = 'adminReports';
   static const String adminOperationalQueue = 'adminOperationalQueue';
   static const String adminWorkOrderDetails = 'adminWorkOrderDetails';
+  static const String adminAssignedWorkOrderDetails =
+      'adminAssignedWorkOrderDetails';
+  static const String adminViewSchedule = 'adminViewSchedule';
+  static const String adminReassignWorkOrder = 'adminReassignWorkOrder';
   static const String adminTeam = 'adminTeam';
   static const String adminMe = 'adminMe';
 
@@ -48,9 +53,13 @@ abstract final class RouteNames {
   static const String adminInventoryAssets = 'adminInventoryAssets';
   static const String adminDetailRequest = 'adminDetailRequest';
 
+  static const String techPauseWorkOrder = 'techPauseWorkOrder';
+  static const String techRejectWorkOrder = 'techRejectWorkOrder';
+
   static const String customerMyProducts = 'customerMyProducts';
   static const String customerRequestService = 'customerRequestService';
   static const String customerActiveRepairs = 'customerActiveRepairs';
+  static const String customerCancelWorkOrder = 'customerCancelWorkOrder';
   static const String customerPersonalInfo = 'customerPersonalInfo';
   static const String customerSecuritySettings = 'customerSecuritySettings';
   static const String customerNotifications = 'customerNotifications';

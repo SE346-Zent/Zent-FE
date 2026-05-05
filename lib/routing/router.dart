@@ -165,7 +165,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerMe,
+  initialLocation: Routes.techMe,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes

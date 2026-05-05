@@ -180,9 +180,9 @@ class PartTrackingSection extends StatelessWidget {
         bottom: AppDimens.spaceSm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.background500,
+        color: AppColors.tertiary50,
         borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        border: Border.all(color: AppColors.secondary50),
+        border: Border.all(color: AppColors.secondary200),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

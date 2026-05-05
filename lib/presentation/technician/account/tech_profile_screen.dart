@@ -10,7 +10,6 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
 // Shared Tech Components
 import 'widgets/tech_app_bar.dart';
-import 'package:zent_fe/presentation/common/core/ui/button.dart';
 
 // Feature-specific Widgets
 import 'widgets/profile_avatar.dart';
@@ -62,14 +61,6 @@ class _TechProfileView extends StatelessWidget {
               const SizedBox(height: AppDimens.spaceXl),
 
               const ProfileMenuOptions(),
-              const SizedBox(height: AppDimens.spaceXl),
-              
-              PrimaryActionButton(
-                label: 'Sign Out',
-                width: double.infinity,
-                icon: Icons.logout,
-                onPressed: () => viewModel.logout(context),
-              ),
               const SizedBox(height: AppDimens.spaceXl),
             ],
           ),

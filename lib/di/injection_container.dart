@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../data/datasources/local/auth_local_datasource.dart';
 import '../data/datasources/remote/auth_remote_datasource.dart';
-import '../data/datasources/remote/order_remote_datasource.dart';
+import '../data/datasources/remote/work_order_remote_datasource.dart';
 import '../data/datasources/local/work_order_local_datasource.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../data/repositories/work_order_repository_impl.dart';
@@ -133,7 +133,7 @@ Future<void> init() async {
   sl.registerFactory(() => CustomerNotificationsViewModel());
   sl.registerFactory(() => ProductsViewModel());
   sl.registerFactory(() => DetailedProductViewModel());
-  sl.registerFactory(() => RequestServiceViewModel());
+  sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(() => ActiveRepairsViewModel());
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(() => DetailedChatViewModel());
@@ -185,8 +185,8 @@ Future<void> init() async {
   sl.registerLazySingleton<WorkOrderLocalDataSource>(
     () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
   );
-  sl.registerLazySingleton<OrderRemoteDataSource>(
-    () => OrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
+  sl.registerLazySingleton<WorkOrderRemoteDataSource>(
+    () => WorkOrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
   );
   sl.registerLazySingleton<ProductRemoteDataSource>(
     () => ProductRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),

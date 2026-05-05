@@ -109,7 +109,7 @@ class _RequestServiceReviewScreenState
         emailVal: emailCtrl.text,
         phoneVal: phoneCtrl.text,
         countryVal: vm.country,
-        stateVal: vm.state,
+        provinceVal: vm.province,
         cityVal: vm.city,
         addressVal: vm.address,
         buildingVal: vm.building,
@@ -127,7 +127,7 @@ class _RequestServiceReviewScreenState
         emailVal: vm.email,
         phoneVal: vm.phone,
         countryVal: vm.country,
-        stateVal: vm.state,
+        provinceVal: vm.province,
         cityVal: vm.city,
         addressVal: addressCtrl.text,
         buildingVal: buildingCtrl.text,
@@ -403,14 +403,14 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'State',
-                  value: viewModel.state,
-                  items: viewModel.states
+                  label: 'Province',
+                  value: viewModel.province,
+                  items: viewModel.provinces
                       .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateState(v);
+                      viewModel.updateProvince(v);
                     }
                   },
                   isRequired: true,
@@ -546,7 +546,9 @@ class _RequestServiceReviewScreenState
                   boxShadow: canSubmit ? [BoxShadowStyles.glowing] : null,
                 ),
                 child: ElevatedButton(
-                  onPressed: canSubmit ? () => _onSubmit(viewModel) : null,
+                  onPressed: (canSubmit && !viewModel.isLoading)
+                      ? () => _onSubmit(viewModel)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -555,14 +557,23 @@ class _RequestServiceReviewScreenState
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
                     ),
                   ),
-                  child: Text(
-                    'Submit',
-                    style: TextStyles.title.copyWith(
-                      color: canSubmit
-                          ? AppColors.surface50
-                          : AppColors.secondary400,
-                    ),
-                  ),
+                  child: viewModel.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: AppColors.surface50,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Submit',
+                          style: TextStyles.title.copyWith(
+                            color: canSubmit
+                                ? AppColors.surface50
+                                : AppColors.secondary400,
+                          ),
+                        ),
                 ),
               ),
             ),

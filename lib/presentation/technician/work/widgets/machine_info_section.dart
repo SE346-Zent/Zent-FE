@@ -21,7 +21,7 @@ class MachineInfoSection extends StatelessWidget {
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.subtle],
-        border: Border.all(color: AppColors.secondary50),
+        border: Border.all(color: AppColors.secondary300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

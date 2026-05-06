@@ -32,10 +32,7 @@ class AdminMainLayout extends StatelessWidget {
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
       drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: AdminSidebar(
-        userName: userName,
-        adminId: 'ADMIN-1234',
-      ),
+      drawer: AdminSidebar(userName: userName, adminId: 'ADMIN-1234'),
       body: Stack(
         children: [
           Padding(

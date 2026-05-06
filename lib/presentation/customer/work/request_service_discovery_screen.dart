@@ -86,7 +86,10 @@ class _RequestServiceDiscoveryScreenState
                       isSelected:
                           viewModel.selectedSerialNumber ==
                           product.serialNumber,
-                      onTap: () => viewModel.selectDevice(product.id, product.serialNumber),
+                      onTap: () => viewModel.selectDevice(
+                        product.id,
+                        product.serialNumber,
+                      ),
                     );
                   },
                 ),

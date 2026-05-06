@@ -26,7 +26,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   int get currentStep => _currentStep;
 
   // Technician name from logged-in user
-  String get technicianName => sl<AuthViewModel>().currentUser?.name ?? 'Technician';
+  String get technicianName =>
+      sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
   // Current formatted date
   String get currentDate {

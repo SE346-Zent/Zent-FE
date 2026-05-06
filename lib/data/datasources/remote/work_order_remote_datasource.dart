@@ -48,7 +48,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     final url = Uri.parse('$_baseURL/work_order/single_wo?Id=$id');
     try {
       final headers = await _getHeaders();
-      final response = await client.get(url, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(
@@ -73,7 +75,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     final url = Uri.parse('$_baseURL/work_order/many_wo?userId=$userId');
     try {
       final headers = await _getHeaders();
-      final response = await client.get(url, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
@@ -111,9 +115,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
 
       // Handle non-success status codes first
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception(
-          'Status ${response.statusCode}: ${response.body}',
-        );
+        throw Exception('Status ${response.statusCode}: ${response.body}');
       }
 
       if (response.body.isEmpty) {
@@ -141,7 +143,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     final url = Uri.parse('$_baseURL/work_order/active?customerId=$customerId');
     try {
       final headers = await _getHeaders();
-      final response = await client.get(url, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
@@ -156,7 +160,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!;
       } else {
-        throw Exception(apiResponse.message ?? 'Failed to fetch active repairs');
+        throw Exception(
+          apiResponse.message ?? 'Failed to fetch active repairs',
+        );
       }
     } catch (e) {
       throw Exception('Error fetching active repairs: $e');

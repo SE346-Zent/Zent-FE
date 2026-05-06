@@ -36,10 +36,7 @@ class _InventoryAssetsScreenContent extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AccountHeader(
-              title: 'Inventory Assets',
-              showDivider: true,
-            ),
+            const AccountHeader(title: 'Inventory Assets', showDivider: true),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -58,8 +55,9 @@ class _InventoryAssetsScreenContent extends StatelessWidget {
                     const SizedBox(height: AppDimens.spaceLg),
                     ...viewModel.assets.map(
                       (asset) => Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: AppDimens.spaceLg),
+                        padding: const EdgeInsets.only(
+                          bottom: AppDimens.spaceLg,
+                        ),
                         child: InventoryAssetCard(asset: asset),
                       ),
                     ),

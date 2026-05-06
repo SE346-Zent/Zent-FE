@@ -186,7 +186,8 @@ Future<void> init() async {
     () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
   );
   sl.registerLazySingleton<WorkOrderRemoteDataSource>(
-    () => WorkOrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
+    () =>
+        WorkOrderRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
   );
   sl.registerLazySingleton<ProductRemoteDataSource>(
     () => ProductRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),

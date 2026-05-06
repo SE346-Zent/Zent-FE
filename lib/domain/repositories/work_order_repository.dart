@@ -7,7 +7,7 @@ abstract class WorkOrderRepository {
   Future<WorkOrder> getSingleWorkOrder({required String id});
   Future<List<WorkOrder>> getManyWorkOrders({required String userId});
   Future<List<WorkOrder>> getActiveRepairs({required String customerId});
-  
+
   // Drafts (Local)
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft);
   Future<WorkOrderCompletionDraft?> getWorkOrderDraft(String workOrderId);

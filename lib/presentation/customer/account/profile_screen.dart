@@ -38,7 +38,10 @@ class _ProfileScreenContent extends StatelessWidget {
     }
   }
 
-  void _onSignOutPressed(BuildContext context, CustomerProfileViewModel viewModel) {
+  void _onSignOutPressed(
+    BuildContext context,
+    CustomerProfileViewModel viewModel,
+  ) {
     viewModel.logout(context);
   }
 

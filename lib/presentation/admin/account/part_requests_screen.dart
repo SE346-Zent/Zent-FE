@@ -38,76 +38,73 @@ class _PartRequestsScreenContent extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AccountHeader(
-              title: 'Part Requests',
-              showDivider: true,
-            ),
+            const AccountHeader(title: 'Part Requests', showDivider: true),
             Expanded(
               child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppSearchBar(hintText: 'Search work order ID'),
-              const SizedBox(height: AppDimens.spaceLg),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildSummaryBox(
-                      'PENDING',
-                      viewModel.pendingCount.toString(),
-                      AppColors.warning500,
+                padding: const EdgeInsets.all(AppDimens.spaceMd),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppSearchBar(hintText: 'Search work order ID'),
+                    const SizedBox(height: AppDimens.spaceLg),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryBox(
+                            'PENDING',
+                            viewModel.pendingCount.toString(),
+                            AppColors.warning500,
+                          ),
+                        ),
+                        const SizedBox(width: AppDimens.spaceMd),
+                        Expanded(
+                          child: _buildSummaryBox(
+                            'APPROVED',
+                            viewModel.approvedCount.toString(),
+                            AppColors.success500,
+                          ),
+                        ),
+                        const SizedBox(width: AppDimens.spaceMd),
+                        Expanded(
+                          child: _buildSummaryBox(
+                            'REJECTED',
+                            viewModel.rejectedCount.toString(),
+                            AppColors.error500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    child: _buildSummaryBox(
-                      'APPROVED',
-                      viewModel.approvedCount.toString(),
-                      AppColors.success500,
+                    const SizedBox(height: AppDimens.spaceXl),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: viewModel.requests.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: AppDimens.spaceMd),
+                      itemBuilder: (context, index) {
+                        final item = viewModel.requests[index];
+                        Color statusColor = item.status == 'Pending'
+                            ? AppColors.warning500
+                            : (item.status == 'Approved'
+                                  ? AppColors.success500
+                                  : AppColors.error500);
+                        return PartRequestCard(
+                          partName: item.partName,
+                          woId: item.woId,
+                          date: item.date,
+                          status: item.status,
+                          statusColor: statusColor,
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    child: _buildSummaryBox(
-                      'REJECTED',
-                      viewModel.rejectedCount.toString(),
-                      AppColors.error500,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: AppDimens.spaceXl),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: viewModel.requests.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: AppDimens.spaceMd),
-                itemBuilder: (context, index) {
-                  final item = viewModel.requests[index];
-                  Color statusColor = item.status == 'Pending'
-                      ? AppColors.warning500
-                      : (item.status == 'Approved'
-                            ? AppColors.success500
-                            : AppColors.error500);
-                  return PartRequestCard(
-                    partName: item.partName,
-                    woId: item.woId,
-                    date: item.date,
-                    status: item.status,
-                    statusColor: statusColor,
-                  );
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    ],
-  ),
-),
-);
+    );
   }
 
   Widget _buildSummaryBox(String label, String value, Color borderColor) {

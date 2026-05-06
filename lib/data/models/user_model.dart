@@ -27,7 +27,8 @@ class UserModel extends User {
       id: json['id'] as String? ?? 'temp_id',
       email: json['email'] as String? ?? 'temp_email',
       name: json['fullName'] as String? ?? "abc",
-      phoneNumber: json['phoneNumber'] as String? ?? json['phone'] as String? ?? '',
+      phoneNumber:
+          json['phoneNumber'] as String? ?? json['phone'] as String? ?? '',
       role: _mapRole(json['role'], json['roleId']),
     );
   }

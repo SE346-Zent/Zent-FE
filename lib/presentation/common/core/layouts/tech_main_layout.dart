@@ -28,10 +28,7 @@ class TechMainLayout extends StatelessWidget {
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
       drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: TechSidebar(
-        userName: userName,
-        employeeId: 'TECH-1234',
-      ),
+      drawer: TechSidebar(userName: userName, employeeId: 'TECH-1234'),
       body: Stack(
         children: [
           Padding(

@@ -8,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/choose_role_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class ChooseRoleScreen extends StatelessWidget {
   const ChooseRoleScreen({super.key});
@@ -30,23 +31,17 @@ class _ChooseRoleScreenContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background500,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'Create Account',
-          style: TextStyles.headline.copyWith(color: AppColors.primary500),
-        ),
-        centerTitle: true,
-      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
+        child: Column(
+          children: [
+            const AccountHeader(
+              title: 'Create Account',
+              showDivider: true,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppDimens.spaceMd),
@@ -110,8 +105,11 @@ class _ChooseRoleScreenContent extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
-          ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

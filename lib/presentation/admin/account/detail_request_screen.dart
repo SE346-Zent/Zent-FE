@@ -9,6 +9,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'widgets/admin_text_field.dart';
 import 'viewmodels/detail_request_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class DetailRequestScreen extends StatelessWidget {
   const DetailRequestScreen({super.key});
@@ -111,37 +112,22 @@ class _DetailRequestScreenContent extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Column(
+      body: SafeArea(
+        child: Column(
           children: [
-            Text(
-              'Detail Request',
-              style: TextStyles.headline.copyWith(color: AppColors.primary500),
+            const AccountHeader(
+              title: 'Detail Request',
+              subtitle: '#WO-12345 • 12h30 AM',
+              showDivider: true,
             ),
-            Text(
-              '#WO-12345 • 12h30 AM',
-              style: TextStyles.label.copyWith(color: AppColors.secondary500),
-            ),
-          ],
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
+            Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppDimens.spaceMd),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(AppDimens.spaceMd),
+                    padding: const EdgeInsets.all(AppDimens.spaceSm),
                     decoration: BoxDecoration(
                       color: AppColors.tertiary50,
                       borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -169,7 +155,6 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                   color: Colors.black,
                                 ),
                               ),
-                              const SizedBox(height: 2.0),
                               Text(
                                 'Enter the details of the part that was not found in the inventory system.',
                                 style: TextStyles.label.copyWith(
@@ -352,6 +337,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -12,6 +12,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 import 'widgets/app_search_bar.dart';
 import 'widgets/part_request_card.dart';
 import 'viewmodels/part_request_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class PartRequestsScreen extends StatelessWidget {
   const PartRequestsScreen({super.key});
@@ -34,21 +35,15 @@ class _PartRequestsScreenContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background500,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Part Requests',
-          style: TextStyles.headline.copyWith(color: AppColors.primary500),
-        ),
-        centerTitle: true,
-      ),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const AccountHeader(
+              title: 'Part Requests',
+              showDivider: true,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimens.spaceMd),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +104,10 @@ class _PartRequestsScreenContent extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ],
+  ),
+),
+);
   }
 
   Widget _buildSummaryBox(String label, String value, Color borderColor) {

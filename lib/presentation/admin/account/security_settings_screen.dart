@@ -37,7 +37,7 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              const AccountHeader(title: 'Security Settings'),
+              const AccountHeader(title: 'Security Settings', showDivider: true),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(AppDimens.spaceMd),

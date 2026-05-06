@@ -11,6 +11,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'widgets/admin_text_field.dart';
 import 'viewmodels/create_account_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class CreateAccountScreen extends StatelessWidget {
   final String role;
@@ -40,22 +41,10 @@ class _CreateAccountScreenContent extends StatelessWidget {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.background500,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-            onPressed: () => context.pop(),
-          ),
-          title: Text(
-            titleText,
-            style: TextStyles.headline.copyWith(color: AppColors.primary500),
-          ),
-          centerTitle: true,
-        ),
         body: SafeArea(
           child: Column(
             children: [
+              AccountHeader(title: titleText, showDivider: true),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(

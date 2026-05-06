@@ -257,7 +257,8 @@ class RequestServiceViewModel extends ChangeNotifier {
           final inputFormat = DateFormat("HH:mm, dd/MM/yyyy");
           final dateTime = inputFormat.parse(appointmentDate!);
           // Format to ISO 8601: "yyyy-MM-ddTHH:mm:ssZ"
-          formattedAppointment = "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}Z";
+          formattedAppointment =
+              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}Z";
         } catch (e) {
           debugPrint("Error parsing date: $e");
           formattedAppointment = appointmentDate!; // fallback
@@ -285,25 +286,28 @@ class RequestServiceViewModel extends ChangeNotifier {
       }
 
       // Validation: description is required by server
-      final desc = (description != null && description!.trim().isNotEmpty) 
-          ? description!.trim() 
+      final desc = (description != null && description!.trim().isNotEmpty)
+          ? description!.trim()
           : null;
-      
+
       if (desc == null) {
         throw Exception('Please provide a description of the problem.');
       }
 
-      // Hardcode HCM for Ho Chi Minh City as requested
+      // Hardcode HCM for Ho Chi Minh City as requested by BE logic
       String finalCity = city ?? '';
-      if (finalCity == 'Thành Phố Hồ Chí Minh') {
+      String finalProvince = province ?? '';
+      if (finalCity == 'Thành Phố Hồ Chí Minh' ||
+          finalProvince == 'Thành Phố Hồ Chí Minh') {
         finalCity = 'HCM';
+        finalProvince = 'HCM';
       }
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        city: finalCity,
+        city: "HCM",
         country: country ?? 'VIET NAM',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,
@@ -311,8 +315,10 @@ class RequestServiceViewModel extends ChangeNotifier {
         lastName: lastName ?? '',
         phoneNumber: phone,
         productId: selectedProductId ?? '',
-        referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty) ? ticketRef : null,
-        province: province ?? '',
+        referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
+            ? ticketRef
+            : null,
+        province: finalProvince,
         workOrderSymptomId: symptomId,
       );
 
@@ -323,9 +329,9 @@ class RequestServiceViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint("Error submitting ticket: $e");
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit ticket: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to submit ticket: $e')));
       }
     } finally {
       _isLoading = false;
@@ -353,7 +359,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     isEditingAdditionalInfo = false;
     isEditingContact = false;
     isEditingAddress = false;
-    
+
     selectedProductId = null;
     selectedSerialNumber = null;
     selectedServiceId = null;

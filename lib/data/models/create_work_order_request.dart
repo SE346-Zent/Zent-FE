@@ -45,7 +45,7 @@ class CreateWorkOrderRequest {
       'phone_number': phoneNumber,
       'product_id': productId,
       'reference_ticket_id': referenceTicketId,
-      'province': province,
+      'state': province,
       'work_order_symptom_id': workOrderSymptomId,
     };
   }

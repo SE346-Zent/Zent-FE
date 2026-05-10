@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
-import '../../../common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class PasswordInputField extends StatefulWidget {
   final String label;
@@ -33,7 +33,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         ),
         const SizedBox(height: AppDimens.spaceXs),
         Container(
-          width: 331.0,
+          width: double.infinity,
           height: 45.0,
           decoration: BoxDecoration(
             color: AppColors.background500,

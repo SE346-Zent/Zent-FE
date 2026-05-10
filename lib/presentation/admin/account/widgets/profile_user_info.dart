@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../viewmodel/profile_viewmodel.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/text_styles.dart';
+import '../viewmodels/profile_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class ProfileUserInfo extends StatelessWidget {
   final UserProfileInfo userInfo;

@@ -38,7 +38,19 @@ dependencies:
   google_fonts: ^8.0.2
   provider: ^6.1.5+1
   go_router: ^17.1.0
+  shared_preferences: ^2.5.4
+  flutter_secure_storage: ^10.0.0
+  http: ^1.6.0
+  flutter_dotenv: ^6.0.0
+  jwt_decoder: ^2.0.1
+  get_it: ^9.2.1
   font_awesome_flutter: ^11.0.0
+  image_picker: ^1.2.1
+  camerawesome: ^2.5.0
+  permission_handler: ^12.0.1
+  path_provider: ^2.1.5
+  signature: ^5.5.0
+  mobile_scanner: ^7.2.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +93,8 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/data/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

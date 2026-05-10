@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
-import 'package:zent_fe/routing/routes.dart';
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
@@ -20,14 +20,37 @@ import 'widgets/password_requirements_box.dart';
 
 // ViewModel
 import 'view_models/reset_password_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ResetPasswordScreen extends StatelessWidget {
-  const ResetPasswordScreen({super.key});
+  final String email;
+  final String token;
+  const ResetPasswordScreen({
+    super.key,
+    required this.email,
+    required this.token,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) {
+        final viewModel = di.sl<ResetPasswordViewModel>();
+        viewModel.init(email: email, token: token);
+        return viewModel;
+      },
+      child: const _ResetPasswordScreenContent(),
+    );
+  }
+}
+
+class _ResetPasswordScreenContent extends StatelessWidget {
+  const _ResetPasswordScreenContent();
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ResetPasswordViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -36,11 +59,6 @@ class ResetPasswordScreen extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              Container(
-                height: 1.0,
-                width: double.infinity,
-                color: Colors.black,
-              ),
               const AuthAppBar(title: 'Reset Password'),
               Container(
                 height: 1.0,
@@ -69,27 +87,60 @@ class ResetPasswordScreen extends StatelessWidget {
                                   isCenter: false,
                                 ),
                                 const SizedBox(height: AppDimens.spaceMd),
-                                const AuthTextField(
+                                AuthTextField(
                                   label: 'New Password',
                                   hintText: 'Enter your new password',
                                   isPassword: true,
+                                  onChanged: viewModel.setNewPassword,
                                 ),
                                 const SizedBox(height: AppDimens.spaceLg),
-                                const PasswordStrengthIndicator(),
+                                PasswordStrengthIndicator(
+                                  strengthLevel: viewModel.passwordStrength,
+                                ),
                                 const SizedBox(height: AppDimens.spaceLg),
-                                const AuthTextField(
+                                AuthTextField(
                                   label: 'Confirm Password',
                                   hintText: 'Confirm new password',
                                   isPassword: true,
+                                  onChanged: viewModel.setConfirmPassword,
                                 ),
                                 const SizedBox(height: AppDimens.spaceLg),
-                                const PasswordRequirementsBox(),
+                                PasswordRequirementsBox(
+                                  hasMinLength: viewModel.hasMinLength,
+                                  hasNumber: viewModel.hasNumber,
+                                  hasSpecialChar: viewModel.hasSpecialChar,
+                                ),
                                 const SizedBox(height: AppDimens.spaceXl),
                                 AuthPrimaryButton(
                                   text: 'Reset Password',
-                                  onPressed: () => context.go(
-                                    '${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}/${Routes.resetPassword}/${Routes.resetSuccessfully}',
-                                  ),
+                                  isLoading: viewModel.isLoading,
+                                  onPressed: !viewModel.doPasswordsMatch
+                                      ? null
+                                      : () async {
+                                          FocusScope.of(context).unfocus();
+                                          final isSuccess = await viewModel
+                                              .submitNewPassword();
+
+                                          if (isSuccess && context.mounted) {
+                                            context.goNamed(
+                                              RouteNames.resetSuccessfully,
+                                            );
+                                          } else if (viewModel.errorMessage !=
+                                                  null &&
+                                              context.mounted) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  viewModel.errorMessage!,
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.error500,
+                                              ),
+                                            );
+                                          }
+                                        },
                                 ),
                                 const Spacer(),
                                 const Center(

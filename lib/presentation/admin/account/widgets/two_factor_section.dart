@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'security_card_container.dart';
 import 'security_section_title.dart';
 import 'two_factor_auth_toggle.dart';
-import '../viewmodel/security_settings_viewmodel.dart';
+import '../viewmodels/security_settings_viewmodel.dart';
 
 class TwoFactorSection extends StatelessWidget {
   final SecuritySettingsData securityData;
@@ -24,7 +24,7 @@ class TwoFactorSection extends StatelessWidget {
           title: 'Two-Factor Authentication',
           iconData: Icons.security_outlined,
           iconColor: AppColors.tertiary500,
-          iconSize: 20.0,
+          iconSize: 28.0,
         ),
         const SizedBox(height: AppDimens.spaceMd),
         SecurityCardContainer(

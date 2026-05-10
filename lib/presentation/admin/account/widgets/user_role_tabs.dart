@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/colors.dart';
-import '../../../common/core/themes/dimens.dart';
-import '../../../common/core/themes/text_styles.dart';
-import '../../../common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/themes/colors.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class UserRoleTabs extends StatelessWidget {
   final int activeIndex;
@@ -16,20 +16,46 @@ class UserRoleTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 364.0,
-      height: 46.0,
-      decoration: BoxDecoration(
-        color: AppColors.secondary50,
-        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
-      child: Row(
-        children: [
-          _buildTab(context, title: 'Technicians', index: 0),
-          _buildTab(context, title: 'Admin', index: 1),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final indicatorWidth = (constraints.maxWidth - 8.0) / 2;
+
+        return Container(
+          width: double.infinity,
+          height: 46.0,
+          decoration: BoxDecoration(
+            color: AppColors.secondary50,
+            borderRadius: BorderRadius.circular(AppDimens.boraMd),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+          child: Stack(
+            children: [
+              AnimatedAlign(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                alignment: activeIndex == 0
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
+                child: Container(
+                  width: indicatorWidth,
+                  height: 38.0,
+                  decoration: BoxDecoration(
+                    color: AppColors.surface100,
+                    borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                    boxShadow: [BoxShadowStyles.subtle],
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  _buildTab(context, title: 'Technicians', index: 0),
+                  _buildTab(context, title: 'Admin', index: 1),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -43,12 +69,8 @@ class UserRoleTabs extends StatelessWidget {
       child: GestureDetector(
         onTap: () => onTabChanged(index),
         child: Container(
-          height: 37.0,
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.surface100 : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            boxShadow: isActive ? [BoxShadowStyles.subtle] : [],
-          ),
+          height: 38.0,
+          color: Colors.transparent,
           alignment: Alignment.center,
           child: Text(
             title,

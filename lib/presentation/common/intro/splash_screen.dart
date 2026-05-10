@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:zent_fe/presentation/common/intro/on_boarding_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
+import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/presentation/common/intro/viewmodels/splash_viewmodel.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
-class AppSplashScreen extends StatefulWidget {
+class AppSplashScreen extends StatelessWidget {
   const AppSplashScreen({super.key});
 
   @override
-  State<AppSplashScreen> createState() => _AppSplashScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => di.sl<SplashViewModel>(),
+      child: const _SplashScreenContent(),
+    );
+  }
 }
 
-class _AppSplashScreenState extends State<AppSplashScreen> {
+class _SplashScreenContent extends StatefulWidget {
+  const _SplashScreenContent();
+
+  @override
+  State<_SplashScreenContent> createState() => _SplashScreenContentState();
+}
+
+class _SplashScreenContentState extends State<_SplashScreenContent> {
   bool _isVisible = false;
   bool _isInitialized = false;
 
@@ -52,37 +68,16 @@ class _AppSplashScreenState extends State<AppSplashScreen> {
 
     FlutterNativeSplash.remove();
 
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const OnBoardingScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(0.0, 0.05);
-            const end = Offset.zero;
-            const curve = Curves.easeOutCubic;
+    if (!mounted) return;
+    final splashViewModel = context.read<SplashViewModel>();
+    final isFirstTime = await splashViewModel.resolveFirstTimeFlow();
 
-            var slideTween = Tween(
-              begin: begin,
-              end: end,
-            ).chain(CurveTween(curve: curve));
-            var fadeTween = Tween(begin: 0.0, end: 1.0).chain(
-              CurveTween(
-                curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-              ),
-            );
-            return FadeTransition(
-              opacity: animation.drive(fadeTween),
-              child: SlideTransition(
-                position: animation.drive(slideTween),
-                child: child,
-              ),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 1200),
-        ),
-      );
+    if (mounted) {
+      if (isFirstTime) {
+        context.goNamed(RouteNames.onBoarding);
+      } else {
+        context.goNamed(RouteNames.login);
+      }
     }
   }
 

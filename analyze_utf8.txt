@@ -1,0 +1,27 @@
+﻿Analyzing Zent-FE...                                            
+
+  error - Target of URI doesn't exist: 'widgets/account_header.dart' - lib\presentation\admin\account\profile_screen.dart:4:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'widgets/profile_avatar.dart' - lib\presentation\admin\account\profile_screen.dart:5:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'widgets/profile_logout_button.dart' - lib\presentation\admin\account\profile_screen.dart:6:8 - uri_does_not_exist
+  error - The name 'AccountHeader' isn't a class - lib\presentation\admin\account\profile_screen.dart:30:21 - creation_with_non_type
+  error - The method 'ProfileAvatar' isn't defined for the type 'ProfileScreen' - lib\presentation\admin\account\profile_screen.dart:37:15 - undefined_method
+  error - The method 'ProfileLogoutButton' isn't defined for the type 'ProfileScreen' - lib\presentation\admin\account\profile_screen.dart:46:15 - undefined_method
+  error - Target of URI doesn't exist: 'widgets/account_header.dart' - lib\presentation\admin\account\security_settings_screen.dart:4:8 - uri_does_not_exist
+  error - The name 'AccountHeader' isn't a class - lib\presentation\admin\account\security_settings_screen.dart:25:19 - creation_with_non_type
+  error - Target of URI doesn't exist: 'widgets/account_header.dart' - lib\presentation\admin\account\user_management_screen.dart:6:8 - uri_does_not_exist
+  error - The name 'AccountHeader' isn't a class - lib\presentation\admin\account\user_management_screen.dart:29:19 - creation_with_non_type
+  error - Target of URI doesn't exist: 'profile_menu_item.dart' - lib\presentation\admin\account\widgets\profile_menu_options.dart:3:8 - uri_does_not_exist
+  error - The method 'ProfileMenuItem' isn't defined for the type 'ProfileMenuOptions' - lib\presentation\admin\account\widgets\profile_menu_options.dart:14:9 - undefined_method
+  error - The method 'ProfileMenuItem' isn't defined for the type 'ProfileMenuOptions' - lib\presentation\admin\account\widgets\profile_menu_options.dart:24:9 - undefined_method
+  error - The method 'ProfileMenuItem' isn't defined for the type 'ProfileMenuOptions' - lib\presentation\admin\account\widgets\profile_menu_options.dart:34:9 - undefined_method
+   info - The imported package 'flutter_bloc' isn't a dependency of the importing package - lib\presentation\customer\account\bloc\chat_bloc.dart:1:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:flutter_bloc/flutter_bloc.dart' - lib\presentation\customer\account\bloc\chat_bloc.dart:1:8 - uri_does_not_exist
+  error - Classes can only extend other classes - lib\presentation\customer\account\bloc\chat_bloc.dart:40:24 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\presentation\customer\account\bloc\chat_bloc.dart:41:22 - extra_positional_arguments
+  error - The method 'on' isn't defined for the type 'ChatBloc' - lib\presentation\customer\account\bloc\chat_bloc.dart:42:5 - undefined_method
+   info - The imported package 'flutter_bloc' isn't a dependency of the importing package - lib\presentation\customer\account\messages_screen.dart:2:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:flutter_bloc/flutter_bloc.dart' - lib\presentation\customer\account\messages_screen.dart:2:8 - uri_does_not_exist
+  error - The method 'BlocProvider' isn't defined for the type 'CustomerMessagesScreen' - lib\presentation\customer\account\messages_screen.dart:14:12 - undefined_method
+  error - The method 'add' isn't defined for the type 'ChatBloc' - lib\presentation\customer\account\messages_screen.dart:15:40 - undefined_method
+  error - The method 'BlocBuilder' isn't defined for the type '_MessagesScreenContent' - lib\presentation\customer\account\messages_screen.dart:100:26 - undefined_method
+

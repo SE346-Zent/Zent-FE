@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
-import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
@@ -18,14 +17,27 @@ import 'widgets/back_to_sign_in_button.dart';
 
 // ViewModel
 import 'view_models/forgot_password_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => di.sl<ForgotPasswordViewModel>(),
+      child: const _ForgotPasswordScreenContent(),
+    );
+  }
+}
+
+class _ForgotPasswordScreenContent extends StatelessWidget {
+  const _ForgotPasswordScreenContent();
+
+  @override
+  Widget build(BuildContext context) {
     final viewModel = context.watch<ForgotPasswordViewModel>();
-    debugPrint('ViewModel check: $viewModel');
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -34,11 +46,6 @@ class ForgotPasswordScreen extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              Container(
-                height: 1.0,
-                width: double.infinity,
-                color: AppColors.primary900,
-              ),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
@@ -55,17 +62,49 @@ class ForgotPasswordScreen extends StatelessWidget {
                               children: [
                                 const ForgotPasswordHeader(),
                                 const SizedBox(height: AppDimens.spaceXl),
-                                const AuthTextField(
+
+                                AuthTextField(
                                   hintText: 'Enter your new email address',
                                   keyboardType: TextInputType.emailAddress,
+                                  onChanged: viewModel.setEmail,
                                 ),
+
                                 const SizedBox(height: AppDimens.spaceXl),
+
                                 AuthPrimaryButton(
                                   text: 'Send OTP Code',
-                                  onPressed: () => context.push(
-                                    '${Routes.login}/${Routes.forgetPassword}/${Routes.verifyOtp}',
-                                  ),
+                                  isLoading: viewModel.isLoading,
+                                  onPressed: !viewModel.isEmailValid
+                                      ? null
+                                      : () async {
+                                          FocusScope.of(context).unfocus();
+
+                                          final isSuccess = await viewModel
+                                              .requestOTP();
+
+                                          if (isSuccess && context.mounted) {
+                                            context.goNamed(
+                                              'forgotPasswordVerifyOtp',
+                                              extra: viewModel.email,
+                                            );
+                                          } else if (viewModel.errorMessage !=
+                                                  null &&
+                                              context.mounted) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  viewModel.errorMessage!,
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.error500,
+                                              ),
+                                            );
+                                          }
+                                        },
                                 ),
+
                                 const SizedBox(height: AppDimens.spaceLg),
                                 const BackToSignInButton(),
                                 const Spacer(),

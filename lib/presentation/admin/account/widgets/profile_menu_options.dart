@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../common/core/themes/dimens.dart';
-import 'profile_menu_item.dart';
+import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/ui/menu_item.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/profile_viewmodel.dart';
+import '../viewmodels/profile_viewmodel.dart';
 
 class ProfileMenuOptions extends StatelessWidget {
   const ProfileMenuOptions({super.key});
@@ -11,7 +11,7 @@ class ProfileMenuOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ProfileMenuItem(
+        MenuItem(
           title: 'User Management',
           subtitle: 'Contact details & address',
           iconData: Icons.person_outline,
@@ -21,7 +21,7 @@ class ProfileMenuOptions extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppDimens.spaceSm),
-        ProfileMenuItem(
+        MenuItem(
           title: 'Security Settings',
           subtitle: 'Security & Biomaker',
           iconData: Icons.lock_outline,
@@ -31,13 +31,33 @@ class ProfileMenuOptions extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppDimens.spaceSm),
-        ProfileMenuItem(
-          title: 'System Log',
-          subtitle: 'Security & Biomaker',
-          iconData: Icons.person_outline,
+        MenuItem(
+          title: 'Add Part Request',
+          subtitle: 'Request new components',
+          iconData: Icons.local_offer_outlined,
           onTap: () => context.read<ProfileViewModel>().handleMenuTap(
             context,
-            'System Log',
+            'Add Part Request',
+          ),
+        ),
+        const SizedBox(height: AppDimens.spaceSm),
+        MenuItem(
+          title: 'Available Roles',
+          subtitle: 'Configure the detailed roles of users',
+          iconData: Icons.domain_outlined,
+          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
+            context,
+            'Available Roles',
+          ),
+        ),
+        const SizedBox(height: AppDimens.spaceSm),
+        MenuItem(
+          title: 'Inventory Assets',
+          subtitle: 'Manage product and part in the warehouse',
+          iconData: Icons.inventory_2_outlined,
+          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
+            context,
+            'Inventory Assets',
           ),
         ),
       ],

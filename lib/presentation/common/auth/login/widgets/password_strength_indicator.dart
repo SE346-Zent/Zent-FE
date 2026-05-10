@@ -4,25 +4,37 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class PasswordStrengthIndicator extends StatelessWidget {
-  final int strengthLevel; // 0: None, 1: Weak, 2: Fair, 3: Good, 4: Strong
+  final int strengthLevel;
 
-  const PasswordStrengthIndicator({
-    super.key,
-    this.strengthLevel = 1, // Default to weak if not provided
-  });
+  const PasswordStrengthIndicator({super.key, this.strengthLevel = 0});
 
   @override
   Widget build(BuildContext context) {
-    String strengthText = 'weak';
-    Color strengthColor = Colors.red;
+    String strengthText = '';
+    Color strengthColor = AppColors.surface600;
 
-    // Determine strength text and color based on the level
-    if (strengthLevel == 2) {
-      strengthText = 'fair';
-      strengthColor = Colors.orange;
-    } else if (strengthLevel >= 3) {
-      strengthText = 'strong';
-      strengthColor = Colors.green;
+    switch (strengthLevel) {
+      case 1:
+        strengthText = 'Weak';
+        strengthColor = AppColors.error500;
+        break;
+      case 2:
+        strengthText = 'Medium';
+        strengthColor = AppColors.warning500;
+        break;
+      case 3:
+        strengthText = 'Strong';
+        strengthColor = AppColors.success300;
+        break;
+      case 4:
+        strengthText = 'Very Strong';
+        strengthColor = AppColors.success600;
+        break;
+      case 0:
+      default:
+        strengthText = '';
+        strengthColor = AppColors.surface600;
+        break;
     }
 
     return Column(
@@ -73,7 +85,8 @@ class PasswordStrengthIndicator extends StatelessWidget {
 
   Widget _buildStrengthBar({required bool isActive, required Color color}) {
     return Expanded(
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
         height: 4,
         decoration: BoxDecoration(
           color: isActive ? color : AppColors.secondary200,

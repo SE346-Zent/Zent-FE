@@ -8,6 +8,7 @@ class UserModel extends User {
     required super.name,
     required super.phoneNumber,
     required super.role,
+    required super.phoneNumber,
   });
 
   //* from entity -> model
@@ -18,17 +19,17 @@ class UserModel extends User {
       name: user.name,
       phoneNumber: user.phoneNumber,
       role: user.role,
+      phoneNumber: user.phoneNumber,
     );
   }
 
   //* from json -> model
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] as String? ?? 'temp_id',
-      email: json['email'] as String? ?? 'temp_email',
-      name: json['fullName'] as String? ?? "abc",
-      phoneNumber:
-          json['phoneNumber'] as String? ?? json['phone'] as String? ?? '',
+      id: (json['id'] ?? json['_id'] ?? 'temp_id').toString(),
+      email: (json['email'] ?? '').toString(),
+      name: (json['fullName'] ?? '').toString(),
+      phoneNumber: (json['phoneNumber'] ?? '').toString(),
       role: _mapRole(json['role'], json['roleId']),
     );
   }
@@ -36,7 +37,6 @@ class UserModel extends User {
   static UserRoles _mapRole(dynamic roleStr, dynamic roleId) {
     if (roleId != null) {
       final id = int.tryParse(roleId.toString());
-      // Based on API: 1 & 2 are Admins/SuperAdmins, 3 is Customer, 4 is Technician
       if (id == 1 || id == 2) return UserRoles.admin;
       if (id == 3) return UserRoles.customer;
       if (id == 4) return UserRoles.technician;
@@ -45,11 +45,11 @@ class UserModel extends User {
     if (roleStr != null && roleStr is String) {
       return UserRoles.values.firstWhere(
         (e) => e.name.toUpperCase() == roleStr.toUpperCase(),
-        orElse: () => UserRoles.customer, // Default to customer for safety
+        orElse: () => UserRoles.customer,
       );
     }
 
-    return UserRoles.customer; // Default to customer
+    return UserRoles.customer;
   }
 
   //* to json
@@ -58,8 +58,8 @@ class UserModel extends User {
       'id': id,
       'email': email,
       'fullName': name,
-      'phoneNumber': phoneNumber,
       'role': role.name,
+      'phoneNumber': phoneNumber,
     };
   }
 }

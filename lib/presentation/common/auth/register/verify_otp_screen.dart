@@ -103,19 +103,6 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                                   canResend: viewModel.canResendOTP,
                                   onResend: () async {
                                     await viewModel.resendOtp();
-                                    if (context.mounted &&
-                                        viewModel.errorMessage != null) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            viewModel.errorMessage!,
-                                          ),
-                                          backgroundColor: AppColors.error500,
-                                        ),
-                                      );
-                                    }
                                   },
                                 ),
                                 const SizedBox(height: AppDimens.spaceXl),
@@ -141,20 +128,6 @@ class _VerifyOtpScreenContent extends StatelessWidget {
                                                 },
                                               );
                                             }
-                                          } else if (viewModel.errorMessage !=
-                                                  null &&
-                                              context.mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  viewModel.errorMessage!,
-                                                ),
-                                                backgroundColor:
-                                                    AppColors.error500,
-                                              ),
-                                            );
                                           }
                                         },
                                 ),

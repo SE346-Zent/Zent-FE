@@ -23,7 +23,7 @@ class LoginViewModel extends ChangeNotifier {
 
     try {
       final email = emailController.text.trim();
-      final password = passwordController.text.trim();
+      final password = passwordController.text;
 
       if (email.isEmpty || password.isEmpty) {
         _errorMessage = 'Email and password are required';

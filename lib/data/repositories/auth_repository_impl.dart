@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:zent_fe/domain/repositories/auth_repository.dart';
-import 'package:zent_fe/domain/entities/user.dart';
-import 'package:zent_fe/domain/entities/enums/user_roles.dart';
+import '../../domain/entities/user.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
-import '../models/auth_response_model.dart';
+import '../../routing/rbac_token_store.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -18,16 +15,19 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User> login({required String email, required String password}) async {
-    final AuthResponseModel response = await authRemoteService.login(
-      email,
-      password,
-    );
+    final response = await authRemoteService.login(email, password);
 
+    // 1. Save to Memory Store
+    RbacTokenStore.setToken(response.accessToken);
+    RbacTokenStore.setRole(response.user.role);
+
+    // 2. Save to Secure Storage (Persistence)
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
     );
 
+    // 3. Save User Info
     await authLocalDataSource.saveUser(response.user);
 
     return response.user;
@@ -40,12 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> verifyOtp({required String email, required String otp}) async {
-    try {
-      await authRemoteService.verifyOtp(email, otp);
-    } catch (e, stacktrace) {
-      debugPrint("Stacktrace: $stacktrace");
-      rethrow;
-    }
+    await authRemoteService.verifyOtp(email, otp);
   }
 
   @override
@@ -55,20 +50,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signup({
+    required String email,
+    required String password,
     required String fullName,
     required String phoneNumber,
-    required String email,
-    required UserRoles role,
-    required String password,
   }) async {
-    final roleString = role.name.toUpperCase();
-
     await authRemoteService.signup(
       fullName: fullName,
       phone: phoneNumber,
       email: email,
       password: password,
-      role: roleString,
     );
   }
 
@@ -89,22 +80,30 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> refreshToken() async {
-    final accessToken = await authLocalDataSource.getAccessToken();
-    final refreshToken = await authLocalDataSource.getRefreshToken();
-    if (accessToken != null && refreshToken != null) {
-      final decodedToken = JwtDecoder.decode(accessToken);
-      final email = decodedToken['email'];
-      final AuthResponseModel response = await authRemoteService.refreshToken(
+    final email = (await authLocalDataSource.getUser())?.email ?? '';
+    final refreshToken = await authLocalDataSource.getRefreshToken() ?? '';
+    if (email.isNotEmpty && refreshToken.isNotEmpty) {
+      final response = await authRemoteService.refreshToken(
         email,
         refreshToken,
       );
-
+      RbacTokenStore.setToken(response.accessToken);
       await authLocalDataSource.saveCredentials(
         response.accessToken,
         response.refreshToken,
       );
-    } else {
-      throw Exception("No tokens found to refresh");
+    }
+  }
+
+  @override
+  Future<void> restoreSession() async {
+    final token = await authLocalDataSource.getAccessToken();
+    if (token != null) {
+      RbacTokenStore.setToken(token);
+    }
+    final user = await authLocalDataSource.getUser();
+    if (user != null) {
+      RbacTokenStore.setRole(user.role);
     }
   }
 

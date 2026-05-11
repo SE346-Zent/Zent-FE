@@ -8,7 +8,6 @@ class UserModel extends User {
     required super.name,
     required super.phoneNumber,
     required super.role,
-    required super.phoneNumber,
   });
 
   //* from entity -> model
@@ -19,7 +18,6 @@ class UserModel extends User {
       name: user.name,
       phoneNumber: user.phoneNumber,
       role: user.role,
-      phoneNumber: user.phoneNumber,
     );
   }
 

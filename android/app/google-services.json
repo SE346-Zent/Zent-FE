@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "51847463474",
+    "project_id": "zent-7df9e",
+    "storage_bucket": "zent-7df9e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51847463474:android:9e50bbe87bd4b825fab22b",
+        "android_client_info": {
+          "package_name": "com.example.zent_fe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAatAT0v1GdMi7Sbu2XZmZBaVQ0eRVr48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

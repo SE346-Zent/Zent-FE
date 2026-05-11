@@ -107,8 +107,14 @@ String? _rbacRedirect(BuildContext context, GoRouterState state) {
   }
 
   // ── Authenticated on a public / auth route ───────────────────────────────
-  // Redirect straight to the role's home screen.
-  if (isPublic) {
+  // Redirect straight to the role's home screen, UNLESS we are in the middle
+  // of an auth flow (OTP, Reset Password).
+  final isAuthFlow =
+      location.contains(Routes.verifyOtp) ||
+      location.contains(Routes.resetPassword) ||
+      location.contains(Routes.resetSuccessfully);
+
+  if (isPublic && !isAuthFlow) {
     return switch (role) {
       UserRoles.admin => Routes.adminDashboard,
       UserRoles.technician => Routes.techHome,

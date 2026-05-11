@@ -76,6 +76,7 @@ class AuthRepositoryImpl implements AuthRepository {
       debugPrint("Remote logout failed: $e");
     } finally {
       await authLocalDataSource.clearCredentials();
+      RbacTokenStore.clearToken();
     }
   }
 

@@ -350,7 +350,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     if (contentType.contains('application/json')) {
       try {
         final errorMap = jsonDecode(body);
-        throw Exception(errorMap['message'] ?? 'Something went wrong ($statusCode)');
+        throw Exception(
+          errorMap['message'] ?? 'Something went wrong ($statusCode)',
+        );
       } catch (_) {
         // Nếu không parse được JSON, trả về thông báo chung chung
         throw Exception('Server response error ($statusCode)');

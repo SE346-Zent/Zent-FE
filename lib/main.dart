@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_installations/firebase_installations.dart';
 import 'dart:developer' as developer;
 
 // 1. Create a GlobalKey to control SnackBars from anywhere

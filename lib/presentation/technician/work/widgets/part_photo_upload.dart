@@ -44,7 +44,7 @@ class PartPhotoUpload extends StatelessWidget {
             ),
             Text(
               "MAX: 5 PHOTOS",
-              style: TextStyles.label.copyWith(color: AppColors.secondary500),
+              style: TextStyles.label.copyWith(color: AppColors.tertiary500),
             ),
           ],
         ),

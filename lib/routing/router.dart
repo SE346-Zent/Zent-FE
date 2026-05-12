@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/common/intro/on_boarding_screen.dart';
@@ -61,42 +59,34 @@ import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
 
-// ---------------------------------------------------------------------------
-// RBAC — Role-Based Access Control
-// ---------------------------------------------------------------------------
-
-/// Token store.
-/// Call [RbacTokenStore.setToken] from your auth datasource after login and
-/// [RbacTokenStore.clearToken] on logout.
-class RbacTokenStore {
-  RbacTokenStore._();
-
-  static String? _token;
-
-  static void setToken(String token) => _token = token;
-  static void clearToken() => _token = null;
-  static String? get token => _token;
-}
+import './rbac_token_store.dart';
 
 UserRoles _getRoleFromToken() {
+  /*
+  // Cách cũ: Giải mã JWT để lấy Role (Dùng khi Backend nhúng Role vào Token)
   final token = RbacTokenStore.token;
   if (token == null) return UserRoles.unauthenticated;
   try {
     final parts = token.split('.');
     if (parts.length != 3) return UserRoles.unauthenticated;
-    // Base64Url-decode the payload (middle segment) and parse claims.
     final normalized = base64Url.normalize(parts[1]);
     final decoded = utf8.decode(base64Url.decode(normalized));
     final claims = jsonDecode(decoded) as Map<String, dynamic>;
-    return switch (claims['role'] as String?) {
-      'admin' => UserRoles.admin,
+    final roleString = (claims['role'] as String?)?.toLowerCase();
+    return switch (roleString) {
+      'admin' || 'super_admin' => UserRoles.admin,
       'technician' => UserRoles.technician,
       'customer' => UserRoles.customer,
       _ => UserRoles.unauthenticated,
     };
-  } catch (_) {
+  } catch (e) {
+    debugPrint("JWT Decode Error: $e");
     return UserRoles.unauthenticated;
   }
+  */
+
+  // Cách mới: Lấy trực tiếp từ Store (Dựa trên roleId Server trả về khi Login)
+  return RbacTokenStore.role;
 }
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
@@ -117,8 +107,14 @@ String? _rbacRedirect(BuildContext context, GoRouterState state) {
   }
 
   // ── Authenticated on a public / auth route ───────────────────────────────
-  // Redirect straight to the role's home screen.
-  if (isPublic) {
+  // Redirect straight to the role's home screen, UNLESS we are in the middle
+  // of an auth flow (OTP, Reset Password).
+  final isAuthFlow =
+      location.contains(Routes.verifyOtp) ||
+      location.contains(Routes.resetPassword) ||
+      location.contains(Routes.resetSuccessfully);
+
+  if (isPublic && !isAuthFlow) {
     return switch (role) {
       UserRoles.admin => Routes.adminDashboard,
       UserRoles.technician => Routes.techHome,
@@ -165,8 +161,8 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerMe,
-  //redirect: _rbacRedirect,
+  initialLocation: Routes.splash,
+  redirect: _rbacRedirect,
   routes: [
     // Main routes
     GoRoute(

@@ -130,6 +130,7 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.raised],
+        border: Border.all(color: AppColors.secondary300),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -194,6 +195,7 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
         color: AppColors.surface50,
         borderRadius: BorderRadius.circular(AppDimens.boraSm),
         boxShadow: [BoxShadowStyles.subtle],
+        border: Border.all(color: AppColors.secondary300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +248,7 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
 
     return DashedBorderContainer(
       height: padSize,
-      color: AppColors.secondary200,
+      color: AppColors.secondary300,
       strokeWidth: 1.0,
       borderRadius: AppDimens.boraMd,
       child: ClipRRect(

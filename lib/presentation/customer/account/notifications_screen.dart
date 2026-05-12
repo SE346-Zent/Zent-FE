@@ -100,7 +100,7 @@ class _CustomerNotificationsView extends StatelessWidget {
 
               // Info Box: Push Permissions
               Container(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
+                padding: const EdgeInsets.all(AppDimens.spaceSm),
                 decoration: BoxDecoration(
                   color: AppColors.tertiary50,
                   borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -124,7 +124,6 @@ class _CustomerNotificationsView extends StatelessWidget {
                               color: Colors.black,
                             ),
                           ),
-                          const SizedBox(height: AppDimens.spaceXs),
                           Text(
                             'To receive these alerts, ensure notifications are enabled in your device settings',
                             style: TextStyles.label.copyWith(

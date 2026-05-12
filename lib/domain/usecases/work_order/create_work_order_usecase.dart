@@ -1,19 +1,12 @@
 import '../../repositories/work_order_repository.dart';
+import '../../../data/models/create_work_order_request.dart';
 
 class CreateWorkOrderUseCase {
   final WorkOrderRepository repository;
 
   CreateWorkOrderUseCase(this.repository);
 
-  Future<void> execute({
-    required String productId,
-    required String description,
-    required String customerId,
-  }) async {
-    return await repository.createWorkOrder(
-      productId: productId,
-      description: description,
-      customerId: customerId,
-    );
+  Future<void> execute(CreateWorkOrderRequest request) async {
+    return await repository.createWorkOrder(request);
   }
 }

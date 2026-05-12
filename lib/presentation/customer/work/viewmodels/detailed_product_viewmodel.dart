@@ -23,6 +23,7 @@ class DetailedProductViewModel extends ChangeNotifier {
       );
     } catch (e) {
       product = ProductItemData(
+        id: serialNumber,
         name: 'Unknown Product',
         serialNumber: serialNumber,
         warrantyDate: 'Unknown',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
 import 'package:zent_fe/routing/routes.dart';
 
 class UserProfileInfo {
@@ -17,8 +18,9 @@ class UserProfileInfo {
 
 class TechProfileViewModel extends ChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
+  final LogoutUseCase logoutUseCase;
 
-  TechProfileViewModel(this.getCurrentUserUseCase) {
+  TechProfileViewModel(this.getCurrentUserUseCase, this.logoutUseCase) {
     _loadUserInfo();
   }
 
@@ -41,6 +43,18 @@ class TechProfileViewModel extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error loading tech profile: $e");
+    }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    try {
+      await logoutUseCase.execute();
+    } catch (e) {
+      debugPrint("Error during logout: $e");
+    } finally {
+      if (context.mounted) {
+        context.go(Routes.login);
+      }
     }
   }
 

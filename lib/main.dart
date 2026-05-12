@@ -32,6 +32,7 @@ Future<void> main() async {
 
   // 2. Add the Foreground Listener here!
   _setupForegroundMessaging();
+  fetchInstallationId();
 
   runApp(const MyApp());
 }
@@ -61,6 +62,22 @@ void _setupForegroundMessaging() {
       );
     }
   });
+}
+
+Future<void> fetchInstallationId() async {
+  try {
+    // Fetch the Firebase Installation ID
+    String id = await FirebaseInstallations.instance.getId();
+
+    developer.log('====================================');
+    developer.log('FIREBASE INSTALLATION ID (FID): $id');
+    developer.log('====================================');
+
+    // Copy this ID from your console and paste it into the
+    // "Test on Device" section of the Firebase In-App Messaging console.
+  } catch (e) {
+    developer.log('Error fetching Installation ID: $e');
+  }
 }
 
 Future<void> _setupFCMForTesting() async {

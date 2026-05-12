@@ -10,7 +10,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:developer' as developer;
 
 // 1. Create a GlobalKey to control SnackBars from anywhere
-final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -26,7 +27,7 @@ Future<void> main() async {
 
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  
+
   await _setupFCMForTesting();
 
   // 2. Add the Foreground Listener here!
@@ -42,14 +43,19 @@ void _setupForegroundMessaging() {
     developer.log('Message data: ${message.data}');
 
     if (message.notification != null) {
-      developer.log('Message also contained a notification: ${message.notification}');
-      
+      developer.log(
+        'Message also contained a notification: ${message.notification}',
+      );
+
       // 4. Trigger an In-App SnackBar safely using the GlobalKey
       rootScaffoldMessengerKey.currentState?.showSnackBar(
         SnackBar(
-          content: Text('${message.notification?.title}: ${message.notification?.body}'),
+          content: Text(
+            '${message.notification?.title}: ${message.notification?.body}',
+          ),
           backgroundColor: Colors.deepPurple,
-          behavior: SnackBarBehavior.floating, // Makes it look like an in-app banner
+          behavior:
+              SnackBarBehavior.floating, // Makes it look like an in-app banner
           duration: const Duration(seconds: 4),
         ),
       );
@@ -60,7 +66,9 @@ void _setupForegroundMessaging() {
 Future<void> _setupFCMForTesting() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
-    alert: true, badge: true, sound: true,
+    alert: true,
+    badge: true,
+    sound: true,
   );
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
@@ -84,7 +92,7 @@ class MyApp extends StatelessWidget {
         title: 'Zent FE',
         debugShowCheckedModeBanner: false,
         // 5. Attach the GlobalKey to the MaterialApp
-        scaffoldMessengerKey: rootScaffoldMessengerKey, 
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),

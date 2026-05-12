@@ -7,7 +7,8 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'dart:developer' as developer; // <-- Tech Lead Tip: Use this instead of print()
+import 'dart:developer'
+    as developer; // <-- Tech Lead Tip: Use this instead of print()
 
 // 1. MUST BE A TOP-LEVEL FUNCTION
 @pragma('vm:entry-point')
@@ -23,7 +24,7 @@ Future<void> main() async {
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   await dotenv.load(fileName: ".env");
   await di.init();
-  
+
   // Initialize Firebase First
   await Firebase.initializeApp();
 
@@ -52,7 +53,7 @@ Future<void> _setupFCMForTesting() async {
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
     // Fetch the token!
     String? token = await messaging.getToken();
-    
+
     // Using formatting to make it stand out in your debug console
     developer.log('====================================');
     developer.log('FCM TOKEN: $token');

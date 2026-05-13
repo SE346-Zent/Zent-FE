@@ -122,6 +122,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<String> verifyForgotOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      return await authRemoteService.verifyForgotOtp(email, otp);
+    } catch (e, stacktrace) {
+      debugPrint("Stacktrace: $stacktrace");
+      rethrow;
+    }
+  }
+
+  @override
   Future<bool> resetPassword({
     required String email,
     required String token,

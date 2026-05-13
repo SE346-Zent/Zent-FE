@@ -19,6 +19,7 @@ abstract class AuthRemoteDatasource {
   Future<void> logout(String email, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
   Future<void> forgotPassword(String email);
+  Future<String> verifyForgotOtp(String email, String otp);
   Future<bool> resetPassword({
     required String email,
     required String token,
@@ -30,7 +31,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final http.Client client;
   static final String _baseURL = dotenv.get(
     "BASE_URL",
-    fallback: "http://localhost:3000/api",
+    fallback: "https://api.ryanandexen.qzz.io/api/v1",
   );
   static final Duration _timeOut = Duration(
     seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
@@ -353,6 +354,42 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
+  Future<String> verifyForgotOtp(String email, String otp) async {
+    final url = Uri.parse('$_baseURL/auth/verify-forgot-password-otp');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'otpCode': otp}),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Verify OTP Failed');
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+      final data = apiResponse.data;
+
+      if (data is String) return data;
+      if (data is Map<String, dynamic> && data['token'] != null) {
+        return data['token'].toString();
+      }
+
+      throw Exception('Reset token not found in server response');
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Verify forgot OTP error: $e');
+    }
+  }
+
+  @override
   Future<bool> resetPassword({
     required String email,
     required String token,
@@ -367,35 +404,17 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             body: jsonEncode({
               'email': email,
               'token': token,
-              'password': newPassword,
+              'new_password': newPassword,
             }),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
         final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Reset Password Failed (Code: ${response.statusCode})',
-        );
+        throw Exception(errorMap['message'] ?? 'Reset Password Failed');
       }
 
-      final jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<dynamic>.fromJson(
-        jsonMap,
-        (data) => data,
-      );
-
-      if (apiResponse.isSuccessful) {
-        return true;
-      } else {
-        throw Exception(apiResponse.message ?? 'Reset Password Failed');
-      }
+      return true;
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Reset password error: $e');

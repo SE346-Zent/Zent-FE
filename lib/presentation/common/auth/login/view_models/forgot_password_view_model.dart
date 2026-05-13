@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/usecases/auth/forgot_password_usecase.dart';
 
 class ForgotPasswordViewModel extends ChangeNotifier {
+  final ForgotPasswordUseCase forgotPasswordUseCase;
+
+  ForgotPasswordViewModel({required this.forgotPasswordUseCase});
+
   String _email = '';
   bool _isLoading = false;
   String? _errorMessage;
@@ -29,7 +34,7 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      await forgotPasswordUseCase.call(_email);
 
       _isLoading = false;
       notifyListeners();

@@ -6,6 +6,7 @@ import '../presentation/common/intro/on_boarding_screen.dart';
 import '../presentation/common/intro/splash_screen.dart';
 import '../presentation/common/auth/login/login_screen.dart';
 import '../presentation/common/auth/login/forgot_password_screen.dart';
+import '../presentation/common/auth/login/verify_forgot_otp_screen.dart';
 import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
@@ -165,7 +166,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerMe,
+  initialLocation: Routes.splash,
   //redirect: _rbacRedirect,
   routes: [
     // Main routes
@@ -184,51 +185,6 @@ final GoRouter appRouter = GoRouter(
       path: Routes.login,
       builder: (context, state) => const LoginScreen(),
       routes: [
-        // Sub routes for password recovery flow
-        GoRoute(
-          name: RouteNames.forgotPassword,
-          path: Routes.forgetPassword,
-          builder: (context, state) => const ForgotPasswordScreen(),
-          routes: [
-            GoRoute(
-              name: RouteNames.forgotPasswordVerifyOtp,
-              path: Routes.verifyOtp,
-              builder: (context, state) {
-                final extra = state.extra;
-                String email = '';
-
-                if (extra is String) {
-                  email = extra;
-                } else if (extra is Map<String, dynamic>) {
-                  email = extra['email'] as String? ?? '';
-                }
-
-                return VerifyOtpScreen(email: email);
-              },
-              routes: [
-                GoRoute(
-                  name: RouteNames.resetPassword,
-                  path: Routes.resetPassword,
-                  builder: (context, state) {
-                    final extra = state.extra as Map<String, dynamic>? ?? {};
-                    final email = extra['email'] as String? ?? '';
-                    final token = extra['token'] as String? ?? '';
-
-                    return ResetPasswordScreen(email: email, token: token);
-                  },
-                  routes: [
-                    GoRoute(
-                      name: RouteNames.resetSuccessfully,
-                      path: Routes.resetSuccessfully,
-                      builder: (context, state) =>
-                          const ResetSuccessfullyScreen(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
         GoRoute(
           name: RouteNames.signUp,
           path: Routes.signUp,
@@ -242,7 +198,6 @@ final GoRouter appRouter = GoRouter(
                 final email = extra['email'] as String? ?? '';
                 final isRegistration =
                     extra['isRegistration'] as bool? ?? false;
-
                 return VerifyOtpScreen(
                   email: email,
                   isRegistration: isRegistration,
@@ -250,6 +205,40 @@ final GoRouter appRouter = GoRouter(
               },
             ),
           ],
+        ),
+        GoRoute(
+          name: RouteNames.forgotPassword,
+          path: Routes.forgetPassword,
+          builder: (context, state) => const ForgotPasswordScreen(),
+        ),
+        GoRoute(
+          name: RouteNames.forgotPasswordVerifyOtp,
+          path: '${Routes.forgetPassword}/${Routes.verifyOtp}',
+          builder: (context, state) {
+            final extra = state.extra;
+            String email = '';
+            if (extra is String) {
+              email = extra;
+            } else if (extra is Map<String, dynamic>) {
+              email = extra['email'] as String? ?? '';
+            }
+            return VerifyForgotOtpScreen(email: email);
+          },
+        ),
+        GoRoute(
+          name: RouteNames.resetPassword,
+          path: '${Routes.forgetPassword}/${Routes.resetPassword}',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>? ?? {};
+            final email = extra['email'] as String? ?? '';
+            final token = extra['token'] as String? ?? '';
+            return ResetPasswordScreen(email: email, token: token);
+          },
+        ),
+        GoRoute(
+          name: RouteNames.resetSuccessfully,
+          path: '${Routes.forgetPassword}/${Routes.resetSuccessfully}',
+          builder: (context, state) => const ResetSuccessfullyScreen(),
         ),
       ],
     ),

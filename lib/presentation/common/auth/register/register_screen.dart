@@ -39,13 +39,6 @@ class _RegisterScreenContent extends StatelessWidget {
     final viewModel = context.watch<RegisterViewModel>();
 
     // Automatically show error if it exists
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (viewModel.errorMessage != null && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
-      }
-    });
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),

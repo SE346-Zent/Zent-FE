@@ -51,6 +51,17 @@ dependencies:
   path_provider: ^2.1.5
   signature: ^5.5.0
   mobile_scanner: ^7.2.0
+  uuid: ^4.5.3
+  intl: ^0.20.2
+  firebase_messaging: ^15.2.10
+  firebase_core: ^3.12.1
+  firebase_analytics: ^11.3.3
+  firebase_in_app_messaging: ^0.8.0+13
+  
+  # Add this exact version:
+  flutter_local_notifications: ^17.1.2
+  firebase_app_installations: ^0.3.3
+  firebase_installations: ^16.3.6
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,4 @@
 import 'package:zent_fe/domain/entities/user.dart';
-import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 
 abstract class AuthRepository {
   Future<User> login({required String email, required String password});
@@ -8,7 +7,6 @@ abstract class AuthRepository {
   Future<void> signup({
     required String email,
     required String password,
-    required UserRoles role,
     required String fullName,
     required String phoneNumber,
   });
@@ -20,6 +18,7 @@ abstract class AuthRepository {
   Future<void> logout();
 
   Future<void> refreshToken();
+  Future<void> restoreSession();
 
   Future<bool> isFirstTime();
 

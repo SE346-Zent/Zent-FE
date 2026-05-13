@@ -110,6 +110,7 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
 
           CustomerDropdownField<String>(
             label: 'Symptom',
+            hint: 'Select Category',
             value: selectedSymptom,
             items: [
               'Screen Broken',
@@ -138,6 +139,7 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
             hint: 'Describe the problem with your device.',
             maxLines: 5,
             controller: descCtrl,
+            isRequired: true,
           ),
           const SizedBox(height: AppDimens.spaceLg),
 

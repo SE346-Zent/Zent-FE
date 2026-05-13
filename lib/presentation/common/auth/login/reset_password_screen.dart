@@ -125,20 +125,6 @@ class _ResetPasswordScreenContent extends StatelessWidget {
                                             context.goNamed(
                                               RouteNames.resetSuccessfully,
                                             );
-                                          } else if (viewModel.errorMessage !=
-                                                  null &&
-                                              context.mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  viewModel.errorMessage!,
-                                                ),
-                                                backgroundColor:
-                                                    AppColors.error500,
-                                              ),
-                                            );
                                           }
                                         },
                                 ),

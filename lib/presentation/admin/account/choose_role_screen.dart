@@ -8,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/choose_role_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class ChooseRoleScreen extends StatelessWidget {
   const ChooseRoleScreen({super.key});
@@ -30,88 +31,86 @@ class _ChooseRoleScreenContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background500,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'Create Account',
-          style: TextStyles.headline.copyWith(color: AppColors.primary500),
-        ),
-        centerTitle: true,
-      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppDimens.spaceMd),
-              Text(
-                'Choose Role',
-                style: TextStyles.display.copyWith(color: AppColors.primary500),
-              ),
-              const SizedBox(height: AppDimens.spaceSm),
-              Text(
-                'Choose a role to create a new account',
-                style: TextStyles.bodyMedium.copyWith(
-                  color: AppColors.secondary500,
-                ),
-              ),
-              const SizedBox(height: 48),
-              _buildRoleCard(
-                title: 'Technicians',
-                description:
-                    'Access your daily job assignments, and manage your field operations efficiently',
-                icon: Icons.build_outlined,
-                isSelected: viewModel.selectedRole == 'Technicians',
-                onTap: () => viewModel.selectRole('Technicians'),
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-              _buildRoleCard(
-                title: 'Admins',
-                description:
-                    'Oversee all active operations, manage technician schedules to ensure maximum productivity.',
-                icon: Icons.settings_outlined,
-                isSelected: viewModel.selectedRole == 'Admins',
-                onTap: () => viewModel.selectRole('Admins'),
-              ),
-              const Spacer(),
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.tertiary500,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [BoxShadowStyles.glowing],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () {
-                      context.pushNamed(
-                        RouteNames.adminCreateAccount,
-                        extra: {'role': viewModel.selectedRole},
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Center(
-                        child: Text(
-                          'Continue',
-                          style: TextStyles.title.copyWith(color: Colors.white),
+        child: Column(
+          children: [
+            const AccountHeader(title: 'Create Account', showDivider: true),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: AppDimens.spaceMd),
+                    Text(
+                      'Choose Role',
+                      style: TextStyles.display.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                    const SizedBox(height: AppDimens.spaceSm),
+                    Text(
+                      'Choose a role to create a new account',
+                      style: TextStyles.bodyMedium.copyWith(
+                        color: AppColors.secondary500,
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                    _buildRoleCard(
+                      title: 'Technicians',
+                      description:
+                          'Access your daily job assignments, and manage your field operations efficiently',
+                      icon: Icons.build_outlined,
+                      isSelected: viewModel.selectedRole == 'Technicians',
+                      onTap: () => viewModel.selectRole('Technicians'),
+                    ),
+                    const SizedBox(height: AppDimens.spaceLg),
+                    _buildRoleCard(
+                      title: 'Admins',
+                      description:
+                          'Oversee all active operations, manage technician schedules to ensure maximum productivity.',
+                      icon: Icons.settings_outlined,
+                      isSelected: viewModel.selectedRole == 'Admins',
+                      onTap: () => viewModel.selectRole('Admins'),
+                    ),
+                    const Spacer(),
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.tertiary500,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [BoxShadowStyles.glowing],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            context.pushNamed(
+                              RouteNames.adminCreateAccount,
+                              extra: {'role': viewModel.selectedRole},
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: Center(
+                              child: Text(
+                                'Continue',
+                                style: TextStyles.title.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

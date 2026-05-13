@@ -12,6 +12,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 import 'widgets/app_search_bar.dart';
 import 'widgets/part_request_card.dart';
 import 'viewmodels/part_request_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class PartRequestsScreen extends StatelessWidget {
   const PartRequestsScreen({super.key});
@@ -34,79 +35,73 @@ class _PartRequestsScreenContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background500,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary500),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Part Requests',
-          style: TextStyles.headline.copyWith(color: AppColors.primary500),
-        ),
-        centerTitle: true,
-      ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AppSearchBar(hintText: 'Search work order ID'),
-              const SizedBox(height: AppDimens.spaceLg),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildSummaryBox(
-                      'PENDING',
-                      viewModel.pendingCount.toString(),
-                      AppColors.warning500,
+        child: Column(
+          children: [
+            const AccountHeader(title: 'Part Requests', showDivider: true),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppDimens.spaceMd),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppSearchBar(hintText: 'Search work order ID'),
+                    const SizedBox(height: AppDimens.spaceLg),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryBox(
+                            'PENDING',
+                            viewModel.pendingCount.toString(),
+                            AppColors.warning500,
+                          ),
+                        ),
+                        const SizedBox(width: AppDimens.spaceMd),
+                        Expanded(
+                          child: _buildSummaryBox(
+                            'APPROVED',
+                            viewModel.approvedCount.toString(),
+                            AppColors.success500,
+                          ),
+                        ),
+                        const SizedBox(width: AppDimens.spaceMd),
+                        Expanded(
+                          child: _buildSummaryBox(
+                            'REJECTED',
+                            viewModel.rejectedCount.toString(),
+                            AppColors.error500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    child: _buildSummaryBox(
-                      'APPROVED',
-                      viewModel.approvedCount.toString(),
-                      AppColors.success500,
+                    const SizedBox(height: AppDimens.spaceXl),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: viewModel.requests.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: AppDimens.spaceMd),
+                      itemBuilder: (context, index) {
+                        final item = viewModel.requests[index];
+                        Color statusColor = item.status == 'Pending'
+                            ? AppColors.warning500
+                            : (item.status == 'Approved'
+                                  ? AppColors.success500
+                                  : AppColors.error500);
+                        return PartRequestCard(
+                          partName: item.partName,
+                          woId: item.woId,
+                          date: item.date,
+                          status: item.status,
+                          statusColor: statusColor,
+                        );
+                      },
                     ),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    child: _buildSummaryBox(
-                      'REJECTED',
-                      viewModel.rejectedCount.toString(),
-                      AppColors.error500,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: AppDimens.spaceXl),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: viewModel.requests.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: AppDimens.spaceMd),
-                itemBuilder: (context, index) {
-                  final item = viewModel.requests[index];
-                  Color statusColor = item.status == 'Pending'
-                      ? AppColors.warning500
-                      : (item.status == 'Approved'
-                            ? AppColors.success500
-                            : AppColors.error500);
-                  return PartRequestCard(
-                    partName: item.partName,
-                    woId: item.woId,
-                    date: item.date,
-                    status: item.status,
-                    statusColor: statusColor,
-                  );
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

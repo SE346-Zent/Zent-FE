@@ -1,6 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zent_fe/data/models/create_work_order_request.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/domain/usecases/work_order/create_work_order_usecase.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:intl/intl.dart';
 
 class ServiceTypeData {
   final String id;
@@ -17,9 +22,19 @@ class ServiceTypeData {
 }
 
 class RequestServiceViewModel extends ChangeNotifier {
+  final CreateWorkOrderUseCase createWorkOrderUseCase;
+
+  RequestServiceViewModel(this.createWorkOrderUseCase);
+
   int _currentStep = 1;
+  bool _isLoading = false;
 
   int get currentStep => _currentStep;
+  bool get isLoading => _isLoading;
+
+  // Selected device
+  String? selectedProductId;
+  String? selectedSerialNumber;
 
   // Selected information for Step 2
   String? symptom;
@@ -35,7 +50,7 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   // Step 3 Data: Address Info
   String? country = 'VIET NAM';
-  String? state;
+  String? province;
   String? city;
   String? address;
   String? building;
@@ -57,11 +72,11 @@ class RequestServiceViewModel extends ChangeNotifier {
   }
 
   final List<String> countries = ['VIET NAM'];
-  final List<String> states = [];
-  final Map<String, List<String>> _citiesByState = {};
+  final List<String> provinces = [];
+  final Map<String, List<String>> _citiesByProvince = {};
 
   Future<void> loadLocationData() async {
-    if (states.isNotEmpty) return;
+    if (provinces.isNotEmpty) return;
 
     try {
       final String response = await rootBundle.loadString(
@@ -69,17 +84,17 @@ class RequestServiceViewModel extends ChangeNotifier {
       );
       final List<dynamic> data = json.decode(response);
 
-      states.clear();
-      _citiesByState.clear();
+      provinces.clear();
+      _citiesByProvince.clear();
 
       for (var item in data) {
-        final stateName = item['name'] as String;
+        final provinceName = item['name'] as String;
         final citiesList = (item['cities'] as List)
             .map((e) => e.toString())
             .toList();
 
-        states.add(stateName);
-        _citiesByState[stateName] = citiesList;
+        provinces.add(provinceName);
+        _citiesByProvince[provinceName] = citiesList;
       }
 
       notifyListeners();
@@ -89,11 +104,11 @@ class RequestServiceViewModel extends ChangeNotifier {
   }
 
   List<String> get availableCities =>
-      state != null ? (_citiesByState[state!] ?? []) : [];
+      province != null ? (_citiesByProvince[province!] ?? []) : [];
 
-  void updateState(String newState) {
-    if (state != newState) {
-      state = newState;
+  void updateProvince(String newProvince) {
+    if (province != newProvince) {
+      province = newProvince;
       city = null;
       notifyListeners();
     }
@@ -128,10 +143,8 @@ class RequestServiceViewModel extends ChangeNotifier {
     ),
   ];
 
-  // Selected device
-  String? selectedSerialNumber;
-
-  void selectDevice(String sn) {
+  void selectDevice(String id, String sn) {
+    selectedProductId = id;
     selectedSerialNumber = sn;
     notifyListeners();
   }
@@ -143,10 +156,16 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   void initContactInfo() {
     loadLocationData();
-    // Auto-fill from UserProvider mock if not set
-    firstName ??= 'Hung';
-    lastName ??= 'dep zai';
-    email ??= 'example@gmail.com';
+    // Auto-fill from logged-in user if not set
+    final user = sl<AuthViewModel>().currentUser;
+    if (user != null) {
+      if (firstName == null || firstName!.isEmpty) {
+        final parts = user.name.split(' ');
+        firstName = parts.first;
+        lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      }
+      email ??= user.email;
+    }
   }
 
   void saveContactInfo({
@@ -155,7 +174,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     String? emailVal,
     String? phoneVal,
     String? countryVal,
-    String? stateVal,
+    String? provinceVal,
     String? cityVal,
     String? addressVal,
     String? buildingVal,
@@ -165,7 +184,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     email = emailVal;
     phone = phoneVal;
     country = countryVal;
-    state = stateVal;
+    province = provinceVal;
     city = cityVal;
     address = addressVal;
     building = buildingVal;
@@ -226,10 +245,98 @@ class RequestServiceViewModel extends ChangeNotifier {
     }
   }
 
-  void submitTicket(BuildContext context) {
-    // Go to step 5 on success
-    _currentStep = 5;
+  Future<void> submitTicket(BuildContext context) async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      // Parse the appointment date (Format from picker/mask: "HH:mm, dd/MM/yyyy")
+      String formattedAppointment = '';
+      if (appointmentDate != null && appointmentDate!.isNotEmpty) {
+        try {
+          final inputFormat = DateFormat("HH:mm, dd/MM/yyyy");
+          final dateTime = inputFormat.parse(appointmentDate!);
+          // Format to ISO 8601: "yyyy-MM-ddTHH:mm:ssZ"
+          formattedAppointment =
+              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}Z";
+        } catch (e) {
+          debugPrint("Error parsing date: $e");
+          formattedAppointment = appointmentDate!; // fallback
+        }
+      }
+
+      // Map symptom string to ID
+      int symptomId = 1; // Default
+      switch (symptom) {
+        case 'Screen Broken':
+          symptomId = 1;
+          break;
+        case 'Battery Issue':
+          symptomId = 2;
+          break;
+        case 'Software Glitch':
+          symptomId = 3;
+          break;
+        case 'Hardware Damage':
+          symptomId = 4;
+          break;
+        case 'Other':
+          symptomId = 5;
+          break;
+      }
+
+      // Validation: description is required by server
+      final desc = (description != null && description!.trim().isNotEmpty)
+          ? description!.trim()
+          : null;
+
+      if (desc == null) {
+        throw Exception('Please provide a description of the problem.');
+      }
+
+      // Hardcode HCM for Ho Chi Minh City as requested by BE logic
+      String finalCity = city ?? '';
+      String finalProvince = province ?? '';
+      if (finalCity == 'Thành Phố Hồ Chí Minh' ||
+          finalProvince == 'Thành Phố Hồ Chí Minh') {
+        finalCity = 'HCM';
+        finalProvince = 'HCM';
+      }
+
+      final request = CreateWorkOrderRequest(
+        address: address ?? '',
+        appointment: formattedAppointment,
+        building: building,
+        city: "HCM",
+        country: country ?? 'VIET NAM',
+        description: desc,
+        email: (email != null && email!.trim().isNotEmpty) ? email : null,
+        firstName: firstName ?? '',
+        lastName: lastName ?? '',
+        phoneNumber: phone,
+        productId: selectedProductId ?? '',
+        referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
+            ? ticketRef
+            : null,
+        province: finalProvince,
+        workOrderSymptomId: symptomId,
+      );
+
+      await createWorkOrderUseCase.execute(request);
+
+      // Go to step 5 on success
+      _currentStep = 5;
+    } catch (e) {
+      debugPrint("Error submitting ticket: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to submit ticket: $e')));
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void reset() {
@@ -244,7 +351,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     email = null;
     phone = null;
     country = 'VIET NAM';
-    state = null;
+    province = null;
     city = null;
     address = null;
     building = null;
@@ -253,8 +360,9 @@ class RequestServiceViewModel extends ChangeNotifier {
     isEditingContact = false;
     isEditingAddress = false;
 
-    selectedServiceId = null;
+    selectedProductId = null;
     selectedSerialNumber = null;
+    selectedServiceId = null;
 
     notifyListeners();
   }

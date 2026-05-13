@@ -65,20 +65,21 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       await logoutUseCase.execute();
-      // Logic for navigation after logout is usually handled by the router
-      // listening to the repository or token store changes.
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
       notifyListeners();
+      if (context.mounted) {
+        context.go('/login');
+      }
     }
   }
 

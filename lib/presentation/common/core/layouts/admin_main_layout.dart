@@ -7,6 +7,8 @@ import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
 import '../../../admin/account/widgets/admin_sidebar.dart';
 import '../../../../routing/route_names.dart';
+import '../../../../di/injection_container.dart';
+import '../../auth/auth_view_model.dart';
 
 class AdminMainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -25,14 +27,12 @@ class AdminMainLayout extends StatelessWidget {
     final currentUri = GoRouterState.of(context).uri.toString();
     final isQueueScreen = currentUri.toLowerCase().contains('queue');
     final displayIndex = isQueueScreen ? -1 : navigationShell.currentIndex;
+    final userName = sl<AuthViewModel>().currentUser?.name ?? 'Admin';
     return Scaffold(
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
       drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: const AdminSidebar(
-        userName: 'Hung dep zai',
-        adminId: 'ADMIN-1234',
-      ),
+      drawer: AdminSidebar(userName: userName, adminId: 'ADMIN-1234'),
       body: Stack(
         children: [
           Padding(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/entities/work_order_completion_draft.dart';
 import 'package:zent_fe/domain/usecases/work_order/work_order_draft_usecase.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class CompleteWorkOrderViewModel extends ChangeNotifier {
   bool _isDisposed = false;
@@ -23,8 +25,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
   int _currentStep = 0;
   int get currentStep => _currentStep;
 
-  // Mock technician name
-  String get technicianName => "Hung dep zai";
+  // Technician name from logged-in user
+  String get technicianName =>
+      sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
   // Current formatted date
   String get currentDate {

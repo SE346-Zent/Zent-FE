@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../models/auth_response_model.dart' show AuthResponseModel;
@@ -12,11 +13,10 @@ abstract class AuthRemoteDatasource {
     required String phone,
     required String email,
     required String password,
-    required String role,
   });
   Future<void> verifyOtp(String email, String otp);
   Future<void> resendOtp(String email);
-  Future<void> logout(String email, String refreshToken);
+  Future<void> logout(String accessToken, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
   Future<void> forgotPassword(String email);
   Future<String> verifyForgotOtp(String email, String otp);
@@ -29,10 +29,7 @@ abstract class AuthRemoteDatasource {
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final http.Client client;
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "https://api.ryanandexen.qzz.io/api/v1",
-  );
+  static final String _baseURL = dotenv.get("BASE_URL");
   static final Duration _timeOut = Duration(
     seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
   );
@@ -46,21 +43,16 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({'email': email, 'password': password}),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ?? 'Login Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -86,33 +78,27 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String phone,
     required String email,
     required String password,
-    required String role,
   }) async {
     final url = Uri.parse('$_baseURL/auth/register');
     try {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({
               'email': email,
-              'phoneNumber': phone,
               'fullName': fullName,
               'password': password,
+              'phoneNumber': phone,
             }),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ?? 'Signup Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -136,22 +122,16 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'otpCode': otp, 'email': email}),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({'otp': otp, 'email': email}),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Verify OTP Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -176,22 +156,16 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({'email': email}),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Resend OTP Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -210,7 +184,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void> logout(String email, String refreshToken) async {
+  Future<void> logout(String accessToken, String refreshToken) async {
     final url = Uri.parse('$_baseURL/auth/logout');
     try {
       final response = await client
@@ -218,22 +192,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             url,
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $refreshToken',
+              'Authorization': 'Bearer $accessToken',
             },
-            body: jsonEncode({'email': email}),
+            body: jsonEncode({'refresh_token': refreshToken}),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ?? 'Logout Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -263,23 +229,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             url,
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json',
               'Authorization': 'Bearer $refreshToken',
             },
-            body: jsonEncode({'email': email}),
+            body: jsonEncode({'refresh_token': refreshToken}),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Refresh token Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -299,20 +257,6 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     }
   }
 
-  String adaptRoleFromFEToBE(String role) {
-    switch (role.toUpperCase()) {
-      case 'SUPERADMIN':
-        return 'SUPER_ADMIN';
-      case 'TECHNICIAN':
-        return 'TECHNICIAN';
-      case 'CUSTOMER':
-        return 'CUSTOMER';
-      case 'ADMIN':
-      default:
-        return 'ADMIN';
-    }
-  }
-
   @override
   Future<void> forgotPassword(String email) async {
     final url = Uri.parse('$_baseURL/auth/forgot-password');
@@ -320,22 +264,16 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({'email': email}),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        if (response.body.isEmpty) {
-          throw Exception(
-            'Server returned empty response (Status: ${response.statusCode})',
-          );
-        }
-        final errorMap = jsonDecode(response.body);
-        throw Exception(
-          errorMap['message'] ??
-              'Forgot Password Failed (Code: ${response.statusCode})',
-        );
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -400,24 +338,58 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({
-              'email': email,
-              'token': token,
+              'reset_token': token,
               'new_password': newPassword,
             }),
           )
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Reset Password Failed');
+        _handleErrorResponse(response);
       }
 
       return true;
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Reset password error: $e');
+    }
+  }
+
+  void _handleErrorResponse(http.Response response) {
+    final statusCode = response.statusCode;
+    final body = response.body;
+
+    // Log lỗi chi tiết ra Console để lập trình viên theo dõi
+    debugPrint('--- API Error $statusCode ---');
+    debugPrint('Body: $body');
+    debugPrint('-----------------------------');
+
+    if (body.isEmpty) {
+      throw Exception('Server Error ($statusCode)');
+    }
+
+    final contentType = response.headers['content-type'] ?? '';
+    if (contentType.contains('application/json')) {
+      try {
+        final errorMap = jsonDecode(body);
+        throw Exception(
+          errorMap['message'] ?? 'Something went wrong ($statusCode)',
+        );
+      } catch (_) {
+        // Nếu không parse được JSON, trả về thông báo chung chung
+        throw Exception('Server response error ($statusCode)');
+      }
+    } else {
+      // Nếu là HTML hoặc text khác, không hiện lên UI mà chỉ báo lỗi chung
+      if (statusCode == 401) {
+        throw Exception('Invalid email or password');
+      }
+      throw Exception('Server error ($statusCode)');
     }
   }
 }

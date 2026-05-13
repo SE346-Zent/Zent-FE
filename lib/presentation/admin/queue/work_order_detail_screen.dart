@@ -20,15 +20,21 @@ class WorkOrderDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<WorkOrderDetailViewModel>()..initData(workOrderId),
-      child: const _WorkOrderDetailScreenContent(),
+      child: _WorkOrderDetailScreenContent(),
     );
   }
 }
 
 class _WorkOrderDetailScreenContent extends StatelessWidget {
-  const _WorkOrderDetailScreenContent();
+  _WorkOrderDetailScreenContent();
+
+  final GlobalKey _filterKey = GlobalKey();
 
   void _showSortingDialog(BuildContext context) {
+    final RenderBox? renderBox =
+        _filterKey.currentContext?.findRenderObject() as RenderBox?;
+    final position = renderBox?.localToGlobal(Offset.zero);
+
     showDialog(
       context: context,
       barrierColor: Colors.transparent,
@@ -43,13 +49,13 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: 250.0,
+              top: (position?.dy ?? 250.0) - 20,
               right: 16.0,
               child: Material(
                 color: Colors.transparent,
                 child: Container(
                   width: 220,
-                  padding: const EdgeInsets.all(AppDimens.spaceMd),
+                  padding: const EdgeInsets.all(AppDimens.spaceSm),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -71,11 +77,10 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                         height: 1.0,
                         thickness: 1.0,
                       ),
-                      const SizedBox(height: AppDimens.spaceMd),
+                      const SizedBox(height: AppDimens.spaceXs),
                       _buildSortRow('Rating'),
-                      const SizedBox(height: AppDimens.spaceMd),
+                      const SizedBox(height: AppDimens.spaceXs),
                       _buildSortRow('Workload'),
-                      const SizedBox(height: AppDimens.spaceLg),
                       ElevatedButton(
                         onPressed: () => Navigator.pop(ctx),
                         style: ElevatedButton.styleFrom(
@@ -280,6 +285,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     style: TextStyles.headline.copyWith(color: Colors.black),
                   ),
                   GestureDetector(
+                    key: _filterKey,
                     onTap: () => _showSortingDialog(context),
                     child: const Icon(Icons.filter_list, color: Colors.black),
                   ),
@@ -307,7 +313,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
   Widget _buildInfoCard(IconData icon, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppDimens.spaceMd,
+        horizontal: AppDimens.spaceSm,
         vertical: AppDimens.spaceMd,
       ),
       decoration: BoxDecoration(
@@ -324,7 +330,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               color: AppColors.surface600,
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
             ),
-            child: Icon(icon, color: AppColors.secondary400, size: 18),
+            child: Icon(icon, color: AppColors.secondary400, size: 22),
           ),
           const SizedBox(width: 8.0),
           Expanded(

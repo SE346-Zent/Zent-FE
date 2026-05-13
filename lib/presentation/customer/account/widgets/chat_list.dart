@@ -21,8 +21,6 @@ class ChatList extends StatelessWidget {
 
     if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
-    } else if (viewModel.errorMessage != null) {
-      return Center(child: Text("Error: ${viewModel.errorMessage}"));
     } else if (viewModel.chats.isNotEmpty) {
       return ListView.builder(
         itemCount: viewModel.chats.length,

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
+import 'package:zent_fe/routing/routes.dart';
 
 class CustomerProfileViewModel extends ChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
+  final LogoutUseCase logoutUseCase;
 
-  CustomerProfileViewModel(this.getCurrentUserUseCase) {
+  CustomerProfileViewModel(this.getCurrentUserUseCase, this.logoutUseCase) {
     _loadUserInfo();
   }
 
@@ -22,6 +26,18 @@ class CustomerProfileViewModel extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error loading customer profile: $e");
+    }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    try {
+      await logoutUseCase.execute();
+    } catch (e) {
+      debugPrint("Error during logout: $e");
+    } finally {
+      if (context.mounted) {
+        context.go(Routes.login);
+      }
     }
   }
 

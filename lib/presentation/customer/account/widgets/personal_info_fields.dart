@@ -27,16 +27,6 @@ class PersonalInfoFields extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
           child: InputField(
-            label: 'Employee ID',
-            initialValue: viewModel.employeeId,
-            leadingIcon: Icons.work_outline,
-            isReadOnly: true,
-          ),
-        ),
-        const SizedBox(height: AppDimens.spaceMd),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
-          child: InputField(
             label: 'Email Address',
             initialValue: viewModel.emailAddress,
             leadingIcon: Icons.mail_outline,

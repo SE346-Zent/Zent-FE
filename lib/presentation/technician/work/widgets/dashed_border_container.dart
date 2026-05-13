@@ -5,6 +5,7 @@ class DashedBorderContainer extends StatelessWidget {
   final Widget child;
   final double height;
   final Color color;
+  final Color? backgroundColor;
   final double strokeWidth;
   final double dashWidth;
   final double dashGap;
@@ -15,6 +16,7 @@ class DashedBorderContainer extends StatelessWidget {
     required this.child,
     this.height = 91.0,
     this.color = const Color(0xFFC0C4CA), // secondary-100
+    this.backgroundColor,
     this.strokeWidth = 1.0,
     this.dashWidth = 5.0,
     this.dashGap = 3.0,
@@ -35,6 +37,12 @@ class DashedBorderContainer extends StatelessWidget {
         height: height,
         width: double.infinity,
         alignment: Alignment.center,
+        decoration: backgroundColor != null
+            ? BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(borderRadius),
+              )
+            : null,
         child: child,
       ),
     );

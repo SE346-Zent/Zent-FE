@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/auth/register_usecase.dart';
-import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 
 class RegisterViewModel extends ChangeNotifier {
   final RegisterUseCase registerUseCase;
@@ -42,7 +41,6 @@ class RegisterViewModel extends ChangeNotifier {
         email: email,
         phoneNumber: phone,
         password: password,
-        role: UserRoles.customer,
       );
 
       return true;

@@ -88,19 +88,6 @@ class ResetSuccessfullyScreen extends StatelessWidget {
                                 child: ElevatedButton.icon(
                                   onPressed: () {
                                     context.goNamed(RouteNames.login);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Text(
-                                          'Password updated successfully',
-                                        ),
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            AppDimens.boraSm,
-                                          ),
-                                        ),
-                                      ),
-                                    );
                                   },
                                   icon: const Icon(
                                     Icons.login,

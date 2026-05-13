@@ -98,15 +98,32 @@ class InventoryAssetCard extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              Icon(
-                                inStock
-                                    ? Icons.check_box_outlined
-                                    : Icons.disabled_by_default_outlined,
-                                color: inStock
-                                    ? AppColors.success500
-                                    : AppColors.error500,
-                                size: 16.0,
-                              ),
+                              inStock
+                                  ? const Icon(
+                                      Icons.assignment_turned_in_outlined,
+                                      color: AppColors.success500,
+                                      size: 16.0,
+                                    )
+                                  : Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.assignment_outlined,
+                                          color: AppColors.error500,
+                                          size: 16.0,
+                                        ),
+                                        Container(
+                                          width: 8,
+                                          height: 8,
+                                          color: Colors.white,
+                                        ),
+                                        const Icon(
+                                          Icons.close,
+                                          color: AppColors.error500,
+                                          size: 10.0,
+                                        ),
+                                      ],
+                                    ),
                               const SizedBox(width: AppDimens.spaceXs),
                               Text(
                                 inStock

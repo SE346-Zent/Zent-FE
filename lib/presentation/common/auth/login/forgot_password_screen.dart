@@ -87,20 +87,6 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                               'forgotPasswordVerifyOtp',
                                               extra: viewModel.email,
                                             );
-                                          } else if (viewModel.errorMessage !=
-                                                  null &&
-                                              context.mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  viewModel.errorMessage!,
-                                                ),
-                                                backgroundColor:
-                                                    AppColors.error500,
-                                              ),
-                                            );
                                           }
                                         },
                                 ),

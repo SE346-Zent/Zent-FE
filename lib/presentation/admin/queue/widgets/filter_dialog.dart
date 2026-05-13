@@ -12,10 +12,11 @@ class FilterDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      alignment: Alignment.topCenter,
-      insetPadding: const EdgeInsets.only(top: 130.0, left: 16.0, right: 16.0),
+      alignment: Alignment.topLeft,
+      insetPadding: const EdgeInsets.only(top: 130.0, left: 16.0),
       child: Container(
-        padding: const EdgeInsets.all(AppDimens.spaceMd),
+        width: 220,
+        padding: const EdgeInsets.all(AppDimens.spaceSm),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -31,7 +32,7 @@ class FilterDialog extends StatelessWidget {
             ),
             const SizedBox(height: AppDimens.spaceSm),
             const Divider(color: AppColors.secondary50, height: 1),
-            const SizedBox(height: AppDimens.spaceMd),
+            const SizedBox(height: AppDimens.spaceXs),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

@@ -17,10 +17,10 @@ class AuthResponseModel {
   //* from json
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     return AuthResponseModel(
-      accessToken: json['accessToken'] as String? ?? '',
-      refreshToken: json['refreshToken'] as String? ?? '',
+      accessToken: (json['accessToken'] ?? '').toString(),
+      refreshToken: (json['refreshToken'] ?? '').toString(),
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
-      tokenType: json['tokenType'] as String? ?? 'Bearer',
+      tokenType: (json['tokenType'] ?? 'Bearer').toString(),
     );
   }
 

@@ -42,7 +42,7 @@ class _UserManagementScreenContent extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              const AccountHeader(title: 'Manage Account'),
+              const AccountHeader(title: 'Manage Account', showDivider: true),
               const SizedBox(height: AppDimens.spaceLg),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),

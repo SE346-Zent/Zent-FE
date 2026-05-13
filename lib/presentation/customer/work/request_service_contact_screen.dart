@@ -30,7 +30,7 @@ class _RequestServiceContactScreenState
     return firstNameCtrl.text.isNotEmpty &&
         lastNameCtrl.text.isNotEmpty &&
         vm.country != null &&
-        vm.state != null &&
+        vm.province != null &&
         vm.city != null &&
         addressCtrl.text.isNotEmpty;
   }
@@ -74,7 +74,7 @@ class _RequestServiceContactScreenState
       emailVal: emailCtrl.text,
       phoneVal: phoneCtrl.text,
       countryVal: viewModel.country,
-      stateVal: viewModel.state,
+      provinceVal: viewModel.province,
       cityVal: viewModel.city,
       addressVal: addressCtrl.text,
       buildingVal: buildingCtrl.text,
@@ -180,7 +180,7 @@ class _RequestServiceContactScreenState
               if (v != null) {
                 viewModel.saveContactInfo(
                   countryVal: v,
-                  stateVal: viewModel.state,
+                  provinceVal: viewModel.province,
                   cityVal: viewModel.city,
                 );
               }
@@ -190,14 +190,14 @@ class _RequestServiceContactScreenState
           const SizedBox(height: AppDimens.spaceMd),
 
           CustomerDropdownField<String>(
-            label: 'State',
-            value: viewModel.state,
-            items: viewModel.states
+            label: 'Province',
+            value: viewModel.province,
+            items: viewModel.provinces
                 .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                 .toList(),
             onChanged: (v) {
               if (v != null) {
-                viewModel.updateState(v);
+                viewModel.updateProvince(v);
               }
             },
             isRequired: true,

@@ -52,7 +52,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.subtle],
-        border: Border.all(color: AppColors.secondary50),
+        border: Border.all(color: AppColors.secondary300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +92,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
             child: Text(
               maxPhotosNote,
               style: TextStyles.label.copyWith(
-                color: AppColors.tertiary300,
+                color: AppColors.tertiary500,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -118,7 +118,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
           Text(
             maxPhotosNote,
             style: TextStyles.label.copyWith(
-              color: AppColors.tertiary300,
+              color: AppColors.tertiary500,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -136,19 +136,15 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
     if (photos.isEmpty) {
       return GestureDetector(
         onTap: () => _onOpenCamera(context),
-        child: Container(
-          width: double.infinity,
+        child: DashedBorderContainer(
           height: 100,
-          decoration: BoxDecoration(
-            color: AppColors.background500.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(AppDimens.boraSm),
-          ),
-          child: const DashedBorderContainer(
-            child: Center(
-              child: Text(
-                "Tap to capture",
-                style: TextStyle(color: AppColors.secondary300),
-              ),
+          color: AppColors.secondary200,
+          backgroundColor: AppColors.surface600,
+          borderRadius: AppDimens.boraSm,
+          child: Center(
+            child: Text(
+              "Tap to capture",
+              style: TextStyle(color: AppColors.secondary300),
             ),
           ),
         ),

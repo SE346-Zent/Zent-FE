@@ -22,7 +22,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          if (_capturedFilePath == null)
+          if (_capturedFilePath == null) ...[
             Transform.translate(
               offset: const Offset(
                 0,
@@ -129,45 +129,59 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
                   );
                 },
               ),
-            )
-          else
-            // Post-Capture State (Stage 2)
-            Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.file(
-                    File(_capturedFilePath!),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  bottom: 30, // Centered in black bar area
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Retake Button
-                      _buildActionCircle(
-                        icon: Icons.close_rounded,
-                        onTap: () => setState(() => _capturedFilePath = null),
-                        color: Colors.black54,
-                      ),
-                      _buildActionCircle(
-                        icon: Icons.check_rounded,
-                        onTap: () {
-                          if (widget.onPhotoCaptured != null) {
-                            widget.onPhotoCaptured!(_capturedFilePath!);
-                          }
-                          context.pop(_capturedFilePath);
-                        },
-                        color: Colors.black54,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
+          ] else ...[
+            // Post-Capture State (Stage 2)
+            Positioned.fill(
+              child: Image.file(File(_capturedFilePath!), fit: BoxFit.cover),
+            ),
+            Positioned(
+              bottom: 30, // Centered in black bar area
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Retake Button
+                  _buildActionCircle(
+                    icon: Icons.close_rounded,
+                    onTap: () => setState(() => _capturedFilePath = null),
+                    color: Colors.black54,
+                  ),
+                  _buildActionCircle(
+                    icon: Icons.check_rounded,
+                    onTap: () {
+                      if (widget.onPhotoCaptured != null) {
+                        widget.onPhotoCaptured!(_capturedFilePath!);
+                      }
+                      context.pop(_capturedFilePath);
+                    },
+                    color: Colors.black54,
+                  ),
+                ],
+              ),
+            ),
+          ],
+          // Back button (Always visible)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            left: 20,
+            child: GestureDetector(
+              onTap: () => context.pop(),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

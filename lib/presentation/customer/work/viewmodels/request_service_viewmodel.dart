@@ -161,7 +161,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     if (user != null) {
       if (firstName == null || firstName!.isEmpty) {
         final parts = user.name.split(' ');
-        firstName = parts.first;
+        firstName = parts.isNotEmpty ? parts.first : '';
         lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
       }
       email ??= user.email;
@@ -410,9 +410,8 @@ class RequestServiceViewModel extends ChangeNotifier {
       _currentStep = 5;
     } catch (e) {
       debugPrint("Error submitting ticket: $e");
-      if (context.mounted) {
-        debugPrint('Failed to submit ticket: $e');
-      }
+      // Rethrow to let the UI handle or display error
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -18,7 +18,8 @@ import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
 import '../presentation/admin/queue/operational_queue_screen.dart';
 import '../presentation/admin/queue/work_order_detail_screen.dart';
 import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
-import '../presentation/admin/queue/admin_rejection_detail_screen.dart';
+import '../presentation/admin/rejections/rejected_work_orders_screen.dart';
+import '../presentation/admin/rejections/rejection_detail_screen.dart';
 import '../presentation/admin/queue/view_schedule_screen.dart';
 import '../presentation/admin/queue/reassign_work_order_screen.dart';
 import '../presentation/admin/reports/admin_reports_screen.dart';
@@ -347,6 +348,23 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const InventoryAssetsScreen(),
                 ),
+                GoRoute(
+                  name: RouteNames.adminRejectedWorkOrders,
+                  path: Routes.adminRejectedWorkOrders,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const RejectedWorkOrdersScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminRejectionDetail,
+                      path: Routes.adminRejectionDetail,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['id'] ?? '';
+                        return RejectionDetailScreen(workOrderId: id);
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
             GoRoute(
@@ -392,15 +410,6 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final id = state.pathParameters['workOrderId'] ?? '';
                     return ReassignWorkOrderScreen(workOrderId: id);
-                  },
-                ),
-                GoRoute(
-                  name: RouteNames.adminRejectionDetail,
-                  path: 'rejection-detail/:workOrderId',
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) {
-                    final id = state.pathParameters['workOrderId'] ?? '';
-                    return AdminRejectionDetailScreen(workOrderId: id);
                   },
                 ),
               ],

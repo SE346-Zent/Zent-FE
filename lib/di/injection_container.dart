@@ -59,7 +59,8 @@ import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart'
 import '../presentation/admin/queue/viewmodels/assigned_work_order_detail_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/view_schedule_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/reassign_work_order_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/admin_rejection_detail_viewmodel.dart';
+import '../presentation/admin/rejections/viewmodels/rejected_work_orders_viewmodel.dart';
+import '../presentation/admin/rejections/viewmodels/rejection_detail_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/service_viewmodel.dart';
@@ -146,10 +147,17 @@ Future<void> init() async {
   sl.registerFactory(() => ViewScheduleViewModel());
   sl.registerFactory(() => ReassignWorkOrderViewModel());
   sl.registerFactory(
-    () => AdminRejectionDetailViewModel(
+    () => RejectedWorkOrdersViewModel(
+      getManyWorkOrdersUseCase: sl(),
       approveRefusalUseCase: sl(),
       denyRefusalUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => RejectionDetailViewModel(
       getSingleWorkOrderUseCase: sl(),
+      approveRefusalUseCase: sl(),
+      denyRefusalUseCase: sl(),
     ),
   );
   sl.registerFactory(() => ChooseRoleViewModel());
@@ -165,10 +173,25 @@ Future<void> init() async {
   sl.registerFactory(() => ChatViewModel());
   sl.registerFactory(() => CustomerSecurityViewModel());
   sl.registerFactory(() => CustomerNotificationsViewModel());
-  sl.registerFactory(() => ProductsViewModel());
-  sl.registerFactory(() => DetailedProductViewModel());
+  sl.registerFactory(
+    () => ProductsViewModel(
+      getMyProductsUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => DetailedProductViewModel(
+      getMyProductsUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
-  sl.registerFactory(() => ActiveRepairsViewModel());
+  sl.registerFactory(
+    () => ActiveRepairsViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(() => DetailedChatViewModel());
   sl.registerFactory(() => DeviceRegistrationViewModel());
@@ -187,12 +210,7 @@ Future<void> init() async {
     (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
   );
   sl.registerFactory(() => TechPauseWorkOrderViewModel());
-  sl.registerFactory(
-    () => TechRejectWorkOrderViewModel(
-      refuseWorkOrderUseCase: sl(),
-      getSingleWorkOrderUseCase: sl(),
-    ),
-  );
+  sl.registerFactory(() => TechRejectWorkOrderViewModel(sl(), sl(), sl()));
   sl.registerFactory(() => AddNewPartViewModel());
   sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
     (workOrderId, _) => CompleteWorkOrderViewModel(

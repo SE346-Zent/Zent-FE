@@ -24,8 +24,6 @@ class _NotificationTileState extends State<NotificationTile> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
       onTap: () {
         setState(() {
           _isExpanded = !_isExpanded;
@@ -101,15 +99,41 @@ class _NotificationTileState extends State<NotificationTile> {
                       overflow: _isExpanded ? null : TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      widget.notification.body,
-                      style: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.secondary500,
+                    AnimatedCrossFade(
+                      firstChild: Text(
+                        widget.notification.body,
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: _isExpanded ? null : 1,
-                      overflow: _isExpanded ? null : TextOverflow.ellipsis,
+                      secondChild: Text(
+                        widget.notification.body,
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
+                      ),
+                      crossFadeState: _isExpanded
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      duration: const Duration(milliseconds: 300),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(width: AppDimens.spaceSm),
+              // Expand arrow
+              Padding(
+                padding: EdgeInsets.only(top: _isExpanded ? 8.0 : 0),
+                child: AnimatedRotation(
+                  turns: _isExpanded ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 300),
+                  child: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: AppColors.secondary400,
+                    size: 20,
+                  ),
                 ),
               ),
             ],

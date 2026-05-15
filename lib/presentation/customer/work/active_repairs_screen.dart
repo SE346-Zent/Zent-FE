@@ -15,7 +15,7 @@ class ActiveRepairsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<ActiveRepairsViewModel>(),
+      create: (_) => sl<ActiveRepairsViewModel>()..fetchWorkOrders(),
       child: const _ActiveRepairsView(),
     );
   }
@@ -35,60 +35,90 @@ class _ActiveRepairsView extends StatelessWidget {
         showBackButton: true,
         showBottomDivider: true,
       ),
-      body: CustomScrollView(
-        slivers: [
-          // Title & Tracking Card
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: AppDimens.spaceMd,
-                left: AppDimens.spaceMd,
-                right: AppDimens.spaceMd,
-              ),
+      body: viewModel.isLoading && viewModel.activeWorkOrders.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : viewModel.errorMessage != null && viewModel.activeWorkOrders.isEmpty
+          ? Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Tracking Work Order',
-                    style: TextStyles.display.copyWith(
-                      color: Colors.black,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'Error: ${viewModel.errorMessage}',
+                    style: TextStyles.bodyLarge,
                   ),
-                  const SizedBox(height: AppDimens.spaceXs),
-                  Text(
-                    'Tracking your ongoing industrial service in real-time',
-                    style: TextStyles.bodyLarge.copyWith(
-                      color: AppColors.secondary500,
-                    ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => viewModel.fetchWorkOrders(),
+                    child: const Text('Retry'),
                   ),
-                  const SizedBox(height: AppDimens.spaceLg),
-
-                  // Tracking Card
-                  TrackingCard(currentStatusStep: viewModel.currentStatusStep),
-                  const SizedBox(height: AppDimens.spaceXl),
                 ],
               ),
-            ),
-          ),
+            )
+          : CustomScrollView(
+              slivers: [
+                // Title & Tracking Card
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: AppDimens.spaceMd,
+                      left: AppDimens.spaceMd,
+                      right: AppDimens.spaceMd,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tracking Work Order',
+                          style: TextStyles.display.copyWith(
+                            color: Colors.black,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimens.spaceXs),
+                        Text(
+                          'Tracking your ongoing industrial service in real-time',
+                          style: TextStyles.bodyLarge.copyWith(
+                            color: AppColors.secondary500,
+                          ),
+                        ),
+                        const SizedBox(height: AppDimens.spaceLg),
 
-          // Recent Completed List
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: AppDimens.spaceMd,
-                right: AppDimens.spaceMd,
-                bottom: AppDimens.spaceMd,
-              ),
-              child: RecentCompletedList(
-                recentCompleted: viewModel.recentCompleted,
-              ),
+                        // Tracking Card
+                        if (viewModel.currentTrackingOrder != null)
+                          TrackingCard(
+                            workOrder: viewModel.currentTrackingOrder!,
+                            currentStatusStep: viewModel.currentStatusStep,
+                          )
+                        else
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(AppDimens.spaceXl),
+                              child: Text('No active work orders'),
+                            ),
+                          ),
+                        const SizedBox(height: AppDimens.spaceXl),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Recent Completed List
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: AppDimens.spaceMd,
+                      right: AppDimens.spaceMd,
+                      bottom: AppDimens.spaceMd,
+                    ),
+                    child: RecentCompletedList(
+                      recentCompleted: viewModel.completedWorkOrders,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

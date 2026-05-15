@@ -107,11 +107,6 @@ class _OperationalQueueScreenState extends State<OperationalQueueScreen> {
                                   isSelected: viewModel.activeTabIndex == 3,
                                   onTap: () => viewModel.changeTab(3),
                                 ),
-                                OperationalQueueTabItem(
-                                  title: 'Rejections',
-                                  isSelected: viewModel.activeTabIndex == 4,
-                                  onTap: () => viewModel.changeTab(4),
-                                ),
                               ],
                             ),
                           ),

@@ -4,6 +4,7 @@ import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import '../account/widgets/customer_app_bar.dart';
 import 'viewmodels/request_service_viewmodel.dart';
+import 'viewmodels/products_viewmodel.dart';
 import 'request_service_discovery_screen.dart';
 import 'request_service_info_screen.dart';
 import 'request_service_contact_screen.dart';
@@ -28,8 +29,13 @@ class _RequestServiceScreenState extends State<RequestServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _viewModel,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: _viewModel),
+        ChangeNotifierProvider(
+          create: (_) => sl<ProductsViewModel>()..fetchProducts(),
+        ),
+      ],
       child: const _RequestServiceView(),
     );
   }

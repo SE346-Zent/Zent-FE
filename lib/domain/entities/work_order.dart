@@ -18,6 +18,8 @@ class WorkOrder {
   final String customerName;
   final String technicianId;
   final String? technicianName;
+  final String workOrderNum;
+  final List<String> rejectionPhotos;
 
   WorkOrder({
     required this.id,
@@ -37,6 +39,8 @@ class WorkOrder {
     this.customerName = '',
     required this.technicianId,
     this.technicianName,
+    required this.workOrderNum,
+    this.rejectionPhotos = const [],
   });
 
   String get address => addressString;

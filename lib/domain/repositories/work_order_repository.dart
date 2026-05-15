@@ -14,6 +14,9 @@ abstract class WorkOrderRepository {
   Future<List<WorkOrder>> getManyWorkOrders({
     required String userId,
     String? status,
+    int page = 1,
+    int limit = 20,
+    String? role,
   });
   Future<List<WorkOrder>> getActiveRepairs({required String customerId});
 

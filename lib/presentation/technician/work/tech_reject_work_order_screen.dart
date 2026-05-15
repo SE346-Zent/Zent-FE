@@ -9,6 +9,7 @@ import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/routing/route_names.dart';
 import 'viewmodels/tech_reject_work_order_viewmodel.dart';
+import 'widgets/part_photo_upload.dart';
 
 class TechRejectWorkOrderScreen extends StatefulWidget {
   final String workOrderId;
@@ -118,6 +119,15 @@ class _TechRejectWorkOrderScreenState extends State<TechRejectWorkOrderScreen> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: AppDimens.spaceLg),
+                            PartPhotoUpload(
+                              title: 'Evidence Photos',
+                              hintText: 'Tap to capture evidence photos',
+                              photos: viewModel.evidenceImageUrls,
+                              onPhotoAdded: viewModel.addPhotoFromPath,
+                              onPhotoRemoved: viewModel.removePhoto,
+                            ),
+                            const SizedBox(height: AppDimens.spaceXl),
                           ],
                         ),
                       ),

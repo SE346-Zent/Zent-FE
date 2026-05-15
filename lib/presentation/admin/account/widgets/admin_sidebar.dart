@@ -123,10 +123,7 @@ class AdminSidebar extends StatelessWidget {
                       isActive: false,
                       onTap: () {
                         Navigator.pop(context);
-                        context.goNamed(
-                          RouteNames.adminOperationalQueue,
-                          queryParameters: {'tab': '4'},
-                        );
+                        context.goNamed(RouteNames.adminRejectedWorkOrders);
                       },
                     ),
                     SidebarMenuItem(

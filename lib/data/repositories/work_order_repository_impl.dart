@@ -57,8 +57,17 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   Future<List<WorkOrder>> getManyWorkOrders({
     required String userId,
     String? status,
+    int page = 1,
+    int limit = 20,
+    String? role,
   }) async {
-    return await remoteDataSource.getManyWorkOrders(userId, status: status);
+    return await remoteDataSource.getManyWorkOrders(
+      userId,
+      status: status,
+      page: page,
+      limit: limit,
+      role: role,
+    );
   }
 
   @override

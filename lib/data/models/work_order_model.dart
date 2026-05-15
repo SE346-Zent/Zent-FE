@@ -20,6 +20,8 @@ class WorkOrderModel extends WorkOrder {
     super.customerName = '',
     required super.technicianId,
     super.technicianName,
+    required super.workOrderNum,
+    super.rejectionPhotos = const [],
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -41,6 +43,8 @@ class WorkOrderModel extends WorkOrder {
       customerName: entity.customerName,
       technicianId: entity.technicianId,
       technicianName: entity.technicianName,
+      workOrderNum: entity.workOrderNum,
+      rejectionPhotos: entity.rejectionPhotos,
     );
   }
 
@@ -106,6 +110,19 @@ class WorkOrderModel extends WorkOrder {
       technicianName:
           json['technicianName'] as String? ??
           json['technician_name'] as String?,
+      workOrderNum:
+          json['workOrderNum'] as String? ??
+          json['workOrderNumber'] as String? ??
+          json['work_order_num'] as String? ??
+          '',
+      rejectionPhotos:
+          (json['evidenceImageUrls'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          (json['rejection_photos'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
     );
   }
 
@@ -174,6 +191,8 @@ class WorkOrderModel extends WorkOrder {
       'customer_name': customerName,
       'technician_id': technicianId,
       'technician_name': technicianName,
+      'work_order_num': workOrderNum,
+      'rejection_photos': rejectionPhotos,
     };
   }
 }

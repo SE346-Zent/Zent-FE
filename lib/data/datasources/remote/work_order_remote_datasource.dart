@@ -16,6 +16,9 @@ abstract class WorkOrderRemoteDataSource {
   Future<List<WorkOrderModel>> getManyWorkOrders(
     String userId, {
     String? status,
+    int page = 1,
+    int limit = 20,
+    String? role,
   });
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
   Future<void> completeWorkOrder(String id, CompleteWorkOrderRequest request);
@@ -85,13 +88,21 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   Future<List<WorkOrderModel>> getManyWorkOrders(
     String userId, {
     String? status,
+    int page = 1,
+    int limit = 20,
+    String? role,
   }) async {
-    // Strictly follow api-1.json: technician_id filter is for Admin/SuperAdmin only.
-    // For Tech, backend filters by token.
+    // Reverting to simpler query to fix "Failed to deserialize query string: invalid type: string '1', expected u64"
+    // and to ensure results are returned for Tech/Customer via token filtering.
     var uri = Uri.parse('$_baseURL/work_orders');
+    final queryParams = <String, String>{};
 
     if (status != null) {
-      uri = uri.replace(queryParameters: {'status': status});
+      queryParams['status'] = status;
+    }
+
+    if (queryParams.isNotEmpty) {
+      uri = uri.replace(queryParameters: queryParams);
     }
 
     try {
@@ -126,7 +137,22 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     try {
       final headers = await _getHeaders();
       headers['X-Idempotency-Key'] = const Uuid().v4();
-      final body = jsonEncode(request.toJson());
+
+      // Transform UUIDs to hex strings (no dashes) as backend uses BINARY(16)
+      final Map<String, dynamic> bodyMap = request.toJson();
+      if (bodyMap['product_id'] != null) {
+        bodyMap['product_id'] = bodyMap['product_id'].toString().replaceAll(
+          '-',
+          '',
+        );
+      }
+      if (bodyMap['reference_ticket_id'] != null) {
+        bodyMap['reference_ticket_id'] = bodyMap['reference_ticket_id']
+            .toString()
+            .replaceAll('-', '');
+      }
+
+      final body = jsonEncode(bodyMap);
 
       final response = await client
           .post(url, headers: headers, body: body)
@@ -198,12 +224,13 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       multipartRequest.fields['reason'] = request.reason;
       multipartRequest.fields['explanation'] = request.explanation;
 
-      // photos is required in api-1.json (array of binary).
-      // For now, sending no files if UI hasn't provided any,
-      // but if the backend strictly requires the 'photos' field even if empty:
-      // (The http package doesn't have a way to send an empty array of files easily
-      // without adding a dummy file, but let's try just the fields first.
-      // If photos is mandatory as a key, we'll see.)
+      // Add evidence images
+      for (final path in request.evidenceImageUrls) {
+        if (path.isNotEmpty) {
+          final file = await http.MultipartFile.fromPath('photos', path);
+          multipartRequest.files.add(file);
+        }
+      }
 
       final streamedResponse = await multipartRequest.send().timeout(_timeOut);
       final response = await http.Response.fromStream(streamedResponse);

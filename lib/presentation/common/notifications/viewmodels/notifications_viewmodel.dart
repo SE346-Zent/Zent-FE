@@ -69,7 +69,7 @@ class NotificationsViewModel extends ChangeNotifier {
       final results = await useCase(page: _currentPage, limit: _limit);
 
       if (refresh) {
-        _notifications = results;
+        _notifications = List<NotificationItem>.from(results);
       } else {
         _notifications.addAll(results);
       }

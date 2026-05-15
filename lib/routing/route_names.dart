@@ -22,6 +22,7 @@ abstract final class RouteNames {
       'adminAssignedWorkOrderDetails';
   static const String adminViewSchedule = 'adminViewSchedule';
   static const String adminReassignWorkOrder = 'adminReassignWorkOrder';
+  static const String adminRejectedWorkOrders = 'adminRejectedWorkOrders';
   static const String adminTeam = 'adminTeam';
   static const String adminMe = 'adminMe';
 

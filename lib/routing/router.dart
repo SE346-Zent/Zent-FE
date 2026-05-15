@@ -8,7 +8,6 @@ import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/common/auth/register/register_screen.dart';
-import '../presentation/common/notifications/notification_permission_required_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
@@ -91,12 +90,7 @@ UserRoles _getRoleFromToken() {
   return RbacTokenStore.role;
 }
 
-const _publicPrefixes = [
-  Routes.splash,
-  Routes.onBoarding,
-  Routes.login,
-  '/notification-required',
-];
+const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
 // ignore: unused_element
 Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
@@ -105,21 +99,9 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
 
   // Check notification permission for Admin and Tech
   if (role == UserRoles.admin || role == UserRoles.technician) {
-    if (location != '/notification-required') {
-      final settings = await FirebaseMessaging.instance
-          .getNotificationSettings();
-      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-        return '/notification-required';
-      }
-    } else {
-      // If we are on the required screen, check if it's now authorized to go back
-      final settings = await FirebaseMessaging.instance
-          .getNotificationSettings();
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        return role == UserRoles.admin
-            ? Routes.adminDashboard
-            : Routes.techHome;
-      }
+    final settings = await FirebaseMessaging.instance.requestPermission();
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      return Routes.login;
     }
   }
 
@@ -197,11 +179,7 @@ final GoRouter appRouter = GoRouter(
       path: Routes.splash,
       builder: (context, state) => const AppSplashScreen(),
     ),
-    GoRoute(
-      name: 'notificationRequired',
-      path: '/notification-required',
-      builder: (context, state) => const NotificationPermissionRequiredScreen(),
-    ),
+
     GoRoute(
       name: RouteNames.onBoarding,
       path: Routes.onBoarding,

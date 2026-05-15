@@ -30,10 +30,15 @@ class WorkOrderCard extends StatelessWidget {
 
     // Status Color Processing
     Color statusColor = AppColors.tertiary400;
-    if (isCompleted) statusColor = AppColors.success500;
-    if (isPending) statusColor = AppColors.secondary200;
-    if (order.status == WorkOrderStatus.rejectInReview)
+    if (isCompleted) {
+      statusColor = AppColors.success500;
+    }
+    if (isPending) {
+      statusColor = AppColors.secondary200;
+    }
+    if (order.status == WorkOrderStatus.rejectInReview) {
       statusColor = Colors.orange;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),

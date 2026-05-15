@@ -10,8 +10,6 @@ import '../../../../routing/route_names.dart';
 import '../../../../di/injection_container.dart';
 import '../../auth/auth_view_model.dart';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-
 class AdminMainLayout extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
@@ -22,25 +20,6 @@ class AdminMainLayout extends StatefulWidget {
 }
 
 class _AdminMainLayoutState extends State<AdminMainLayout> {
-  @override
-  void initState() {
-    super.initState();
-    _checkNotificationPermissions();
-  }
-
-  Future<void> _checkNotificationPermissions() async {
-    final messaging = FirebaseMessaging.instance;
-    final settings = await messaging.requestPermission();
-    if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-        settings.authorizationStatus != AuthorizationStatus.provisional) {
-      if (mounted) {
-        debugPrint('Notification permission is required. Logging out...');
-        sl<AuthViewModel>().clearUser();
-        context.goNamed(RouteNames.login);
-      }
-    }
-  }
-
   void _goBranch(int index) {
     widget.navigationShell.goBranch(
       index,

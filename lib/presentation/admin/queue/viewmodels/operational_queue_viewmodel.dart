@@ -59,12 +59,21 @@ class OperationalQueueViewModel extends ChangeNotifier {
     final List<Map<String, dynamic>> jobs = _allWorkOrders.map((wo) {
       // Map enum name to more user-friendly display name
       String statusDisplay = wo.status.name;
-      if (statusDisplay == 'inProg') statusDisplay = 'In Progress';
-      if (statusDisplay == 'complete') statusDisplay = 'Completed';
-      if (statusDisplay == 'rejectInReview')
+      if (statusDisplay == 'inProg') {
+        statusDisplay = 'In Progress';
+      }
+      if (statusDisplay == 'complete') {
+        statusDisplay = 'Completed';
+      }
+      if (statusDisplay == 'rejectInReview') {
         statusDisplay = 'Pending Rejection';
-      if (statusDisplay == 'pending') statusDisplay = 'Pending';
-      if (statusDisplay == 'rejected') statusDisplay = 'Rejected';
+      }
+      if (statusDisplay == 'pending') {
+        statusDisplay = 'Pending';
+      }
+      if (statusDisplay == 'rejected') {
+        statusDisplay = 'Rejected';
+      }
 
       return {
         'id': '#${wo.id}',

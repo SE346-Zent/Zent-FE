@@ -59,8 +59,9 @@ class DetailedProductViewModel extends ChangeNotifier {
   // UI Helpers
   String get imagePath {
     if (product == null) return AppAssets.laptopA;
-    if (product!.name.toLowerCase().contains('laptop b'))
+    if (product!.name.toLowerCase().contains('laptop b')) {
       return AppAssets.laptopB;
+    }
     return AppAssets.laptopA;
   }
 

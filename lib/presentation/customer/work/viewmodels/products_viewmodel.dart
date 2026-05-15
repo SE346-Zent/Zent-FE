@@ -38,10 +38,12 @@ class ProductsViewModel extends ChangeNotifier {
 
   // Helper to get image for a product
   String getProductImage(Product product) {
-    if (product.name.toLowerCase().contains('laptop a'))
+    if (product.name.toLowerCase().contains('laptop a')) {
       return AppAssets.laptopA;
-    if (product.name.toLowerCase().contains('laptop b'))
+    }
+    if (product.name.toLowerCase().contains('laptop b')) {
       return AppAssets.laptopB;
+    }
     return AppAssets.laptopA; // Default
   }
 

@@ -125,7 +125,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
             },
-            body: jsonEncode({'otp': otp, 'email': email}),
+            body: jsonEncode({'otpCode': otp, 'email': email}),
           )
           .timeout(_timeOut);
 

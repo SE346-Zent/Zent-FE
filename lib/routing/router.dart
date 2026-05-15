@@ -8,16 +8,18 @@ import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/common/auth/register/register_screen.dart';
+import '../presentation/common/notifications/notification_permission_required_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
 import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
-import '../presentation/admin/dashboard/admin_notifications_screen.dart';
 import '../presentation/admin/queue/operational_queue_screen.dart';
 import '../presentation/admin/queue/work_order_detail_screen.dart';
 import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
+import '../presentation/admin/queue/admin_rejection_detail_screen.dart';
 import '../presentation/admin/queue/view_schedule_screen.dart';
 import '../presentation/admin/queue/reassign_work_order_screen.dart';
 import '../presentation/admin/reports/admin_reports_screen.dart';
@@ -27,9 +29,9 @@ import '../presentation/admin/account/detail_request_screen.dart';
 import '../presentation/customer/work/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
+import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
-import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
 import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
@@ -42,8 +44,8 @@ import '../presentation/common/core/layouts/admin_main_layout.dart';
 import '../presentation/common/core/layouts/customer_main_layout.dart';
 import '../presentation/technician/account/tech_profile_screen.dart';
 import '../presentation/technician/account/personal_info_screen.dart';
-import '../presentation/technician/account/notifications_screen.dart';
 import '../presentation/technician/account/security_screen.dart';
+import '../presentation/common/notifications/notifications_list_screen.dart';
 import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
@@ -89,12 +91,37 @@ UserRoles _getRoleFromToken() {
   return RbacTokenStore.role;
 }
 
-const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
+const _publicPrefixes = [
+  Routes.splash,
+  Routes.onBoarding,
+  Routes.login,
+  '/notification-required',
+];
 
 // ignore: unused_element
-String? _rbacRedirect(BuildContext context, GoRouterState state) {
+Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
   final location = state.matchedLocation;
   final role = _getRoleFromToken();
+
+  // Check notification permission for Admin and Tech
+  if (role == UserRoles.admin || role == UserRoles.technician) {
+    if (location != '/notification-required') {
+      final settings = await FirebaseMessaging.instance
+          .getNotificationSettings();
+      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+        return '/notification-required';
+      }
+    } else {
+      // If we are on the required screen, check if it's now authorized to go back
+      final settings = await FirebaseMessaging.instance
+          .getNotificationSettings();
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        return role == UserRoles.admin
+            ? Routes.adminDashboard
+            : Routes.techHome;
+      }
+    }
+  }
 
   final isPublic = _publicPrefixes.any(
     (p) => location == p || location.startsWith('$p/'),
@@ -169,6 +196,11 @@ final GoRouter appRouter = GoRouter(
       name: RouteNames.splash,
       path: Routes.splash,
       builder: (context, state) => const AppSplashScreen(),
+    ),
+    GoRoute(
+      name: 'notificationRequired',
+      path: '/notification-required',
+      builder: (context, state) => const NotificationPermissionRequiredScreen(),
     ),
     GoRoute(
       name: RouteNames.onBoarding,
@@ -288,7 +320,7 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.adminNotifications,
                   path: Routes.adminNotifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const AdminNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
               ],
             ),
@@ -331,6 +363,15 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final id = state.pathParameters['workOrderId'] ?? '';
                     return ReassignWorkOrderScreen(workOrderId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminRejectionDetail,
+                  path: 'rejection-detail/:workOrderId',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return AdminRejectionDetailScreen(workOrderId: id);
                   },
                 ),
               ],
@@ -536,7 +577,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'techNotifications',
                   path: Routes.notifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const TechNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
                 GoRoute(
                   name: 'techSecuritySettings',

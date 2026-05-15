@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 
@@ -37,9 +38,14 @@ class ServiceHeader extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const Icon(
-                    Icons.notifications_none,
-                    color: AppColors.surface100,
+                  GestureDetector(
+                    onTap: () {
+                      context.pushNamed(RouteNames.customerNotifications);
+                    },
+                    child: const Icon(
+                      Icons.notifications_none,
+                      color: AppColors.surface100,
+                    ),
                   ),
                   const SizedBox(width: AppDimens.spaceMd),
                   InkWell(

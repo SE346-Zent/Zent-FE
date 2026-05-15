@@ -7,12 +7,21 @@ import 'package:uuid/uuid.dart';
 import '../../models/api_response.dart';
 import '../../models/work_order_model.dart';
 import '../../models/create_work_order_request.dart';
+import '../../models/complete_work_order_request.dart';
+import '../../models/refuse_work_order_request.dart';
 import '../local/auth_local_datasource.dart';
 
 abstract class WorkOrderRemoteDataSource {
   Future<WorkOrderModel> getSingleWorkOrder(String id);
-  Future<List<WorkOrderModel>> getManyWorkOrders(String userId);
+  Future<List<WorkOrderModel>> getManyWorkOrders(
+    String userId, {
+    String? status,
+  });
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
+  Future<void> completeWorkOrder(String id, CompleteWorkOrderRequest request);
+  Future<void> refuseWorkOrder(String id, RefuseWorkOrderRequest request);
+  Future<void> approveRefusal(String id, ApproveRefusalRequest request);
+  Future<void> denyRefusal(String id);
   Future<List<WorkOrderModel>> getActiveRepairs(String customerId);
 }
 
@@ -20,9 +29,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   final http.Client client;
   final AuthLocalDataSource authLocalDataSource;
 
+  // The BASE_URL should be something like http://.../api/v1
   static final String _baseURL = dotenv.get(
     "BASE_URL",
-    fallback: "http://localhost:3000/api",
+    fallback: "http://localhost:3000/api/v1",
   );
 
   static final Duration _timeOut = Duration(
@@ -45,7 +55,8 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
 
   @override
   Future<WorkOrderModel> getSingleWorkOrder(String id) async {
-    final url = Uri.parse('$_baseURL/work_order/single_wo?Id=$id');
+    // Corrected path from api-1.json: /api/v1/work_orders/{id}
+    final url = Uri.parse('$_baseURL/work_orders/$id');
     try {
       final headers = await _getHeaders();
       final response = await client
@@ -71,12 +82,22 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   }
 
   @override
-  Future<List<WorkOrderModel>> getManyWorkOrders(String userId) async {
-    final url = Uri.parse('$_baseURL/work_order/many_wo?userId=$userId');
+  Future<List<WorkOrderModel>> getManyWorkOrders(
+    String userId, {
+    String? status,
+  }) async {
+    // Strictly follow api-1.json: technician_id filter is for Admin/SuperAdmin only.
+    // For Tech, backend filters by token.
+    var uri = Uri.parse('$_baseURL/work_orders');
+
+    if (status != null) {
+      uri = uri.replace(queryParameters: {'status': status});
+    }
+
     try {
       final headers = await _getHeaders();
       final response = await client
-          .get(url, headers: headers)
+          .get(uri, headers: headers)
           .timeout(_timeOut);
 
       final jsonMap = jsonDecode(response.body);
@@ -101,8 +122,6 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
 
   @override
   Future<void> createWorkOrder(CreateWorkOrderRequest request) async {
-    // New endpoint from image
-    // Note: BASE_URL already includes /v1
     final url = Uri.parse('$_baseURL/work_orders');
     try {
       final headers = await _getHeaders();
@@ -113,7 +132,6 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .post(url, headers: headers, body: body)
           .timeout(_timeOut);
 
-      // Handle non-success status codes first
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw Exception('Status ${response.statusCode}: ${response.body}');
       }
@@ -130,7 +148,6 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           throw Exception(apiResponse.message ?? 'Failed to create work order');
         }
       } catch (e) {
-        // If we can't parse JSON but status is success, we might be okay
         debugPrint('Warning: Could not parse response JSON: $e');
       }
     } catch (e) {
@@ -139,8 +156,109 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   }
 
   @override
+  Future<void> completeWorkOrder(
+    String id,
+    CompleteWorkOrderRequest request,
+  ) async {
+    // Path: /api/v1/work_orders/{id}/complete
+    final url = Uri.parse('$_baseURL/work_orders/$id/complete');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode(request.toJson());
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Status ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error completing work order: $e');
+    }
+  }
+
+  @override
+  Future<void> refuseWorkOrder(
+    String id,
+    RefuseWorkOrderRequest request,
+  ) async {
+    // Path: /api/v1/work_orders/{id}/refuse
+    // According to api-1.json, this endpoint requires multipart/form-data
+    final url = Uri.parse('$_baseURL/work_orders/$id/refuse');
+    try {
+      final requestHeaders = await _getHeaders();
+      // Remove Content-Type so the http package can set it with the correct boundary
+      requestHeaders.remove('Content-Type');
+
+      final multipartRequest = http.MultipartRequest('POST', url);
+      multipartRequest.headers.addAll(requestHeaders);
+
+      // Map fields to match RefuseWorkOrderMultipart in api-1.json
+      multipartRequest.fields['reason'] = request.reason;
+      multipartRequest.fields['explanation'] = request.explanation;
+
+      // photos is required in api-1.json (array of binary).
+      // For now, sending no files if UI hasn't provided any,
+      // but if the backend strictly requires the 'photos' field even if empty:
+      // (The http package doesn't have a way to send an empty array of files easily
+      // without adding a dummy file, but let's try just the fields first.
+      // If photos is mandatory as a key, we'll see.)
+
+      final streamedResponse = await multipartRequest.send().timeout(_timeOut);
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Status ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error refusing work order: $e');
+    }
+  }
+
+  @override
+  Future<void> approveRefusal(String id, ApproveRefusalRequest request) async {
+    // Path: /api/v1/work_orders/{id}/refusal/approve
+    final url = Uri.parse('$_baseURL/work_orders/$id/refusal/approve');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode(request.toJson());
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Status ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error approving refusal: $e');
+    }
+  }
+
+  @override
+  Future<void> denyRefusal(String id) async {
+    // Path: /api/v1/work_orders/{id}/refusal/deny
+    final url = Uri.parse('$_baseURL/work_orders/$id/refusal/deny');
+    try {
+      final headers = await _getHeaders();
+      final response = await client
+          .post(url, headers: headers)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Status ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error denying refusal: $e');
+    }
+  }
+
+  @override
   Future<List<WorkOrderModel>> getActiveRepairs(String customerId) async {
-    final url = Uri.parse('$_baseURL/work_order/active?customerId=$customerId');
+    // Align with /api/v1/work_orders using status filters if possible.
+    // Assuming status=active or equivalent filter.
+    final url = Uri.parse('$_baseURL/work_orders?status=active');
     try {
       final headers = await _getHeaders();
       final response = await client

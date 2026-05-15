@@ -22,7 +22,7 @@ class ProductItemData {
 class ProductsViewModel extends ChangeNotifier {
   final List<ProductItemData> products = [
     ProductItemData(
-      id: '0563ce89-9a1f-4ef0-8e00-090377248b5e',
+      id: '155630d2-54c0-46ef-abff-dd797fcadea7',
       name: 'Laptop A',
       serialNumber: 'NA-1234568',
       warrantyDate: 'Oct 20, 2026',
@@ -30,7 +30,7 @@ class ProductsViewModel extends ChangeNotifier {
       imagePath: AppAssets.laptopA,
     ),
     ProductItemData(
-      id: '0925e498-3fb0-4734-addb-97bcf8c4acb2',
+      id: '5d530009-ff8d-4e48-abbe-57850174fb76',
       name: 'Laptop B',
       serialNumber: 'NA-8765432',
       warrantyDate: 'Oct 20, 2026',

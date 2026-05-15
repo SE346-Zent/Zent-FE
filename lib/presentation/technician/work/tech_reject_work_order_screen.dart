@@ -1,88 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
-
+import 'package:zent_fe/routing/route_names.dart';
 import 'viewmodels/tech_reject_work_order_viewmodel.dart';
 
-class TechRejectWorkOrderScreen extends StatelessWidget {
+class TechRejectWorkOrderScreen extends StatefulWidget {
   final String workOrderId;
 
   const TechRejectWorkOrderScreen({super.key, required this.workOrderId});
 
   @override
+  State<TechRejectWorkOrderScreen> createState() =>
+      _TechRejectWorkOrderScreenState();
+}
+
+class _TechRejectWorkOrderScreenState extends State<TechRejectWorkOrderScreen> {
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) =>
-          di.sl<TechRejectWorkOrderViewModel>()..initData(workOrderId),
-      child: const _TechRejectWorkOrderContent(),
-    );
-  }
-}
-
-class _TechRejectWorkOrderContent extends StatelessWidget {
-  const _TechRejectWorkOrderContent();
-
-  @override
-  Widget build(BuildContext context) {
-    final viewModel = context.watch<TechRejectWorkOrderViewModel>();
-
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        backgroundColor: AppColors.background500,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight + 1.0),
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: () => context.pop(),
-                ),
-                title: Text(
-                  'Reject Work Order',
-                  style: TextStyles.headline.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                ),
-                centerTitle: true,
+          di.sl<TechRejectWorkOrderViewModel>()..initData(widget.workOrderId),
+      child: Consumer<TechRejectWorkOrderViewModel>(
+        builder: (context, viewModel, child) {
+          return Scaffold(
+            backgroundColor: AppColors.background500,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => context.pop(),
               ),
-              const Divider(
-                height: 1,
-                thickness: 1,
-                color: AppColors.secondary50,
+              title: Text(
+                'Reject Work Order',
+                style: TextStyles.headline.copyWith(
+                  color: AppColors.primary500,
+                ),
               ),
-            ],
-          ),
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
+              centerTitle: true,
+            ),
+            body: Stack(
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
                         padding: const EdgeInsets.all(AppDimens.spaceLg),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildAssignmentCard(viewModel),
-                            const SizedBox(height: AppDimens.spaceXl),
+                            if (viewModel.workOrder != null)
+                              _buildAssignmentCard(viewModel),
+
+                            const SizedBox(height: AppDimens.spaceLg),
 
                             Text(
-                              'Reason for Rejection',
+                              'Select Reason',
                               style: TextStyles.title.copyWith(
                                 color: AppColors.primary500,
                               ),
@@ -142,20 +121,27 @@ class _TechRejectWorkOrderContent extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Spacer(),
-                      _buildBottomButton(context),
-                    ],
-                  ),
+                    ),
+                    _buildBottomButton(context),
+                  ],
                 ),
-              ),
-            );
-          },
-        ),
+                if (viewModel.isLoading)
+                  Container(
+                    color: Colors.black26,
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildAssignmentCard(TechRejectWorkOrderViewModel viewModel) {
+    final wo = viewModel.workOrder;
+    if (wo == null) return const SizedBox.shrink();
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -180,17 +166,11 @@ class _TechRejectWorkOrderContent extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppDimens.spaceSm),
-                    _buildInfoRow('Work Order ID', viewModel.workOrderId),
+                    _buildInfoRow('Work Order ID', wo.id),
                     const SizedBox(height: 4.0),
-                    _buildInfoRow(
-                      'Customer',
-                      viewModel.assignmentDetails['customer']!,
-                    ),
+                    _buildInfoRow('Customer', wo.customerName),
                     const SizedBox(height: 4.0),
-                    _buildInfoRow(
-                      'Assigner',
-                      viewModel.assignmentDetails['assigner']!,
-                    ),
+                    _buildInfoRow('Product', wo.title),
                   ],
                 ),
               ),
@@ -209,7 +189,16 @@ class _TechRejectWorkOrderContent extends StatelessWidget {
           label,
           style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
         ),
-        Text(value, style: TextStyles.middle.copyWith(color: Colors.black)),
+        const SizedBox(width: AppDimens.spaceMd),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: TextStyles.middle.copyWith(color: Colors.black),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }
@@ -223,7 +212,7 @@ class _TechRejectWorkOrderContent extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10.0),
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
@@ -245,7 +234,12 @@ class _TechRejectWorkOrderContent extends StatelessWidget {
               size: 20,
             ),
             const SizedBox(width: AppDimens.spaceMd),
-            Text(title, style: TextStyles.middle.copyWith(color: Colors.black)),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyles.middle.copyWith(color: Colors.black),
+              ),
+            ),
           ],
         ),
       ),
@@ -253,33 +247,35 @@ class _TechRejectWorkOrderContent extends StatelessWidget {
   }
 
   Widget _buildBottomButton(BuildContext context) {
+    final viewModel = context.watch<TechRejectWorkOrderViewModel>();
     return Container(
       padding: const EdgeInsets.all(AppDimens.spaceLg),
-      color: AppColors.background500,
+      color: Colors.white,
       child: SafeArea(
         top: false,
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           height: 52,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppDimens.boraSm),
-            boxShadow: [BoxShadowStyles.glowing],
-          ),
-          child: ElevatedButton(
-            onPressed: () {
-              context.goNamed(RouteNames.techWorkOrder);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.tertiary500,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimens.boraSm),
-              ),
-            ),
-            child: Text(
-              'Confirm Rejection',
-              style: TextStyles.title.copyWith(color: Colors.white),
-            ),
+          child: PrimaryActionButton(
+            label: 'Confirm Rejection',
+            onPressed: viewModel.isLoading
+                ? null
+                : () {
+                    if (viewModel.selectedReasonId == null) {
+                      debugPrint('Validation: Please select a reason');
+                      return;
+                    }
+                    // Handle async logic without making the closure itself async if the type is strict
+                    viewModel.submitRejection().then((error) {
+                      if (context.mounted) {
+                        if (error == null) {
+                          context.goNamed(RouteNames.techWorkOrder);
+                        } else {
+                          debugPrint('Rejection Error: $error');
+                        }
+                      }
+                    });
+                  },
           ),
         ),
       ),

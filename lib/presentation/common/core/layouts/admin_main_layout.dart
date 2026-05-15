@@ -10,15 +10,41 @@ import '../../../../routing/route_names.dart';
 import '../../../../di/injection_container.dart';
 import '../../auth/auth_view_model.dart';
 
-class AdminMainLayout extends StatelessWidget {
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+class AdminMainLayout extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const AdminMainLayout({super.key, required this.navigationShell});
 
+  @override
+  State<AdminMainLayout> createState() => _AdminMainLayoutState();
+}
+
+class _AdminMainLayoutState extends State<AdminMainLayout> {
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationPermissions();
+  }
+
+  Future<void> _checkNotificationPermissions() async {
+    final messaging = FirebaseMessaging.instance;
+    final settings = await messaging.requestPermission();
+    if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+        settings.authorizationStatus != AuthorizationStatus.provisional) {
+      if (mounted) {
+        debugPrint('Notification permission is required. Logging out...');
+        sl<AuthViewModel>().clearUser();
+        context.goNamed(RouteNames.login);
+      }
+    }
+  }
+
   void _goBranch(int index) {
-    navigationShell.goBranch(
+    widget.navigationShell.goBranch(
       index,
-      initialLocation: index == navigationShell.currentIndex,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
   }
 
@@ -26,7 +52,9 @@ class AdminMainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUri = GoRouterState.of(context).uri.toString();
     final isQueueScreen = currentUri.toLowerCase().contains('queue');
-    final displayIndex = isQueueScreen ? -1 : navigationShell.currentIndex;
+    final displayIndex = isQueueScreen
+        ? -1
+        : widget.navigationShell.currentIndex;
     final userName = sl<AuthViewModel>().currentUser?.name ?? 'Admin';
     return Scaffold(
       backgroundColor: AppColors.background500,
@@ -39,7 +67,7 @@ class AdminMainLayout extends StatelessWidget {
             padding: EdgeInsets.only(
               bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
             ),
-            child: navigationShell,
+            child: widget.navigationShell,
           ),
           Positioned(
             left: 0,

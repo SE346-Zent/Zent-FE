@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/entities/work_order_completion_draft.dart';
 import 'package:zent_fe/domain/usecases/work_order/work_order_draft_usecase.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
+import 'package:zent_fe/data/models/complete_work_order_request.dart';
+import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
@@ -99,11 +101,57 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
     }
   }
 
-  void submitPressed() {
+  Future<void> submitPressed(BuildContext context) async {
     debugPrint(
       "action triggered: Submit Completion Report for WO: $workOrderId",
     );
-    // Clear draft on success?
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final request = CompleteWorkOrderRequest(
+        mtm: mtm,
+        serialNumber: serialNumber,
+        partChanges: [
+          ..._installedParts.map(
+            (p) => PartChangeInput(partId: p.id, changeType: 'INSTALL'),
+          ),
+          ..._uninstalledParts.map(
+            (p) => PartChangeInput(partId: p.id, changeType: 'UNINSTALL'),
+          ),
+        ],
+        diagnosis: diagnosticNotes,
+        latitude: 0.0, // Assuming location logic is handled elsewhere or mock
+        longitude: 0.0,
+        signatureFileName: 'signature.png',
+        checklist: _checklist
+            .map(
+              (c) => ChecklistResultInput(
+                id: c.id,
+                result: c.result,
+                notes: c.notes,
+              ),
+            )
+            .toList(),
+      );
+
+      // Call API (using repository or usecase if available)
+      final repo = sl<WorkOrderRepositoryImpl>();
+      await repo.remoteDataSource.completeWorkOrder(workOrderId, request);
+
+      // Clear draft on success
+      await workOrderDraftUseCase.clear(workOrderId);
+      if (context.mounted) {
+        Navigator.pop(context);
+        debugPrint('Work Order Completed successfully');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        debugPrint('Failed to complete work order: $e');
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   // --- Draft Persistence ---
@@ -126,6 +174,34 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
         _duringPhotos.addAll(draft.duringPhotos);
         _postPhotos.clear();
         _postPhotos.addAll(draft.postPhotos);
+
+        _checklist.clear();
+        if (draft.checklist.isEmpty) {
+          _checklist.addAll([
+            TechWorkOrderChecklistItem(
+              id: 1,
+              result: false,
+              notes: "Device powers on",
+            ),
+            TechWorkOrderChecklistItem(
+              id: 2,
+              result: false,
+              notes: "Screen is intact",
+            ),
+            TechWorkOrderChecklistItem(
+              id: 3,
+              result: false,
+              notes: "All screws tightened",
+            ),
+            TechWorkOrderChecklistItem(
+              id: 4,
+              result: false,
+              notes: "Customer verified repair",
+            ),
+          ]);
+        } else {
+          _checklist.addAll(draft.checklist);
+        }
 
         // Restore step
         _currentStep = draft.currentStep.clamp(0, totalSteps - 1);
@@ -174,6 +250,29 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
         quantity: 1,
       ),
     ]);
+    _checklist.clear();
+    _checklist.addAll([
+      TechWorkOrderChecklistItem(
+        id: 1,
+        result: false,
+        notes: "Device powers on",
+      ),
+      TechWorkOrderChecklistItem(
+        id: 2,
+        result: false,
+        notes: "Screen is intact",
+      ),
+      TechWorkOrderChecklistItem(
+        id: 3,
+        result: false,
+        notes: "All screws tightened",
+      ),
+      TechWorkOrderChecklistItem(
+        id: 4,
+        result: false,
+        notes: "Customer verified repair",
+      ),
+    ]);
     notifyListeners();
   }
 
@@ -192,6 +291,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
       postPhotos: _postPhotos,
       currentStep: _currentStep,
       signaturePoints: _signaturePoints,
+      checklist: _checklist,
     );
     await workOrderDraftUseCase.save(draft);
   }
@@ -228,6 +328,24 @@ class CompleteWorkOrderViewModel extends ChangeNotifier {
     _signaturePoints.clear();
     _signaturePoints.addAll(points);
     _saveDraft();
+  }
+
+  // Checklist
+  final List<TechWorkOrderChecklistItem> _checklist = [];
+  List<TechWorkOrderChecklistItem> get checklist => _checklist;
+
+  void toggleChecklistItem(int id, bool value) {
+    final index = _checklist.indexWhere((item) => item.id == id);
+    if (index != -1) {
+      final old = _checklist[index];
+      _checklist[index] = TechWorkOrderChecklistItem(
+        id: old.id,
+        result: value,
+        notes: old.notes,
+      );
+      _saveDraft();
+      notifyListeners();
+    }
   }
 
   // Photo Management

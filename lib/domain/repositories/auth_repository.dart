@@ -18,7 +18,7 @@ abstract class AuthRepository {
   Future<void> logout();
 
   Future<void> refreshToken();
-  Future<void> restoreSession();
+  Future<bool> restoreSession();
 
   Future<bool> isFirstTime();
 

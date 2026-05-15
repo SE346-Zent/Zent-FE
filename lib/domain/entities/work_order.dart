@@ -7,6 +7,7 @@ class WorkOrder {
   final WorkOrderStatus status;
   final String description;
   final String rejectReason;
+  final String refusalNote;
   final int priority;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -14,7 +15,9 @@ class WorkOrder {
   final int version;
   final String adminId;
   final String customerId;
+  final String customerName;
   final String technicianId;
+  final String? technicianName;
 
   WorkOrder({
     required this.id,
@@ -23,6 +26,7 @@ class WorkOrder {
     required this.status,
     required this.description,
     required this.rejectReason,
+    this.refusalNote = '',
     required this.priority,
     required this.createdAt,
     required this.updatedAt,
@@ -30,6 +34,11 @@ class WorkOrder {
     required this.version,
     required this.adminId,
     required this.customerId,
+    this.customerName = '',
     required this.technicianId,
+    this.technicianName,
   });
+
+  String get address => addressString;
+  String get refusalReason => rejectReason;
 }

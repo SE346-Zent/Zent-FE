@@ -6,7 +6,7 @@ class GetManyWorkOrdersUseCase {
 
   GetManyWorkOrdersUseCase(this.repository);
 
-  Future<List<WorkOrder>> execute(String userId) async {
-    return await repository.getManyWorkOrders(userId: userId);
+  Future<List<WorkOrder>> execute(String userId, {String? status}) async {
+    return await repository.getManyWorkOrders(userId: userId, status: status);
   }
 }

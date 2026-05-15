@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/operational_queue_viewmodel.dart';
 
 class OperationalQueueJobCard extends StatelessWidget {
   final Map<String, dynamic> job;
@@ -88,16 +90,27 @@ class OperationalQueueJobCard extends StatelessWidget {
                         ),
                         const SizedBox(width: AppDimens.spaceSm),
                         GestureDetector(
-                          onTap: () {
-                            context.pushNamed(
-                              RouteNames.adminWorkOrderDetails,
-                              pathParameters: {
-                                'workOrderId': job['id'].toString().replaceAll(
-                                  '#',
-                                  '',
-                                ),
-                              },
+                          onTap: () async {
+                            final cleanId = job['id'].toString().replaceAll(
+                              '#',
+                              '',
                             );
+                            if (job['statusEnum'] == 'rejectInReview') {
+                              await context.pushNamed(
+                                RouteNames.adminRejectionDetail,
+                                pathParameters: {'workOrderId': cleanId},
+                              );
+                            } else {
+                              await context.pushNamed(
+                                RouteNames.adminWorkOrderDetails,
+                                pathParameters: {'workOrderId': cleanId},
+                              );
+                            }
+                            if (context.mounted) {
+                              context
+                                  .read<OperationalQueueViewModel>()
+                                  .loadWorkOrders();
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -105,14 +118,18 @@ class OperationalQueueJobCard extends StatelessWidget {
                               vertical: 6.0,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary500,
+                              color: job['statusEnum'] == 'rejectInReview'
+                                  ? AppColors.tertiary500
+                                  : AppColors.primary500,
                               borderRadius: BorderRadius.circular(
                                 AppDimens.boraSm,
                               ),
                               boxShadow: [BoxShadowStyles.subtle],
                             ),
                             child: Text(
-                              'Assign',
+                              job['statusEnum'] == 'rejectInReview'
+                                  ? 'Review'
+                                  : 'Assign',
                               style: TextStyles.title.copyWith(
                                 color: Colors.white,
                               ),

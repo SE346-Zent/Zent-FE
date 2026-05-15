@@ -7,12 +7,24 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_installations/firebase_installations.dart';
+import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'dart:developer' as developer;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // 1. Create a GlobalKey to control SnackBars from anywhere
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  description:
+      'This channel is used for important notifications.', // description
+  importance: Importance.max, // MUST be max for heads-up banner
+);
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -29,9 +41,22 @@ Future<void> main() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    ), // Use your app icon
+  );
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  // 4. Create the channel on the device
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >()
+      ?.createNotificationChannel(channel);
+
   await _setupFCMForTesting();
 
-  // 2. Add the Foreground Listener here!
   _setupForegroundMessaging();
   fetchInstallationId();
 
@@ -42,23 +67,29 @@ Future<void> main() async {
 void _setupForegroundMessaging() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     developer.log('Got a message whilst in the foreground!');
-    developer.log('Message data: ${message.data}');
 
-    if (message.notification != null) {
-      developer.log(
-        'Message also contained a notification: ${message.notification}',
-      );
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
 
-      // 4. Trigger an In-App SnackBar safely using the GlobalKey
-      rootScaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(
-          content: Text(
-            '${message.notification?.title}: ${message.notification?.body}',
+    // If the message has a notification and we are on Android
+    if (notification != null && android != null) {
+      developer.log('Triggering native Android foreground banner');
+
+      // Trigger the native system notification instead of a SnackBar
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            icon: '@mipmap/ic_launcher',
+            // These two properties force the heads-up banner
+            importance: Importance.max,
+            priority: Priority.high,
           ),
-          backgroundColor: Colors.deepPurple,
-          behavior:
-              SnackBarBehavior.floating, // Makes it look like an in-app banner
-          duration: const Duration(seconds: 4),
         ),
       );
     }

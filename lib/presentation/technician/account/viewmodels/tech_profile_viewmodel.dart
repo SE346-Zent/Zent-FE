@@ -74,10 +74,6 @@ class TechProfileViewModel extends ChangeNotifier {
         context.push('${Routes.techMe}/${Routes.techSecuritySettings}');
         break;
 
-      case 'Notifications':
-        context.push('${Routes.techMe}/${Routes.notifications}');
-        break;
-
       default:
         break;
     }

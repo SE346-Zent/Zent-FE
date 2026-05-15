@@ -62,7 +62,10 @@ class _AdminDashboardScreenContent extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.notifications_none, color: Colors.white),
+                    icon: const Icon(
+                      Icons.notifications_none,
+                      color: Colors.white,
+                    ),
                     onPressed: () {
                       context.pushNamed(RouteNames.adminNotifications);
                     },

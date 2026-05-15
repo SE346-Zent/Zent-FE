@@ -83,9 +83,9 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
   @override
   Future<int> getUnreadCount() async {
-    final uri = Uri.parse('$_baseURL/notifications').replace(
-      queryParameters: {'page': '1', 'limit': '1'},
-    );
+    final uri = Uri.parse(
+      '$_baseURL/notifications',
+    ).replace(queryParameters: {'page': '1', 'limit': '1'});
     final headers = await _getHeaders();
 
     final response = await client.get(uri, headers: headers);

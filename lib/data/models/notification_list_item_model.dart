@@ -19,7 +19,9 @@ class NotificationListItemModel extends NotificationItem {
         return DateTime.parse(dateStr);
       } catch (_) {
         // Handle formats like "2026-05-15 11:34:18.285 UTC"
-        String normalized = dateStr.replaceAll(' UTC', 'Z').replaceFirst(' ', 'T');
+        String normalized = dateStr
+            .replaceAll(' UTC', 'Z')
+            .replaceFirst(' ', 'T');
         try {
           return DateTime.parse(normalized);
         } catch (e) {

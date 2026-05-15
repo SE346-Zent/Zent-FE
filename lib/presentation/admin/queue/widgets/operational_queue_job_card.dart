@@ -95,17 +95,10 @@ class OperationalQueueJobCard extends StatelessWidget {
                               '#',
                               '',
                             );
-                            if (job['statusEnum'] == 'rejectInReview') {
-                              await context.pushNamed(
-                                RouteNames.adminRejectionDetail,
-                                pathParameters: {'workOrderId': cleanId},
-                              );
-                            } else {
-                              await context.pushNamed(
-                                RouteNames.adminWorkOrderDetails,
-                                pathParameters: {'workOrderId': cleanId},
-                              );
-                            }
+                            await context.pushNamed(
+                              RouteNames.adminWorkOrderDetails,
+                              pathParameters: {'workOrderId': cleanId},
+                            );
                             if (context.mounted) {
                               context
                                   .read<OperationalQueueViewModel>()
@@ -118,18 +111,14 @@ class OperationalQueueJobCard extends StatelessWidget {
                               vertical: 6.0,
                             ),
                             decoration: BoxDecoration(
-                              color: job['statusEnum'] == 'rejectInReview'
-                                  ? AppColors.tertiary500
-                                  : AppColors.primary500,
+                              color: AppColors.primary500,
                               borderRadius: BorderRadius.circular(
                                 AppDimens.boraSm,
                               ),
                               boxShadow: [BoxShadowStyles.subtle],
                             ),
                             child: Text(
-                              job['statusEnum'] == 'rejectInReview'
-                                  ? 'Review'
-                                  : 'Assign',
+                              'Assign',
                               style: TextStyles.title.copyWith(
                                 color: Colors.white,
                               ),

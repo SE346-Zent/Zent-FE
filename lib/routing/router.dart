@@ -299,12 +299,64 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const NotificationsListScreen(),
                 ),
+                GoRoute(
+                  name: RouteNames.adminUserManagement,
+                  path: Routes.adminUserManagement,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const UserManagementScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminChooseRoleCreateAccount,
+                      path: Routes.adminChooseRoleCreateAccount,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const ChooseRoleScreen(),
+                      routes: [
+                        GoRoute(
+                          name: RouteNames.adminCreateAccount,
+                          path: Routes.adminCreateAccount,
+                          parentNavigatorKey: _rootNavigatorKey,
+                          builder: (context, state) {
+                            final extra =
+                                state.extra as Map<String, dynamic>? ?? {};
+                            final role =
+                                extra['role'] as String? ?? 'Technicians';
+                            return CreateAccountScreen(role: role);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminPartRequests,
+                  path: Routes.adminPartRequests,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PartRequestsScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminDetailRequest,
+                      path: Routes.adminDetailRequest,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const DetailRequestScreen(),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminInventoryAssets,
+                  path: Routes.adminInventoryAssets,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const InventoryAssetsScreen(),
+                ),
               ],
             ),
             GoRoute(
               name: RouteNames.adminOperationalQueue,
               path: Routes.adminOperationalQueue,
-              builder: (context, state) => const OperationalQueueScreen(),
+              builder: (context, state) {
+                final tabStr = state.uri.queryParameters['tab'];
+                final tab = int.tryParse(tabStr ?? '0') ?? 0;
+                return OperationalQueueScreen(initialTab: tab);
+              },
               routes: [
                 GoRoute(
                   name: RouteNames.adminWorkOrderDetails,
@@ -388,60 +440,12 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const SecuritySettingsScreen(),
                 ),
                 GoRoute(
-                  name: RouteNames.adminUserManagement,
-                  path: Routes.adminUserManagement,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const UserManagementScreen(),
-                  routes: [
-                    GoRoute(
-                      name: RouteNames.adminChooseRoleCreateAccount,
-                      path: Routes.adminChooseRoleCreateAccount,
-                      parentNavigatorKey: _rootNavigatorKey,
-                      builder: (context, state) => const ChooseRoleScreen(),
-                      routes: [
-                        GoRoute(
-                          name: RouteNames.adminCreateAccount,
-                          path: Routes.adminCreateAccount,
-                          parentNavigatorKey: _rootNavigatorKey,
-                          builder: (context, state) {
-                            final extra =
-                                state.extra as Map<String, dynamic>? ?? {};
-                            final role =
-                                extra['role'] as String? ?? 'Technicians';
-                            return CreateAccountScreen(role: role);
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                GoRoute(
                   name: RouteNames.adminSystemLog,
                   path: Routes.adminSystemLog,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('System Log Screen')),
                   ),
-                ),
-                GoRoute(
-                  name: RouteNames.adminPartRequests,
-                  path: Routes.adminPartRequests,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const PartRequestsScreen(),
-                  routes: [
-                    GoRoute(
-                      name: RouteNames.adminDetailRequest,
-                      path: Routes.adminDetailRequest,
-                      parentNavigatorKey: _rootNavigatorKey,
-                      builder: (context, state) => const DetailRequestScreen(),
-                    ),
-                  ],
-                ),
-                GoRoute(
-                  name: RouteNames.adminInventoryAssets,
-                  path: Routes.adminInventoryAssets,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const InventoryAssetsScreen(),
                 ),
               ],
             ),

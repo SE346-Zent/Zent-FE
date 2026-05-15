@@ -12,7 +12,8 @@ import 'widgets/operational_queue_tab_item.dart';
 import 'widgets/operational_queue_job_card.dart';
 
 class OperationalQueueScreen extends StatefulWidget {
-  const OperationalQueueScreen({super.key});
+  final int initialTab;
+  const OperationalQueueScreen({super.key, this.initialTab = 0});
 
   @override
   State<OperationalQueueScreen> createState() => _OperationalQueueScreenState();
@@ -32,7 +33,9 @@ class _OperationalQueueScreenState extends State<OperationalQueueScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<OperationalQueueViewModel>()..loadWorkOrders(),
+      create: (_) => di.sl<OperationalQueueViewModel>()
+        ..changeTab(widget.initialTab)
+        ..loadWorkOrders(),
       child: Consumer<OperationalQueueViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(

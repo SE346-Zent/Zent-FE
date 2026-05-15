@@ -77,38 +77,69 @@ class AdminSidebar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SidebarMenuItem(
-                      title: "QR Code Scanner",
+                      title: "Add Part Request",
                       icon: const Icon(
-                        Icons.qr_code_scanner,
-                        color: AppColors.surface100,
-                      ),
-                      isActive: true,
-                      onTap: () {
-                        debugPrint("action triggered: QR Code Scanner");
-                      },
-                    ),
-                    SidebarMenuItem(
-                      title: "Add New Part",
-                      icon: const Icon(
-                        Icons.add_circle_outline,
-                        color: AppColors.primary500,
+                        Icons.local_offer_outlined,
+                        color: Colors.black,
+                        size: 23.0,
                       ),
                       isActive: false,
                       onTap: () {
                         Navigator.pop(context);
-                        context.goNamed(RouteNames.techAddNewPart);
+                        context.goNamed(RouteNames.adminPartRequests);
                       },
                     ),
                     SidebarMenuItem(
-                      title: "Part Search",
+                      title: "User Management",
                       icon: const Icon(
-                        Icons.inventory_2_outlined,
-                        color: AppColors.primary500,
+                        Icons.person_add_alt_1_outlined,
+                        color: Colors.black,
+                        size: 23.0,
                       ),
                       isActive: false,
                       onTap: () {
                         Navigator.pop(context);
-                        context.goNamed(RouteNames.techPartSearch);
+                        context.goNamed(RouteNames.adminUserManagement);
+                      },
+                    ),
+                    SidebarMenuItem(
+                      title: "Rejected Work Orders",
+                      icon: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Icon(
+                            Icons.assignment_outlined,
+                            color: Colors.black,
+                            size: 23.0,
+                          ),
+                          Container(width: 10, height: 10, color: Colors.white),
+                          const Icon(
+                            Icons.close,
+                            color: Colors.black,
+                            size: 14.0,
+                          ),
+                        ],
+                      ),
+                      isActive: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.goNamed(
+                          RouteNames.adminOperationalQueue,
+                          queryParameters: {'tab': '4'},
+                        );
+                      },
+                    ),
+                    SidebarMenuItem(
+                      title: "Work Order History",
+                      icon: const Icon(
+                        Icons.history,
+                        color: Colors.black,
+                        size: 23.0,
+                      ),
+                      isActive: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        debugPrint("Navigating to Work Order History");
                       },
                     ),
                     const SizedBox(height: AppDimens.spaceSm),

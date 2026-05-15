@@ -12,6 +12,8 @@ abstract class NotificationRemoteDataSource {
     int limit = 20,
     int? categoryId,
   });
+
+  Future<int> getUnreadCount();
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -74,6 +76,27 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       } else {
         throw Exception(apiResponse.message ?? 'Failed to fetch notifications');
       }
+    } else {
+      throw Exception('Server error: ${response.statusCode}');
+    }
+  }
+
+  @override
+  Future<int> getUnreadCount() async {
+    final uri = Uri.parse('$_baseURL/notifications').replace(
+      queryParameters: {'page': '1', 'limit': '1'},
+    );
+    final headers = await _getHeaders();
+
+    final response = await client.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final jsonMap = json.decode(response.body);
+      final meta = jsonMap['meta'];
+      if (meta != null && meta['unreadCount'] != null) {
+        return meta['unreadCount'] as int;
+      }
+      return 0;
     } else {
       throw Exception('Server error: ${response.statusCode}');
     }

@@ -36,6 +36,7 @@ import '../domain/repositories/notification_repository.dart';
 import '../data/repositories/notification_repository_impl.dart';
 import '../data/datasources/remote/notification_remote_datasource.dart';
 import '../domain/usecases/notification/get_notifications_usecase.dart';
+import '../domain/usecases/notification/get_unread_count_usecase.dart';
 import '../presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
@@ -118,6 +119,7 @@ Future<void> init() async {
 
   // Notification Use Cases
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUnreadCountUseCase(sl()));
 
   // ViewModels
   sl.registerLazySingleton(() => AuthViewModel());

@@ -2,103 +2,118 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import '../../../../domain/entities/notification_item.dart';
 
-class NotificationTile extends StatelessWidget {
+class NotificationTile extends StatefulWidget {
   final NotificationItem notification;
-  final VoidCallback onExpanded;
+  final VoidCallback onTap;
 
   const NotificationTile({
     super.key,
     required this.notification,
-    required this.onExpanded,
+    required this.onTap,
   });
 
-  String _formatDate(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}m ago';
-    } else if (diff.inHours < 24) {
-      return '${diff.inHours}h ago';
-    } else {
-      return '${diff.inDays}d ago';
-    }
-  }
+  @override
+  State<NotificationTile> createState() => _NotificationTileState();
+}
+
+class _NotificationTileState extends State<NotificationTile> {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
-      decoration: BoxDecoration(
-        color: notification.isRead ? Colors.white : AppColors.surface100,
-        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        border: Border.all(
-          color: notification.isRead
-              ? AppColors.secondary200
-              : AppColors.tertiary300,
-          width: 1.0,
-        ),
-        boxShadow: [BoxShadowStyles.raised],
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          onExpansionChanged: (expanded) {
-            if (expanded && !notification.isRead) {
-              onExpanded();
-            }
-          },
-          tilePadding: const EdgeInsets.symmetric(
-            horizontal: AppDimens.spaceMd,
-            vertical: AppDimens.spaceSm,
+    return InkWell(
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      onTap: () {
+        setState(() {
+          _isExpanded = !_isExpanded;
+        });
+        widget.onTap();
+      },
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 52),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceXs,
+            vertical: AppDimens.spaceXs,
           ),
-          leading: CircleAvatar(
-            radius: 20,
-            backgroundColor: notification.isRead
-                ? AppColors.secondary100
-                : AppColors.tertiary100,
-            child: Icon(
-              notification.isRead
-                  ? Icons.notifications_none
-                  : Icons.notifications_active,
-              color: notification.isRead
-                  ? AppColors.secondary500
-                  : AppColors.tertiary500,
-              size: 20,
-            ),
-          ),
-          title: Text(
-            notification.title,
-            style: TextStyles.title.copyWith(
-              color: notification.isRead
-                  ? AppColors.secondary700
-                  : Colors.black,
-              fontWeight: notification.isRead
-                  ? FontWeight.normal
-                  : FontWeight.bold,
-            ),
-          ),
-          subtitle: Text(
-            _formatDate(notification.createdAt.toLocal()),
-            style: TextStyles.label.copyWith(color: AppColors.secondary400),
-          ),
-          children: [
-            const Divider(height: 1, color: AppColors.secondary100),
-            Padding(
-              padding: const EdgeInsets.all(AppDimens.spaceLg),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  notification.body,
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.secondary700,
-                    height: 1.5,
+          child: Row(
+            crossAxisAlignment: _isExpanded
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
+            children: [
+              // Unread dot
+              Padding(
+                padding: EdgeInsets.only(top: _isExpanded ? 8.0 : 0),
+                child: SizedBox(
+                  width: 14,
+                  child: Center(
+                    child: !widget.notification.isRead
+                        ? Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              color: AppColors.tertiary500,
+                              shape: BoxShape.circle,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: AppDimens.spaceXs),
+              // Avatar
+              Padding(
+                padding: EdgeInsets.only(top: _isExpanded ? 4.0 : 0),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        widget.notification.data?['avatarUrl'] ??
+                            'https://i.pravatar.cc/150?u=${widget.notification.notificationId}',
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppDimens.spaceMd),
+              // Content
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.notification.title,
+                      style: TextStyles.middle.copyWith(
+                        color: const Color(0xFF000000),
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: _isExpanded ? null : 1,
+                      overflow: _isExpanded ? null : TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.notification.body,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.secondary500,
+                      ),
+                      maxLines: _isExpanded ? null : 1,
+                      overflow: _isExpanded ? null : TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

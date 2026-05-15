@@ -4,6 +4,8 @@ import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
 
 class TechHomeHeader extends StatelessWidget {
@@ -53,14 +55,40 @@ class TechHomeHeader extends StatelessWidget {
               ),
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      context.pushNamed(RouteNames.techNotifications);
+                  Consumer<NotificationsViewModel>(
+                    builder: (context, viewModel, _) {
+                      final hasUnread = viewModel.unreadCount > 0;
+                      return Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              context.pushNamed(RouteNames.techNotifications);
+                            },
+                            child: const Icon(
+                              Icons.notifications_none,
+                              color: AppColors.surface100,
+                            ),
+                          ),
+                          if (hasUnread)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: AppColors.tertiary500,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.primary500,
+                                    width: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
                     },
-                    child: const Icon(
-                      Icons.notifications_none,
-                      color: AppColors.surface100,
-                    ),
                   ),
                   const SizedBox(width: AppDimens.spaceSm),
                   GestureDetector(

@@ -19,4 +19,9 @@ class NotificationRepositoryImpl implements NotificationRepository {
       categoryId: categoryId,
     );
   }
+
+  @override
+  Future<int> getUnreadCount() async {
+    return await remoteDataSource.getUnreadCount();
+  }
 }

@@ -28,7 +28,6 @@ import '../presentation/admin/account/detail_request_screen.dart';
 import '../presentation/customer/work/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
-import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
@@ -552,7 +551,7 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const TechPersonalInfoScreen(),
                 ),
                 GoRoute(
-                  name: 'techNotifications',
+                  name: RouteNames.techNotifications,
                   path: Routes.notifications,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const NotificationsListScreen(),
@@ -693,8 +692,7 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.customerNotifications,
                   path: Routes.customerNotifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) =>
-                      const CustomerNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
               ],
             ),

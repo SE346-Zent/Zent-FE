@@ -13,6 +13,7 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/admin_dashboard_viewmodel.dart';
 import 'widgets/admin_dashboard_quick_actions.dart';
 import 'widgets/admin_dashboard_stat_card.dart';
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -21,7 +22,14 @@ class AdminDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<AdminDashboardViewModel>(),
-      child: const _AdminDashboardScreenContent(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
+          ),
+        ],
+        child: const _AdminDashboardScreenContent(),
+      ),
     );
   }
 }
@@ -47,10 +55,37 @@ class _AdminDashboardScreenContent extends StatelessWidget {
           style: TextStyles.headline.copyWith(color: Colors.white),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: () {
-              context.pushNamed(RouteNames.adminNotifications);
+          Consumer<NotificationsViewModel>(
+            builder: (context, viewModel, _) {
+              final hasUnread = viewModel.unreadCount > 0;
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none, color: Colors.white),
+                    onPressed: () {
+                      context.pushNamed(RouteNames.adminNotifications);
+                    },
+                  ),
+                  if (hasUnread)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiary500,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.primary500,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
             },
           ),
           Container(

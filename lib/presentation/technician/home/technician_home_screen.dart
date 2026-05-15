@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'viewmodels/technician_home_viewmodel.dart';
 import 'widgets/tech_home_header.dart';
 import 'widgets/tech_stats_row.dart';
@@ -18,7 +19,14 @@ class TechnicianHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<TechnicianHomeViewModel>(),
-      child: const _TechnicianHomeContent(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
+          ),
+        ],
+        child: const _TechnicianHomeContent(),
+      ),
     );
   }
 }

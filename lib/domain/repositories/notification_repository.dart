@@ -6,4 +6,6 @@ abstract class NotificationRepository {
     int limit = 20,
     int? categoryId,
   });
+
+  Future<int> getUnreadCount();
 }

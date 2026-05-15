@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/domain/entities/notification_item.dart';
 
 import 'viewmodels/notifications_viewmodel.dart';
 import 'widgets/notification_tile.dart';
@@ -57,6 +58,8 @@ class _NotificationsListScreenContentState
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<NotificationsViewModel>();
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       appBar: PreferredSize(
@@ -74,6 +77,7 @@ class _NotificationsListScreenContentState
                 'Notifications',
                 style: TextStyles.headline.copyWith(
                   color: AppColors.primary500,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               centerTitle: true,
@@ -86,13 +90,11 @@ class _NotificationsListScreenContentState
           ],
         ),
       ),
-      body: _buildBody(context),
+      body: _buildBody(context, viewModel),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    final viewModel = context.watch<NotificationsViewModel>();
-
+  Widget _buildBody(BuildContext context, NotificationsViewModel viewModel) {
     if (viewModel.isLoading && viewModel.notifications.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -115,37 +117,119 @@ class _NotificationsListScreenContentState
         ),
       );
     }
-    return viewModel.notifications.isEmpty
-        ? const Center(child: Text('No notifications'))
-        : RefreshIndicator(
-            onRefresh: () async {
-              viewModel.fetchNotifications(refresh: true);
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(AppDimens.spaceMd),
-              itemCount:
-                  viewModel.notifications.length + (viewModel.hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == viewModel.notifications.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
+
+    final todayItems = viewModel.todayNotifications;
+    final weekItems = viewModel.thisWeekNotifications;
+
+    if (todayItems.isEmpty && weekItems.isEmpty) {
+      return const Center(child: Text('No notifications'));
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        viewModel.fetchNotifications(refresh: true);
+      },
+      child: ListView(
+        controller: _scrollController,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.spaceMd,
+          vertical: AppDimens.spaceMd,
+        ),
+        children: [
+          // Summary line
+          Padding(
+            padding: const EdgeInsets.only(
+              top: AppDimens.spaceMd,
+              bottom: AppDimens.spaceXs,
+            ),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyles.label.copyWith(color: AppColors.secondary500),
+                children: [
+                  const TextSpan(text: 'You have '),
+                  TextSpan(
+                    text: '${todayItems.length} notifications',
+                    style: TextStyles.label.copyWith(
+                      color: AppColors.tertiary500,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                }
-                final notification = viewModel.notifications[index];
-                return NotificationTile(
-                  notification: notification,
-                  onExpanded: () {
-                    context.read<NotificationsViewModel>().markAsRead(
-                      notification.notificationId,
-                    );
-                  },
-                );
+                  ),
+                  const TextSpan(text: ' today'),
+                ],
+              ),
+            ),
+          ),
+
+          // Today Section
+          if (todayItems.isNotEmpty) ...[
+            _buildSectionHeader('Today'),
+            ..._buildNotificationGroup(todayItems, viewModel),
+          ],
+
+          const SizedBox(height: AppDimens.spaceMd),
+
+          // This Week Section
+          if (weekItems.isNotEmpty) ...[
+            _buildSectionHeader('This Week'),
+            ..._buildNotificationGroup(weekItems, viewModel),
+          ],
+
+          if (viewModel.hasMore)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+
+          const SizedBox(height: 32), // Extra space at bottom
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: AppDimens.spaceSm,
+        bottom: AppDimens.spaceSm,
+      ),
+      child: Text(
+        title,
+        style: TextStyles.headline.copyWith(
+          color: AppColors.primary500,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildNotificationGroup(
+    List<NotificationItem> items,
+    NotificationsViewModel viewModel,
+  ) {
+    return List.generate(items.length, (index) {
+      final item = items[index];
+      final isLast = index == items.length - 1;
+
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceSm),
+            child: NotificationTile(
+              notification: item,
+              onTap: () {
+                viewModel.markAsRead(item.notificationId);
+                // Handle tap logic if any
               },
             ),
-          );
+          ),
+          if (!isLast)
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.secondary100,
+            ),
+        ],
+      );
+    });
   }
 }

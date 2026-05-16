@@ -126,7 +126,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
             },
-            body: jsonEncode({'otp': otp, 'email': email}),
+            body: jsonEncode({'otpCode': otp, 'email': email}),
           )
           .timeout(_timeOut);
 
@@ -299,7 +299,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .post(
             url,
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'email': email, 'otpCode': otp}),
+            body: jsonEncode({'email': email, 'otp_code': otp}),
           )
           .timeout(_timeOut);
 
@@ -316,8 +316,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final data = apiResponse.data;
 
       if (data is String) return data;
-      if (data is Map<String, dynamic> && data['token'] != null) {
-        return data['token'].toString();
+      if (data is Map<String, dynamic> && data['resetToken'] != null) {
+        return data['resetToken'].toString();
       }
 
       throw Exception('Reset token not found in server response');

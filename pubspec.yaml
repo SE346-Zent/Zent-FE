@@ -61,7 +61,8 @@ dependencies:
   # Add this exact version:
   flutter_local_notifications: ^17.1.2
   firebase_app_installations: ^0.3.3
-  firebase_installations: ^16.3.6
+  flutter_bloc: ^9.1.0
+
 
 dev_dependencies:
   flutter_test:

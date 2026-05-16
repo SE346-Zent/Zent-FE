@@ -152,7 +152,9 @@ Future<void> init() async {
   sl.registerFactory(() => ProductsViewModel());
   sl.registerFactory(() => DetailedProductViewModel());
   sl.registerFactory(() => RequestServiceViewModel(sl()));
-  sl.registerFactory(() => ActiveRepairsViewModel());
+  sl.registerFactory(
+    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
+  );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(() => DetailedChatViewModel());
   sl.registerFactory(() => DeviceRegistrationViewModel());

@@ -4,8 +4,15 @@ import '../entities/work_order_completion_draft.dart';
 
 abstract class WorkOrderRepository {
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
-  Future<WorkOrder> getSingleWorkOrder({required String id});
-  Future<List<WorkOrder>> getManyWorkOrders({required String userId});
+  Future<List<WorkOrder>> getWorkOrders({
+    int page = 1,
+    int limit = 20,
+    String? role,
+    String? province,
+    String? technicianId,
+  });
+
+  Future<WorkOrder> getWorkOrderDetail({required String id});
   Future<List<WorkOrder>> getActiveRepairs({required String customerId});
 
   // Drafts (Local)

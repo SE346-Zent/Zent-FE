@@ -7,6 +7,6 @@ class GetSingleWorkOrderUseCase {
   GetSingleWorkOrderUseCase(this.repository);
 
   Future<WorkOrder> execute(String id) async {
-    return await repository.getSingleWorkOrder(id: id);
+    return await repository.getWorkOrderDetail(id: id);
   }
 }

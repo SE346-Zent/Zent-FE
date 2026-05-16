@@ -17,6 +17,15 @@ class WorkOrderModel extends WorkOrder {
     required super.adminId,
     required super.customerId,
     required super.technicianId,
+    super.workOrderNum,
+    super.customerName,
+    super.productName,
+    super.appointment,
+    super.building,
+    super.city,
+    super.country,
+    super.email,
+    super.firstName,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -35,60 +44,107 @@ class WorkOrderModel extends WorkOrder {
       adminId: entity.adminId,
       customerId: entity.customerId,
       technicianId: entity.technicianId,
+      workOrderNum: entity.workOrderNum,
+      customerName: entity.customerName,
+      productName: entity.productName,
+      appointment: entity.appointment,
+      building: entity.building,
+      city: entity.city,
+      country: entity.country,
+      email: entity.email,
+      firstName: entity.firstName,
     );
   }
 
   factory WorkOrderModel.fromJson(Map<String, dynamic> json) {
     return WorkOrderModel(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      addressString: json['addressString'] as String? ?? '',
-      status: _parseStatus(
-        json['status_id'] as int? ?? json['statusId'] as int?,
-      ),
-      description: json['description'] as String? ?? '',
-      rejectReason: json['rejectReason'] as String? ?? '',
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      addressString:
+          json['address']?.toString() ??
+          json['addressString']?.toString() ??
+          '',
+      status: _parseStatus(json['status']?.toString()),
+      description: json['description']?.toString() ?? '',
+      rejectReason: json['rejectReason']?.toString() ?? '',
       priority: json['priority'] as int? ?? 0,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
+          ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
           : DateTime.now(),
       closedAt: json['closedAt'] != null
-          ? DateTime.parse(json['closedAt'])
+          ? DateTime.tryParse(json['closedAt'])
           : null,
+
       version: json['version'] as int? ?? 0,
-      adminId: json['adminId'] as String? ?? '',
-      customerId: json['customerId'] as String? ?? '',
-      technicianId: json['technicianId'] as String? ?? '',
+      adminId: json['adminId']?.toString() ?? '',
+      customerId: json['customerId']?.toString() ?? '',
+      technicianId: json['technicianId']?.toString() ?? '',
+      workOrderNum: json['workOrderNum']?.toString(),
+      customerName: json['customerName']?.toString(),
+      productName: json['productName']?.toString(),
+      appointment: json['appointment'] != null
+          ? DateTime.tryParse(json['appointment'])
+          : null,
+      building: json['building']?.toString(),
+      city: json['city']?.toString(),
+      country: json['country']?.toString(),
+      email: json['email']?.toString(),
+      firstName: json['firstName']?.toString(),
     );
   }
 
-  static WorkOrderStatus _parseStatus(int? statusId) {
-    if (statusId == null) return WorkOrderStatus.pending;
-    if (statusId >= 0 && statusId < WorkOrderStatus.values.length) {
-      return WorkOrderStatus.values[statusId];
+  static WorkOrderStatus _parseStatus(String? statusStr) {
+    if (statusStr == null || statusStr.isEmpty) {
+      return WorkOrderStatus.pending;
     }
-    return WorkOrderStatus.pending;
+    final normalizedStatus = statusStr.toLowerCase().replaceAll('_', '');
+    switch (normalizedStatus) {
+      case 'pending':
+        return WorkOrderStatus.pending;
+      case 'inprog':
+      case 'inprogress':
+        return WorkOrderStatus.inProg;
+      case 'complete':
+      case 'completed':
+        return WorkOrderStatus.complete;
+      case 'rejectinreview':
+        return WorkOrderStatus.rejectInReview;
+      case 'rejected':
+      case 'reject':
+        return WorkOrderStatus.rejected;
+      default:
+        return WorkOrderStatus.pending;
+    }
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
-      'address_string': addressString,
-      'status_id': status.index,
+      'address': addressString,
+      'status': status.name,
       'description': description,
-      'reject_reason': rejectReason,
+      'rejectReason': rejectReason,
       'priority': priority,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-      'closed_at': closedAt?.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'closedAt': closedAt?.toIso8601String(),
       'version': version,
-      'admin_id': adminId,
-      'customer_id': customerId,
-      'technician_id': technicianId,
+      'adminId': adminId,
+      'customerId': customerId,
+      'technicianId': technicianId,
+      'workOrderNum': workOrderNum,
+      'customerName': customerName,
+      'productName': productName,
+      'appointment': appointment?.toIso8601String(),
+      'building': building,
+      'city': city,
+      'country': country,
+      'email': email,
+      'firstName': firstName,
     };
   }
 }

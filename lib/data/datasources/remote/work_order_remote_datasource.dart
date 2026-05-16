@@ -10,8 +10,16 @@ import '../../models/create_work_order_request.dart';
 import '../local/auth_local_datasource.dart';
 
 abstract class WorkOrderRemoteDataSource {
-  Future<WorkOrderModel> getSingleWorkOrder(String id);
-  Future<List<WorkOrderModel>> getManyWorkOrders(String userId);
+  Future<List<WorkOrderModel>> getWorkOrders({
+    int page = 1,
+    int limit = 20,
+    String? role,
+    String? province,
+    String? technicianId,
+  });
+
+  Future<WorkOrderModel> getWorkOrderDetail(String id);
+
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
   Future<List<WorkOrderModel>> getActiveRepairs(String customerId);
 }
@@ -44,65 +52,91 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   }
 
   @override
-  Future<WorkOrderModel> getSingleWorkOrder(String id) async {
-    final url = Uri.parse('$_baseURL/work_order/single_wo?Id=$id');
+  Future<List<WorkOrderModel>> getWorkOrders({
+    int page = 1,
+    int limit = 20,
+    String? role,
+    String? province,
+    String? technicianId,
+  }) async {
+    final queryParameters = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      if (role != null) 'role': role,
+      if (province != null) 'province': province,
+      if (technicianId != null) 'technician_id': technicianId,
+    };
+
+    final url = Uri.parse(
+      '$_baseURL/work_orders',
+    ).replace(queryParameters: queryParameters);
+
     try {
       final headers = await _getHeaders();
       final response = await client
           .get(url, headers: headers)
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as List<dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!
+            .map(
+              (item) => WorkOrderModel.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch work orders');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error fetching work orders: $e');
+    }
+  }
+
+  @override
+  Future<WorkOrderModel> getWorkOrderDetail(String id) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id');
+
+    try {
+      final headers = await _getHeaders();
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(
         jsonMap,
-        (data) => WorkOrderModel.fromJson(data),
+        (data) => WorkOrderModel.fromJson(data as Map<String, dynamic>),
       );
 
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!;
       } else {
         throw Exception(
-          apiResponse.message ?? 'Failed to fetch single work order',
+          apiResponse.message ?? 'Failed to fetch work order detail',
         );
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error fetching single work order: $e');
     }
   }
 
   @override
-  Future<List<WorkOrderModel>> getManyWorkOrders(String userId) async {
-    final url = Uri.parse('$_baseURL/work_order/many_wo?userId=$userId');
-    try {
-      final headers = await _getHeaders();
-      final response = await client
-          .get(url, headers: headers)
-          .timeout(_timeOut);
-
-      final jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
-        data,
-      ) {
-        if (data is List) {
-          return data.map((e) => WorkOrderModel.fromJson(e)).toList();
-        }
-        return [];
-      });
-
-      if (apiResponse.isSuccessful && apiResponse.data != null) {
-        return apiResponse.data!;
-      } else {
-        throw Exception(apiResponse.message ?? 'Failed to fetch work orders');
-      }
-    } catch (e) {
-      throw Exception('Error fetching many work orders: $e');
-    }
-  }
-
-  @override
   Future<void> createWorkOrder(CreateWorkOrderRequest request) async {
-    // New endpoint from image
-    // Note: BASE_URL already includes /v1
     final url = Uri.parse('$_baseURL/work_orders');
     try {
       final headers = await _getHeaders();
@@ -113,14 +147,11 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .post(url, headers: headers, body: body)
           .timeout(_timeOut);
 
-      // Handle non-success status codes first
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
 
-      if (response.body.isEmpty) {
-        return;
-      }
+      if (response.body.isEmpty) return;
 
       try {
         final jsonMap = jsonDecode(response.body);
@@ -130,10 +161,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           throw Exception(apiResponse.message ?? 'Failed to create work order');
         }
       } catch (e) {
-        // If we can't parse JSON but status is success, we might be okay
         debugPrint('Warning: Could not parse response JSON: $e');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error creating work order: $e');
     }
   }
@@ -146,6 +177,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       final response = await client
           .get(url, headers: headers)
           .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
@@ -165,7 +200,35 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
         );
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error fetching active repairs: $e');
+    }
+  }
+
+  void _handleErrorResponse(http.Response response) {
+    final statusCode = response.statusCode;
+    final body = response.body;
+
+    debugPrint('--- API Error $statusCode ---');
+    debugPrint('Body: $body');
+    debugPrint('-----------------------------');
+
+    if (body.isEmpty) {
+      throw Exception('Server Error ($statusCode)');
+    }
+
+    final contentType = response.headers['content-type'] ?? '';
+    if (contentType.contains('application/json')) {
+      try {
+        final errorMap = jsonDecode(body);
+        throw Exception(
+          errorMap['message'] ?? 'Something went wrong ($statusCode)',
+        );
+      } catch (_) {
+        throw Exception('Server response error ($statusCode)');
+      }
+    } else {
+      throw Exception('Server error ($statusCode)');
     }
   }
 }

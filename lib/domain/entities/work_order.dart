@@ -15,6 +15,15 @@ class WorkOrder {
   final String adminId;
   final String customerId;
   final String technicianId;
+  final String? workOrderNum;
+  final String? customerName;
+  final String? productName;
+  final DateTime? appointment;
+  final String? building;
+  final String? city;
+  final String? country;
+  final String? email;
+  final String? firstName;
 
   WorkOrder({
     required this.id,
@@ -31,5 +40,14 @@ class WorkOrder {
     required this.adminId,
     required this.customerId,
     required this.technicianId,
+    this.workOrderNum,
+    this.customerName,
+    this.productName,
+    this.appointment,
+    this.building,
+    this.city,
+    this.country,
+    this.email,
+    this.firstName,
   });
 }

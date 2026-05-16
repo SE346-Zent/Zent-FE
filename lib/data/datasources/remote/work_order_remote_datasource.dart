@@ -62,9 +62,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     final queryParameters = {
       'page': page.toString(),
       'limit': limit.toString(),
-      if (role != null) 'role': role,
-      if (province != null) 'province': province,
-      if (technicianId != null) 'technician_id': technicianId,
+      ?role: role,
+      ?province: province,
+      'technician_id': technicianId,
     };
 
     final url = Uri.parse(

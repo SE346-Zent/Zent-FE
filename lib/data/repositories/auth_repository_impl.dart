@@ -3,7 +3,6 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
-import '../../routing/rbac_token_store.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -18,17 +17,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<User> login({required String email, required String password}) async {
     final response = await authRemoteService.login(email, password);
 
-    // 1. Save to Memory Store
-    RbacTokenStore.setToken(response.accessToken);
-    RbacTokenStore.setRole(response.user.role);
-
-    // 2. Save to Secure Storage (Persistence)
+    // 1. Save to Secure Storage (Persistence)
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
     );
 
-    // 3. Save User Info
+    // 2. Save User Info
     await authLocalDataSource.saveUser(response.user);
 
     return response.user;
@@ -76,7 +71,6 @@ class AuthRepositoryImpl implements AuthRepository {
       debugPrint("Remote logout failed: $e");
     } finally {
       await authLocalDataSource.clearCredentials();
-      RbacTokenStore.clearToken();
     }
   }
 
@@ -89,7 +83,6 @@ class AuthRepositoryImpl implements AuthRepository {
         email,
         refreshToken,
       );
-      RbacTokenStore.setToken(response.accessToken);
       await authLocalDataSource.saveCredentials(
         response.accessToken,
         response.refreshToken,
@@ -99,14 +92,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> restoreSession() async {
-    final token = await authLocalDataSource.getAccessToken();
-    if (token != null) {
-      RbacTokenStore.setToken(token);
-    }
-    final user = await authLocalDataSource.getUser();
-    if (user != null) {
-      RbacTokenStore.setRole(user.role);
-    }
   }
 
   @override

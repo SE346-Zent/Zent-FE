@@ -20,8 +20,6 @@ class WorkOrder {
   final String? technicianName;
   final String workOrderNum;
   final List<String> rejectionPhotos;
-  final String? workOrderNum;
-  final String? customerName;
   final String? productName;
   final DateTime? appointment;
   final String? building;
@@ -47,8 +45,9 @@ class WorkOrder {
     required this.customerId,
     this.customerName = '',
     required this.technicianId,
-    this.workOrderNum,
-    this.customerName,
+    this.technicianName,
+    required this.workOrderNum,
+    this.rejectionPhotos = const [],
     this.productName,
     this.appointment,
     this.building,
@@ -56,9 +55,6 @@ class WorkOrder {
     this.country,
     this.email,
     this.firstName,
-    this.technicianName,
-    required this.workOrderNum,
-    this.rejectionPhotos = const [],
   });
 
   String get address => addressString;

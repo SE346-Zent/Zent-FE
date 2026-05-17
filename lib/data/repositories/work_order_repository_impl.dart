@@ -49,8 +49,8 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
-  Future<WorkOrder> getSingleWorkOrder({required String id}) async {
-    return await remoteDataSource.getSingleWorkOrder(id);
+  Future<WorkOrder> getWorkOrderDetail({required String id}) async {
+    return await remoteDataSource.getWorkOrderDetail(id);
   }
 
   @override

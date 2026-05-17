@@ -78,10 +78,15 @@ Future<UserRoles> _getRoleFromToken() async {
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
-Future<Future<String?>> _rbacRedirect(BuildContext context, GoRouterState state) async async {
+Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
   final location = state.matchedLocation;
-  final role = _getRoleFromToken();
-
+  final role = await _getRoleFromToken();
+  if (role == UserRoles.admin || role == UserRoles.technician) {
+    final settings = await FirebaseMessaging.instance.requestPermission();
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      return Routes.login;
+    }
+  }
   final isPublic = _publicPrefixes.any(
     (p) => location == p || location.startsWith('$p/'),
   );

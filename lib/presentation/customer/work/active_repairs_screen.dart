@@ -89,6 +89,7 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
 
                         if (viewModel.activeWorkOrder != null) ...[
                           TrackingCard(
+                            workOrder: viewModel.activeWorkOrder!,
                             currentStatusStep: viewModel.currentStatusStep,
                           ),
                           const SizedBox(height: AppDimens.spaceXl),

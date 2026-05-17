@@ -103,9 +103,6 @@ class AuthRepositoryImpl implements AuthRepository {
           refreshTokenStr,
         );
 
-        // Lưu thông tin mới
-        RbacTokenStore.setToken(response.accessToken);
-        RbacTokenStore.setRole(response.user.role);
         await authLocalDataSource.saveCredentials(
           response.accessToken,
           response.refreshToken,

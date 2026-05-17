@@ -11,7 +11,6 @@ abstract class WorkOrderRepository {
   Future<void> approveRefusal(String id, ApproveRefusalRequest request);
   Future<void> denyRefusal(String id);
   Future<List<WorkOrder>> getWorkOrders({
-    
     int page = 1,
     int limit = 20,
     String? role,
@@ -19,12 +18,7 @@ abstract class WorkOrderRepository {
     String? technicianId,
   });
 
-  Future<WorkOrder> getWorkOrderDetail({required String id,
-    String? status,
-    int page = 1,
-    int limit = 20,
-    String? role,
-  });
+  Future<WorkOrder> getWorkOrderDetail({required String id});
   Future<List<WorkOrder>> getActiveRepairs({required String customerId});
 
   // Drafts (Local)

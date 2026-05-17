@@ -199,12 +199,7 @@ Future<void> init() async {
   );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(
-    
-    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl(
-      getManyWorkOrdersUseCase: sl(),
-      getCurrentUserUseCase: sl(),
-    ),
-  ),
+    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
   );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(() => DetailedChatViewModel());

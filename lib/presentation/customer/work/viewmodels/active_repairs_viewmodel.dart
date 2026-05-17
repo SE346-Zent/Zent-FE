@@ -3,18 +3,6 @@ import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/entities/enums/work_order_status.dart';
 
-class CompletedRepairItem {
-  final String title;
-  final String woNumber;
-  final String date;
-
-  CompletedRepairItem({
-    required this.title,
-    required this.woNumber,
-    required this.date,
-  });
-}
-
 class ActiveRepairsViewModel extends ChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
 
@@ -25,7 +13,7 @@ class ActiveRepairsViewModel extends ChangeNotifier {
 
   int currentStatusStep = 0;
   WorkOrder? activeWorkOrder;
-  List<CompletedRepairItem> recentCompleted = [];
+  List<WorkOrder> recentCompleted = [];
 
   Future<void> fetchWorkOrders() async {
     isLoading = true;
@@ -58,17 +46,7 @@ class ActiveRepairsViewModel extends ChangeNotifier {
           .toList();
       completedOrders.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-      recentCompleted = completedOrders.map((o) {
-        final dateStr =
-            "${o.updatedAt.year}-${o.updatedAt.month.toString().padLeft(2, '0')}-${o.updatedAt.day.toString().padLeft(2, '0')}";
-        return CompletedRepairItem(
-          title: o.title.isNotEmpty
-              ? o.title
-              : (o.productName ?? 'Service Request'),
-          woNumber: o.workOrderNum ?? o.id.substring(0, 8),
-          date: dateStr,
-        );
-      }).toList();
+      recentCompleted = completedOrders;
 
       isLoading = false;
       notifyListeners();

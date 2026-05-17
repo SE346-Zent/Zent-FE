@@ -19,8 +19,9 @@ class WorkOrderModel extends WorkOrder {
     required super.customerId,
     super.customerName = '',
     required super.technicianId,
-    super.workOrderNum,
-    super.customerName,
+    super.technicianName,
+    required super.workOrderNum,
+    super.rejectionPhotos = const [],
     super.productName,
     super.appointment,
     super.building,
@@ -28,9 +29,6 @@ class WorkOrderModel extends WorkOrder {
     super.country,
     super.email,
     super.firstName,
-    super.technicianName,
-    required super.workOrderNum,
-    super.rejectionPhotos = const [],
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -51,8 +49,9 @@ class WorkOrderModel extends WorkOrder {
       customerId: entity.customerId,
       customerName: entity.customerName,
       technicianId: entity.technicianId,
+      technicianName: entity.technicianName,
       workOrderNum: entity.workOrderNum,
-      customerName: entity.customerName,
+      rejectionPhotos: entity.rejectionPhotos,
       productName: entity.productName,
       appointment: entity.appointment,
       building: entity.building,
@@ -60,9 +59,6 @@ class WorkOrderModel extends WorkOrder {
       country: entity.country,
       email: entity.email,
       firstName: entity.firstName,
-      technicianName: entity.technicianName,
-      workOrderNum: entity.workOrderNum,
-      rejectionPhotos: entity.rejectionPhotos,
     );
   }
 

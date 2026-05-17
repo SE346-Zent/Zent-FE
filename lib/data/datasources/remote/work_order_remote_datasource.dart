@@ -19,15 +19,7 @@ abstract class WorkOrderRemoteDataSource {
     String? province,
     String? technicianId,
   });
-
-  Future<WorkOrderModel> getWorkOrderDetail(
-    String id, {
-    String? status,
-    int page = 1,
-    int limit = 20,
-    String? role,
-  });
-
+  Future<WorkOrderModel> getWorkOrderDetail(String id);
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
   Future<void> completeWorkOrder(String id, CompleteWorkOrderRequest request);
   Future<void> refuseWorkOrder(String id, RefuseWorkOrderRequest request);
@@ -116,30 +108,13 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   }
 
   @override
-  Future<List<WorkOrderModel>> getManyWorkOrders(
-    String userId, {
-    String? status,
-    int page = 1,
-    int limit = 20,
-    String? role,
-  }) async {
-    // Reverting to simpler query to fix "Failed to deserialize query string: invalid type: string '1', expected u64"
-    // and to ensure results are returned for Tech/Customer via token filtering.
-    var uri = Uri.parse('$_baseURL/work_orders');
-    final queryParams = <String, String>{};
-
-    if (status != null) {
-      queryParams['status'] = status;
-    }
-
-    if (queryParams.isNotEmpty) {
-      uri = uri.replace(queryParameters: queryParams);
-    }
+  Future<WorkOrderModel> getWorkOrderDetail(String id) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id');
 
     try {
       final headers = await _getHeaders();
       final response = await client
-          .get(uri, headers: headers)
+          .get(url, headers: headers)
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {

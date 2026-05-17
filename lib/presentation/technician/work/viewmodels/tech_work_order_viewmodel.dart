@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
-
-class MockWorkOrder {
-  final String id;
-  final String title;
-  final String priority; // 'High' or 'Normal'
-  final String status; // 'In Progress', 'Pending', 'Completed'
-  final String customerName;
-  final String time;
-  final String address;
-
-  MockWorkOrder(
-    this.id,
-    this.title,
-    this.priority,
-    this.status,
-    this.customerName,
-    this.time,
-    this.address,
-  );
-}
+import '../../../../domain/entities/work_order.dart';
+import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 
 class TechWorkOrderViewModel extends ChangeNotifier {
+  final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+
+  TechWorkOrderViewModel({
+    required this.getManyWorkOrdersUseCase,
+    required this.getCurrentUserUseCase,
+  });
+
   int selectedFilterIndex = 0;
   final List<String> filters = [
     'All Jobs',
@@ -29,44 +20,50 @@ class TechWorkOrderViewModel extends ChangeNotifier {
     'Completed',
   ];
 
-  final List<MockWorkOrder> allOrders = [
-    MockWorkOrder(
-      '#WO-1234',
-      'Laptop Repair',
-      'High',
-      'In Progress',
-      'John Doe',
-      '10:30 AM - Today',
-      '123 Hoa Binh, Quan Tan Phu, TPHCM',
-    ),
-    MockWorkOrder(
-      '#WO-1235',
-      'PC Maintenance',
-      'Normal',
-      'Pending',
-      'Jane Smith',
-      '02:00 PM - Tomorrow',
-      '456 Le Loi, Quan 1, TPHCM',
-    ),
-    MockWorkOrder(
-      '#WO-1236',
-      'Screen Replacement',
-      'High',
-      'Completed',
-      'Peter Parker',
-      '09:00 AM - Yesterday',
-      '789 Nguyen Hue, Quan 1, TPHCM',
-    ),
-  ];
+  List<WorkOrder> _allOrders = [];
+  bool isLoading = false;
 
-  List<MockWorkOrder> get filteredOrders {
-    if (selectedFilterIndex == 0) return allOrders;
-    final statusFilter = filters[selectedFilterIndex];
-    return allOrders.where((order) => order.status == statusFilter).toList();
+  List<WorkOrder> get filteredOrders {
+    if (selectedFilterIndex == 0) return _allOrders;
+    final statusFilter = filters[selectedFilterIndex].toLowerCase();
+
+    // Simple mapping for demo/logic
+    return _allOrders.where((order) {
+      final status = order.status.name; // Use exact enum name
+      if (statusFilter == 'in progress') return status == 'inProg';
+      if (statusFilter == 'pending') return status == 'pending';
+      if (statusFilter == 'completed') return status == 'complete';
+      return status.toLowerCase() == statusFilter;
+    }).toList();
+  }
+
+  Future<void> initData() async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final user = await getCurrentUserUseCase.execute();
+      if (user != null) {
+        final results = await getManyWorkOrdersUseCase.execute(
+          user.id,
+          role: 'technician',
+        );
+        // The server already filters work orders by the technician's token identity.
+        _allOrders = results;
+      }
+    } catch (e) {
+      debugPrint("Error fetching tech work orders: $e");
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   void setFilter(int index) {
-    selectedFilterIndex = index;
-    notifyListeners();
+    if (selectedFilterIndex != index) {
+      selectedFilterIndex = index;
+      notifyListeners();
+      initData(); // Trigger API refresh
+    }
   }
 }

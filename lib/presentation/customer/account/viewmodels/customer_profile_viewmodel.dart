@@ -33,7 +33,11 @@ class CustomerProfileViewModel extends ChangeNotifier {
     try {
       await logoutUseCase.execute();
     } catch (e) {
-      debugPrint("Error during logout: $e");
+      final errorStr = e.toString();
+      if (!errorStr.contains('400') &&
+          !errorStr.toLowerCase().contains('revoked')) {
+        debugPrint("Error during logout: $e");
+      }
     } finally {
       if (context.mounted) {
         context.go(Routes.login);

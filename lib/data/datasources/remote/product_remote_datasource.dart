@@ -1,8 +1,4 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-import '../../models/api_response.dart';
 import '../../models/product_model.dart';
 import '../local/auth_local_datasource.dart';
 
@@ -14,54 +10,52 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final http.Client client;
   final AuthLocalDataSource authLocalDataSource;
 
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "http://localhost:3000/api",
-  );
-
-  static final Duration _timeOut = Duration(
-    seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
-  );
-
   ProductRemoteDataSourceImpl({
     required this.client,
     required this.authLocalDataSource,
   });
 
-  Future<Map<String, String>> _getHeaders() async {
-    final token = await authLocalDataSource.getAccessToken();
-    return {
-      'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
-  }
-
   @override
   Future<List<ProductModel>> getMyProducts(String userId) async {
-    final url = Uri.parse('$_baseURL/product/my_products?userId=$userId');
-    try {
-      final headers = await _getHeaders();
-      final response = await client
-          .get(url, headers: headers)
-          .timeout(_timeOut);
-
-      final jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<List<ProductModel>>.fromJson(jsonMap, (
-        data,
-      ) {
-        if (data is List) {
-          return data.map((e) => ProductModel.fromJson(e)).toList();
-        }
-        return [];
-      });
-
-      if (apiResponse.isSuccessful && apiResponse.data != null) {
-        return apiResponse.data!;
-      } else {
-        throw Exception(apiResponse.message ?? 'Failed to fetch products');
-      }
-    } catch (e) {
-      throw Exception('Error fetching products: $e');
-    }
+    // TEMPORARY: Hardcoded seeding as the /product/my_products endpoint is not in api-1.json
+    // Data matched from database screenshot provided by user
+    return [
+      ProductModel(
+        id: '155630d2-54c0-46ef-abff-dd797fcadea7',
+        name: 'Lenovo relationships',
+        model: '83LY00HQVN',
+        serialNumber: 'SN-RELATIONSHIPS-00006',
+      ),
+      ProductModel(
+        id: '5d530009-ff8d-4e48-abbe-57850174fb76',
+        name: 'Lenovo applications',
+        model: '82SN003JVN',
+        serialNumber: 'SN-APPLICATIONS-00005',
+      ),
+      ProductModel(
+        id: '8b002018-3651-4726-ad5d-cb6437c5aec5',
+        name: 'Lenovo paradigms',
+        model: '82SN003JVN',
+        serialNumber: 'SN-PARADIGMS-00000',
+      ),
+      ProductModel(
+        id: 'a6248c33-7436-4d3d-919d-9b9022737b79',
+        name: 'Lenovo infomediaries',
+        model: '82SN003JVN',
+        serialNumber: 'SN-INFOMEDIARIES-00008',
+      ),
+      ProductModel(
+        id: 'b37096c3-ecbe-4404-8806-62bdf95cb8fe',
+        name: 'Lenovo infomediaries',
+        model: '82SN003JVN',
+        serialNumber: 'SN-INFOMEDIARIES-00002',
+      ),
+      ProductModel(
+        id: 'fe9ff979-d1e3-406c-8564-0924fc0434bd',
+        name: 'Lenovo metrics',
+        model: '82SN003JVN',
+        serialNumber: 'SN-METRICS-00007',
+      ),
+    ];
   }
 }

@@ -23,10 +23,20 @@ class UserModel extends User {
 
   //* from json -> model
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Robust ID extraction: Check common keys used by different backend versions/libraries
+    final String id =
+        (json['id'] ??
+                json['_id'] ??
+                json['userId'] ??
+                json['customerId'] ??
+                json['sub'] ??
+                'temp_id')
+            .toString();
+
     return UserModel(
-      id: (json['id'] ?? json['_id'] ?? 'temp_id').toString(),
+      id: id,
       email: (json['email'] ?? '').toString(),
-      name: (json['fullName'] ?? '').toString(),
+      name: (json['fullName'] ?? json['name'] ?? '').toString(),
       phoneNumber: (json['phoneNumber'] ?? '').toString(),
       role: _mapRole(json['role'], json['roleId']),
     );

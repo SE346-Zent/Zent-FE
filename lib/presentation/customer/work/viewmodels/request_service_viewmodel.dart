@@ -49,7 +49,7 @@ class RequestServiceViewModel extends ChangeNotifier {
   String? phone;
 
   // Step 3 Data: Address Info
-  String? country = 'VIET NAM';
+  String? country = 'Vietnam';
   String? province;
   String? city;
   String? address;
@@ -71,7 +71,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> countries = ['VIET NAM'];
+  final List<String> countries = ['Vietnam'];
   final List<String> provinces = [];
   final Map<String, List<String>> _citiesByProvince = {};
 
@@ -161,7 +161,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     if (user != null) {
       if (firstName == null || firstName!.isEmpty) {
         final parts = user.name.split(' ');
-        firstName = parts.first;
+        firstName = parts.isNotEmpty ? parts.first : '';
         lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
       }
       email ??= user.email;
@@ -204,6 +204,88 @@ class RequestServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<TimeOfDay?> _showCustomTimePicker(BuildContext context) async {
+    TimeOfDay selectedTime = const TimeOfDay(hour: 7, minute: 0);
+    return showDialog<TimeOfDay>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              title: const Text('Select Appointment Time'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Available hours: 07:00 - 17:00'),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownButton<int>(
+                        value: selectedTime.hour,
+                        items: List.generate(11, (index) => index + 7).map((
+                          hour,
+                        ) {
+                          return DropdownMenuItem(
+                            value: hour,
+                            child: Text(hour.toString().padLeft(2, '0')),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              selectedTime = TimeOfDay(
+                                hour: val,
+                                minute: val == 17 ? 0 : selectedTime.minute,
+                              );
+                            });
+                          }
+                        },
+                      ),
+                      const Text(' : '),
+                      DropdownButton<int>(
+                        value: selectedTime.minute,
+                        items: [0, 15, 30, 45]
+                            .where((m) => !(selectedTime.hour == 17 && m > 0))
+                            .map((minute) {
+                              return DropdownMenuItem(
+                                value: minute,
+                                child: Text(minute.toString().padLeft(2, '0')),
+                              );
+                            })
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(
+                              () => selectedTime = TimeOfDay(
+                                hour: selectedTime.hour,
+                                minute: val,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, selectedTime),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> pickDate(BuildContext context) async {
     final DateTime? date = await showDatePicker(
       context: context,
@@ -215,10 +297,7 @@ class RequestServiceViewModel extends ChangeNotifier {
 
     if (!context.mounted) return;
 
-    final TimeOfDay? time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
+    final TimeOfDay? time = await _showCustomTimePicker(context);
     if (time == null) return;
 
     final String hh = time.hour.toString().padLeft(2, '0');
@@ -294,21 +373,24 @@ class RequestServiceViewModel extends ChangeNotifier {
         throw Exception('Please provide a description of the problem.');
       }
 
-      // Hardcode HCM for Ho Chi Minh City as requested by BE logic
       String finalCity = city ?? '';
       String finalProvince = province ?? '';
-      if (finalCity == 'Thành Phố Hồ Chí Minh' ||
-          finalProvince == 'Thành Phố Hồ Chí Minh') {
-        finalCity = 'HCM';
+
+      // Map full names to short codes for Backend
+      if (finalProvince.contains('Hồ Chí Minh')) {
         finalProvince = 'HCM';
+        finalCity = 'HCM';
+      } else if (finalProvince.contains('Hà Nội')) {
+        finalProvince = 'HN';
+        finalCity = 'HN';
       }
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        city: "HCM",
-        country: country ?? 'VIET NAM',
+        city: finalCity,
+        country: country ?? 'Vietnam',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,
         firstName: firstName ?? '',
@@ -328,11 +410,8 @@ class RequestServiceViewModel extends ChangeNotifier {
       _currentStep = 5;
     } catch (e) {
       debugPrint("Error submitting ticket: $e");
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to submit ticket: $e')));
-      }
+      // Rethrow to let the UI handle or display error
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -350,7 +429,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     lastName = null;
     email = null;
     phone = null;
-    country = 'VIET NAM';
+    country = 'Vietnam';
     province = null;
     city = null;
     address = null;

@@ -22,6 +22,7 @@ abstract final class RouteNames {
       'adminAssignedWorkOrderDetails';
   static const String adminViewSchedule = 'adminViewSchedule';
   static const String adminReassignWorkOrder = 'adminReassignWorkOrder';
+  static const String adminRejectedWorkOrders = 'adminRejectedWorkOrders';
   static const String adminTeam = 'adminTeam';
   static const String adminMe = 'adminMe';
 
@@ -51,10 +52,12 @@ abstract final class RouteNames {
   static const String adminCreateAccount = 'adminCreateAccount';
   static const String adminPartRequests = 'adminPartRequests';
   static const String adminInventoryAssets = 'adminInventoryAssets';
+  static const String adminRejectionDetail = 'adminRejectionDetail';
   static const String adminDetailRequest = 'adminDetailRequest';
 
   static const String techPauseWorkOrder = 'techPauseWorkOrder';
   static const String techRejectWorkOrder = 'techRejectWorkOrder';
+  static const String techNotifications = 'techNotifications';
 
   static const String customerMyProducts = 'customerMyProducts';
   static const String customerRequestService = 'customerRequestService';

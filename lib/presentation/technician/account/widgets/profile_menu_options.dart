@@ -46,16 +46,6 @@ class ProfileMenuOptions extends StatelessWidget {
             'Security',
           ),
         ),
-        const SizedBox(height: AppDimens.spaceSm),
-        ProfileMenuItem(
-          title: 'Notifications',
-          subtitle: 'Alerts & messages',
-          iconData: Icons.notifications_none,
-          onTap: () => context.read<TechProfileViewModel>().handleMenuTap(
-            context,
-            'Notifications',
-          ),
-        ),
       ],
     );
   }

@@ -4,8 +4,11 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
+import '../../../../domain/entities/work_order.dart';
+import 'package:intl/intl.dart';
+
 class RecentCompletedList extends StatelessWidget {
-  final List<dynamic> recentCompleted; // Or specific type
+  final List<WorkOrder> recentCompleted;
 
   const RecentCompletedList({super.key, required this.recentCompleted});
 
@@ -31,49 +34,59 @@ class RecentCompletedList extends StatelessWidget {
           const Divider(height: 1, color: AppColors.secondary50),
 
           // List item
-          Column(
-            children: [
-              for (int i = 0; i < recentCompleted.length; i++) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimens.spaceMd,
-                    vertical: AppDimens.spaceSm,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            recentCompleted[i].title,
-                            style: TextStyles.bodyLarge.copyWith(
-                              color: AppColors.secondary500,
+          if (recentCompleted.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(AppDimens.spaceMd),
+              child: Center(child: Text('No completed work orders')),
+            )
+          else
+            Column(
+              children: [
+                for (int i = 0; i < recentCompleted.length; i++) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimens.spaceMd,
+                      vertical: AppDimens.spaceSm,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              recentCompleted[i].title,
+                              style: TextStyles.bodyLarge.copyWith(
+                                color: AppColors.secondary500,
+                              ),
                             ),
-                          ),
-                          Text(
-                            recentCompleted[i].woNumber,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary300,
+                            Text(
+                              recentCompleted[i].workOrderNum.isNotEmpty
+                                  ? recentCompleted[i].workOrderNum
+                                  : 'WO-${recentCompleted[i].id.substring(0, 4)}',
+                              style: TextStyles.label.copyWith(
+                                color: AppColors.secondary300,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        recentCompleted[i].date,
-                        style: TextStyles.label.copyWith(
-                          color: AppColors.secondary500,
-                          fontWeight: FontWeight.w500,
+                          ],
                         ),
-                      ),
-                    ],
+                        Text(
+                          DateFormat(
+                            'MMM dd, yyyy',
+                          ).format(recentCompleted[i].createdAt),
+                          style: TextStyles.label.copyWith(
+                            color: AppColors.secondary500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                if (i < recentCompleted.length - 1)
-                  const Divider(height: 1, color: AppColors.secondary50),
+                  if (i < recentCompleted.length - 1)
+                    const Divider(height: 1, color: AppColors.secondary50),
+                ],
               ],
-            ],
-          ),
+            ),
         ],
       ),
     );

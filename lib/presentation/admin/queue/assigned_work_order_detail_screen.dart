@@ -82,6 +82,10 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
               _buildJobSpecificationCard(viewModel),
               const SizedBox(height: AppDimens.spaceLg),
               _buildAssignedTechnicianCard(context, viewModel),
+              if (viewModel.isRejectInReview) ...[
+                const SizedBox(height: AppDimens.spaceLg),
+                _buildRefusalActions(context, viewModel),
+              ],
             ],
           ),
         ),
@@ -430,6 +434,109 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                 style: TextStyles.title.copyWith(color: Colors.white),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRefusalActions(
+    BuildContext context,
+    AssignedWorkOrderDetailViewModel viewModel,
+  ) {
+    if (viewModel.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.error400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: AppColors.error500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Rejection Review',
+                style: TextStyles.title.copyWith(color: AppColors.error500),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceSm),
+          Text(
+            'The technician requested to reject this work order. Please review and decide whether to approve or deny.',
+            style: TextStyles.bodyLarge,
+          ),
+          const SizedBox(height: AppDimens.spaceLg),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () async {
+                    final error = await viewModel.denyRefusal();
+                    if (context.mounted) {
+                      if (error == null) {
+                        debugPrint('Refusal Denied Success');
+                        context.pop();
+                      } else {
+                        debugPrint('Refusal Denied Error: $error');
+                      }
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    side: const BorderSide(
+                      color: AppColors.error500,
+                      width: 1.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                    ),
+                  ),
+                  child: Text(
+                    'Deny Rejection',
+                    style: TextStyles.title.copyWith(color: AppColors.error500),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppDimens.spaceMd),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final error = await viewModel.approveRefusal();
+                    if (context.mounted) {
+                      if (error == null) {
+                        debugPrint('Refusal Approved Success');
+                        context.pop();
+                      } else {
+                        debugPrint('Refusal Approved Error: $error');
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.success500,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                    ),
+                  ),
+                  child: Text(
+                    'Approve',
+                    style: TextStyles.title.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

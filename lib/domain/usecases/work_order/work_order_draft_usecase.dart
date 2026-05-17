@@ -13,4 +13,8 @@ class WorkOrderDraftUseCase {
   Future<void> save(WorkOrderCompletionDraft draft) async {
     await repository.saveWorkOrderDraft(draft);
   }
+
+  Future<void> clear(String workOrderId) async {
+    await repository.clearWorkOrderDraft(workOrderId);
+  }
 }

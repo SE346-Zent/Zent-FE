@@ -1,41 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/entities/product.dart';
+import 'package:zent_fe/domain/usecases/product/get_my_products_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart';
 
-class ProductItemData {
-  final String id;
-  final String name;
-  final String serialNumber;
-  final String warrantyDate;
-  final String status;
-  final String imagePath;
-
-  ProductItemData({
-    required this.id,
-    required this.name,
-    required this.serialNumber,
-    required this.warrantyDate,
-    required this.status,
-    required this.imagePath,
-  });
-}
-
 class ProductsViewModel extends ChangeNotifier {
-  final List<ProductItemData> products = [
-    ProductItemData(
-      id: '0563ce89-9a1f-4ef0-8e00-090377248b5e',
-      name: 'Laptop A',
-      serialNumber: 'NA-1234568',
-      warrantyDate: 'Oct 20, 2026',
-      status: 'Active',
-      imagePath: AppAssets.laptopA,
-    ),
-    ProductItemData(
-      id: '0925e498-3fb0-4734-addb-97bcf8c4acb2',
-      name: 'Laptop B',
-      serialNumber: 'NA-8765432',
-      warrantyDate: 'Oct 20, 2026',
-      status: 'Expiring',
-      imagePath: AppAssets.laptopB,
-    ),
-  ];
+  final GetMyProductsUseCase getMyProductsUseCase;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+
+  ProductsViewModel({
+    required this.getMyProductsUseCase,
+    required this.getCurrentUserUseCase,
+  });
+
+  List<Product> _products = [];
+  List<Product> get products => _products;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  Future<void> fetchProducts() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final user = await getCurrentUserUseCase.execute();
+      if (user != null) {
+        _products = await getMyProductsUseCase.execute(user.id);
+      }
+    } catch (e) {
+      debugPrint("Error fetching products: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Helper to get image for a product
+  String getProductImage(Product product) {
+    if (product.name.toLowerCase().contains('laptop a')) {
+      return AppAssets.laptopA;
+    }
+    if (product.name.toLowerCase().contains('laptop b')) {
+      return AppAssets.laptopB;
+    }
+    return AppAssets.laptopA; // Default
+  }
+
+  String getProductStatus(Product product) {
+    if (product.warrantyUntil == null) return 'No Warranty';
+    if (product.warrantyUntil!.isBefore(DateTime.now())) return 'Expired';
+    if (product.warrantyUntil!.isBefore(
+      DateTime.now().add(const Duration(days: 30)),
+    )) {
+      return 'Expiring';
+    }
+    return 'Active';
+  }
 }

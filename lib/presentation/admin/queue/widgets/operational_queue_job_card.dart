@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/operational_queue_viewmodel.dart';
 
 class OperationalQueueJobCard extends StatelessWidget {
   final Map<String, dynamic> job;
@@ -58,7 +60,7 @@ class OperationalQueueJobCard extends StatelessWidget {
                     const SizedBox(height: AppDimens.spaceMd),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: Row(
@@ -67,8 +69,20 @@ class OperationalQueueJobCard extends StatelessWidget {
                               Container(
                                 width: 8,
                                 height: 8,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.warning500,
+                                decoration: BoxDecoration(
+                                  color: () {
+                                    final s = job['statusEnum'].toString();
+                                    if (s == 'rejected') {
+                                      return AppColors.error500;
+                                    }
+                                    if (s == 'rejectInReview') {
+                                      return AppColors.error200;
+                                    }
+                                    if (s == 'inProg' || s == 'complete') {
+                                      return AppColors.tertiary500;
+                                    }
+                                    return AppColors.warning500; // pending
+                                  }(),
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -78,6 +92,7 @@ class OperationalQueueJobCard extends StatelessWidget {
                                   job['status'],
                                   style: TextStyles.middle.copyWith(
                                     color: AppColors.secondary500,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -87,38 +102,45 @@ class OperationalQueueJobCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: AppDimens.spaceSm),
-                        GestureDetector(
-                          onTap: () {
-                            context.pushNamed(
-                              RouteNames.adminWorkOrderDetails,
-                              pathParameters: {
-                                'workOrderId': job['id'].toString().replaceAll(
-                                  '#',
-                                  '',
-                                ),
-                              },
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14.0,
-                              vertical: 6.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary500,
-                              borderRadius: BorderRadius.circular(
-                                AppDimens.boraSm,
+                        // Only show Assign button if it's PENDING (no tech yet)
+                        if (job['statusEnum'] == 'pending')
+                          GestureDetector(
+                            onTap: () async {
+                              final cleanId = job['id'].toString().replaceAll(
+                                '#',
+                                '',
+                              );
+                              await context.pushNamed(
+                                RouteNames.adminWorkOrderDetails,
+                                pathParameters: {'workOrderId': cleanId},
+                              );
+                              if (context.mounted) {
+                                context
+                                    .read<OperationalQueueViewModel>()
+                                    .loadWorkOrders();
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 30.0, // Increased width
+                                vertical: 5.0,
                               ),
-                              boxShadow: [BoxShadowStyles.subtle],
-                            ),
-                            child: Text(
-                              'Assign',
-                              style: TextStyles.title.copyWith(
-                                color: Colors.white,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary500,
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.boraSm,
+                                ),
+                                boxShadow: [BoxShadowStyles.subtle],
+                              ),
+                              child: Text(
+                                'Assign',
+                                style: TextStyles.title.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ],

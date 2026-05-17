@@ -24,7 +24,7 @@ class TechWorkOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<TechWorkOrderViewModel>(
-      create: (_) => sl<TechWorkOrderViewModel>(),
+      create: (_) => sl<TechWorkOrderViewModel>()..initData(),
       child: const _TechWorkOrderView(),
     );
   }
@@ -59,15 +59,19 @@ class _TechWorkOrderView extends StatelessWidget {
 
             // Work Order List
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimens.spaceMd,
-                ),
-                itemCount: viewModel.filteredOrders.length,
-                itemBuilder: (context, index) {
-                  return WorkOrderCard(order: viewModel.filteredOrders[index]);
-                },
-              ),
+              child: viewModel.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimens.spaceMd,
+                      ),
+                      itemCount: viewModel.filteredOrders.length,
+                      itemBuilder: (context, index) {
+                        return WorkOrderCard(
+                          order: viewModel.filteredOrders[index],
+                        );
+                      },
+                    ),
             ),
           ],
         ),

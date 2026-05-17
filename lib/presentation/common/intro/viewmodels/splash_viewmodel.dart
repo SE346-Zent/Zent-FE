@@ -13,8 +13,12 @@ class SplashViewModel extends ChangeNotifier {
     if (isFirstTime) {
       await _firstTimeUseCase.setDone();
     } else {
-      // Khôi phục Token và Role từ bộ nhớ máy
-      await _authRepository.restoreSession();
+      // Khôi phục Token và Role từ bộ nhớ máy + Refresh Token luôn
+      final success = await _authRepository.restoreSession();
+      if (!success) {
+        // Nếu refresh thất bại, coi như chưa đăng nhập
+        return false;
+      }
     }
     return isFirstTime;
   }

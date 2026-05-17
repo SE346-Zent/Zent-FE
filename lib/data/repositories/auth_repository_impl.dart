@@ -91,7 +91,34 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> restoreSession() async {
+  Future<bool> restoreSession() async {
+    try {
+      final user = await authLocalDataSource.getUser();
+      final refreshTokenStr = await authLocalDataSource.getRefreshToken();
+
+      if (user != null && refreshTokenStr != null) {
+        // Luôn thử refresh token để lấy access token mới khi khởi động
+        final response = await authRemoteService.refreshToken(
+          user.email,
+          refreshTokenStr,
+        );
+
+        // Lưu thông tin mới
+        RbacTokenStore.setToken(response.accessToken);
+        RbacTokenStore.setRole(response.user.role);
+        await authLocalDataSource.saveCredentials(
+          response.accessToken,
+          response.refreshToken,
+        );
+        await authLocalDataSource.saveUser(response.user);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Restore session failed: $e");
+      await logout(); // Xóa sạch nếu lỗi
+      return false;
+    }
   }
 
   @override

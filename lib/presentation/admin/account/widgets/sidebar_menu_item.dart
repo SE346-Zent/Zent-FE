@@ -21,7 +21,7 @@ class SidebarMenuItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
+      margin: const EdgeInsets.only(bottom: AppDimens.spaceXs),
       decoration: BoxDecoration(
         color: isActive ? AppColors.tertiary500 : Colors.transparent,
         borderRadius: BorderRadius.circular(AppDimens.boraSm),

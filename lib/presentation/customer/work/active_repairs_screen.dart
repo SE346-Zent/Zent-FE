@@ -15,7 +15,7 @@ class ActiveRepairsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<ActiveRepairsViewModel>(),
+      create: (_) => sl<ActiveRepairsViewModel>()..fetchWorkOrders(),
       child: const _ActiveRepairsView(),
     );
   }

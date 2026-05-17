@@ -6,8 +6,13 @@ import 'dashed_border_container.dart';
 
 class PartPhotoEmptyState extends StatelessWidget {
   final VoidCallback onTap;
+  final String hintText;
 
-  const PartPhotoEmptyState({super.key, required this.onTap});
+  const PartPhotoEmptyState({
+    super.key,
+    required this.onTap,
+    this.hintText = "Tap to capture part photo",
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,7 @@ class PartPhotoEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppDimens.spaceXs),
             Text(
-              "Tap to capture part photo",
+              hintText,
               style: TextStyles.bodyMedium.copyWith(
                 color: AppColors.secondary500,
               ),

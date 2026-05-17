@@ -11,15 +11,6 @@ class ProfileMenuOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        MenuItem(
-          title: 'User Management',
-          subtitle: 'Contact details & address',
-          iconData: Icons.person_outline,
-          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
-            context,
-            'User Management',
-          ),
-        ),
         const SizedBox(height: AppDimens.spaceSm),
         MenuItem(
           title: 'Security Settings',
@@ -28,16 +19,6 @@ class ProfileMenuOptions extends StatelessWidget {
           onTap: () => context.read<ProfileViewModel>().handleMenuTap(
             context,
             'Security Settings',
-          ),
-        ),
-        const SizedBox(height: AppDimens.spaceSm),
-        MenuItem(
-          title: 'Add Part Request',
-          subtitle: 'Request new components',
-          iconData: Icons.local_offer_outlined,
-          onTap: () => context.read<ProfileViewModel>().handleMenuTap(
-            context,
-            'Add Part Request',
           ),
         ),
         const SizedBox(height: AppDimens.spaceSm),

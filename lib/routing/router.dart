@@ -13,16 +13,18 @@ import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/common/auth/register/register_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
 import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
-import '../presentation/admin/dashboard/admin_notifications_screen.dart';
 import '../presentation/admin/queue/operational_queue_screen.dart';
 import '../presentation/admin/queue/work_order_detail_screen.dart';
 import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
+import '../presentation/admin/rejections/rejected_work_orders_screen.dart';
+import '../presentation/admin/rejections/rejection_detail_screen.dart';
 import '../presentation/admin/queue/view_schedule_screen.dart';
 import '../presentation/admin/queue/reassign_work_order_screen.dart';
 import '../presentation/admin/reports/admin_reports_screen.dart';
@@ -34,7 +36,6 @@ import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
 import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
-import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
 import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
@@ -47,8 +48,8 @@ import '../presentation/common/core/layouts/admin_main_layout.dart';
 import '../presentation/common/core/layouts/customer_main_layout.dart';
 import '../presentation/technician/account/tech_profile_screen.dart';
 import '../presentation/technician/account/personal_info_screen.dart';
-import '../presentation/technician/account/notifications_screen.dart';
 import '../presentation/technician/account/security_screen.dart';
+import '../presentation/common/notifications/notifications_list_screen.dart';
 import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
@@ -77,9 +78,10 @@ Future<UserRoles> _getRoleFromToken() async {
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
-Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
+Future<Future<String?>> _rbacRedirect(BuildContext context, GoRouterState state) async async {
   final location = state.matchedLocation;
-  final role = await _getRoleFromToken();
+  final role = _getRoleFromToken();
+
   final isPublic = _publicPrefixes.any(
     (p) => location == p || location.startsWith('$p/'),
   );
@@ -151,6 +153,7 @@ final GoRouter appRouter = GoRouter(
       path: Routes.splash,
       builder: (context, state) => const AppSplashScreen(),
     ),
+
     GoRoute(
       name: RouteNames.onBoarding,
       path: Routes.onBoarding,
@@ -257,14 +260,83 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.adminNotifications,
                   path: Routes.adminNotifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const AdminNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.adminUserManagement,
+                  path: Routes.adminUserManagement,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const UserManagementScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminChooseRoleCreateAccount,
+                      path: Routes.adminChooseRoleCreateAccount,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const ChooseRoleScreen(),
+                      routes: [
+                        GoRoute(
+                          name: RouteNames.adminCreateAccount,
+                          path: Routes.adminCreateAccount,
+                          parentNavigatorKey: _rootNavigatorKey,
+                          builder: (context, state) {
+                            final extra =
+                                state.extra as Map<String, dynamic>? ?? {};
+                            final role =
+                                extra['role'] as String? ?? 'Technicians';
+                            return CreateAccountScreen(role: role);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminPartRequests,
+                  path: Routes.adminPartRequests,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PartRequestsScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminDetailRequest,
+                      path: Routes.adminDetailRequest,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const DetailRequestScreen(),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminInventoryAssets,
+                  path: Routes.adminInventoryAssets,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const InventoryAssetsScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.adminRejectedWorkOrders,
+                  path: Routes.adminRejectedWorkOrders,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const RejectedWorkOrdersScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminRejectionDetail,
+                      path: Routes.adminRejectionDetail,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['id'] ?? '';
+                        return RejectionDetailScreen(workOrderId: id);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
             GoRoute(
               name: RouteNames.adminOperationalQueue,
               path: Routes.adminOperationalQueue,
-              builder: (context, state) => const OperationalQueueScreen(),
+              builder: (context, state) {
+                final tabStr = state.uri.queryParameters['tab'];
+                final tab = int.tryParse(tabStr ?? '0') ?? 0;
+                return OperationalQueueScreen(initialTab: tab);
+              },
               routes: [
                 GoRoute(
                   name: RouteNames.adminWorkOrderDetails,
@@ -339,60 +411,12 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const SecuritySettingsScreen(),
                 ),
                 GoRoute(
-                  name: RouteNames.adminUserManagement,
-                  path: Routes.adminUserManagement,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const UserManagementScreen(),
-                  routes: [
-                    GoRoute(
-                      name: RouteNames.adminChooseRoleCreateAccount,
-                      path: Routes.adminChooseRoleCreateAccount,
-                      parentNavigatorKey: _rootNavigatorKey,
-                      builder: (context, state) => const ChooseRoleScreen(),
-                      routes: [
-                        GoRoute(
-                          name: RouteNames.adminCreateAccount,
-                          path: Routes.adminCreateAccount,
-                          parentNavigatorKey: _rootNavigatorKey,
-                          builder: (context, state) {
-                            final extra =
-                                state.extra as Map<String, dynamic>? ?? {};
-                            final role =
-                                extra['role'] as String? ?? 'Technicians';
-                            return CreateAccountScreen(role: role);
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                GoRoute(
                   name: RouteNames.adminSystemLog,
                   path: Routes.adminSystemLog,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const Scaffold(
                     body: Center(child: Text('System Log Screen')),
                   ),
-                ),
-                GoRoute(
-                  name: RouteNames.adminPartRequests,
-                  path: Routes.adminPartRequests,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const PartRequestsScreen(),
-                  routes: [
-                    GoRoute(
-                      name: RouteNames.adminDetailRequest,
-                      path: Routes.adminDetailRequest,
-                      parentNavigatorKey: _rootNavigatorKey,
-                      builder: (context, state) => const DetailRequestScreen(),
-                    ),
-                  ],
-                ),
-                GoRoute(
-                  name: RouteNames.adminInventoryAssets,
-                  path: Routes.adminInventoryAssets,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const InventoryAssetsScreen(),
                 ),
               ],
             ),
@@ -502,10 +526,10 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const TechPersonalInfoScreen(),
                 ),
                 GoRoute(
-                  name: 'techNotifications',
+                  name: RouteNames.techNotifications,
                   path: Routes.notifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const TechNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
                 GoRoute(
                   name: 'techSecuritySettings',
@@ -643,8 +667,7 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.customerNotifications,
                   path: Routes.customerNotifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) =>
-                      const CustomerNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
               ],
             ),

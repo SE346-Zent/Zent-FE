@@ -50,7 +50,11 @@ class TechProfileViewModel extends ChangeNotifier {
     try {
       await logoutUseCase.execute();
     } catch (e) {
-      debugPrint("Error during logout: $e");
+      final errorStr = e.toString();
+      if (!errorStr.contains('400') &&
+          !errorStr.toLowerCase().contains('revoked')) {
+        debugPrint("Error during logout: $e");
+      }
     } finally {
       if (context.mounted) {
         context.go(Routes.login);
@@ -72,10 +76,6 @@ class TechProfileViewModel extends ChangeNotifier {
 
       case 'Security':
         context.push('${Routes.techMe}/${Routes.techSecuritySettings}');
-        break;
-
-      case 'Notifications':
-        context.push('${Routes.techMe}/${Routes.notifications}');
         break;
 
       default:

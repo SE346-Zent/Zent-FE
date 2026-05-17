@@ -12,6 +12,18 @@ class TechWorkOrderPart {
   });
 }
 
+class TechWorkOrderChecklistItem {
+  final int id;
+  final bool result;
+  final String? notes;
+
+  TechWorkOrderChecklistItem({
+    required this.id,
+    required this.result,
+    this.notes,
+  });
+}
+
 class WorkOrderCompletionDraft {
   final String workOrderId;
   final String mtm;
@@ -24,6 +36,7 @@ class WorkOrderCompletionDraft {
   final List<String> postPhotos;
   final int currentStep;
   final List<Map<String, dynamic>> signaturePoints;
+  final List<TechWorkOrderChecklistItem> checklist;
 
   WorkOrderCompletionDraft({
     required this.workOrderId,
@@ -37,5 +50,6 @@ class WorkOrderCompletionDraft {
     this.postPhotos = const [],
     this.currentStep = 0,
     this.signaturePoints = const [],
+    this.checklist = const [],
   });
 }

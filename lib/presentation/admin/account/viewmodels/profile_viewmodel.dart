@@ -73,7 +73,12 @@ class ProfileViewModel extends ChangeNotifier {
     try {
       await logoutUseCase.execute();
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      final errorStr = e.toString();
+      // If the session is already revoked (400), don't show an error, just proceed to logout locally
+      if (!errorStr.contains('400') &&
+          !errorStr.toLowerCase().contains('revoked')) {
+        _errorMessage = errorStr.replaceFirst('Exception: ', '');
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

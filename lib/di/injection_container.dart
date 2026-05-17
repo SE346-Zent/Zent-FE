@@ -26,10 +26,19 @@ import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../domain/usecases/work_order/create_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
+import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
+import '../domain/usecases/work_order/approve_refusal_usecase.dart';
+import '../domain/usecases/work_order/deny_refusal_usecase.dart';
 import '../domain/usecases/product/get_my_products_usecase.dart';
 import '../domain/repositories/product_repository.dart';
 import '../data/repositories/product_repository_impl.dart';
 import '../data/datasources/remote/product_remote_datasource.dart';
+import '../domain/repositories/notification_repository.dart';
+import '../data/repositories/notification_repository_impl.dart';
+import '../data/datasources/remote/notification_remote_datasource.dart';
+import '../domain/usecases/notification/get_notifications_usecase.dart';
+import '../domain/usecases/notification/get_unread_count_usecase.dart';
+import '../presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
@@ -52,6 +61,8 @@ import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart'
 import '../presentation/admin/queue/viewmodels/assigned_work_order_detail_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/view_schedule_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/reassign_work_order_viewmodel.dart';
+import '../presentation/admin/rejections/viewmodels/rejected_work_orders_viewmodel.dart';
+import '../presentation/admin/rejections/viewmodels/rejection_detail_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/service_viewmodel.dart';
@@ -107,6 +118,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CreateWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetActiveRepairsUseCase(sl()));
   sl.registerLazySingleton(() => GetMyProductsUseCase(sl()));
+  sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => ApproveRefusalUseCase(sl()));
+  sl.registerLazySingleton(() => DenyRefusalUseCase(sl()));
+
+  // Notification Use Cases
+  sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUnreadCountUseCase(sl()));
 
   // ViewModels
   sl.registerLazySingleton(() => AuthViewModel());
@@ -130,11 +148,30 @@ Future<void> init() async {
   sl.registerFactory(() => AdminDashboardViewModel());
   sl.registerFactory(() => AdminNotificationsViewModel());
   sl.registerFactory(() => AdminReportsViewModel());
-  sl.registerFactory(() => OperationalQueueViewModel());
+  sl.registerFactory(
+    () => OperationalQueueViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => WorkOrderDetailViewModel());
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
   sl.registerFactory(() => ViewScheduleViewModel());
   sl.registerFactory(() => ReassignWorkOrderViewModel());
+  sl.registerFactory(
+    () => RejectedWorkOrdersViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      approveRefusalUseCase: sl(),
+      denyRefusalUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => RejectionDetailViewModel(
+      getSingleWorkOrderUseCase: sl(),
+      approveRefusalUseCase: sl(),
+      denyRefusalUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => ChooseRoleViewModel());
   sl.registerFactory(() => CreateAccountViewModel());
   sl.registerFactory(() => ProfileViewModel(sl(), sl()));
@@ -148,25 +185,46 @@ Future<void> init() async {
   sl.registerFactory(() => ChatViewModel());
   sl.registerFactory(() => CustomerSecurityViewModel());
   sl.registerFactory(() => CustomerNotificationsViewModel());
-  sl.registerFactory(() => ProductsViewModel());
-  sl.registerFactory(() => DetailedProductViewModel());
+  sl.registerFactory(
+    () => ProductsViewModel(
+      getMyProductsUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => DetailedProductViewModel(
+      getMyProductsUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(
-    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
+    
+    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  ),
   );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(() => DetailedChatViewModel());
   sl.registerFactory(() => DeviceRegistrationViewModel());
   sl.registerFactory(() => PartsViewModel());
+  sl.registerFactory(() => NotificationsViewModel());
 
   // Tech ViewModels
   sl.registerFactory(() => TechnicianHomeViewModel());
-  sl.registerFactory(() => TechWorkOrderViewModel());
+  sl.registerFactory(
+    () => TechWorkOrderViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
   sl.registerFactoryParam<TechWorkOrderDetailsViewModel, String, void>(
     (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
   );
   sl.registerFactory(() => TechPauseWorkOrderViewModel());
-  sl.registerFactory(() => TechRejectWorkOrderViewModel());
+  sl.registerFactory(() => TechRejectWorkOrderViewModel(sl(), sl(), sl()));
   sl.registerFactory(() => AddNewPartViewModel());
   sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
     (workOrderId, _) => CompleteWorkOrderViewModel(
@@ -193,6 +251,9 @@ Future<void> init() async {
   sl.registerLazySingleton<ProductRepository>(
     () => ProductRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(remoteDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDatasource>(
@@ -210,6 +271,12 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<ProductRemoteDataSource>(
     () => ProductRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
+  );
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(
+      client: sl(),
+      authLocalDataSource: sl(),
+    ),
   );
 
   // --- External ---

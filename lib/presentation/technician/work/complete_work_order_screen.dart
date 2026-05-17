@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/complete_work_order_viewmodel.dart';
@@ -70,7 +71,7 @@ class _CompleteWorkOrderContent extends StatelessWidget {
               currentStep: viewModel.currentStep,
               totalSteps: CompleteWorkOrderViewModel.totalSteps,
               onBackPressed: () => _onBackPressed(context, viewModel),
-              onNextPressed: () => _onNextPressed(viewModel),
+              onNextPressed: () => _onNextPressed(context, viewModel),
             ),
           ],
         ),
@@ -158,9 +159,34 @@ class _CompleteWorkOrderContent extends StatelessWidget {
     );
   }
 
-  /// Step 4: Diagnostic Section + Evidence photos (Post-assembly - inline max)
+  /// Step 4: Checklist + Diagnostic Section
   Widget _buildStep4(CompleteWorkOrderViewModel viewModel) {
-    return Column(children: [DiagnosticSection(viewModel: viewModel)]);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Verification Checklist',
+          style: TextStyles.title.copyWith(color: AppColors.primary500),
+        ),
+        const SizedBox(height: AppDimens.spaceSm),
+        ...viewModel.checklist.map((item) {
+          return CheckboxListTile(
+            title: Text(item.notes ?? '', style: TextStyles.bodyLarge),
+            value: item.result,
+            onChanged: (val) {
+              if (val != null) {
+                viewModel.toggleChecklistItem(item.id, val);
+              }
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            contentPadding: EdgeInsets.zero,
+            activeColor: AppColors.primary500,
+          );
+        }),
+        const SizedBox(height: AppDimens.spaceLg),
+        DiagnosticSection(viewModel: viewModel),
+      ],
+    );
   }
 
   /// Step 5: Customer Signature
@@ -186,9 +212,12 @@ class _CompleteWorkOrderContent extends StatelessWidget {
     }
   }
 
-  void _onNextPressed(CompleteWorkOrderViewModel viewModel) {
+  void _onNextPressed(
+    BuildContext context,
+    CompleteWorkOrderViewModel viewModel,
+  ) {
     if (viewModel.currentStep == CompleteWorkOrderViewModel.totalSteps - 1) {
-      viewModel.submitPressed();
+      viewModel.submitPressed(context);
     } else {
       viewModel.nextStepPressed();
     }

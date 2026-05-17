@@ -9,6 +9,7 @@ class WorkOrderModel extends WorkOrder {
     required super.status,
     required super.description,
     required super.rejectReason,
+    super.refusalNote = '',
     required super.priority,
     required super.createdAt,
     required super.updatedAt,
@@ -16,6 +17,7 @@ class WorkOrderModel extends WorkOrder {
     required super.version,
     required super.adminId,
     required super.customerId,
+    super.customerName = '',
     required super.technicianId,
     super.workOrderNum,
     super.customerName,
@@ -26,6 +28,9 @@ class WorkOrderModel extends WorkOrder {
     super.country,
     super.email,
     super.firstName,
+    super.technicianName,
+    required super.workOrderNum,
+    super.rejectionPhotos = const [],
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -36,6 +41,7 @@ class WorkOrderModel extends WorkOrder {
       status: entity.status,
       description: entity.description,
       rejectReason: entity.rejectReason,
+      refusalNote: entity.refusalNote,
       priority: entity.priority,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
@@ -43,6 +49,7 @@ class WorkOrderModel extends WorkOrder {
       version: entity.version,
       adminId: entity.adminId,
       customerId: entity.customerId,
+      customerName: entity.customerName,
       technicianId: entity.technicianId,
       workOrderNum: entity.workOrderNum,
       customerName: entity.customerName,
@@ -53,71 +60,135 @@ class WorkOrderModel extends WorkOrder {
       country: entity.country,
       email: entity.email,
       firstName: entity.firstName,
+      technicianName: entity.technicianName,
+      workOrderNum: entity.workOrderNum,
+      rejectionPhotos: entity.rejectionPhotos,
     );
   }
 
   factory WorkOrderModel.fromJson(Map<String, dynamic> json) {
     return WorkOrderModel(
-      id: json['id']?.toString() ?? '',
-      title: json['title']?.toString() ?? '',
-      addressString:
-          json['address']?.toString() ??
-          json['addressString']?.toString() ??
+      id: (json['id'] ?? json['_id'] ?? '').toString(),
+      title:
+          json['productName'] as String? ??
+          json['title'] as String? ??
+          json['workOrderNumber'] as String? ??
+          json['workOrderNum'] as String? ??
           '',
-      status: _parseStatus(json['status']?.toString()),
-      description: json['description']?.toString() ?? '',
-      rejectReason: json['rejectReason']?.toString() ?? '',
+      addressString:
+          json['address'] as String? ??
+          json['addressString'] as String? ??
+          json['address_string'] as String? ??
+          '',
+      status: _parseStatus(
+        json['work_order_status_id'] ??
+            json['status_id'] ??
+            json['statusId'] ??
+            json['status'],
+      ),
+      description: json['description'] as String? ?? '',
+      rejectReason:
+          json['reject_reason'] as String? ??
+          json['rejectReason'] as String? ??
+          json['symptomName'] as String? ??
+          '',
+      refusalNote:
+          json['refusal_note'] as String? ??
+          json['refusalNote'] as String? ??
+          '',
       priority: json['priority'] as int? ?? 0,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
-          : DateTime.now(),
+          : (json['created_at'] != null
+                ? DateTime.parse(json['created_at'])
+                : DateTime.now()),
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
-          : DateTime.now(),
+          : (json['updated_at'] != null
+                ? DateTime.parse(json['updated_at'])
+                : DateTime.now()),
       closedAt: json['closedAt'] != null
           ? DateTime.tryParse(json['closedAt'])
-          : null,
+          : (json['closed_at'] != null
+                ? DateTime.parse(json['closed_at'])
+                : null),
 
       version: json['version'] as int? ?? 0,
-      adminId: json['adminId']?.toString() ?? '',
-      customerId: json['customerId']?.toString() ?? '',
-      technicianId: json['technicianId']?.toString() ?? '',
-      workOrderNum: json['workOrderNum']?.toString(),
-      customerName: json['customerName']?.toString(),
-      productName: json['productName']?.toString(),
-      appointment: json['appointment'] != null
-          ? DateTime.tryParse(json['appointment'])
-          : null,
-      building: json['building']?.toString(),
-      city: json['city']?.toString(),
-      country: json['country']?.toString(),
-      email: json['email']?.toString(),
-      firstName: json['firstName']?.toString(),
+      adminId: (json['adminId'] ?? json['admin_id'] ?? '').toString(),
+      customerId: (json['customerId'] ?? json['customer_id'] ?? '').toString(),
+      customerName:
+          json['customerName'] as String? ??
+          json['customer_name'] as String? ??
+          '',
+      technicianId:
+          (json['technicianId'] ??
+                  json['technician_id'] ??
+                  json['tech_id'] ??
+                  '')
+              .toString(),
+      technicianName:
+          json['technicianName'] as String? ??
+          json['technician_name'] as String?,
+      workOrderNum:
+          json['workOrderNum'] as String? ??
+          json['workOrderNumber'] as String? ??
+          json['work_order_num'] as String? ??
+          '',
+      rejectionPhotos:
+          (json['evidenceImageUrls'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          (json['rejection_photos'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
     );
   }
 
-  static WorkOrderStatus _parseStatus(String? statusStr) {
-    if (statusStr == null || statusStr.isEmpty) {
-      return WorkOrderStatus.pending;
+  static WorkOrderStatus _parseStatus(dynamic statusVal) {
+    if (statusVal == null) return WorkOrderStatus.pending;
+
+    // Explicit mapping based on DB:
+    // 1: Pending, 2: Assigned, 3: InProg, 4: Closed, 5: Reject_InReview, 6: Rejected
+    if (statusVal is int) {
+      switch (statusVal) {
+        case 1:
+          return WorkOrderStatus.pending;
+        case 2:
+          return WorkOrderStatus.inProg; // Map Assigned to inProg for UI
+        case 3:
+          return WorkOrderStatus.inProg;
+        case 4:
+          return WorkOrderStatus.complete;
+        case 5:
+          return WorkOrderStatus.rejectInReview;
+        case 6:
+          return WorkOrderStatus.rejected;
+        default:
+          return WorkOrderStatus.pending;
+      }
     }
-    final normalizedStatus = statusStr.toLowerCase().replaceAll('_', '');
-    switch (normalizedStatus) {
-      case 'pending':
+
+    if (statusVal is String) {
+      final s = statusVal.toLowerCase();
+      if (s.contains('pending')) {
         return WorkOrderStatus.pending;
-      case 'inprog':
-      case 'inprogress':
+      }
+      if (s.contains('prog') || s.contains('assigned')) {
         return WorkOrderStatus.inProg;
-      case 'complete':
-      case 'completed':
+      }
+      if (s.contains('complete') || s.contains('closed')) {
         return WorkOrderStatus.complete;
-      case 'rejectinreview':
+      }
+      if (s.contains('reject_inreview') || s.contains('rejectinreview')) {
         return WorkOrderStatus.rejectInReview;
-      case 'rejected':
-      case 'reject':
+      }
+      if (s.contains('rejected')) {
         return WorkOrderStatus.rejected;
-      default:
-        return WorkOrderStatus.pending;
+      }
     }
+
+    return WorkOrderStatus.pending;
   }
 
   Map<String, dynamic> toJson() {
@@ -127,7 +198,8 @@ class WorkOrderModel extends WorkOrder {
       'address': addressString,
       'status': status.name,
       'description': description,
-      'rejectReason': rejectReason,
+      'reject_reason': rejectReason,
+      'refusal_note': refusalNote,
       'priority': priority,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -135,6 +207,7 @@ class WorkOrderModel extends WorkOrder {
       'version': version,
       'adminId': adminId,
       'customerId': customerId,
+      'customer_name': customerName,
       'technicianId': technicianId,
       'workOrderNum': workOrderNum,
       'customerName': customerName,
@@ -145,6 +218,9 @@ class WorkOrderModel extends WorkOrder {
       'country': country,
       'email': email,
       'firstName': firstName,
+      'technician_name': technicianName,
+      'work_order_num': workOrderNum,
+      'rejection_photos': rejectionPhotos,
     };
   }
 }

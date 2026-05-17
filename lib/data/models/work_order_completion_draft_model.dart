@@ -36,6 +36,36 @@ class TechWorkOrderPartModel extends TechWorkOrderPart {
   }
 }
 
+class TechWorkOrderChecklistItemModel extends TechWorkOrderChecklistItem {
+  TechWorkOrderChecklistItemModel({
+    required super.id,
+    required super.result,
+    super.notes,
+  });
+
+  factory TechWorkOrderChecklistItemModel.fromEntity(
+    TechWorkOrderChecklistItem entity,
+  ) {
+    return TechWorkOrderChecklistItemModel(
+      id: entity.id,
+      result: entity.result,
+      notes: entity.notes,
+    );
+  }
+
+  factory TechWorkOrderChecklistItemModel.fromJson(Map<String, dynamic> json) {
+    return TechWorkOrderChecklistItemModel(
+      id: json['id'] as int,
+      result: json['result'] as bool,
+      notes: json['notes'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'result': result, if (notes != null) 'notes': notes};
+  }
+}
+
 class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
   WorkOrderCompletionDraftModel({
     required super.workOrderId,
@@ -49,6 +79,7 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
     super.postPhotos,
     super.currentStep,
     super.signaturePoints,
+    super.checklist,
   });
 
   factory WorkOrderCompletionDraftModel.fromEntity(
@@ -66,6 +97,7 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       postPhotos: entity.postPhotos,
       currentStep: entity.currentStep,
       signaturePoints: entity.signaturePoints,
+      checklist: entity.checklist,
     );
   }
 
@@ -92,6 +124,13 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       signaturePoints: (json['signaturePoints'] as List? ?? [])
           .map((e) => Map<String, dynamic>.from(e as Map))
           .toList(),
+      checklist: (json['checklist'] as List? ?? [])
+          .map(
+            (e) => TechWorkOrderChecklistItemModel.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -112,6 +151,9 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       'postPhotos': postPhotos,
       'currentStep': currentStep,
       'signaturePoints': signaturePoints,
+      'checklist': checklist
+          .map((e) => TechWorkOrderChecklistItemModel.fromEntity(e).toJson())
+          .toList(),
     };
   }
 }

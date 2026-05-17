@@ -8,10 +8,18 @@ import 'package:zent_fe/routing/route_names.dart';
 import 'tracking_stepper.dart';
 import 'active_repairs_action_button.dart';
 
+import '../../../../domain/entities/work_order.dart';
+import 'package:intl/intl.dart';
+
 class TrackingCard extends StatelessWidget {
+  final WorkOrder workOrder;
   final int currentStatusStep;
 
-  const TrackingCard({super.key, required this.currentStatusStep});
+  const TrackingCard({
+    super.key,
+    required this.workOrder,
+    required this.currentStatusStep,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +49,16 @@ class TrackingCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'WO-1234',
+                          workOrder.workOrderNum.isNotEmpty
+                              ? workOrder.workOrderNum
+                              : 'WO-${workOrder.id.substring(0, 4)}',
                           style: TextStyles.bodyLarge.copyWith(
                             color: AppColors.secondary400,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Mainboard Inspection',
+                          workOrder.title,
                           style: TextStyles.headline.copyWith(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -56,7 +66,7 @@ class TrackingCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Scheduled time: 14h30',
+                          'Requested: ${DateFormat('MMM dd, yyyy HH:mm').format(workOrder.createdAt)}',
                           style: TextStyles.bodyMedium.copyWith(
                             color: AppColors.secondary500,
                           ),
@@ -75,7 +85,9 @@ class TrackingCard extends StatelessWidget {
                                 onTap: () {
                                   context.pushNamed(
                                     RouteNames.customerCancelWorkOrder,
-                                    pathParameters: {'workOrderId': 'WO-1234'},
+                                    pathParameters: {
+                                      'workOrderId': workOrder.id,
+                                    },
                                   );
                                 },
                               ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/work/viewmodels/service_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
 import 'package:zent_fe/presentation/customer/work/widgets/service_action_card.dart';
@@ -16,7 +17,14 @@ class CustomerServiceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<ServiceViewModel>(),
-      child: const _ServiceScreenContent(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
+          ),
+        ],
+        child: const _ServiceScreenContent(),
+      ),
     );
   }
 }

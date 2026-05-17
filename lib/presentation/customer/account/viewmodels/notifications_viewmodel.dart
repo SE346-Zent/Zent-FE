@@ -26,8 +26,6 @@ class CustomerNotificationsViewModel extends ChangeNotifier {
 
   void saveSettings(BuildContext context) {
     debugPrint('Viewmodel: Saving Notifications settings...');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Notifications settings saved!')),
-    );
+    debugPrint('Notifications settings saved!');
   }
 }

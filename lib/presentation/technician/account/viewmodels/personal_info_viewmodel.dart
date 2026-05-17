@@ -33,8 +33,6 @@ class TechPersonalInfoViewModel extends ChangeNotifier {
 
     notifyListeners();
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Successfully updated!')));
+    debugPrint('Successfully updated!');
   }
 }

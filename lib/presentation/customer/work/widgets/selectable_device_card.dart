@@ -43,7 +43,7 @@ class SelectableDeviceCard extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(AppDimens.spaceMd),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
           children: [
             // Image
             RepaintBoundary(
@@ -51,8 +51,8 @@ class SelectableDeviceCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppDimens.boraSm),
                 child: Image.asset(
                   imagePath,
-                  width: 60,
-                  height: 60,
+                  width: 64, // Slightly larger for better balance
+                  height: 64,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -62,6 +62,7 @@ class SelectableDeviceCard extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min, // Hug content
                 children: [
                   Text(
                     name,
@@ -69,30 +70,41 @@ class SelectableDeviceCard extends StatelessWidget {
                       color: AppColors.primary500,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'S/N: $serialNumber',
                     style: TextStyles.label.copyWith(
                       color: AppColors.secondary600,
+                      fontSize: 12,
                     ),
                   ),
                   Text(
                     'MTM: $mtm',
                     style: TextStyles.label.copyWith(
                       color: AppColors.secondary600,
+                      fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: AppDimens.spaceSm),
             // Status
-            Text(
-              status,
-              style: TextStyles.label.copyWith(
-                color: AppColors.success500,
-                fontWeight: FontWeight.w500,
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  status,
+                  style: TextStyles.label.copyWith(
+                    color: AppColors.success500,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

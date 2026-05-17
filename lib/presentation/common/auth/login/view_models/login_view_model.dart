@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../../domain/usecases/auth/login_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/login_usecase.dart';
+import 'package:zent_fe/domain/entities/user.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final LoginUseCase loginUseCase;
@@ -15,25 +16,25 @@ class LoginViewModel extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Future<bool> login() async {
+  Future<User?> login() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final email = emailController.text.trim();
-      final password = passwordController.text.trim();
+      final password = passwordController.text;
 
       if (email.isEmpty || password.isEmpty) {
         _errorMessage = 'Email and password are required';
-        return false;
+        return null;
       }
 
-      await loginUseCase.execute(email, password);
-      return true;
+      final user = await loginUseCase.execute(email, password);
+      return user;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
-      return false;
+      return null;
     } finally {
       _isLoading = false;
       notifyListeners();

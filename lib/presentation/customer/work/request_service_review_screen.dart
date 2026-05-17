@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -8,7 +7,6 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'widgets/customer_text_field.dart';
 import 'widgets/customer_dropdown_field.dart';
 import 'viewmodels/request_service_viewmodel.dart';
-import 'viewmodels/products_viewmodel.dart';
 
 class RequestServiceReviewScreen extends StatefulWidget {
   const RequestServiceReviewScreen({super.key});
@@ -39,21 +37,35 @@ class _RequestServiceReviewScreenState
   @override
   void initState() {
     super.initState();
+    _syncControllersFromViewModel();
+  }
+
+  /// Sync all controllers with latest data from the viewmodel.
+  /// Called in initState and in build() to ensure data from Steps 1-3
+  /// is always reflected, even after navigating back and editing.
+  void _syncControllersFromViewModel() {
     final vm = context.read<RequestServiceViewModel>();
 
-    // Init values
-    symptomCtrl.text = vm.symptom ?? '';
-    ticketRefCtrl.text = vm.ticketRef ?? '';
-    descCtrl.text = vm.description ?? '';
-    appointmentCtrl.text = vm.appointmentDate ?? '';
+    _setIfChanged(symptomCtrl, vm.symptom ?? '');
+    _setIfChanged(ticketRefCtrl, vm.ticketRef ?? '');
+    _setIfChanged(descCtrl, vm.description ?? '');
+    _setIfChanged(appointmentCtrl, vm.appointmentDate ?? '');
 
-    firstNameCtrl.text = vm.firstName ?? '';
-    lastNameCtrl.text = vm.lastName ?? '';
-    emailCtrl.text = vm.email ?? '';
-    phoneCtrl.text = vm.phone ?? '';
+    _setIfChanged(firstNameCtrl, vm.firstName ?? '');
+    _setIfChanged(lastNameCtrl, vm.lastName ?? '');
+    _setIfChanged(emailCtrl, vm.email ?? '');
+    _setIfChanged(phoneCtrl, vm.phone ?? '');
 
-    addressCtrl.text = vm.address ?? '';
-    buildingCtrl.text = vm.building ?? '';
+    _setIfChanged(addressCtrl, vm.address ?? '');
+    _setIfChanged(buildingCtrl, vm.building ?? '');
+  }
+
+  /// Only update the controller if the value actually changed,
+  /// to avoid resetting cursor position during active editing.
+  void _setIfChanged(TextEditingController ctrl, String newValue) {
+    if (ctrl.text != newValue) {
+      ctrl.text = newValue;
+    }
   }
 
   @override
@@ -95,7 +107,7 @@ class _RequestServiceReviewScreenState
         emailVal: emailCtrl.text,
         phoneVal: phoneCtrl.text,
         countryVal: vm.country,
-        stateVal: vm.state,
+        provinceVal: vm.province,
         cityVal: vm.city,
         addressVal: vm.address,
         buildingVal: vm.building,
@@ -113,7 +125,7 @@ class _RequestServiceReviewScreenState
         emailVal: vm.email,
         phoneVal: vm.phone,
         countryVal: vm.country,
-        stateVal: vm.state,
+        provinceVal: vm.province,
         cityVal: vm.city,
         addressVal: addressCtrl.text,
         buildingVal: buildingCtrl.text,
@@ -122,20 +134,29 @@ class _RequestServiceReviewScreenState
     vm.toggleEditSection('Address');
   }
 
-  void _onSubmit(RequestServiceViewModel vm) {
-    vm.submitTicket(context);
+  void _onSubmit(RequestServiceViewModel vm) async {
+    try {
+      await vm.submitTicket(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit: ${e.toString()}'),
+            backgroundColor: AppColors.error500,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<RequestServiceViewModel>();
-    final productsVM = sl<ProductsViewModel>();
 
-    // Find the product
-    final product = productsVM.products.firstWhere(
-      (p) => p.serialNumber == viewModel.selectedSerialNumber,
-      orElse: () => productsVM.products.first,
-    );
+    // Re-sync controllers with viewmodel data each time build runs
+    // (e.g. when returning to Step 4 after editing Steps 2/3)
+    _syncControllersFromViewModel();
 
     // Any currently editing section disables submit
     final bool isAnyEditing =
@@ -169,7 +190,7 @@ class _RequestServiceReviewScreenState
           ),
           const SizedBox(height: AppDimens.spaceMd),
 
-          // Product Card
+          // Product Card - Simplified to show selected info without real product validation
           IntrinsicHeight(
             child: Container(
               decoration: BoxDecoration(
@@ -198,7 +219,7 @@ class _RequestServiceReviewScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            product.serialNumber,
+                            viewModel.selectedSerialNumber ?? 'N/A',
                             style: TextStyles.headline.copyWith(
                               color: AppColors.tertiary500,
                               fontWeight: FontWeight.bold,
@@ -206,33 +227,16 @@ class _RequestServiceReviewScreenState
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            product.name,
-                            style: TextStyles.bodyLarge.copyWith(
-                              color: Colors.black,
+                            'Seeded Product ID:',
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.secondary600,
                             ),
                           ),
-                          const SizedBox(height: 2),
                           Text(
-                            'Machine Type: abc12345',
-                            style: TextStyles.bodyLarge.copyWith(
+                            viewModel.selectedProductId ?? 'N/A',
+                            style: TextStyles.bodyMedium.copyWith(
                               color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          RichText(
-                            text: TextSpan(
-                              text: 'Warranty Status: ',
-                              style: TextStyles.bodyLarge.copyWith(
-                                color: Colors.black,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'In warranty',
-                                  style: TextStyles.bodyLarge.copyWith(
-                                    color: AppColors.success500,
-                                  ),
-                                ),
-                              ],
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -384,14 +388,14 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'State',
-                  value: viewModel.state,
-                  items: viewModel.states
+                  label: 'Province',
+                  value: viewModel.province,
+                  items: viewModel.provinces
                       .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateState(v);
+                      viewModel.updateProvince(v);
                     }
                   },
                   isRequired: true,
@@ -527,7 +531,9 @@ class _RequestServiceReviewScreenState
                   boxShadow: canSubmit ? [BoxShadowStyles.glowing] : null,
                 ),
                 child: ElevatedButton(
-                  onPressed: canSubmit ? () => _onSubmit(viewModel) : null,
+                  onPressed: (canSubmit && !viewModel.isLoading)
+                      ? () => _onSubmit(viewModel)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -536,14 +542,23 @@ class _RequestServiceReviewScreenState
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
                     ),
                   ),
-                  child: Text(
-                    'Submit',
-                    style: TextStyles.title.copyWith(
-                      color: canSubmit
-                          ? AppColors.surface50
-                          : AppColors.secondary400,
-                    ),
-                  ),
+                  child: viewModel.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: AppColors.surface50,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Submit',
+                          style: TextStyles.title.copyWith(
+                            color: canSubmit
+                                ? AppColors.surface50
+                                : AppColors.secondary400,
+                          ),
+                        ),
                 ),
               ),
             ),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import 'package:zent_fe/domain/entities/enums/account_status.dart';
 
 class UserListItem extends StatelessWidget {
@@ -32,6 +33,7 @@ class UserListItem extends StatelessWidget {
             color: AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary100, width: 1.0),
+            boxShadow: [BoxShadowStyles.raised],
           ),
           padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
           child: Row(

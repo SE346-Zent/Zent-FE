@@ -5,6 +5,7 @@ import '../../models/work_order_completion_draft_model.dart';
 abstract class WorkOrderLocalDataSource {
   Future<void> cacheWorkOrderDraft(WorkOrderCompletionDraftModel draft);
   Future<WorkOrderCompletionDraftModel?> getWorkOrderDraft(String workOrderId);
+  Future<void> clearWorkOrderDraft(String workOrderId);
 }
 
 class WorkOrderLocalDataSourceImpl implements WorkOrderLocalDataSource {
@@ -27,6 +28,11 @@ class WorkOrderLocalDataSourceImpl implements WorkOrderLocalDataSource {
       return WorkOrderCompletionDraftModel.fromJson(json.decode(jsonString));
     }
     return null;
+  }
+
+  @override
+  Future<void> clearWorkOrderDraft(String workOrderId) async {
+    await sharedPreferences.remove(_getKey(workOrderId));
   }
 
   String _getKey(String workOrderId) => 'WO_DRAFT_$workOrderId';

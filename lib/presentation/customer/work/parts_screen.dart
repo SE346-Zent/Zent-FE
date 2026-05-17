@@ -20,7 +20,7 @@ class PartsScreen extends StatefulWidget {
 
 class _PartsScreenState extends State<PartsScreen> {
   late PartsViewModel _viewModel;
-  final GlobalKey _filterKey = GlobalKey();
+  final GlobalKey _searchBarKey = GlobalKey();
 
   @override
   void initState() {
@@ -33,14 +33,14 @@ class _PartsScreenState extends State<PartsScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _viewModel,
-      child: _PartsView(filterKey: _filterKey),
+      child: _PartsView(searchBarKey: _searchBarKey),
     );
   }
 }
 
 class _PartsView extends StatelessWidget {
-  final GlobalKey filterKey;
-  const _PartsView({required this.filterKey});
+  final GlobalKey searchBarKey;
+  const _PartsView({required this.searchBarKey});
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +123,7 @@ class _PartsView extends StatelessWidget {
               Text('List Parts', style: TextStyles.headline),
               const SizedBox(height: AppDimens.spaceMd),
               Container(
+                key: searchBarKey,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(AppDimens.boraSm),
@@ -156,7 +157,6 @@ class _PartsView extends StatelessWidget {
                       color: AppColors.secondary400,
                     ),
                     suffixIcon: IconButton(
-                      key: filterKey,
                       icon: const Icon(
                         Icons.filter_list,
                         color: AppColors.secondary600,
@@ -255,14 +255,15 @@ class _PartsView extends StatelessWidget {
 
   // --- Popup Menu Filter ---
   void _showFilterMenu(BuildContext context, PartsViewModel viewModel) {
-    // Lấy đối tượng render và tọa độ từ nút bấm
+    // Lấy đối tượng render và tọa độ từ search bar
     final RenderBox renderBox =
-        filterKey.currentContext!.findRenderObject() as RenderBox;
+        searchBarKey.currentContext!.findRenderObject() as RenderBox;
     final offset = renderBox.localToGlobal(Offset.zero);
 
     showDialog(
       context: context,
       barrierColor: Colors.transparent,
+      useSafeArea: false,
       builder: (BuildContext context) {
         return Stack(
           children: [
@@ -273,7 +274,7 @@ class _PartsView extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: offset.dy + renderBox.size.height + 0,
+              top: offset.dy + renderBox.size.height + 4,
               right:
                   MediaQuery.of(context).size.width -
                   offset.dx -

@@ -18,7 +18,7 @@ import 'widgets/tech_primary_button.dart';
 import 'widgets/profile_avatar.dart';
 
 // ViewModel
-import 'view_models/personal_info_viewmodel.dart';
+import 'viewmodels/personal_info_viewmodel.dart';
 
 class TechPersonalInfoScreen extends StatelessWidget {
   const TechPersonalInfoScreen({super.key});
@@ -48,10 +48,11 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: 'Hung dep zai');
-    _employeeIdController = TextEditingController(text: 'TECH-1234');
-    _emailController = TextEditingController(text: 'hungdepzai@zent.com');
-    _phoneController = TextEditingController(text: '12355678');
+    final vm = context.read<TechPersonalInfoViewModel>();
+    _nameController = TextEditingController(text: vm.fullName);
+    _employeeIdController = TextEditingController(text: vm.employeeId);
+    _emailController = TextEditingController(text: vm.email);
+    _phoneController = TextEditingController(text: vm.phoneNumber);
   }
 
   @override
@@ -63,9 +64,26 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
     super.dispose();
   }
 
+  void _syncControllersFromViewModel() {
+    final vm = context.read<TechPersonalInfoViewModel>();
+    _setIfChanged(_nameController, vm.fullName);
+    _setIfChanged(_employeeIdController, vm.employeeId);
+    _setIfChanged(_emailController, vm.email);
+    _setIfChanged(_phoneController, vm.phoneNumber);
+  }
+
+  void _setIfChanged(TextEditingController ctrl, String newValue) {
+    if (ctrl.text != newValue) {
+      ctrl.text = newValue;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TechPersonalInfoViewModel>();
+
+    // Sync controllers with async viewmodel data
+    _syncControllersFromViewModel();
 
     return Scaffold(
       backgroundColor: AppColors.background500,
@@ -81,7 +99,7 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
               const SizedBox(height: AppDimens.spaceMd),
 
               Text(
-                'Hung dep zai',
+                viewModel.fullName,
                 style: TextStyles.display.copyWith(
                   color: Colors.black,
                   fontSize: 24,

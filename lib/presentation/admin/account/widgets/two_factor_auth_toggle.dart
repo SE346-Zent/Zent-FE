@@ -76,8 +76,8 @@ class _TwoFactorAuthToggleState extends State<TwoFactorAuthToggle> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2.0),
                 child: Container(
-                  width: 24.0,
-                  height: 24.0,
+                  width: AppDimens.spaceLg,
+                  height: AppDimens.spaceLg,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.surface100, // #FFFFFF

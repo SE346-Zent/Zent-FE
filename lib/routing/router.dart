@@ -1,92 +1,109 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/common/intro/on_boarding_screen.dart';
 import '../presentation/common/intro/splash_screen.dart';
 import '../presentation/common/auth/login/login_screen.dart';
 import '../presentation/common/auth/login/forgot_password_screen.dart';
-import '../presentation/common/auth/login/verify_otp_screen.dart';
+import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
+import '../presentation/common/auth/register/register_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
-import '../presentation/customer/account/service_screen.dart';
+import '../presentation/admin/account/choose_role_screen.dart';
+import '../presentation/admin/account/create_account_screen.dart';
+import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
+import '../presentation/admin/queue/operational_queue_screen.dart';
+import '../presentation/admin/queue/work_order_detail_screen.dart';
+import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
+import '../presentation/admin/rejections/rejected_work_orders_screen.dart';
+import '../presentation/admin/rejections/rejection_detail_screen.dart';
+import '../presentation/admin/queue/view_schedule_screen.dart';
+import '../presentation/admin/queue/reassign_work_order_screen.dart';
+import '../presentation/admin/reports/admin_reports_screen.dart';
+import '../presentation/admin/account/part_requests_screen.dart';
+import '../presentation/admin/account/inventory_assets_screen.dart';
+import '../presentation/admin/account/detail_request_screen.dart';
+import '../presentation/customer/work/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
-import 'package:zent_fe/presentation/customer/account/personal_info_screen.dart';
+import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
-import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
 import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
 import '../presentation/customer/work/request_service_screen.dart';
 import '../presentation/customer/work/active_repairs_screen.dart';
+import '../presentation/customer/work/customer_cancel_work_order_screen.dart';
 import '../presentation/customer/work/device_registration_screen.dart';
 import '../presentation/customer/work/parts_screen.dart';
-import 'package:zent_fe/presentation/common/core/layouts/admin_main_layout.dart';
-import 'package:zent_fe/presentation/common/core/layouts/customer_main_layout.dart';
+import '../presentation/common/core/layouts/admin_main_layout.dart';
+import '../presentation/common/core/layouts/customer_main_layout.dart';
 import '../presentation/technician/account/tech_profile_screen.dart';
 import '../presentation/technician/account/personal_info_screen.dart';
-import '../presentation/technician/account/notifications_screen.dart';
 import '../presentation/technician/account/security_screen.dart';
+import '../presentation/common/notifications/notifications_list_screen.dart';
 import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
-import '../presentation/technician/account/technician_home_screen.dart';
+import '../presentation/technician/work/tech_pause_work_order_screen.dart';
+import '../presentation/technician/work/tech_reject_work_order_screen.dart';
+import '../presentation/technician/home/technician_home_screen.dart';
 import '../presentation/technician/work/add_new_part_screen.dart';
 import '../presentation/common/core/layouts/tech_main_layout.dart';
 import '../presentation/technician/work/widgets/app_camera_screen.dart';
+import '../presentation/common/core/scanner/app_qr_scanner_screen.dart';
 import '../presentation/technician/work/part_search_screen.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
 
-// ---------------------------------------------------------------------------
-// RBAC — Role-Based Access Control
-// ---------------------------------------------------------------------------
-
-/// Token store.
-/// Call [RbacTokenStore.setToken] from your auth datasource after login and
-/// [RbacTokenStore.clearToken] on logout.
-class RbacTokenStore {
-  RbacTokenStore._();
-
-  static String? _token;
-
-  static void setToken(String token) => _token = token;
-  static void clearToken() => _token = null;
-  static String? get token => _token;
-}
+import './rbac_token_store.dart';
 
 UserRoles _getRoleFromToken() {
+  /*
+  // Cách cũ: Giải mã JWT để lấy Role (Dùng khi Backend nhúng Role vào Token)
   final token = RbacTokenStore.token;
   if (token == null) return UserRoles.unauthenticated;
   try {
     final parts = token.split('.');
     if (parts.length != 3) return UserRoles.unauthenticated;
-    // Base64Url-decode the payload (middle segment) and parse claims.
     final normalized = base64Url.normalize(parts[1]);
     final decoded = utf8.decode(base64Url.decode(normalized));
     final claims = jsonDecode(decoded) as Map<String, dynamic>;
-    return switch (claims['role'] as String?) {
-      'admin' => UserRoles.admin,
+    final roleString = (claims['role'] as String?)?.toLowerCase();
+    return switch (roleString) {
+      'admin' || 'super_admin' => UserRoles.admin,
       'technician' => UserRoles.technician,
       'customer' => UserRoles.customer,
       _ => UserRoles.unauthenticated,
     };
-  } catch (_) {
+  } catch (e) {
+    debugPrint("JWT Decode Error: $e");
     return UserRoles.unauthenticated;
   }
+  */
+
+  // Cách mới: Lấy trực tiếp từ Store (Dựa trên roleId Server trả về khi Login)
+  return RbacTokenStore.role;
 }
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
 // ignore: unused_element
-String? _rbacRedirect(BuildContext context, GoRouterState state) {
+Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
   final location = state.matchedLocation;
   final role = _getRoleFromToken();
+
+  // Check notification permission for Admin and Tech
+  if (role == UserRoles.admin || role == UserRoles.technician) {
+    final settings = await FirebaseMessaging.instance.requestPermission();
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      return Routes.login;
+    }
+  }
 
   final isPublic = _publicPrefixes.any(
     (p) => location == p || location.startsWith('$p/'),
@@ -99,8 +116,14 @@ String? _rbacRedirect(BuildContext context, GoRouterState state) {
   }
 
   // ── Authenticated on a public / auth route ───────────────────────────────
-  // Redirect straight to the role's home screen.
-  if (isPublic) {
+  // Redirect straight to the role's home screen, UNLESS we are in the middle
+  // of an auth flow (OTP, Reset Password).
+  final isAuthFlow =
+      location.contains(Routes.verifyOtp) ||
+      location.contains(Routes.resetPassword) ||
+      location.contains(Routes.resetSuccessfully);
+
+  if (isPublic && !isAuthFlow) {
     return switch (role) {
       UserRoles.admin => Routes.adminDashboard,
       UserRoles.technician => Routes.techHome,
@@ -147,8 +170,8 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.customerServices,
-  //redirect: _rbacRedirect,
+  initialLocation: Routes.splash,
+  redirect: _rbacRedirect,
   routes: [
     // Main routes
     GoRoute(
@@ -156,6 +179,7 @@ final GoRouter appRouter = GoRouter(
       path: Routes.splash,
       builder: (context, state) => const AppSplashScreen(),
     ),
+
     GoRoute(
       name: RouteNames.onBoarding,
       path: Routes.onBoarding,
@@ -214,15 +238,22 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           name: RouteNames.signUp,
           path: Routes.signUp,
-          builder: (context, state) =>
-              const Scaffold(body: Center(child: Text('Sign Up Screen'))),
+          builder: (context, state) => const RegisterScreen(),
           routes: [
             GoRoute(
               name: RouteNames.signUpVerifyOtp,
               path: Routes.verifyOtp,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Sign Up Verify OTP Screen')),
-              ),
+              builder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>? ?? {};
+                final email = extra['email'] as String? ?? '';
+                final isRegistration =
+                    extra['isRegistration'] as bool? ?? false;
+
+                return VerifyOtpScreen(
+                  email: email,
+                  isRegistration: isRegistration,
+                );
+              },
             ),
           ],
         ),
@@ -239,6 +270,16 @@ final GoRouter appRouter = GoRouter(
         return AppCameraScreen(onPhotoCaptured: onPhotoCaptured);
       },
     ),
+    GoRoute(
+      name: RouteNames.qrScanner,
+      path: Routes.qrScanner,
+      builder: (context, state) {
+        final Map<String, dynamic>? extra =
+            state.extra as Map<String, dynamic>?;
+        final onScanned = extra?['onScanned'] as void Function(String)?;
+        return AppQrScannerScreen(onScanned: onScanned);
+      },
+    ),
 
     // Admin top level routes using StatefulShellRoute
     StatefulShellRoute.indexedStack(
@@ -251,9 +292,127 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.adminDashboard,
               path: Routes.adminDashboard,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Admin Dashboard Screen')),
-              ),
+              builder: (context, state) => const AdminDashboardScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.adminNotifications,
+                  path: Routes.adminNotifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const NotificationsListScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.adminUserManagement,
+                  path: Routes.adminUserManagement,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const UserManagementScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminChooseRoleCreateAccount,
+                      path: Routes.adminChooseRoleCreateAccount,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const ChooseRoleScreen(),
+                      routes: [
+                        GoRoute(
+                          name: RouteNames.adminCreateAccount,
+                          path: Routes.adminCreateAccount,
+                          parentNavigatorKey: _rootNavigatorKey,
+                          builder: (context, state) {
+                            final extra =
+                                state.extra as Map<String, dynamic>? ?? {};
+                            final role =
+                                extra['role'] as String? ?? 'Technicians';
+                            return CreateAccountScreen(role: role);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminPartRequests,
+                  path: Routes.adminPartRequests,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PartRequestsScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminDetailRequest,
+                      path: Routes.adminDetailRequest,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) => const DetailRequestScreen(),
+                    ),
+                  ],
+                ),
+                GoRoute(
+                  name: RouteNames.adminInventoryAssets,
+                  path: Routes.adminInventoryAssets,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const InventoryAssetsScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.adminRejectedWorkOrders,
+                  path: Routes.adminRejectedWorkOrders,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const RejectedWorkOrdersScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminRejectionDetail,
+                      path: Routes.adminRejectionDetail,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['id'] ?? '';
+                        return RejectionDetailScreen(workOrderId: id);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            GoRoute(
+              name: RouteNames.adminOperationalQueue,
+              path: Routes.adminOperationalQueue,
+              builder: (context, state) {
+                final tabStr = state.uri.queryParameters['tab'];
+                final tab = int.tryParse(tabStr ?? '0') ?? 0;
+                return OperationalQueueScreen(initialTab: tab);
+              },
+              routes: [
+                GoRoute(
+                  name: RouteNames.adminWorkOrderDetails,
+                  path: Routes.adminWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return WorkOrderDetailScreen(workOrderId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminAssignedWorkOrderDetails,
+                  path: Routes.adminAssignedWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return AssignedWorkOrderDetailScreen(workOrderId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminViewSchedule,
+                  path: Routes.adminViewSchedule,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['techId'] ?? '';
+                    return ViewScheduleScreen(techId: id);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.adminReassignWorkOrder,
+                  path: Routes.adminReassignWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final id = state.pathParameters['workOrderId'] ?? '';
+                    return ReassignWorkOrderScreen(workOrderId: id);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -262,9 +421,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.adminReports,
               path: Routes.adminReports,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Admin Reports Screen')),
-              ),
+              builder: (context, state) => const AdminReportsScreen(),
             ),
           ],
         ),
@@ -290,32 +447,6 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.adminSecuritySettings,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const SecuritySettingsScreen(),
-                ),
-                GoRoute(
-                  name: RouteNames.adminUserManagement,
-                  path: Routes.adminUserManagement,
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const UserManagementScreen(),
-                  routes: [
-                    GoRoute(
-                      name: RouteNames.adminChooseRoleCreateAccount,
-                      path: Routes.adminChooseRoleCreateAccount,
-                      builder: (context, state) => const Scaffold(
-                        body: Center(
-                          child: Text('Choose Role Create Account Screen'),
-                        ),
-                      ),
-                      routes: [
-                        GoRoute(
-                          name: RouteNames.adminCreateAccount,
-                          path: Routes.adminCreateAccount,
-                          builder: (context, state) => const Scaffold(
-                            body: Center(child: Text('Create Account Screen')),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
                 GoRoute(
                   name: RouteNames.adminSystemLog,
@@ -378,6 +509,24 @@ final GoRouter appRouter = GoRouter(
                   },
                 ),
                 GoRoute(
+                  name: RouteNames.techPauseWorkOrder,
+                  path: Routes.techPauseWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return TechPauseWorkOrderScreen(workOrderId: workOrderId);
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.techRejectWorkOrder,
+                  path: Routes.techRejectWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return TechRejectWorkOrderScreen(workOrderId: workOrderId);
+                  },
+                ),
+                GoRoute(
                   name: RouteNames.techCompleteWorkOrder,
                   path: Routes.completeWorkOrder,
                   parentNavigatorKey: _rootNavigatorKey,
@@ -415,10 +564,10 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const TechPersonalInfoScreen(),
                 ),
                 GoRoute(
-                  name: 'techNotifications',
+                  name: RouteNames.techNotifications,
                   path: Routes.notifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const TechNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
                 GoRoute(
                   name: 'techSecuritySettings',
@@ -497,6 +646,17 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const ActiveRepairsScreen(),
                 ),
+                GoRoute(
+                  name: RouteNames.customerCancelWorkOrder,
+                  path: Routes.customerCancelWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return CustomerCancelWorkOrderScreen(
+                      workOrderId: workOrderId,
+                    );
+                  },
+                ),
               ],
             ),
           ],
@@ -545,8 +705,7 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.customerNotifications,
                   path: Routes.customerNotifications,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) =>
-                      const CustomerNotificationsScreen(),
+                  builder: (context, state) => const NotificationsListScreen(),
                 ),
               ],
             ),

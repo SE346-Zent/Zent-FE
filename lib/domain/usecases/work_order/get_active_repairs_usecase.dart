@@ -8,7 +8,10 @@ class GetActiveRepairsUseCase {
   GetActiveRepairsUseCase(this.repository);
 
   Future<List<WorkOrder>> execute(String userId) async {
-    final allOrders = await repository.getManyWorkOrders(userId: userId);
+    final allOrders = await repository.getManyWorkOrders(
+      userId: userId,
+      role: 'customer',
+    );
 
     // Filter for active statuses: pending, inProg, rejectInReview
     return allOrders.where((order) {

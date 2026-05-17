@@ -33,7 +33,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
         ),
         const SizedBox(height: AppDimens.spaceXs),
         Container(
-          width: 331.0,
+          width: double.infinity,
           height: 45.0,
           decoration: BoxDecoration(
             color: AppColors.background500,

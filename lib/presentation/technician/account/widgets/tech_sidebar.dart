@@ -7,6 +7,10 @@ import 'package:zent_fe/presentation/common/core/app_assets.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'sidebar_menu_item.dart';
 
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
+import 'package:zent_fe/routing/routes.dart';
+
 class TechSidebar extends StatelessWidget {
   final String userName;
   final String employeeId;
@@ -19,8 +23,16 @@ class TechSidebar extends StatelessWidget {
     this.appVersion = "Zent v1.0.0",
   });
 
-  void _onLogoutPressed() {
-    debugPrint("action triggered: Logout");
+  Future<void> _onLogoutPressed(BuildContext context) async {
+    try {
+      await sl<LogoutUseCase>().execute();
+    } catch (e) {
+      debugPrint("Error during logout: $e");
+    } finally {
+      if (context.mounted) {
+        context.go(Routes.login);
+      }
+    }
   }
 
   @override
@@ -84,7 +96,15 @@ class TechSidebar extends StatelessWidget {
                       ),
                       isActive: true,
                       onTap: () {
-                        debugPrint("action triggered: QR Code Scanner");
+                        Navigator.pop(context); // Close the drawer first
+                        context.pushNamed(
+                          RouteNames.qrScanner,
+                          extra: {
+                            'onScanned': (String result) {
+                              debugPrint('Sidebar QR Scanned: $result');
+                            },
+                          },
+                        );
                       },
                     ),
                     SidebarMenuItem(
@@ -116,7 +136,7 @@ class TechSidebar extends StatelessWidget {
                     const SizedBox(height: AppDimens.spaceMd),
                     // Logout Action
                     InkWell(
-                      onTap: _onLogoutPressed,
+                      onTap: () => _onLogoutPressed(context),
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

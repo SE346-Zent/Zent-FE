@@ -4,36 +4,106 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import '../view_models/complete_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/technician/work/viewmodels/complete_work_order_viewmodel.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart' as import_router;
+
+/// Display mode for the part tracking section.
+enum PartTrackingMode {
+  /// Show both uninstalled and installed cards (original behavior).
+  both,
+
+  /// Show only the uninstalled parts card.
+  uninstalledOnly,
+
+  /// Show only the installed parts card.
+  installedOnly,
+}
 
 class PartTrackingSection extends StatelessWidget {
   final CompleteWorkOrderViewModel viewModel;
+  final PartTrackingMode mode;
 
-  const PartTrackingSection({super.key, required this.viewModel});
+  const PartTrackingSection({
+    super.key,
+    required this.viewModel,
+    this.mode = PartTrackingMode.both,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildTrackingCard(
+    switch (mode) {
+      case PartTrackingMode.uninstalledOnly:
+        return _buildTrackingCard(
           title: "Part Uninstalled",
           icon: _buildBoxIcon(isDown: true),
           parts: viewModel.uninstalledParts,
-          onScanPressed: () {},
-          onManualPressed: () {},
+          onScanPressed: () => _onScanUninstalledPressed(context),
+          onManualPressed: _onManualUninstalledPressed,
           isUninstalled: true,
-        ),
-        const SizedBox(height: AppDimens.spaceLg),
-        _buildTrackingCard(
+        );
+      case PartTrackingMode.installedOnly:
+        return _buildTrackingCard(
           title: "Part Installed",
           icon: _buildBoxIcon(isDown: false),
           parts: viewModel.installedParts,
-          onScanPressed: () {},
-          onManualPressed: () {},
+          onScanPressed: () => _onScanInstalledPressed(context),
+          onManualPressed: _onManualInstalledPressed,
           isUninstalled: false,
-        ),
-      ],
+        );
+      case PartTrackingMode.both:
+        return Column(
+          children: [
+            _buildTrackingCard(
+              title: "Part Uninstalled",
+              icon: _buildBoxIcon(isDown: true),
+              parts: viewModel.uninstalledParts,
+              onScanPressed: () => _onScanUninstalledPressed(context),
+              onManualPressed: _onManualUninstalledPressed,
+              isUninstalled: true,
+            ),
+            const SizedBox(height: AppDimens.spaceLg),
+            _buildTrackingCard(
+              title: "Part Installed",
+              icon: _buildBoxIcon(isDown: false),
+              parts: viewModel.installedParts,
+              onScanPressed: () => _onScanInstalledPressed(context),
+              onManualPressed: _onManualInstalledPressed,
+              isUninstalled: false,
+            ),
+          ],
+        );
+    }
+  }
+
+  void _onScanUninstalledPressed(BuildContext context) {
+    context.pushNamed(
+      import_router.RouteNames.qrScanner,
+      extra: {
+        'onScanned': (String result) {
+          debugPrint('Scanned Uninstalled Part SN: $result');
+        },
+      },
     );
+  }
+
+  void _onManualUninstalledPressed() {
+    debugPrint("action triggered: manual add uninstalled part");
+  }
+
+  void _onScanInstalledPressed(BuildContext context) {
+    context.pushNamed(
+      import_router.RouteNames.qrScanner,
+      extra: {
+        'onScanned': (String result) {
+          debugPrint('Scanned Installed Part SN: $result');
+        },
+      },
+    );
+  }
+
+  void _onManualInstalledPressed() {
+    debugPrint("action triggered: manual add installed part");
   }
 
   Widget _buildBoxIcon({required bool isDown}) {
@@ -57,7 +127,7 @@ class PartTrackingSection extends StatelessWidget {
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.subtle],
-        border: Border.all(color: AppColors.secondary50),
+        border: Border.all(color: AppColors.secondary300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,9 +180,9 @@ class PartTrackingSection extends StatelessWidget {
         bottom: AppDimens.spaceSm,
       ),
       decoration: BoxDecoration(
-        color: AppColors.background500,
+        color: AppColors.tertiary50,
         borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        border: Border.all(color: AppColors.secondary50),
+        border: Border.all(color: AppColors.secondary200),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -216,34 +286,18 @@ class BoxIconPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Proportional coordinates based on a 24x24 grid
-    // x: 2/24=0.083, 5.5/24=0.23, 12/24=0.5, 18.5/24=0.77, 22/24=0.91
-    // y: 4/24=0.166, 10/24=0.41, 11.5/24=0.48, 14.8/24=0.62, 18.7/24=0.78, 22/24=0.91
-
     // 1. Box Sides and Gap (65% gap)
     final shellPath = Path();
 
-    // Left side + bottom part (35% bars total -> 17.5% each)
-    shellPath.moveTo(w * 0.08, h * 0.41); // (2, 10)
-    shellPath.lineTo(w * 0.08, h * 0.83); // (2, 20)
-    shellPath.quadraticBezierTo(
-      w * 0.08,
-      h * 0.91,
-      w * 0.16,
-      h * 0.91,
-    ); // Corner to (4, 22)
-    shellPath.lineTo(w * 0.23, h * 0.91); // To (~5.5, 22) - 3.5 units bar
+    shellPath.moveTo(w * 0.08, h * 0.41);
+    shellPath.lineTo(w * 0.08, h * 0.83);
+    shellPath.quadraticBezierTo(w * 0.08, h * 0.91, w * 0.16, h * 0.91);
+    shellPath.lineTo(w * 0.23, h * 0.91);
 
-    // Right side + bottom part
-    shellPath.moveTo(w * 0.91, h * 0.41); // (22, 10)
-    shellPath.lineTo(w * 0.91, h * 0.83); // (22, 20)
-    shellPath.quadraticBezierTo(
-      w * 0.91,
-      h * 0.91,
-      w * 0.83,
-      h * 0.91,
-    ); // Corner to (20, 22)
-    shellPath.lineTo(w * 0.77, h * 0.91); // To (~18.5, 22) - 3.5 units bar
+    shellPath.moveTo(w * 0.91, h * 0.41);
+    shellPath.lineTo(w * 0.91, h * 0.83);
+    shellPath.quadraticBezierTo(w * 0.91, h * 0.91, w * 0.83, h * 0.91);
+    shellPath.lineTo(w * 0.77, h * 0.91);
 
     // 2. Widened Top Flaps
     shellPath.moveTo(w * 0.08, h * 0.41);
@@ -251,26 +305,21 @@ class BoxIconPainter extends CustomPainter {
     shellPath.lineTo(w * 0.70, h * 0.16);
     shellPath.lineTo(w * 0.91, h * 0.41);
 
-    // Horizontal divider
     shellPath.moveTo(w * 0.08, h * 0.41);
     shellPath.lineTo(w * 0.91, h * 0.41);
 
-    // Vertical flap divider
     shellPath.moveTo(w * 0.5, h * 0.16);
     shellPath.lineTo(w * 0.5, h * 0.41);
 
     canvas.drawPath(shellPath, paint);
 
-    // 3. Medium-Short & Narrow Arrow
+    // 3. Arrow
     if (isDown) {
-      // Uninstall: Down arrow
-      // Stem starts at h*0.56 (middle ground) and ends at bottom line (h*0.91)
       canvas.drawLine(
         Offset(w * 0.5, h * 0.56),
         Offset(w * 0.5, h * 0.91),
         paint,
       );
-      // Narrow head at (12, 22)
       canvas.drawLine(
         Offset(w * 0.5, h * 0.91),
         Offset(w * 0.38, h * 0.75),
@@ -282,14 +331,11 @@ class BoxIconPainter extends CustomPainter {
         paint,
       );
     } else {
-      // Install: Up arrow
-      // Stem starts at h*0.91 (exactly in the gap) and ends at h*0.55
       canvas.drawLine(
         Offset(w * 0.5, h * 0.91),
         Offset(w * 0.5, h * 0.55),
         paint,
       );
-      // Narrow head at h*0.55
       canvas.drawLine(
         Offset(w * 0.5, h * 0.55),
         Offset(w * 0.38, h * 0.71),

@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
-
-// Core Theming
+import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-
-import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
-// ViewModel
-import '../view_models/tech_work_order_viewmodel.dart';
+import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 
 class WorkOrderCard extends StatelessWidget {
-  final MockWorkOrder order;
+  final WorkOrder order;
 
   const WorkOrderCard({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
-    final isHighPriority = order.priority == 'High';
-    final isCompleted = order.status == 'Completed';
-    final isPending = order.status == 'Pending';
+    // Priority: 0-Normal, 1-High (based on typical mapping, check if different)
+    final isHighPriority = order.priority > 0;
+    final isCompleted = order.status == WorkOrderStatus.complete;
+    final isPending = order.status == WorkOrderStatus.pending;
 
     // Priority Color Processing
     final priorityColor = isHighPriority
@@ -32,8 +30,15 @@ class WorkOrderCard extends StatelessWidget {
 
     // Status Color Processing
     Color statusColor = AppColors.tertiary400;
-    if (isCompleted) statusColor = AppColors.success500;
-    if (isPending) statusColor = AppColors.secondary200;
+    if (isCompleted) {
+      statusColor = AppColors.success500;
+    }
+    if (isPending) {
+      statusColor = AppColors.secondary200;
+    }
+    if (order.status == WorkOrderStatus.rejectInReview) {
+      statusColor = Colors.orange;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
@@ -63,7 +68,7 @@ class WorkOrderCard extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  '${order.priority.toUpperCase()} PRIORITY',
+                  '${isHighPriority ? "HIGH" : "NORMAL"} PRIORITY',
                   style: TextStyles.bodyMedium.copyWith(
                     color: priorityColor,
                     fontSize: 10,
@@ -83,7 +88,7 @@ class WorkOrderCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6.0),
                   Text(
-                    order.status,
+                    order.status.name.toUpperCase(),
                     style: TextStyles.label.copyWith(color: statusColor),
                   ),
                 ],
@@ -94,7 +99,7 @@ class WorkOrderCard extends StatelessWidget {
 
           // 2. Title
           Text(
-            '${order.id} | ${order.title}',
+            '${order.id.substring(0, 8)}... | ${order.title}',
             style: TextStyles.title.copyWith(color: AppColors.primary500),
           ),
           const SizedBox(height: AppDimens.spaceSm),
@@ -102,13 +107,16 @@ class WorkOrderCard extends StatelessWidget {
           // 3. Details
           _buildDetailRow(Icons.person_outline, order.customerName),
           const SizedBox(height: AppDimens.spaceXs),
-          _buildDetailRow(Icons.access_time, order.time),
+          _buildDetailRow(
+            Icons.access_time,
+            order.createdAt.toString().split('.')[0],
+          ),
           const SizedBox(height: AppDimens.spaceXs),
           _buildDetailRow(Icons.location_on_outlined, order.address),
           const SizedBox(height: AppDimens.spaceMd),
 
           // 4. Action Buttons
-          if (isCompleted)
+          if (isCompleted || order.status == WorkOrderStatus.rejectInReview)
             _buildActionButton(
               text: 'View Details',
               textColor: AppColors.tertiary500,
@@ -137,18 +145,23 @@ class WorkOrderCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12.0),
-                Container(
-                  height: 44.0,
-                  width: 44.0,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface100,
-                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                    border: Border.all(color: AppColors.secondary50),
-                  ),
-                  child: const Icon(
-                    Icons.turn_right,
-                    size: 24.0,
-                    color: AppColors.secondary500,
+                GestureDetector(
+                  onTap: () {
+                    // Quick Action: maybe navigation or status change
+                  },
+                  child: Container(
+                    height: 44.0,
+                    width: 44.0,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface100,
+                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                      border: Border.all(color: AppColors.secondary50),
+                    ),
+                    child: const Icon(
+                      Icons.turn_right,
+                      size: 24.0,
+                      color: AppColors.secondary500,
+                    ),
                   ),
                 ),
               ],
@@ -167,6 +180,8 @@ class WorkOrderCard extends StatelessWidget {
           child: Text(
             text,
             style: TextStyles.label.copyWith(color: AppColors.secondary400),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

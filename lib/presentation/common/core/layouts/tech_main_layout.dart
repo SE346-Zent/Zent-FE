@@ -6,36 +6,53 @@ import '../themes/colors.dart';
 import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
 import '../../../technician/account/widgets/tech_sidebar.dart';
+import '../../../../di/injection_container.dart';
+import '../../auth/auth_view_model.dart';
 
-class TechMainLayout extends StatelessWidget {
+class TechMainLayout extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const TechMainLayout({super.key, required this.navigationShell});
 
+  @override
+  State<TechMainLayout> createState() => _TechMainLayoutState();
+}
+
+class _TechMainLayoutState extends State<TechMainLayout> {
   void _goBranch(int index) {
-    navigationShell.goBranch(
+    widget.navigationShell.goBranch(
       index,
-      initialLocation: index == navigationShell.currentIndex,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentUri = GoRouterState.of(context).uri.toString();
+    final isWorkOrderDetails = currentUri.toLowerCase().contains(
+      'work-order-details',
+    );
+    final isAddNewPart = currentUri.toLowerCase().contains('add-new-part');
+    final isSearchScreen = currentUri.toLowerCase().contains(
+      'inventory-search',
+    );
+    final displayIndex = (isWorkOrderDetails || isAddNewPart || isSearchScreen)
+        ? -1
+        : widget.navigationShell.currentIndex;
+    final userName = sl<AuthViewModel>().currentUser?.name ?? 'Technician';
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       resizeToAvoidBottomInset: false,
       drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: const TechSidebar(
-        userName: 'Hung dep zai',
-        employeeId: 'TECH-1234',
-      ),
+      drawer: TechSidebar(userName: userName, employeeId: 'TECH-1234'),
       body: Stack(
         children: [
           Padding(
             padding: EdgeInsets.only(
-              bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
+              bottom: 110.0 + MediaQuery.paddingOf(context).bottom,
             ),
-            child: navigationShell,
+            child: widget.navigationShell,
           ),
           Positioned(
             left: 0,
@@ -47,7 +64,9 @@ class TechMainLayout extends StatelessWidget {
                 bottom: MediaQuery.paddingOf(context).bottom,
               ),
               child: _TechBottomNavBar(
-                currentIndex: navigationShell.currentIndex,
+                currentIndex: displayIndex == -1
+                    ? widget.navigationShell.currentIndex
+                    : displayIndex,
                 onTap: _goBranch,
               ),
             ),

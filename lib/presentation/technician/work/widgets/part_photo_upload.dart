@@ -12,6 +12,7 @@ class PartPhotoUpload extends StatelessWidget {
   final Function(String) onPhotoAdded;
   final Function(int) onPhotoRemoved;
   final String title;
+  final String? hintText;
 
   const PartPhotoUpload({
     super.key,
@@ -19,6 +20,7 @@ class PartPhotoUpload extends StatelessWidget {
     required this.onPhotoAdded,
     required this.onPhotoRemoved,
     this.title = "Part Photo",
+    this.hintText,
   });
 
   void _navigateToCamera(BuildContext context) {
@@ -44,7 +46,7 @@ class PartPhotoUpload extends StatelessWidget {
             ),
             Text(
               "MAX: 5 PHOTOS",
-              style: TextStyles.label.copyWith(color: AppColors.secondary500),
+              style: TextStyles.label.copyWith(color: AppColors.tertiary500),
             ),
           ],
         ),
@@ -59,7 +61,10 @@ class PartPhotoUpload extends StatelessWidget {
                   onAddTap: () => _navigateToCamera(context),
                   onRemoveTap: onPhotoRemoved,
                 )
-              : PartPhotoEmptyState(onTap: () => _navigateToCamera(context)),
+              : PartPhotoEmptyState(
+                  onTap: () => _navigateToCamera(context),
+                  hintText: hintText ?? "Tap to capture part photo",
+                ),
         ),
       ],
     );

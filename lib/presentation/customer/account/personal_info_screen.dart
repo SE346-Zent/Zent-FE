@@ -31,7 +31,7 @@ class _PersonalInfoScreenContent extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AccountHeader(title: 'Personal Info'),
+            const AccountHeader(title: 'Personal Info', showDivider: true),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(

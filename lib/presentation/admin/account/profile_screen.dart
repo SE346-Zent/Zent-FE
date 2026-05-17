@@ -8,7 +8,7 @@ import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
-import 'viewmodel/profile_viewmodel.dart';
+import 'viewmodels/profile_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 class ProfileScreen extends StatelessWidget {
@@ -33,46 +33,50 @@ class _ProfileScreenContent extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 0,
-            vertical: AppDimens.spaceMd,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const AccountHeader(
-                title: 'Profile',
-                showDivider: false,
-                horizontalPadding: 0,
-                verticalPadding: 0,
-                showLeading: false,
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-              Avatar(name: viewModel.userInfo.userName),
-              const SizedBox(height: AppDimens.spaceMd),
-              // User Info
-              ProfileUserInfo(userInfo: viewModel.userInfo),
-              const SizedBox(height: AppDimens.spaceXl),
-              // Menu Items
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
-                child: ProfileMenuOptions(),
-              ),
-              const SizedBox(height: AppDimens.spaceXl),
-              // Sign Out Button
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimens.spaceMd,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 35.0),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: AppDimens.spaceMd,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const AccountHeader(
+                  title: 'Profile',
+                  showDivider: false,
+                  horizontalPadding: 0,
+                  verticalPadding: 0,
+                  showLeading: false,
                 ),
-                child: PrimaryActionButton(
-                  label: 'Sign Out',
-                  width: double.infinity,
-                  icon: Icons.logout,
-                  onPressed: () => context.read<ProfileViewModel>().logout(),
+                const SizedBox(height: AppDimens.spaceLg),
+                Avatar(name: viewModel.userInfo.userName),
+                const SizedBox(height: AppDimens.spaceMd),
+                // User Info
+                ProfileUserInfo(userInfo: viewModel.userInfo),
+                const SizedBox(height: AppDimens.spaceXl),
+                // Menu Items
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                  child: ProfileMenuOptions(),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppDimens.spaceXl),
+                // Sign Out Button
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimens.spaceMd,
+                  ),
+                  child: PrimaryActionButton(
+                    label: 'Sign Out',
+                    width: double.infinity,
+                    icon: Icons.logout,
+                    onPressed: () =>
+                        context.read<ProfileViewModel>().logout(context),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

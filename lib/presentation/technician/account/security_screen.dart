@@ -16,7 +16,7 @@ import 'widgets/tech_text_field.dart';
 import 'widgets/tech_primary_button.dart';
 
 // ViewModel
-import 'view_models/security_viewmodel.dart';
+import 'viewmodels/security_viewmodel.dart';
 
 class TechSecurityScreen extends StatelessWidget {
   const TechSecurityScreen({super.key});

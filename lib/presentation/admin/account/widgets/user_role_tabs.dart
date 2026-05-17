@@ -16,40 +16,46 @@ class UserRoleTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 364.0,
-      height: 46.0,
-      decoration: BoxDecoration(
-        color: AppColors.secondary50,
-        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            alignment: activeIndex == 0
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              width: 178.0,
-              height: 38.0,
-              decoration: BoxDecoration(
-                color: AppColors.surface100,
-                borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                boxShadow: [BoxShadowStyles.subtle],
-              ),
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final indicatorWidth = (constraints.maxWidth - 8.0) / 2;
+
+        return Container(
+          width: double.infinity,
+          height: 46.0,
+          decoration: BoxDecoration(
+            color: AppColors.secondary50,
+            borderRadius: BorderRadius.circular(AppDimens.boraMd),
           ),
-          Row(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+          child: Stack(
             children: [
-              _buildTab(context, title: 'Technicians', index: 0),
-              _buildTab(context, title: 'Admin', index: 1),
+              AnimatedAlign(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                alignment: activeIndex == 0
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
+                child: Container(
+                  width: indicatorWidth,
+                  height: 38.0,
+                  decoration: BoxDecoration(
+                    color: AppColors.surface100,
+                    borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                    boxShadow: [BoxShadowStyles.subtle],
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  _buildTab(context, title: 'Technicians', index: 0),
+                  _buildTab(context, title: 'Admin', index: 1),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

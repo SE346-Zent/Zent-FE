@@ -2,25 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'dashed_border_container.dart';
 
 class PartPhotoEmptyState extends StatelessWidget {
   final VoidCallback onTap;
+  final String hintText;
 
-  const PartPhotoEmptyState({super.key, required this.onTap});
+  const PartPhotoEmptyState({
+    super.key,
+    required this.onTap,
+    this.hintText = "Tap to capture part photo",
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       key: const ValueKey("empty"),
       onTap: onTap,
-      child: Container(
+      child: DashedBorderContainer(
         height: 115.0,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.surface600,
-          border: Border.all(color: AppColors.secondary200, width: 1.0),
-          borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        ),
+        color: AppColors.secondary200,
+        backgroundColor: AppColors.surface600,
+        borderRadius: AppDimens.boraSm,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -31,7 +34,7 @@ class PartPhotoEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppDimens.spaceXs),
             Text(
-              "Tap to capture part photo",
+              hintText,
               style: TextStyles.bodyMedium.copyWith(
                 color: AppColors.secondary500,
               ),

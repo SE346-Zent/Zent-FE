@@ -26,8 +26,8 @@ class PrimaryActionButton extends StatelessWidget {
   /// Optional icon displayed before the label.
   final IconData? icon;
 
-  /// Callback function triggered on tap.
-  final VoidCallback onPressed;
+  /// Callback function triggered on tap. If null, the button will be disabled.
+  final VoidCallback? onPressed;
 
   /// Custom width for the button. Defaults to `364.0`.
   final double? width;
@@ -56,7 +56,7 @@ class PrimaryActionButton extends StatelessWidget {
   const PrimaryActionButton({
     super.key,
     required this.label,
-    required this.onPressed,
+    this.onPressed,
     this.icon,
     // Size defaults
     this.width = 364.0,

@@ -5,7 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/routing/route_names.dart';
-import '../view_models/tech_work_order_details_viewmodel.dart';
+import '../viewmodels/tech_work_order_details_viewmodel.dart';
 
 class DetailsBottomActions extends StatelessWidget {
   final TechWorkOrderDetailsViewModel viewModel;
@@ -23,7 +23,13 @@ class DetailsBottomActions extends StatelessWidget {
             flex: 1,
             child: _buildSecondaryButton(
               label: "Pause",
-              onPressed: viewModel.onPausePressed,
+              onPressed: () {
+                final cleanId = viewModel.workOrderId.replaceAll('#', '');
+                context.pushNamed(
+                  RouteNames.techPauseWorkOrder,
+                  pathParameters: {'workOrderId': cleanId},
+                );
+              },
             ),
           ),
           const SizedBox(width: AppDimens.spaceMd),

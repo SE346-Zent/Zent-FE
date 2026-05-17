@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
-import 'package:zent_fe/presentation/admin/account/viewmodel/user_management_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/user_list_item.dart';
 
 class UserManagementList extends StatelessWidget {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../models/auth_response_model.dart' show AuthResponseModel;
@@ -12,11 +13,10 @@ abstract class AuthRemoteDatasource {
     required String phone,
     required String email,
     required String password,
-    required String role,
   });
-  Future<AuthResponseModel> verifyOtp(String email, String otp);
+  Future<void> verifyOtp(String email, String otp);
   Future<void> resendOtp(String email);
-  Future<void> logout(String email, String refreshToken);
+  Future<void> logout(String accessToken, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
   Future<void> forgotPassword(String email);
   Future<bool> resetPassword({
@@ -28,10 +28,7 @@ abstract class AuthRemoteDatasource {
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   final http.Client client;
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "http://localhost:3000/api",
-  );
+  static final String _baseURL = dotenv.get("BASE_URL");
   static final Duration _timeOut = Duration(
     seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
   );
@@ -40,18 +37,24 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<AuthResponseModel> login(String email, String password) async {
-    final url = Uri.parse('$_baseURL/auth/signin');
+    final url = Uri.parse('$_baseURL/auth/login');
     try {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({'email': email, 'password': password}),
           )
           .timeout(_timeOut);
 
-      final jsonMap = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
+      final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
         jsonMap,
         (data) => AuthResponseModel.fromJson(data),
@@ -63,6 +66,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Login Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Login error: $e');
     }
   }
@@ -73,27 +77,30 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String phone,
     required String email,
     required String password,
-    required String role,
   }) async {
-    final url = Uri.parse('$_baseURL/auth/signup/initiate');
+    final url = Uri.parse('$_baseURL/auth/register');
     try {
-      final mappedRole = adaptRoleFromFEToBE(role);
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({
               'email': email,
-              'phonenumber': phone,
               'fullName': fullName,
               'password': password,
-              'userRoles': mappedRole,
+              'phoneNumber': phone,
             }),
           )
           .timeout(_timeOut);
 
-      final jsonMap = jsonDecode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _handleErrorResponse(response);
+      }
 
+      final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
         (data) => data,
@@ -102,50 +109,63 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Signup Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Sign up error: $e');
     }
   }
 
   @override
-  Future<AuthResponseModel> verifyOtp(String email, String otp) async {
-    final url = Uri.parse('$_baseURL/auth/signup/finish');
+  Future<void> verifyOtp(String email, String otp) async {
+    final url = Uri.parse('$_baseURL/auth/verify-otp');
     try {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'otp': otp, 'email': email}),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({'otpCode': otp, 'email': email}),
           )
           .timeout(_timeOut);
 
-      final jsonMap = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
-      final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
         jsonMap,
-        (data) => AuthResponseModel.fromJson(data),
+        (data) => data,
       );
 
-      if (apiResponse.isSuccessful && apiResponse.data != null) {
-        return apiResponse.data!;
-      } else {
+      if (!apiResponse.isSuccessful) {
         throw Exception(apiResponse.message ?? 'Verify OTP Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Verify OTP error: $e');
     }
   }
 
   @override
   Future<void> resendOtp(String email) async {
-    final url = Uri.parse('$_baseURL/auth/signup/resend-otp');
+    final url = Uri.parse('$_baseURL/auth/resend-otp');
     try {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({'email': email}),
           )
           .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
@@ -157,12 +177,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Resend OTP Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Resend OTP error: $e');
     }
   }
 
   @override
-  Future<void> logout(String email, String refreshToken) async {
+  Future<void> logout(String accessToken, String refreshToken) async {
     final url = Uri.parse('$_baseURL/auth/logout');
     try {
       final response = await client
@@ -170,11 +191,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             url,
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $refreshToken',
+              'Authorization': 'Bearer $accessToken',
             },
-            body: jsonEncode({'email': email}),
+            body: jsonEncode({'refresh_token': refreshToken}),
           )
           .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
@@ -186,6 +211,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Logout Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Logout error: $e');
     }
   }
@@ -202,11 +228,16 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             url,
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json',
               'Authorization': 'Bearer $refreshToken',
             },
-            body: jsonEncode({'email': email}),
+            body: jsonEncode({'refresh_token': refreshToken}),
           )
           .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
@@ -220,21 +251,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Refresh token Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Refresh token error: $e');
-    }
-  }
-
-  String adaptRoleFromFEToBE(String role) {
-    switch (role.toUpperCase()) {
-      case 'SUPERADMIN':
-        return 'SUPER_ADMIN';
-      case 'TECHNICIAN':
-        return 'TECHNICIAN';
-      case 'CUSTOMER':
-        return 'CUSTOMER';
-      case 'ADMIN':
-      default:
-        return 'ADMIN';
     }
   }
 
@@ -245,10 +263,17 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({'email': email}),
           )
           .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
@@ -260,6 +285,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Forgot Password Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Forgot password error: $e');
     }
   }
@@ -275,14 +301,20 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final response = await client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({
-              'email': email,
-              'token': token,
-              'password': newPassword,
+              'reset_token': token,
+              'new_password': newPassword,
             }),
           )
           .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<dynamic>.fromJson(
@@ -296,7 +328,41 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         throw Exception(apiResponse.message ?? 'Reset Password Failed');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Reset password error: $e');
+    }
+  }
+
+  void _handleErrorResponse(http.Response response) {
+    final statusCode = response.statusCode;
+    final body = response.body;
+
+    // Log lỗi chi tiết ra Console để lập trình viên theo dõi
+    debugPrint('--- API Error $statusCode ---');
+    debugPrint('Body: $body');
+    debugPrint('-----------------------------');
+
+    if (body.isEmpty) {
+      throw Exception('Server Error ($statusCode)');
+    }
+
+    final contentType = response.headers['content-type'] ?? '';
+    if (contentType.contains('application/json')) {
+      try {
+        final errorMap = jsonDecode(body);
+        throw Exception(
+          errorMap['message'] ?? 'Something went wrong ($statusCode)',
+        );
+      } catch (_) {
+        // Nếu không parse được JSON, trả về thông báo chung chung
+        throw Exception('Server response error ($statusCode)');
+      }
+    } else {
+      // Nếu là HTML hoặc text khác, không hiện lên UI mà chỉ báo lỗi chung
+      if (statusCode == 401) {
+        throw Exception('Invalid email or password');
+      }
+      throw Exception('Server error ($statusCode)');
     }
   }
 }

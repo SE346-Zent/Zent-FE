@@ -22,6 +22,13 @@ class WorkOrderModel extends WorkOrder {
     super.technicianName,
     required super.workOrderNum,
     super.rejectionPhotos = const [],
+    super.productName,
+    super.appointment,
+    super.building,
+    super.city,
+    super.country,
+    super.email,
+    super.firstName,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -45,6 +52,13 @@ class WorkOrderModel extends WorkOrder {
       technicianName: entity.technicianName,
       workOrderNum: entity.workOrderNum,
       rejectionPhotos: entity.rejectionPhotos,
+      productName: entity.productName,
+      appointment: entity.appointment,
+      building: entity.building,
+      city: entity.city,
+      country: entity.country,
+      email: entity.email,
+      firstName: entity.firstName,
     );
   }
 
@@ -80,20 +94,21 @@ class WorkOrderModel extends WorkOrder {
           '',
       priority: json['priority'] as int? ?? 0,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : (json['created_at'] != null
                 ? DateTime.parse(json['created_at'])
                 : DateTime.now()),
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
+          ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
           : (json['updated_at'] != null
                 ? DateTime.parse(json['updated_at'])
                 : DateTime.now()),
       closedAt: json['closedAt'] != null
-          ? DateTime.parse(json['closedAt'])
+          ? DateTime.tryParse(json['closedAt'])
           : (json['closed_at'] != null
                 ? DateTime.parse(json['closed_at'])
                 : null),
+
       version: json['version'] as int? ?? 0,
       adminId: (json['adminId'] ?? json['admin_id'] ?? '').toString(),
       customerId: (json['customerId'] ?? json['customer_id'] ?? '').toString(),
@@ -176,20 +191,29 @@ class WorkOrderModel extends WorkOrder {
     return {
       'id': id,
       'title': title,
-      'address_string': addressString,
-      'status_id': status.index,
+      'address': addressString,
+      'status': status.name,
       'description': description,
       'reject_reason': rejectReason,
       'refusal_note': refusalNote,
       'priority': priority,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-      'closed_at': closedAt?.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'closedAt': closedAt?.toIso8601String(),
       'version': version,
-      'admin_id': adminId,
-      'customer_id': customerId,
+      'adminId': adminId,
+      'customerId': customerId,
       'customer_name': customerName,
-      'technician_id': technicianId,
+      'technicianId': technicianId,
+      'workOrderNum': workOrderNum,
+      'customerName': customerName,
+      'productName': productName,
+      'appointment': appointment?.toIso8601String(),
+      'building': building,
+      'city': city,
+      'country': country,
+      'email': email,
+      'firstName': firstName,
       'technician_name': technicianName,
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,

@@ -36,9 +36,7 @@ class RejectedWorkOrdersViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 5: Reject_InReview
-      final allOrders = await getManyWorkOrdersUseCase.execute('', status: '5');
-      // Filter manually to ensure only RejectInReview status is shown
+      final allOrders = await getManyWorkOrdersUseCase.execute(limit: 100);
       _workOrders = allOrders
           .where((wo) => wo.status == WorkOrderStatus.rejectInReview)
           .toList();

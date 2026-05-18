@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../di/injection_container.dart'; // 🚀 Nhúng DI vào để gọi Local Datasource
+import '../data/datasources/local/auth_local_datasource.dart'; // 🚀 Import đúng Datasource chuẩn
+
+// ... (Giữ nguyên các dòng import màn hình của ông ở đây) ...
 import '../presentation/common/intro/on_boarding_screen.dart';
 import '../presentation/common/intro/splash_screen.dart';
 import '../presentation/common/auth/login/login_screen.dart';
@@ -61,64 +65,38 @@ import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 import 'package:zent_fe/routing/route_names.dart';
 import './routes.dart' show Routes;
 
-import './rbac_token_store.dart';
-
-UserRoles _getRoleFromToken() {
-  /*
-  // Cách cũ: Giải mã JWT để lấy Role (Dùng khi Backend nhúng Role vào Token)
-  final token = RbacTokenStore.token;
-  if (token == null) return UserRoles.unauthenticated;
+Future<UserRoles> _getRoleFromToken() async {
   try {
-    final parts = token.split('.');
-    if (parts.length != 3) return UserRoles.unauthenticated;
-    final normalized = base64Url.normalize(parts[1]);
-    final decoded = utf8.decode(base64Url.decode(normalized));
-    final claims = jsonDecode(decoded) as Map<String, dynamic>;
-    final roleString = (claims['role'] as String?)?.toLowerCase();
-    return switch (roleString) {
-      'admin' || 'super_admin' => UserRoles.admin,
-      'technician' => UserRoles.technician,
-      'customer' => UserRoles.customer,
-      _ => UserRoles.unauthenticated,
-    };
+    final localAuthDs = sl<AuthLocalDataSource>();
+    final user = await localAuthDs.getUser();
+    return user?.role ?? UserRoles.unauthenticated;
   } catch (e) {
-    debugPrint("JWT Decode Error: $e");
+    debugPrint("Get Role Error: $e");
     return UserRoles.unauthenticated;
   }
-  */
-
-  // Cách mới: Lấy trực tiếp từ Store (Dựa trên roleId Server trả về khi Login)
-  return RbacTokenStore.role;
 }
 
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
-// ignore: unused_element
 Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
   final location = state.matchedLocation;
-  final role = _getRoleFromToken();
-
-  // Check notification permission for Admin and Tech
+  final role = await _getRoleFromToken();
   if (role == UserRoles.admin || role == UserRoles.technician) {
     final settings = await FirebaseMessaging.instance.requestPermission();
     if (settings.authorizationStatus != AuthorizationStatus.authorized) {
       return Routes.login;
     }
   }
-
   final isPublic = _publicPrefixes.any(
     (p) => location == p || location.startsWith('$p/'),
   );
 
   // ── Unauthenticated ─────────────────────────────────────────────────────
   if (role == UserRoles.unauthenticated) {
-    // Allow public routes; everything else goes to login.
     return isPublic ? null : Routes.login;
   }
 
   // ── Authenticated on a public / auth route ───────────────────────────────
-  // Redirect straight to the role's home screen, UNLESS we are in the middle
-  // of an auth flow (OTP, Reset Password).
   final isAuthFlow =
       location.contains(Routes.verifyOtp) ||
       location.contains(Routes.resetPassword) ||

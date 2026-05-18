@@ -33,18 +33,7 @@ class OperationalQueueViewModel extends ChangeNotifier {
     try {
       final user = await getCurrentUserUseCase.execute();
       if (user != null) {
-        // Map tab index to status for API filtering if possible
-        String? statusFilter;
-        if (_activeTabIndex == 3) {
-          statusFilter = 'complete';
-        } else if (_activeTabIndex == 4) {
-          statusFilter = 'rejectInReview';
-        }
-
-        _allWorkOrders = await getManyWorkOrdersUseCase.execute(
-          user.id,
-          status: statusFilter,
-        );
+        _allWorkOrders = await getManyWorkOrdersUseCase.execute(limit: 100);
       }
     } catch (e) {
       debugPrint("Error loading operational queue: $e");

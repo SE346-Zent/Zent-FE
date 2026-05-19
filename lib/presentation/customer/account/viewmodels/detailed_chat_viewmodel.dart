@@ -74,6 +74,10 @@ class DetailedChatViewModel extends ChangeNotifier {
   final TextEditingController messageController = TextEditingController();
   StreamSubscription<dynamic>? _wsSubscription;
 
+  void _sortMessages() {
+    messages.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+  }
+
   bool _isInitialized = false;
   bool _wasConnected = false;
   bool _isDisposed = false;
@@ -144,6 +148,7 @@ class DetailedChatViewModel extends ChangeNotifier {
               messages.add(msg);
             }
           }
+          _sortMessages();
           // Re-send VIEWING room frame to register session with server again
           chatService.startViewing(currentChatId!);
           notifyListeners();
@@ -236,6 +241,8 @@ class DetailedChatViewModel extends ChangeNotifier {
         );
       }).toList();
 
+      _sortMessages();
+
       // 3. Mark all unread incoming messages as read
       final unreadMessageIds = fetchedMessages
           .where((m) => !_isMe(m.senderId) && !m.readBy.any((id) => _isMe(id)))
@@ -321,6 +328,7 @@ class DetailedChatViewModel extends ChangeNotifier {
               // Avoid duplicate rendering if REST loaded the message concurrently
               if (!messages.any((m) => m.id == uiMsg.id)) {
                 messages.add(uiMsg);
+                _sortMessages();
               }
 
               // Automatically send read receipt if this incoming message is from the other user
@@ -395,6 +403,7 @@ class DetailedChatViewModel extends ChangeNotifier {
             .toList();
 
         messages.insertAll(0, uniqueOlder);
+        _sortMessages();
 
         if (fetchedMessages.length < 20) {
           hasMore = false;
@@ -425,6 +434,7 @@ class DetailedChatViewModel extends ChangeNotifier {
         dateTime: now,
       );
       messages.add(uiMsg);
+      _sortMessages();
 
       messageController.clear();
       notifyListeners();
@@ -464,6 +474,7 @@ class DetailedChatViewModel extends ChangeNotifier {
         dateTime: now,
       );
       messages.add(uiMsg);
+      _sortMessages();
     } catch (e) {
       debugPrint("Failed to send image: $e");
     } finally {
@@ -505,6 +516,7 @@ class DetailedChatViewModel extends ChangeNotifier {
         dateTime: now,
       );
       messages.add(uiMsg);
+      _sortMessages();
     } catch (e) {
       debugPrint("Failed to send image: $e");
     } finally {

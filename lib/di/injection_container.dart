@@ -29,7 +29,7 @@ import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
 import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../domain/usecases/work_order/approve_refusal_usecase.dart';
 import '../domain/usecases/work_order/deny_refusal_usecase.dart';
-import '../domain/usecases/work_order/add_part_to_work_order_usecase.dart';
+import '../domain/usecases/work_order/add_part_usecase.dart';
 import '../domain/usecases/product/get_my_products_usecase.dart';
 import '../domain/repositories/product_repository.dart';
 import '../data/repositories/product_repository_impl.dart';
@@ -122,7 +122,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => ApproveRefusalUseCase(sl()));
   sl.registerLazySingleton(() => DenyRefusalUseCase(sl()));
-  sl.registerLazySingleton(() => AddPartToWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => AddPartUseCase(sl()));
 
   // Notification Use Cases
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));

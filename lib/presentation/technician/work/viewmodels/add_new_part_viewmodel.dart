@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../domain/usecases/work_order/add_part_to_work_order_usecase.dart';
+import '../../../../domain/usecases/work_order/add_part_usecase.dart';
 import '../../../../data/models/add_part_request.dart';
 
 class AddNewPartViewModel extends ChangeNotifier {
-  final AddPartToWorkOrderUseCase addPartToWorkOrderUseCase;
+  final AddPartUseCase addPartToWorkOrderUseCase;
 
   AddNewPartViewModel({required this.addPartToWorkOrderUseCase});
 

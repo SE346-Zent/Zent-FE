@@ -114,7 +114,7 @@ class _ResetPasswordScreenContent extends StatelessWidget {
                                 AuthPrimaryButton(
                                   text: 'Reset Password',
                                   isLoading: viewModel.isLoading,
-                                  onPressed: !viewModel.doPasswordsMatch
+                                  onPressed: !viewModel.isPasswordValid
                                       ? null
                                       : () async {
                                           FocusScope.of(context).unfocus();

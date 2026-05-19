@@ -33,17 +33,9 @@ class OperationalQueueViewModel extends ChangeNotifier {
     try {
       final user = await getCurrentUserUseCase.execute();
       if (user != null) {
-        // Map tab index to status for API filtering if possible
-        String? statusFilter;
-        if (_activeTabIndex == 3) {
-          statusFilter = 'complete';
-        } else if (_activeTabIndex == 4) {
-          statusFilter = 'rejectInReview';
-        }
-
         final results = await getManyWorkOrdersUseCase.execute(
-          user.id,
-          status: statusFilter,
+          limit: 100,
+          role: user.role.name,
         );
 
         var province = user.province.toUpperCase();

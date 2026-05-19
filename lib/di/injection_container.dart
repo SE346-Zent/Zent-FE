@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../routing/rbac_token_store.dart';
 import '../data/datasources/local/auth_local_datasource.dart';
 import '../data/datasources/remote/auth_remote_datasource.dart';
 import '../data/datasources/remote/work_order_remote_datasource.dart';
@@ -20,6 +19,8 @@ import '../domain/usecases/auth/get_current_user_usecase.dart';
 import '../domain/usecases/auth/register_usecase.dart';
 import '../domain/usecases/auth/verify_otp_usecase.dart';
 import '../domain/usecases/auth/resend_otp_usecase.dart';
+import '../domain/usecases/auth/forgot_password_usecase.dart';
+import '../domain/usecases/auth/verify_forgot_otp_usecase.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
@@ -42,6 +43,7 @@ import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
 import '../presentation/common/auth/login/view_models/reset_password_view_model.dart';
+import '../presentation/common/auth/login/view_models/verify_forgot_otp_view_model.dart';
 import '../presentation/common/auth/register/view_models/verify_otp_view_model.dart';
 import '../presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/profile_viewmodel.dart';
@@ -109,6 +111,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
   sl.registerLazySingleton(() => ResendOtpUseCase(sl()));
+  sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyForgotOtpUseCase(sl()));
 
   // Work Order Use Cases
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
@@ -130,7 +134,15 @@ Future<void> init() async {
   sl.registerFactory(() => SplashViewModel(sl(), sl()));
   sl.registerFactory(() => LoginViewModel(sl()));
   sl.registerFactory(() => RegisterViewModel(registerUseCase: sl()));
-  sl.registerFactory(() => ForgotPasswordViewModel());
+  sl.registerFactory(
+    () => ForgotPasswordViewModel(forgotPasswordUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => VerifyForgotOtpViewModel(
+      verifyForgotOtpUseCase: sl(),
+      forgotPasswordUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
   sl.registerFactory(
     () => VerifyOtpViewModel(verifyOtpUseCase: sl(), resendOtpUseCase: sl()),
@@ -190,10 +202,7 @@ Future<void> init() async {
   );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(
-    () => ActiveRepairsViewModel(
-      getManyWorkOrdersUseCase: sl(),
-      getCurrentUserUseCase: sl(),
-    ),
+    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
   );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
   sl.registerFactory(
@@ -295,11 +304,4 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => http.Client());
-
-  // --- Load Initial Token ---
-  final authLocalDataSource = sl<AuthLocalDataSource>();
-  final token = await authLocalDataSource.getAccessToken();
-  if (token != null) {
-    RbacTokenStore.setToken(token);
-  }
 }

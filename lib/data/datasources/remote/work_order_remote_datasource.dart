@@ -12,14 +12,14 @@ import '../../models/refuse_work_order_request.dart';
 import '../local/auth_local_datasource.dart';
 
 abstract class WorkOrderRemoteDataSource {
-  Future<WorkOrderModel> getSingleWorkOrder(String id);
-  Future<List<WorkOrderModel>> getManyWorkOrders(
-    String userId, {
-    String? status,
+  Future<List<WorkOrderModel>> getWorkOrders({
     int page = 1,
     int limit = 20,
     String? role,
+    String? province,
+    String? technicianId,
   });
+  Future<WorkOrderModel> getWorkOrderDetail(String id);
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
   Future<void> completeWorkOrder(String id, CompleteWorkOrderRequest request);
   Future<void> refuseWorkOrder(String id, RefuseWorkOrderRequest request);
@@ -66,77 +66,86 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   }
 
   @override
-  Future<WorkOrderModel> getSingleWorkOrder(String id) async {
-    // Corrected path from api-1.json: /api/v1/work_orders/{id}
-    final url = Uri.parse('$_baseURL/work_orders/$id');
+  Future<List<WorkOrderModel>> getWorkOrders({
+    int page = 1,
+    int limit = 20,
+    String? role,
+    String? province,
+    String? technicianId,
+  }) async {
+    final queryParameters = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'role':? role,
+      'province':? province,
+      'technician_id':? technicianId,
+    };
+
+    final url = Uri.parse(
+      '$_baseURL/work_orders',
+    ).replace(queryParameters: queryParameters);
+
     try {
       final headers = await _getHeaders();
       final response = await client
           .get(url, headers: headers)
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as List<dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!
+            .map(
+              (item) => WorkOrderModel.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch work orders');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error fetching work orders: $e');
+    }
+  }
+
+  @override
+  Future<WorkOrderModel> getWorkOrderDetail(String id) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id');
+
+    try {
+      final headers = await _getHeaders();
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(
         jsonMap,
-        (data) => WorkOrderModel.fromJson(data),
+        (data) => WorkOrderModel.fromJson(data as Map<String, dynamic>),
       );
 
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!;
       } else {
         throw Exception(
-          apiResponse.message ?? 'Failed to fetch single work order',
+          apiResponse.message ?? 'Failed to fetch work order detail',
         );
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error fetching single work order: $e');
-    }
-  }
-
-  @override
-  Future<List<WorkOrderModel>> getManyWorkOrders(
-    String userId, {
-    String? status,
-    int page = 1,
-    int limit = 20,
-    String? role,
-  }) async {
-    // Reverting to simpler query to fix "Failed to deserialize query string: invalid type: string '1', expected u64"
-    // and to ensure results are returned for Tech/Customer via token filtering.
-    var uri = Uri.parse('$_baseURL/work_orders');
-    final queryParams = <String, String>{};
-
-    if (status != null) {
-      queryParams['status'] = status;
-    }
-
-    if (queryParams.isNotEmpty) {
-      uri = uri.replace(queryParameters: queryParams);
-    }
-
-    try {
-      final headers = await _getHeaders();
-      final response = await client
-          .get(uri, headers: headers)
-          .timeout(_timeOut);
-
-      final jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
-        data,
-      ) {
-        if (data is List) {
-          return data.map((e) => WorkOrderModel.fromJson(e)).toList();
-        }
-        return [];
-      });
-
-      if (apiResponse.isSuccessful && apiResponse.data != null) {
-        return apiResponse.data!;
-      } else {
-        throw Exception(apiResponse.message ?? 'Failed to fetch work orders');
-      }
-    } catch (e) {
-      throw Exception('Error fetching many work orders: $e');
     }
   }
 
@@ -168,12 +177,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
 
-      if (response.body.isEmpty) {
-        return;
-      }
+      if (response.body.isEmpty) return;
 
       try {
         final jsonMap = jsonDecode(response.body);
@@ -186,6 +193,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
         debugPrint('Warning: Could not parse response JSON: $e');
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error creating work order: $e');
     }
   }
@@ -301,6 +309,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .get(url, headers: headers)
           .timeout(_timeOut);
 
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<List<WorkOrderModel>>.fromJson(jsonMap, (
         data,
@@ -319,6 +331,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
         );
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error fetching active repairs: $e');
     }
   }
@@ -428,6 +441,33 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       return jsonMap;
     } catch (e) {
       throw Exception('Error fetching work order history: $e');
+    }
+  }
+
+  void _handleErrorResponse(http.Response response) {
+    final statusCode = response.statusCode;
+    final body = response.body;
+
+    debugPrint('--- API Error $statusCode ---');
+    debugPrint('Body: $body');
+    debugPrint('-----------------------------');
+
+    if (body.isEmpty) {
+      throw Exception('Server Error ($statusCode)');
+    }
+
+    final contentType = response.headers['content-type'] ?? '';
+    if (contentType.contains('application/json')) {
+      try {
+        final errorMap = jsonDecode(body);
+        throw Exception(
+          errorMap['message'] ?? 'Something went wrong ($statusCode)',
+        );
+      } catch (_) {
+        throw Exception('Server response error ($statusCode)');
+      }
+    } else {
+      throw Exception('Server error ($statusCode)');
     }
   }
 }

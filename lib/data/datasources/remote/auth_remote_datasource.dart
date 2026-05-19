@@ -19,6 +19,7 @@ abstract class AuthRemoteDatasource {
   Future<void> logout(String accessToken, String refreshToken);
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
   Future<void> forgotPassword(String email);
+  Future<String> verifyForgotOtp(String email, String otp);
   Future<bool> resetPassword({
     required String email,
     required String token,
@@ -291,6 +292,42 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
+  Future<String> verifyForgotOtp(String email, String otp) async {
+    final url = Uri.parse('$_baseURL/auth/verify-forgot-password-otp');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'otp_code': otp}),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        final errorMap = jsonDecode(response.body);
+        throw Exception(errorMap['message'] ?? 'Verify OTP Failed');
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+      final data = apiResponse.data;
+
+      if (data is String) return data;
+      if (data is Map<String, dynamic> && data['resetToken'] != null) {
+        return data['resetToken'].toString();
+      }
+
+      throw Exception('Reset token not found in server response');
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Verify forgot OTP error: $e');
+    }
+  }
+
+  @override
   Future<bool> resetPassword({
     required String email,
     required String token,
@@ -316,17 +353,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         _handleErrorResponse(response);
       }
 
-      final jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<dynamic>.fromJson(
-        jsonMap,
-        (data) => data,
-      );
-
-      if (apiResponse.isSuccessful) {
-        return true;
-      } else {
-        throw Exception(apiResponse.message ?? 'Reset Password Failed');
-      }
+      return true;
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Reset password error: $e');

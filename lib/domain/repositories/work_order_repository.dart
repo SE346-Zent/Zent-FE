@@ -10,14 +10,15 @@ abstract class WorkOrderRepository {
   Future<void> refuseWorkOrder(String id, RefuseWorkOrderRequest request);
   Future<void> approveRefusal(String id, ApproveRefusalRequest request);
   Future<void> denyRefusal(String id);
-  Future<WorkOrder> getSingleWorkOrder({required String id});
-  Future<List<WorkOrder>> getManyWorkOrders({
-    required String userId,
-    String? status,
+  Future<List<WorkOrder>> getWorkOrders({
     int page = 1,
     int limit = 20,
     String? role,
+    String? province,
+    String? technicianId,
   });
+
+  Future<WorkOrder> getWorkOrderDetail({required String id});
   Future<List<WorkOrder>> getActiveRepairs({required String customerId});
   Future<void> startWorkOrder(String id, double latitude, double longitude);
   Future<void> uploadClosingFormPhoto(

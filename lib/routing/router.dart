@@ -338,8 +338,7 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.adminWorkOrderHistory,
                   path: Routes.adminWorkOrderHistory,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) =>
-                      const WorkOrdersHistoryScreen(),
+                  builder: (context, state) => const WorkOrdersHistoryScreen(),
                   routes: [
                     GoRoute(
                       name: RouteNames.adminDetailedHistory,
@@ -426,7 +425,10 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final chatId = state.pathParameters['chatId']!;
                     final name = state.uri.queryParameters['name'];
-                    return DetailedChatScreen(chatId: chatId, partnerName: name);
+                    return DetailedChatScreen(
+                      chatId: chatId,
+                      partnerName: name,
+                    );
                   },
                 ),
               ],
@@ -557,7 +559,10 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final chatId = state.pathParameters['chatId']!;
                     final name = state.uri.queryParameters['name'];
-                    return DetailedChatScreen(chatId: chatId, partnerName: name);
+                    return DetailedChatScreen(
+                      chatId: chatId,
+                      partnerName: name,
+                    );
                   },
                 ),
               ],
@@ -695,7 +700,10 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final chatId = state.pathParameters['chatId']!;
                     final name = state.uri.queryParameters['name'];
-                    return DetailedChatScreen(chatId: chatId, partnerName: name);
+                    return DetailedChatScreen(
+                      chatId: chatId,
+                      partnerName: name,
+                    );
                   },
                 ),
               ],

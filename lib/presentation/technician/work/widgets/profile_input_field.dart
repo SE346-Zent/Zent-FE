@@ -15,6 +15,7 @@ class ProfileInputField extends StatelessWidget {
   final Widget? suffixIcon;
   final ValueChanged<String>? onChanged;
   final bool showSubtleShadow;
+  final bool enabled;
 
   const ProfileInputField({
     super.key,
@@ -28,6 +29,7 @@ class ProfileInputField extends StatelessWidget {
     this.suffixIcon,
     this.onChanged,
     this.showSubtleShadow = false,
+    this.enabled = true,
   });
 
   @override
@@ -45,7 +47,9 @@ class ProfileInputField extends StatelessWidget {
         Container(
           height: height ?? (isMultiline ? 101.0 : 45.0),
           decoration: BoxDecoration(
-            color: AppColors.surface100,
+            color: enabled
+                ? AppColors.surface100
+                : AppColors.surface100.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(AppDimens.boraSm),
             border: Border.all(color: AppColors.primary50),
             boxShadow: showSubtleShadow ? [BoxShadowStyles.subtle] : null,
@@ -53,12 +57,15 @@ class ProfileInputField extends StatelessWidget {
           child: TextField(
             controller: controller,
             onChanged: onChanged,
+            enabled: enabled,
             maxLines: isMultiline ? null : 1,
             expands: isMultiline,
             textAlignVertical: isMultiline
                 ? TextAlignVertical.top
                 : TextAlignVertical.center,
-            style: TextStyles.bodyMedium.copyWith(color: AppColors.primary500),
+            style: TextStyles.bodyMedium.copyWith(
+              color: enabled ? AppColors.primary500 : AppColors.secondary300,
+            ),
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: TextStyles.bodyMedium.copyWith(

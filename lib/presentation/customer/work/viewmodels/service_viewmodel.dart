@@ -23,5 +23,11 @@ class ServiceViewModel extends ChangeNotifier {
       "icon": Icons.local_shipping_outlined,
       "routeName": "customerActiveRepairs",
     },
+    {
+      "title": "Work Order History",
+      "subtitle": "Find all my created work orders",
+      "icon": Icons.history,
+      "routeName": "customerWorkOrderHistory",
+    },
   ];
 }

@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:zent_fe/data/services/chat_service.dart';
 
 class ChatPreview {
   final String id;
@@ -19,6 +22,9 @@ class ChatPreview {
 }
 
 class ChatViewModel extends ChangeNotifier {
+  final ChatService chatService;
+  StreamSubscription<dynamic>? _wsSubscription;
+
   List<ChatPreview> _chats = [];
   List<ChatPreview> get chats => _chats;
 
@@ -28,51 +34,88 @@ class ChatViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchChats() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  bool _isInitialized = false;
+  bool _wasConnected = false;
 
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
+  ChatViewModel({required this.chatService}) {
+    _wasConnected = chatService.isConnected;
+    _setupWebSocketListener();
+    chatService.addListener(_onChatServiceChanged);
+  }
+
+  void _onChatServiceChanged() {
+    final isConnected = chatService.isConnected;
+    if (_isInitialized && isConnected && !_wasConnected) {
+      debugPrint(
+        "ChatViewModel: WS Reconnected! Re-fetching latest chat rooms state...",
+      );
+      fetchChats(showLoading: false);
+    }
+    _wasConnected = isConnected;
+  }
+
+  void _setupWebSocketListener() {
+    chatService.connect();
+    _wsSubscription = chatService.messageStream?.listen((event) {
+      if (event is Map<String, dynamic> && event['type'] == 'MESSAGE') {
+        // Refresh chat list silently on new messages
+        fetchChats(showLoading: false);
+      }
+    });
+  }
+
+  Future<void> fetchChats({bool showLoading = true}) async {
+    if (showLoading) {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+    }
 
     try {
-      _chats = [
-        const ChatPreview(
-          id: '1',
-          name: 'Bae Suzy',
-          lastMessage: 'I have sent you some important informat...',
-          time: '10h30',
-          unreadCount: 3,
-        ),
-        const ChatPreview(
-          id: '2',
-          name: 'Bae Suzy',
-          lastMessage: 'I have sent you some important informat...',
-          time: '10h30',
-          unreadCount: 0,
-        ),
-        const ChatPreview(
-          id: '3',
-          name: 'Bae Suzy',
-          lastMessage: 'I have sent you some important informat...',
-          time: '10h30',
-          unreadCount: 3,
-        ),
-        const ChatPreview(
-          id: '4',
-          name: 'Bae Suzy',
-          lastMessage: 'I have sent you some important informat...',
-          time: '10h30',
-          unreadCount: 0,
-        ),
-      ];
+      final rooms = await chatService.getRooms();
+      _chats = rooms.map((room) {
+        String formattedTime = '';
+        if (room.latestMessageAt != null) {
+          try {
+            final dt = DateTime.parse(room.latestMessageAt!).toLocal();
+            formattedTime = DateFormat('HH:mm').format(dt);
+          } catch (_) {
+            formattedTime = '';
+          }
+        }
+        String displayMessage = 'No messages yet';
+        if (room.latestMessageAt != null) {
+          if (room.latestMessage != null && room.latestMessage!.isNotEmpty) {
+            displayMessage = room.latestMessage!;
+          } else {
+            displayMessage = 'Sent an image';
+          }
+        }
+
+        return ChatPreview(
+          id: room.id,
+          name: room.oppositeUserName,
+          lastMessage: displayMessage,
+          time: formattedTime,
+          unreadCount: room.unreadCount,
+          avatarUrl: room.oppositeAvatarUrl,
+        );
+      }).toList();
       _isLoading = false;
+      _isInitialized = true;
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
       _isLoading = false;
+      _isInitialized = true;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    chatService.removeListener(_onChatServiceChanged);
+    _wsSubscription?.cancel();
+    super.dispose();
   }
 }

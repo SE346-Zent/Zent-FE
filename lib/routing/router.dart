@@ -14,18 +14,20 @@ import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
-import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
-import '../presentation/admin/queue/operational_queue_screen.dart';
-import '../presentation/admin/queue/work_order_detail_screen.dart';
-import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
-import '../presentation/admin/rejections/rejected_work_orders_screen.dart';
-import '../presentation/admin/rejections/rejection_detail_screen.dart';
-import '../presentation/admin/queue/view_schedule_screen.dart';
-import '../presentation/admin/queue/reassign_work_order_screen.dart';
-import '../presentation/admin/reports/admin_reports_screen.dart';
+import '../presentation/admin/work/admin_dashboard_screen.dart';
+import '../presentation/admin/work/operational_queue_screen.dart';
+import '../presentation/admin/work/work_order_detail_screen.dart';
+import '../presentation/admin/work/assigned_work_order_detail_screen.dart';
+import '../presentation/admin/work/rejected_work_orders_screen.dart';
+import '../presentation/admin/work/rejection_detail_screen.dart';
+import '../presentation/admin/work/view_schedule_screen.dart';
+import '../presentation/admin/work/reassign_work_order_screen.dart';
+import '../presentation/admin/work/admin_reports_screen.dart';
 import '../presentation/admin/account/part_requests_screen.dart';
 import '../presentation/admin/account/inventory_assets_screen.dart';
 import '../presentation/admin/account/detail_request_screen.dart';
+import '../presentation/admin/work/work_orders_history_screen.dart';
+import '../presentation/admin/work/detailed_history_screen.dart';
 import '../presentation/customer/work/service_screen.dart';
 import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
@@ -365,6 +367,24 @@ final GoRouter appRouter = GoRouter(
                     ),
                   ],
                 ),
+                GoRoute(
+                  name: RouteNames.adminWorkOrderHistory,
+                  path: Routes.adminWorkOrderHistory,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      const WorkOrdersHistoryScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.adminDetailedHistory,
+                      path: Routes.adminDetailedHistory,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['workOrderId'] ?? '';
+                        return DetailedHistoryScreen(workOrderId: id);
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
             GoRoute(
@@ -430,8 +450,19 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.adminTeam,
               path: Routes.adminTeam,
-              builder: (context, state) =>
-                  const Scaffold(body: Center(child: Text('Team Screen'))),
+              builder: (context, state) => const CustomerChatScreen(),
+              routes: [
+                GoRoute(
+                  name: 'adminDetailedChat',
+                  path: 'detailed-chat/:chatId',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final chatId = state.pathParameters['chatId']!;
+                    final name = state.uri.queryParameters['name'];
+                    return DetailedChatScreen(chatId: chatId, partnerName: name);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -487,6 +518,12 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.inventorySearch,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const PartSearchScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.techWorkOrderHistory,
+                  path: Routes.techWorkOrderHistory,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const WorkOrdersHistoryScreen(),
                 ),
               ],
             ),
@@ -544,9 +581,19 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               name: RouteNames.techMessage,
               path: Routes.techMessage,
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Tech Message Screen')),
-              ),
+              builder: (context, state) => const CustomerChatScreen(),
+              routes: [
+                GoRoute(
+                  name: RouteNames.techDetailedChat,
+                  path: 'detailed-chat/:chatId',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final chatId = state.pathParameters['chatId']!;
+                    final name = state.uri.queryParameters['name'];
+                    return DetailedChatScreen(chatId: chatId, partnerName: name);
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -647,6 +694,12 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const ActiveRepairsScreen(),
                 ),
                 GoRoute(
+                  name: RouteNames.customerWorkOrderHistory,
+                  path: Routes.customerWorkOrderHistory,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const WorkOrdersHistoryScreen(),
+                ),
+                GoRoute(
                   name: RouteNames.customerCancelWorkOrder,
                   path: Routes.customerCancelWorkOrder,
                   parentNavigatorKey: _rootNavigatorKey,
@@ -674,7 +727,8 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) {
                     final chatId = state.pathParameters['chatId']!;
-                    return DetailedChatScreen(chatId: chatId);
+                    final name = state.uri.queryParameters['name'];
+                    return DetailedChatScreen(chatId: chatId, partnerName: name);
                   },
                 ),
               ],

@@ -61,6 +61,9 @@ dependencies:
   
   # Add this exact version:
   flutter_local_notifications: ^17.1.2
+  native_exif: ^0.8.0
+  geolocator: ^14.0.1
+  web_socket_channel: ^3.0.3
 
 dev_dependencies:
   flutter_test:

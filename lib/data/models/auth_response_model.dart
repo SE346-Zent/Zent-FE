@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'user_model.dart' show UserModel;
 import '../../domain/entities/user.dart' show User;
 
@@ -16,10 +17,32 @@ class AuthResponseModel {
 
   //* from json
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
+    final accessToken = (json['accessToken'] ?? '').toString();
+    
+    // Extract real user ID from accessToken if possible
+    String parsedUserId = 'temp_id';
+    if (accessToken.isNotEmpty) {
+      try {
+        final parts = accessToken.split('.');
+        if (parts.length == 3) {
+          final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+          final payloadMap = jsonDecode(payload) as Map<String, dynamic>;
+          if (payloadMap['sub'] != null) {
+            parsedUserId = payloadMap['sub'].toString();
+          }
+        }
+      } catch (_) {}
+    }
+
+    final userJson = json['user'] as Map<String, dynamic>? ?? {};
+    if (userJson['id'] == null && userJson['_id'] == null) {
+      userJson['id'] = parsedUserId;
+    }
+
     return AuthResponseModel(
-      accessToken: (json['accessToken'] ?? '').toString(),
+      accessToken: accessToken,
       refreshToken: (json['refreshToken'] ?? '').toString(),
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>? ?? {}),
+      user: UserModel.fromJson(userJson),
       tokenType: (json['tokenType'] ?? 'Bearer').toString(),
     );
   }

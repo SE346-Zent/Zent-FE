@@ -51,16 +51,18 @@ import '../presentation/admin/account/viewmodels/inventory_assets_viewmodel.dart
 import '../presentation/admin/account/viewmodels/detail_request_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/choose_role_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/create_account_viewmodel.dart';
-import '../presentation/admin/dashboard/viewmodels/admin_dashboard_viewmodel.dart';
-import '../presentation/admin/dashboard/viewmodels/admin_notifications_viewmodel.dart';
-import '../presentation/admin/reports/viewmodels/admin_reports_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/operational_queue_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/assigned_work_order_detail_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/view_schedule_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/reassign_work_order_viewmodel.dart';
-import '../presentation/admin/rejections/viewmodels/rejected_work_orders_viewmodel.dart';
-import '../presentation/admin/rejections/viewmodels/rejection_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/admin_dashboard_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/admin_notifications_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/admin_reports_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/operational_queue_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/work_order_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/assigned_work_order_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/view_schedule_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/reassign_work_order_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/rejected_work_orders_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/rejection_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/work_orders_history_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/detailed_history_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/service_viewmodel.dart';
@@ -68,6 +70,7 @@ import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/security_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/notifications_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
+import 'package:zent_fe/data/services/chat_service.dart';
 import '../presentation/customer/work/viewmodels/products_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
@@ -170,7 +173,7 @@ Future<void> init() async {
   sl.registerFactory(() => CustomerProfileViewModel(sl(), sl()));
   sl.registerFactory(() => PersonalInfoViewModel(sl()));
   sl.registerFactory(() => ServiceViewModel());
-  sl.registerFactory(() => ChatViewModel());
+  sl.registerFactory(() => ChatViewModel(chatService: sl()));
   sl.registerFactory(() => CustomerSecurityViewModel());
   sl.registerFactory(() => CustomerNotificationsViewModel());
   sl.registerFactory(
@@ -193,7 +196,9 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
-  sl.registerFactory(() => DetailedChatViewModel());
+  sl.registerFactory(
+    () => DetailedChatViewModel(chatService: sl(), getCurrentUserUseCase: sl()),
+  );
   sl.registerFactory(() => DeviceRegistrationViewModel());
   sl.registerFactory(() => PartsViewModel());
   sl.registerFactory(() => NotificationsViewModel());
@@ -207,7 +212,11 @@ Future<void> init() async {
     ),
   );
   sl.registerFactoryParam<TechWorkOrderDetailsViewModel, String, void>(
-    (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
+    (workOrderId, _) => TechWorkOrderDetailsViewModel(
+      workOrderId: workOrderId,
+      getSingleWorkOrderUseCase: sl(),
+      sharedPreferences: sl(),
+    ),
   );
   sl.registerFactory(() => TechPauseWorkOrderViewModel());
   sl.registerFactory(() => TechRejectWorkOrderViewModel(sl(), sl(), sl()));
@@ -224,6 +233,18 @@ Future<void> init() async {
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(() => TechSecurityViewModel());
   sl.registerFactory(() => PartSearchViewModel());
+  sl.registerFactory(
+    () => WorkOrdersHistoryViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
+  );
+  sl.registerFactoryParam<DetailedHistoryViewModel, String, void>(
+    (workOrderId, _) => DetailedHistoryViewModel(
+      repository: sl(),
+      workOrderId: workOrderId,
+    ),
+  );
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -263,6 +284,10 @@ Future<void> init() async {
       client: sl(),
       authLocalDataSource: sl(),
     ),
+  );
+
+  sl.registerLazySingleton(
+    () => ChatService(client: sl(), authLocalDataSource: sl()),
   );
 
   // --- External ---

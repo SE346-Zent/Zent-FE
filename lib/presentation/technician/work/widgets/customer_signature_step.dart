@@ -12,6 +12,7 @@ class CustomerSignatureStep extends StatefulWidget {
   final String technicianName;
   final List<Map<String, dynamic>> initialPoints;
   final void Function(List<Map<String, dynamic>> points) onSignatureUpdated;
+  final bool isReadOnly;
 
   const CustomerSignatureStep({
     super.key,
@@ -20,6 +21,7 @@ class CustomerSignatureStep extends StatefulWidget {
     required this.technicianName,
     required this.initialPoints,
     required this.onSignatureUpdated,
+    this.isReadOnly = false,
   });
 
   @override
@@ -126,7 +128,6 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
 
   Widget _buildWorkOrderInfoCard() {
     return Container(
-      height: 142,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         boxShadow: [BoxShadowStyles.raised],
@@ -226,7 +227,7 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
               "CUSTOMER SIGNATURE",
               style: TextStyles.middle.copyWith(color: AppColors.secondary500),
             ),
-            if (_hasSignature)
+            if (_hasSignature && !widget.isReadOnly)
               GestureDetector(
                 onTap: _onClearSignature,
                 child: Text(
@@ -259,11 +260,14 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
           child: Stack(
             children: [
               // Signature pad — always present, always interactive
-              Signature(
-                controller: _signatureController,
-                width: double.infinity,
-                height: padSize,
-                backgroundColor: AppColors.surface50,
+              AbsorbPointer(
+                absorbing: widget.isReadOnly,
+                child: Signature(
+                  controller: _signatureController,
+                  width: double.infinity,
+                  height: padSize,
+                  backgroundColor: AppColors.surface50,
+                ),
               ),
               // Placeholder overlay — hidden once user starts drawing
               if (!_hasSignature)
@@ -274,13 +278,17 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.edit_outlined,
+                            widget.isReadOnly
+                                ? Icons.warning_amber_outlined
+                                : Icons.edit_outlined,
                             size: 44,
                             color: AppColors.secondary300,
                           ),
                           const SizedBox(height: AppDimens.spaceXs),
                           Text(
-                            "SIGN HERE",
+                            widget.isReadOnly
+                                ? "NO SIGNATURE RECORDED"
+                                : "SIGN HERE",
                             style: TextStyles.title.copyWith(
                               color: AppColors.secondary300,
                             ),

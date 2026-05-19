@@ -8,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
+import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import 'viewmodels/tech_work_order_details_viewmodel.dart';
 import 'widgets/details_job_info.dart';
 import 'widgets/details_job_timer.dart';
@@ -39,44 +40,60 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SafeArea(
-        child: Column(
-          children: [
-            Stack(
-              alignment: Alignment.centerRight,
-              children: [
-                AccountHeader(
-                  title: "Detailed Work",
-                  subtitle: "${viewModel.workOrderId} • 12h30 AM",
-                  showDivider: true,
+        child: viewModel.isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primary500,
+                  ),
                 ),
-                Positioned(
-                  right: AppDimens.spaceSm,
-                  top: 4.0,
-                  child: _buildPopupMenu(context),
-                ),
-              ],
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DetailsJobInfo(viewModel: viewModel),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    DetailsJobTimer(viewModel: viewModel),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    DetailsChecklist(viewModel: viewModel),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    DetailsArtifactList(viewModel: viewModel),
-                    const SizedBox(height: AppDimens.spaceXl),
-                  ],
-                ),
+              )
+            : Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.centerRight,
+                    children: [
+                      AccountHeader(
+                        title: "Detailed Work",
+                        subtitle: "${viewModel.displayWorkOrderNum} • 12h30 AM",
+                        showDivider: true,
+                      ),
+                      Positioned(
+                        right: AppDimens.spaceSm,
+                        top: 4.0,
+                        child:
+                            (viewModel.workOrder?.status ==
+                                    WorkOrderStatus.complete ||
+                                viewModel.workOrder?.status ==
+                                    WorkOrderStatus.rejected ||
+                                viewModel.workOrder?.status ==
+                                    WorkOrderStatus.rejectInReview)
+                            ? const SizedBox.shrink()
+                            : _buildPopupMenu(context),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppDimens.spaceMd),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DetailsJobInfo(viewModel: viewModel),
+                          const SizedBox(height: AppDimens.spaceLg),
+                          DetailsJobTimer(viewModel: viewModel),
+                          const SizedBox(height: AppDimens.spaceLg),
+                          DetailsChecklist(viewModel: viewModel),
+                          const SizedBox(height: AppDimens.spaceLg),
+                          DetailsArtifactList(viewModel: viewModel),
+                          const SizedBox(height: AppDimens.spaceXl),
+                        ],
+                      ),
+                    ),
+                  ),
+                  DetailsBottomActions(viewModel: viewModel),
+                ],
               ),
-            ),
-            DetailsBottomActions(viewModel: viewModel),
-          ],
-        ),
       ),
     );
   }

@@ -19,6 +19,15 @@ abstract class WorkOrderRepository {
     String? role,
   });
   Future<List<WorkOrder>> getActiveRepairs({required String customerId});
+  Future<void> startWorkOrder(String id, double latitude, double longitude);
+  Future<void> uploadClosingFormPhoto(
+    String id,
+    String filePath,
+    double latitude,
+    double longitude,
+    String phase,
+  );
+  Future<Map<String, dynamic>> getWorkOrderHistory(String id);
 
   // Drafts (Local)
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft);

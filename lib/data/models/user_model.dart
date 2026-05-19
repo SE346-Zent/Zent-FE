@@ -8,6 +8,7 @@ class UserModel extends User {
     required super.name,
     required super.phoneNumber,
     required super.role,
+    required super.province,
   });
 
   //* from entity -> model
@@ -18,6 +19,7 @@ class UserModel extends User {
       name: user.name,
       phoneNumber: user.phoneNumber,
       role: user.role,
+      province: user.province,
     );
   }
 
@@ -39,6 +41,7 @@ class UserModel extends User {
       name: (json['fullName'] ?? json['name'] ?? '').toString(),
       phoneNumber: (json['phoneNumber'] ?? '').toString(),
       role: _mapRole(json['role'], json['roleId']),
+      province: (json['province'] ?? '').toString(),
     );
   }
 
@@ -68,6 +71,7 @@ class UserModel extends User {
       'fullName': name,
       'role': role.name,
       'phoneNumber': phoneNumber,
+      'province': province,
     };
   }
 }

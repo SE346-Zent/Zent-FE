@@ -41,10 +41,35 @@ class OperationalQueueViewModel extends ChangeNotifier {
           statusFilter = 'rejectInReview';
         }
 
-        _allWorkOrders = await getManyWorkOrdersUseCase.execute(
+        final results = await getManyWorkOrdersUseCase.execute(
           user.id,
           status: statusFilter,
         );
+
+        var province = user.province.toUpperCase();
+        if (province.isEmpty) {
+          final email = user.email.toLowerCase();
+          final name = user.name.toLowerCase();
+          if (email.contains("hn") || email.contains("hanoi") || name.contains("hn") || name.contains("hanoi")) {
+            province = 'HN';
+          } else {
+            province = 'HCM';
+          }
+        }
+
+        if (province == 'HN') {
+          _allWorkOrders = results.where((wo) {
+            final addr = wo.addressString.toLowerCase();
+            return addr.contains("hn") || addr.contains("hà nội") || addr.contains("ha noi");
+          }).toList();
+        } else if (province == 'HCM') {
+          _allWorkOrders = results.where((wo) {
+            final addr = wo.addressString.toLowerCase();
+            return addr.contains("hcm") || addr.contains("hồ chí minh") || addr.contains("ho chi minh") || addr.contains("sài gòn") || addr.contains("sai gon");
+          }).toList();
+        } else {
+          _allWorkOrders = results;
+        }
       }
     } catch (e) {
       debugPrint("Error loading operational queue: $e");

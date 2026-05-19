@@ -129,19 +129,19 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                         children: [
                           // 1. State Transition Timeline
                           _buildStateTransitionTimeline(stateHistory),
-                          const SizedBox(height: AppDimens.spaceLg),
+                          const SizedBox(height: 16.0),
 
                           // 2. Part Changes Section
                           _buildPartChangesSection(closingForm),
-                          const SizedBox(height: AppDimens.spaceLg),
+                          const SizedBox(height: 12.0),
 
                           // 3. Evidence Photos Section
                           _buildEvidencePhotosSection(closingForm),
-                          const SizedBox(height: AppDimens.spaceLg),
+                          const SizedBox(height: 12.0),
 
                           // 4. Diagnostic Section
                           _buildDiagnosticSection(closingForm),
-                          const SizedBox(height: AppDimens.spaceLg),
+                          const SizedBox(height: 16.0),
 
                           // 5. Customer Response Section
                           _buildCustomerResponseSection(complaint),
@@ -416,7 +416,6 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                 )
               : const SizedBox.shrink(),
         ),
-        const SizedBox(height: 16.0),
       ],
     );
   }
@@ -577,7 +576,6 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                 )
               : const SizedBox.shrink(),
         ),
-        const SizedBox(height: 16.0),
       ],
     );
   }
@@ -682,7 +680,7 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                 )
               : const SizedBox.shrink(),
         ),
-        const SizedBox(height: 24.0),
+        const SizedBox(height: 12.0),
         const Divider(color: AppColors.secondary50, height: 1),
         const SizedBox(height: 0.0),
       ],

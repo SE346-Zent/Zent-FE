@@ -74,8 +74,6 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     String? technicianId,
   }) async {
     final queryParameters = {
-      'page': page.toString(),
-      'limit': limit.toString(),
       'role': ?role,
       'province': ?province,
       'technician_id': ?technicianId,

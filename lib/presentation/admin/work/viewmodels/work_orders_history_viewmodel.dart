@@ -51,7 +51,7 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
       if (currentUser != null) {
         // Fetch all work orders for the system
         final results = await getManyWorkOrdersUseCase.execute(
-          role: currentUser!.role.name,
+          limit: 100,
           technicianId: currentUser!.role == UserRoles.technician
               ? currentUser!.id
               : null,

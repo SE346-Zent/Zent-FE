@@ -1,3 +1,4 @@
+import '../../data/models/add_part_request.dart';
 import '../../data/models/create_work_order_request.dart';
 import '../../data/models/complete_work_order_request.dart';
 import '../../data/models/refuse_work_order_request.dart';
@@ -10,6 +11,7 @@ abstract class WorkOrderRepository {
   Future<void> refuseWorkOrder(String id, RefuseWorkOrderRequest request);
   Future<void> approveRefusal(String id, ApproveRefusalRequest request);
   Future<void> denyRefusal(String id);
+  Future<void> addPartToWorkOrder(String workOrderId, AddPartRequest request);
   Future<List<WorkOrder>> getWorkOrders({
     int page = 1,
     int limit = 20,

@@ -3,6 +3,7 @@ import '../../domain/entities/work_order_completion_draft.dart';
 import '../../domain/repositories/work_order_repository.dart';
 import '../datasources/local/work_order_local_datasource.dart';
 import '../datasources/remote/work_order_remote_datasource.dart';
+import '../models/add_part_request.dart';
 import '../models/create_work_order_request.dart';
 import '../models/complete_work_order_request.dart';
 import '../models/refuse_work_order_request.dart';
@@ -91,5 +92,10 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   @override
   Future<void> clearWorkOrderDraft(String workOrderId) async {
     await localDataSource.clearWorkOrderDraft(workOrderId);
+  }
+
+  @override
+  Future<void> addPartToWorkOrder(String workOrderId, AddPartRequest request) async {
+    return await remoteDataSource.addPartToWorkOrder(workOrderId, request);
   }
 }

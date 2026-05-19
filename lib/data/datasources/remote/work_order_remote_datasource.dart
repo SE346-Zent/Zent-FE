@@ -9,6 +9,7 @@ import '../../models/work_order_model.dart';
 import '../../models/create_work_order_request.dart';
 import '../../models/complete_work_order_request.dart';
 import '../../models/refuse_work_order_request.dart';
+import '../../models/add_part_request.dart';
 import '../local/auth_local_datasource.dart';
 
 abstract class WorkOrderRemoteDataSource {
@@ -26,6 +27,7 @@ abstract class WorkOrderRemoteDataSource {
   Future<void> approveRefusal(String id, ApproveRefusalRequest request);
   Future<void> denyRefusal(String id);
   Future<List<WorkOrderModel>> getActiveRepairs(String customerId);
+  Future<void> addPartToWorkOrder(String workOrderId, AddPartRequest request);
 }
 
 class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
@@ -56,7 +58,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     };
   }
 
-  @override
+@override
   Future<List<WorkOrderModel>> getWorkOrders({
     int page = 1,
     int limit = 20,
@@ -64,13 +66,18 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     String? province,
     String? technicianId,
   }) async {
-    final queryParameters = {
-      'page': page.toString(),
-      'limit': limit.toString(),
-      ?role: role,
-      ?province: province,
-      'technician_id': technicianId,
-    };
+    final queryParameters = <String, String>{};
+    if (role != null && role.trim().isNotEmpty) {
+      if (int.tryParse(role) == null) {
+        queryParameters['role'] = role;
+      }
+    }
+    if (province != null && province.trim().isNotEmpty) {
+      queryParameters['province'] = province;
+    }
+    if (technicianId != null && technicianId.trim().isNotEmpty) {
+      queryParameters['technician_id'] = technicianId.replaceAll('-', '');
+    }
 
     final url = Uri.parse(
       '$_baseURL/work_orders',
@@ -324,6 +331,28 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Error fetching active repairs: $e');
+    }
+  }
+
+  @override
+  Future<void> addPartToWorkOrder(String workOrderId, AddPartRequest request) async {
+    final url = Uri.parse('$_baseURL/inventory/work_orders/$workOrderId/parts');
+    
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode(request.toJson());
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        _handleErrorResponse(response);
+      }
+      
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error adding part: $e');
     }
   }
 

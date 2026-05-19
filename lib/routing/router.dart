@@ -447,7 +447,10 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.techAddNewPart,
                   path: Routes.addNewPart,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const AddNewPartScreen(),
+                  builder: (context, state) {
+                    final workOrderId = state.extra as String? ?? '';
+                    return AddNewPartScreen(workOrderId: workOrderId);
+                  },
                 ),
                 GoRoute(
                   name: RouteNames.techPartSearch,

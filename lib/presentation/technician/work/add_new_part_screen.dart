@@ -10,22 +10,28 @@ import 'viewmodels/add_new_part_viewmodel.dart';
 import 'widgets/add_new_part_form.dart';
 
 class AddNewPartScreen extends StatelessWidget {
-  const AddNewPartScreen({super.key});
+  final String workOrderId;
+
+  const AddNewPartScreen({super.key, required this.workOrderId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<AddNewPartViewModel>(),
-      child: const _AddNewPartContent(),
+      child: _AddNewPartContent(workOrderId: workOrderId),
     );
   }
 }
 
 class _AddNewPartContent extends StatelessWidget {
-  const _AddNewPartContent();
+  final String workOrderId;
+
+  const _AddNewPartContent({required this.workOrderId});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<AddNewPartViewModel>();
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SafeArea(
@@ -38,13 +44,37 @@ class _AddNewPartContent extends StatelessWidget {
                 child: Column(
                   children: [
                     const AddNewPartForm(),
-                    PrimaryActionButton(
-                      label: "Submit Part Form",
-                      width: double.infinity,
-                      onPressed: () {
-                        debugPrint("action triggered: Submit Part Form");
-                      },
-                    ),
+                    const SizedBox(height: AppDimens.spaceLg),
+                    viewModel.isLoading
+                        ? const CircularProgressIndicator()
+                        : PrimaryActionButton(
+                            label: "Submit Part Form",
+                            width: double.infinity,
+                            onPressed: () async {
+                              final success = await viewModel.submitPartRequest(workOrderId);
+
+                              if (success) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Add part request submitted successfully!"), 
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("Error: ${viewModel.errorMessage}"), 
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
                     const SizedBox(height: AppDimens.spaceLg),
                   ],
                 ),

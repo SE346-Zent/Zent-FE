@@ -18,14 +18,16 @@ class AuthResponseModel {
   //* from json
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
     final accessToken = (json['accessToken'] ?? '').toString();
-    
+
     // Extract real user ID from accessToken if possible
     String parsedUserId = 'temp_id';
     if (accessToken.isNotEmpty) {
       try {
         final parts = accessToken.split('.');
         if (parts.length == 3) {
-          final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+          final payload = utf8.decode(
+            base64Url.decode(base64Url.normalize(parts[1])),
+          );
           final payloadMap = jsonDecode(payload) as Map<String, dynamic>;
           if (payloadMap['sub'] != null) {
             parsedUserId = payloadMap['sub'].toString();

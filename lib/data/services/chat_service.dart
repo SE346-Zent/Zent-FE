@@ -37,11 +37,21 @@ class ChatRoomResponse {
   factory ChatRoomResponse.fromJson(Map<String, dynamic> json) {
     return ChatRoomResponse(
       id: (json['id'] ?? json['_id'])?.toString() ?? '',
-      oppositeUserName: (json['oppositeUserName'] ?? json['opposite_user_name'] ?? 'User')?.toString() ?? '',
+      oppositeUserName:
+          (json['oppositeUserName'] ?? json['opposite_user_name'] ?? 'User')
+              ?.toString() ??
+          '',
       latestMessage: json['latestMessage']?.toString(),
-      latestMessageAt: (json['latestMessageAt'] ?? json['latest_message_at'])?.toString(),
-      oppositeAvatarUrl: (json['oppositeAvatarUrl'] ?? json['opposite_avatar_url'])?.toString(),
-      unreadCount: int.tryParse((json['unreadCount'] ?? json['unread_count'])?.toString() ?? '0') ?? 0,
+      latestMessageAt: (json['latestMessageAt'] ?? json['latest_message_at'])
+          ?.toString(),
+      oppositeAvatarUrl:
+          (json['oppositeAvatarUrl'] ?? json['opposite_avatar_url'])
+              ?.toString(),
+      unreadCount:
+          int.tryParse(
+            (json['unreadCount'] ?? json['unread_count'])?.toString() ?? '0',
+          ) ??
+          0,
     );
   }
 }
@@ -72,11 +82,14 @@ class MessageResponse {
       id: (json['id'] ?? json['_id'])?.toString() ?? '',
       roomId: (json['roomId'] ?? json['room_id'])?.toString() ?? '',
       senderId: (json['senderId'] ?? json['sender_id'])?.toString() ?? '',
-      senderName: (json['senderName'] ?? json['sender_name'] ?? 'User')?.toString() ?? '',
+      senderName:
+          (json['senderName'] ?? json['sender_name'] ?? 'User')?.toString() ??
+          '',
       content: json['content']?.toString(),
       imageUrl: (json['imageUrl'] ?? json['image_url'])?.toString(),
       createdAt: (json['createdAt'] ?? json['created_at'])?.toString() ?? '',
-      readBy: (json['readBy'] as List?)?.map((e) => e.toString()).toList() ??
+      readBy:
+          (json['readBy'] as List?)?.map((e) => e.toString()).toList() ??
           (json['read_by'] as List?)?.map((e) => e.toString()).toList() ??
           [],
     );
@@ -123,10 +136,13 @@ class ChatService extends ChangeNotifier {
     }
     final ociBaseUrl = dotenv.get(
       "OCI_STORAGE_URL",
-      fallback: "https://ax5xvczhukcm.objectstorage.ap-singapore-1.oci.customer-oci.com/p/Ya_v3u8oisCU7-ppjyii-jjJHJ6sOAzF3QpxYpCvMyEv2hKxWqB5y5aAuh-E0DZ8/n/ax5xvczhukcm/b/zent/o/media/images/work-orders/",
+      fallback:
+          "https://ax5xvczhukcm.objectstorage.ap-singapore-1.oci.customer-oci.com/p/Ya_v3u8oisCU7-ppjyii-jjJHJ6sOAzF3QpxYpCvMyEv2hKxWqB5y5aAuh-E0DZ8/n/ax5xvczhukcm/b/zent/o/media/images/work-orders/",
     );
     final resolvedUrl = '$ociBaseUrl$objectName';
-    debugPrint("WS Image URL resolved: objectName=$objectName -> resolvedUrl=$resolvedUrl");
+    debugPrint(
+      "WS Image URL resolved: objectName=$objectName -> resolvedUrl=$resolvedUrl",
+    );
     return resolvedUrl;
   }
 

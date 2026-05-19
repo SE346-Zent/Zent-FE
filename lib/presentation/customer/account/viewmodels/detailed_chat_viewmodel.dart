@@ -297,12 +297,15 @@ class DetailedChatViewModel extends ChangeNotifier {
               // Match and replace local optimistic temporary message to prevent double-rendering
               if (_isMe(senderId)) {
                 final tempIndex = messages.indexWhere((m) {
-                  final isTemp = int.tryParse(m.id) != null && m.id.length >= 13;
+                  final isTemp =
+                      int.tryParse(m.id) != null && m.id.length >= 13;
                   if (!isTemp || !m.isMe) return false;
                   if (uiMsg.imageUrl != null) {
                     return m.imageUrl == uiMsg.imageUrl ||
-                           (m.imageUrl != null && uiMsg.imageUrl!.endsWith(m.imageUrl!)) ||
-                           (uiMsg.imageUrl != null && m.imageUrl!.endsWith(uiMsg.imageUrl!));
+                        (m.imageUrl != null &&
+                            uiMsg.imageUrl!.endsWith(m.imageUrl!)) ||
+                        (uiMsg.imageUrl != null &&
+                            m.imageUrl!.endsWith(uiMsg.imageUrl!));
                   } else {
                     return m.text == uiMsg.text;
                   }

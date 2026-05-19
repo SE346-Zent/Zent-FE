@@ -249,10 +249,8 @@ Future<void> init() async {
     ),
   );
   sl.registerFactoryParam<DetailedHistoryViewModel, String, void>(
-    (workOrderId, _) => DetailedHistoryViewModel(
-      repository: sl(),
-      workOrderId: workOrderId,
-    ),
+    (workOrderId, _) =>
+        DetailedHistoryViewModel(repository: sl(), workOrderId: workOrderId),
   );
 
   // Repository

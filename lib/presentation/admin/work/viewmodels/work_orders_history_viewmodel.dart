@@ -32,7 +32,7 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
         "Completed",
         "Rejected",
         "Reject_Rev",
-        "InProg"
+        "InProg",
       ];
     } else if (currentUser!.role == UserRoles.technician) {
       return ["All Jobs", "Assigned", "InProg", "Completed"];
@@ -51,12 +51,18 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
       if (currentUser != null) {
         // Fetch all work orders for the system
         final results = await getManyWorkOrdersUseCase.execute(
-          currentUser!.id,
           role: currentUser!.role.name,
+          technicianId: currentUser!.role == UserRoles.technician
+              ? currentUser!.id
+              : null,
         );
-        debugPrint("----- HISTORY DIAGNOSTIC: Loaded ${results.length} WOs total -----");
+        debugPrint(
+          "----- HISTORY DIAGNOSTIC: Loaded ${results.length} WOs total -----",
+        );
         for (var wo in results) {
-          debugPrint("WO DIAGNOSTIC: num=${wo.workOrderNum}, customerId=${wo.customerId}, status=${wo.status}, status_name=${wo.status.name}");
+          debugPrint(
+            "WO DIAGNOSTIC: num=${wo.workOrderNum}, customerId=${wo.customerId}, status=${wo.status}, status_name=${wo.status.name}",
+          );
         }
         _allOrders = results;
         _applyFilters();
@@ -93,19 +99,26 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
     final role = currentUser!.role;
     if (role == UserRoles.technician) {
       final cleanCurrentId = currentUser!.id.replaceAll('-', '').toLowerCase();
-      filtered = filtered.where((wo) =>
-          wo.technicianId.isEmpty ||
-          wo.technicianId.replaceAll('-', '').toLowerCase() == cleanCurrentId);
+      filtered = filtered.where(
+        (wo) =>
+            wo.technicianId.isEmpty ||
+            wo.technicianId.replaceAll('-', '').toLowerCase() == cleanCurrentId,
+      );
     } else if (role == UserRoles.customer) {
-      filtered = filtered.where((wo) =>
-          wo.status == WorkOrderStatus.complete ||
-          wo.status == WorkOrderStatus.rejected);
+      filtered = filtered.where(
+        (wo) =>
+            wo.status == WorkOrderStatus.complete ||
+            wo.status == WorkOrderStatus.rejected,
+      );
     } else if (role == UserRoles.admin) {
       var province = currentUser!.province.toUpperCase();
       if (province.isEmpty) {
         final email = currentUser!.email.toLowerCase();
         final name = currentUser!.name.toLowerCase();
-        if (email.contains("hn") || email.contains("hanoi") || name.contains("hn") || name.contains("hanoi")) {
+        if (email.contains("hn") ||
+            email.contains("hanoi") ||
+            name.contains("hn") ||
+            name.contains("hanoi")) {
           province = 'HN';
         } else {
           province = 'HCM';
@@ -115,12 +128,18 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
       if (province == 'HN') {
         filtered = filtered.where((wo) {
           final addr = wo.addressString.toLowerCase();
-          return addr.contains("hn") || addr.contains("hà nội") || addr.contains("ha noi");
+          return addr.contains("hn") ||
+              addr.contains("hà nội") ||
+              addr.contains("ha noi");
         });
       } else if (province == 'HCM') {
         filtered = filtered.where((wo) {
           final addr = wo.addressString.toLowerCase();
-          return addr.contains("hcm") || addr.contains("hồ chí minh") || addr.contains("ho chi minh") || addr.contains("sài gòn") || addr.contains("sai gon");
+          return addr.contains("hcm") ||
+              addr.contains("hồ chí minh") ||
+              addr.contains("ho chi minh") ||
+              addr.contains("sài gòn") ||
+              addr.contains("sai gon");
         });
       }
     }
@@ -128,27 +147,37 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
     // 2. Search query filtering (matches workOrderNum case-insensitive)
     if (searchQuery.isNotEmpty) {
       final query = searchQuery.trim().toLowerCase();
-      filtered = filtered.where((wo) =>
-          wo.workOrderNum.toLowerCase().contains(query) ||
-          wo.title.toLowerCase().contains(query));
+      filtered = filtered.where(
+        (wo) =>
+            wo.workOrderNum.toLowerCase().contains(query) ||
+            wo.title.toLowerCase().contains(query),
+      );
     }
 
     // 3. Tab filter selection
     if (filters.isNotEmpty && selectedFilterIndex < filters.length) {
       final selectedTab = filters[selectedFilterIndex];
       if (selectedTab == "Assigned") {
-        filtered = filtered.where((wo) =>
-            wo.technicianId.isNotEmpty &&
-            wo.status != WorkOrderStatus.complete &&
-            wo.status != WorkOrderStatus.rejected);
+        filtered = filtered.where(
+          (wo) =>
+              wo.technicianId.isNotEmpty &&
+              wo.status != WorkOrderStatus.complete &&
+              wo.status != WorkOrderStatus.rejected,
+        );
       } else if (selectedTab == "Unassigned") {
         filtered = filtered.where((wo) => wo.technicianId.isEmpty);
       } else if (selectedTab == "Completed") {
-        filtered = filtered.where((wo) => wo.status == WorkOrderStatus.complete);
+        filtered = filtered.where(
+          (wo) => wo.status == WorkOrderStatus.complete,
+        );
       } else if (selectedTab == "Rejected") {
-        filtered = filtered.where((wo) => wo.status == WorkOrderStatus.rejected);
+        filtered = filtered.where(
+          (wo) => wo.status == WorkOrderStatus.rejected,
+        );
       } else if (selectedTab == "Reject_Rev") {
-        filtered = filtered.where((wo) => wo.status == WorkOrderStatus.rejectInReview);
+        filtered = filtered.where(
+          (wo) => wo.status == WorkOrderStatus.rejectInReview,
+        );
       } else if (selectedTab == "InProg") {
         filtered = filtered.where((wo) => wo.status == WorkOrderStatus.inProg);
       }

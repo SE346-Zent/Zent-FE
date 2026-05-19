@@ -45,7 +45,9 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
             builder: (context, vm, child) {
               if (vm.isLoading) {
                 return const Center(
-                  child: CircularProgressIndicator(color: AppColors.tertiary500),
+                  child: CircularProgressIndicator(
+                    color: AppColors.tertiary500,
+                  ),
                 );
               }
 
@@ -83,7 +85,10 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary500,
                                 ),
-                                child: const Text("Retry", style: TextStyle(color: Colors.white)),
+                                child: const Text(
+                                  "Retry",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ],
                           ),
@@ -100,8 +105,10 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                 return const Center(child: Text("Work Order Not Found"));
               }
 
-              final stateHistory = history?['stateHistory'] as List<dynamic>? ?? [];
-              final closingForm = history?['closingForm'] as Map<String, dynamic>?;
+              final stateHistory =
+                  history?['stateHistory'] as List<dynamic>? ?? [];
+              final closingForm =
+                  history?['closingForm'] as Map<String, dynamic>?;
               final complaint = history?['complaint'] as Map<String, dynamic>?;
 
               return Column(
@@ -255,11 +262,7 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                       ),
                     ),
                     if (!isLast)
-                      Container(
-                        width: 3,
-                        height: 48,
-                        color: color,
-                      )
+                      Container(width: 3, height: 48, color: color)
                     else ...[
                       CustomPaint(
                         size: const Size(24, 38),
@@ -326,23 +329,29 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
   Widget _buildPartChangesSection(Map<String, dynamic>? closingForm) {
     // Attempt to extract part changes from JSON
     final rawParts = closingForm?['partChanges'] as List<dynamic>? ?? [];
-    
+
     // Parse parts or provide premium realistic default values for beautiful presentation
-    final installedList = rawParts.where((p) => p['changeType'] == 'installed').toList();
+    final installedList = rawParts
+        .where((p) => p['changeType'] == 'installed')
+        .toList();
     if (installedList.isEmpty) {
       installedList.add({
         'name': 'Intel Core i9-13900K Processor',
         'serialNumber': 'SN-8291A-9382',
-        'imageUrl': 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=200',
+        'imageUrl':
+            'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=200',
       });
     }
 
-    final uninstalledList = rawParts.where((p) => p['changeType'] == 'uninstalled').toList();
+    final uninstalledList = rawParts
+        .where((p) => p['changeType'] == 'uninstalled')
+        .toList();
     if (uninstalledList.isEmpty) {
       uninstalledList.add({
         'name': 'Intel Core i7-11700K Processor (Defective)',
         'serialNumber': 'SN-1092B-4819',
-        'imageUrl': 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=200',
+        'imageUrl':
+            'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=200',
       });
     }
 
@@ -373,11 +382,13 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                       ),
                     ),
                     const SizedBox(height: AppDimens.spaceSm),
-                    ...installedList.map((p) => _buildPartItem(
-                          name: p['name'] ?? p['partId'] ?? 'System Motherboard',
-                          serialNumber: p['serialNumber'] ?? 'SN-8291A-9382',
-                          imageUrl: p['imageUrl'] ?? '',
-                        )),
+                    ...installedList.map(
+                      (p) => _buildPartItem(
+                        name: p['name'] ?? p['partId'] ?? 'System Motherboard',
+                        serialNumber: p['serialNumber'] ?? 'SN-8291A-9382',
+                        imageUrl: p['imageUrl'] ?? '',
+                      ),
+                    ),
 
                     const SizedBox(height: AppDimens.spaceMd),
 
@@ -390,11 +401,16 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
                       ),
                     ),
                     const SizedBox(height: AppDimens.spaceSm),
-                    ...uninstalledList.map((p) => _buildPartItem(
-                          name: p['name'] ?? p['partId'] ?? 'Old Motherboard Module',
-                          serialNumber: p['serialNumber'] ?? 'SN-1092B-4819',
-                          imageUrl: p['imageUrl'] ?? '',
-                        )),
+                    ...uninstalledList.map(
+                      (p) => _buildPartItem(
+                        name:
+                            p['name'] ??
+                            p['partId'] ??
+                            'Old Motherboard Module',
+                        serialNumber: p['serialNumber'] ?? 'SN-1092B-4819',
+                        imageUrl: p['imageUrl'] ?? '',
+                      ),
+                    ),
                     const SizedBox(height: AppDimens.spaceSm),
                   ],
                 )
@@ -487,9 +503,13 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
       ]);
     }
 
-    final List<String> duringList = duringPhotos.map((e) => e.toString()).toList();
+    final List<String> duringList = duringPhotos
+        .map((e) => e.toString())
+        .toList();
     if (duringList.isEmpty) {
-      duringList.add('https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=200');
+      duringList.add(
+        'https://images.unsplash.com/photo-1581092335397-9583fe92d232?q=80&w=200',
+      );
     }
 
     final List<String> postList = postPhotos.map((e) => e.toString()).toList();
@@ -568,7 +588,8 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: urls.length,
-        separatorBuilder: (context, index) => const SizedBox(width: AppDimens.spaceSm),
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
           return Container(
             width: 68.0,
@@ -590,7 +611,8 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
   // 4. Diagnostic Section
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildDiagnosticSection(Map<String, dynamic>? closingForm) {
-    final diagnosis = closingForm?['diagnosis'] ??
+    final diagnosis =
+        closingForm?['diagnosis'] ??
         closingForm?['diagnosisNotes'] ??
         "Device motherboard CPU was overheating due to degraded thermal paste. Cleaned and repasted with high-grade premium thermal compound. Reassembled device and completed stress test beautifully for 45 minutes with optimal temperatures.";
 
@@ -601,7 +623,8 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
           icon: Icons.monitor_heart_outlined,
           title: "Diagnostic Section",
           isExpanded: _isDiagnosticExpanded,
-          onTap: () => setState(() => _isDiagnosticExpanded = !_isDiagnosticExpanded),
+          onTap: () =>
+              setState(() => _isDiagnosticExpanded = !_isDiagnosticExpanded),
           customIcon: Transform(
             transform: Matrix4.diagonal3Values(1.0, 1.3, 1.0),
             alignment: Alignment.center,
@@ -618,7 +641,10 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
           curve: Curves.easeInOut,
           child: _isDiagnosticExpanded
               ? Container(
-                  margin: const EdgeInsets.only(top: AppDimens.spaceSm, bottom: AppDimens.spaceMd),
+                  margin: const EdgeInsets.only(
+                    top: AppDimens.spaceSm,
+                    bottom: AppDimens.spaceMd,
+                  ),
                   padding: const EdgeInsets.all(AppDimens.spaceMd),
                   decoration: BoxDecoration(
                     color: AppColors.surface100,
@@ -668,9 +694,12 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildCustomerResponseSection(Map<String, dynamic>? complaint) {
     final rating = complaint?['rating'] ?? complaint?['stars'] ?? 5;
-    final ratingInt = rating is int ? rating : (int.tryParse(rating.toString()) ?? 5);
+    final ratingInt = rating is int
+        ? rating
+        : (int.tryParse(rating.toString()) ?? 5);
 
-    final complaintMessage = complaint?['message'] ??
+    final complaintMessage =
+        complaint?['message'] ??
         complaint?['complaint'] ??
         "The technician arrived on time and repaired the core motherboard fault within an hour. Excellent communication and highly detailed explanations! The laptop works beautifully now.";
 
@@ -681,7 +710,9 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
           icon: Icons.chat_bubble_outline,
           title: "Customer Response",
           isExpanded: _isCustomerResponseExpanded,
-          onTap: () => setState(() => _isCustomerResponseExpanded = !_isCustomerResponseExpanded),
+          onTap: () => setState(
+            () => _isCustomerResponseExpanded = !_isCustomerResponseExpanded,
+          ),
         ),
         const SizedBox(height: AppDimens.spaceXs),
         AnimatedSize(
@@ -740,11 +771,7 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
             alignment: Alignment.center,
             children: [
               // Outer smooth black border backing the star peak
-              const Icon(
-                Icons.star_rounded,
-                color: Colors.black87,
-                size: 38,
-              ),
+              const Icon(Icons.star_rounded, color: Colors.black87, size: 38),
               // Inner filled star (gold if filled, clean white if empty)
               Icon(
                 Icons.star_rounded,

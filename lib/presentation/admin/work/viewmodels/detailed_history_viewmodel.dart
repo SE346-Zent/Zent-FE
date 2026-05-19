@@ -24,7 +24,7 @@ class DetailedHistoryViewModel extends ChangeNotifier {
     try {
       // Fetch details and history in parallel for maximum speed
       final results = await Future.wait([
-        repository.getSingleWorkOrder(id: workOrderId),
+        repository.getWorkOrderDetail(id: workOrderId),
         repository.getWorkOrderHistory(workOrderId),
       ]);
 

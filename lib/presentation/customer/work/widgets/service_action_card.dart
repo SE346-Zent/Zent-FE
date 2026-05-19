@@ -22,9 +22,7 @@ class ServiceActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
-      constraints: const BoxConstraints(
-        minHeight: 88.0,
-      ),
+      constraints: const BoxConstraints(minHeight: 88.0),
       decoration: BoxDecoration(
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -63,9 +61,7 @@ class ServiceActionCard extends StatelessWidget {
                 const SizedBox(width: AppDimens.spaceMd),
                 Expanded(
                   child: Container(
-                    constraints: const BoxConstraints(
-                      minHeight: 60.0,
-                    ),
+                    constraints: const BoxConstraints(minHeight: 60.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,

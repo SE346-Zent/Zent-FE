@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
-import 'package:zent_fe/routing/rbac_token_store.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/chat_list_item.dart';
@@ -12,14 +13,20 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 class ChatList extends StatelessWidget {
   const ChatList({super.key});
 
-  void _onChatTapped(BuildContext context, ChatPreview chat) {
-    if (RbacTokenStore.role == UserRoles.technician) {
+  void _onChatTapped(BuildContext context, ChatPreview chat) async {
+    final localDataSource = sl<AuthLocalDataSource>();
+    final user = await localDataSource.getUser();
+    final role = user?.role;
+
+    if (!context.mounted) return;
+
+    if (role == UserRoles.technician) {
       context.pushNamed(
         RouteNames.techDetailedChat,
         pathParameters: {'chatId': chat.id},
         queryParameters: {'name': chat.name},
       );
-    } else if (RbacTokenStore.role == UserRoles.admin) {
+    } else if (role == UserRoles.admin) {
       context.pushNamed(
         'adminDetailedChat',
         pathParameters: {'chatId': chat.id},

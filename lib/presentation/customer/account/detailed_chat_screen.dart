@@ -117,21 +117,26 @@ class _DetailedChatView extends StatelessWidget {
                               ? index - 1
                               : index;
                           final msg = viewModel.messages[msgIndex];
-                          
+
                           // Messenger-style time separator calculation
                           bool showSeparator = false;
                           if (msgIndex == 0) {
                             showSeparator = true;
                           } else {
                             final prevMsg = viewModel.messages[msgIndex - 1];
-                            final gap = msg.dateTime.difference(prevMsg.dateTime);
+                            final gap = msg.dateTime.difference(
+                              prevMsg.dateTime,
+                            );
                             if (gap.inMinutes.abs() >= 10) {
                               showSeparator = true;
                             }
                           }
 
-                          final bubble =
-                              _buildMessageBubble(context, viewModel, msg);
+                          final bubble = _buildMessageBubble(
+                            context,
+                            viewModel,
+                            msg,
+                          );
                           if (showSeparator) {
                             return Column(
                               mainAxisSize: MainAxisSize.min,
@@ -164,12 +169,14 @@ class _DetailedChatView extends StatelessWidget {
     final localNow = now.toLocal();
     final diff = localNow.difference(localDt);
 
-    final isToday = localDt.year == localNow.year &&
+    final isToday =
+        localDt.year == localNow.year &&
         localDt.month == localNow.month &&
         localDt.day == localNow.day;
 
     final yesterday = localNow.subtract(const Duration(days: 1));
-    final isYesterday = localDt.year == yesterday.year &&
+    final isYesterday =
+        localDt.year == yesterday.year &&
         localDt.month == yesterday.month &&
         localDt.day == yesterday.day;
 
@@ -179,7 +186,8 @@ class _DetailedChatView extends StatelessWidget {
     } else if (isYesterday) {
       label = 'Yesterday, ${DateFormat('HH:mm').format(localDt)}';
     } else if (diff.inDays < 7) {
-      label = '${DateFormat('EEEE').format(localDt)}, ${DateFormat('HH:mm').format(localDt)}';
+      label =
+          '${DateFormat('EEEE').format(localDt)}, ${DateFormat('HH:mm').format(localDt)}';
     } else {
       label = DateFormat('MMM dd, HH:mm').format(localDt);
     }
@@ -238,7 +246,8 @@ class _DetailedChatView extends StatelessWidget {
     DetailedChatViewModel viewModel,
     ChatMessage message,
   ) {
-    final hasImageOnly = message.imageUrl != null &&
+    final hasImageOnly =
+        message.imageUrl != null &&
         message.imageUrl!.isNotEmpty &&
         message.text.isEmpty;
 
@@ -250,7 +259,9 @@ class _DetailedChatView extends StatelessWidget {
         ? EdgeInsets.zero
         : const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
 
-    final bubbleBoxShadow = hasImageOnly ? <BoxShadow>[] : [BoxShadowStyles.subtle];
+    final bubbleBoxShadow = hasImageOnly
+        ? <BoxShadow>[]
+        : [BoxShadowStyles.subtle];
 
     return Row(
       mainAxisAlignment: message.isMe
@@ -297,7 +308,9 @@ class _DetailedChatView extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(AppDimens.boraMd),
                       child: Image.network(
-                        viewModel.chatService.getAttachmentUrl(message.imageUrl!),
+                        viewModel.chatService.getAttachmentUrl(
+                          message.imageUrl!,
+                        ),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           padding: const EdgeInsets.all(8),
@@ -337,7 +350,9 @@ class _DetailedChatView extends StatelessWidget {
                           fontSize: 10,
                           color: hasImageOnly
                               ? AppColors.secondary400
-                              : (message.isMe ? Colors.white70 : Colors.black54),
+                              : (message.isMe
+                                    ? Colors.white70
+                                    : Colors.black54),
                         ),
                       ),
                       if (message.isMe) ...[
@@ -348,8 +363,8 @@ class _DetailedChatView extends StatelessWidget {
                           color: hasImageOnly
                               ? AppColors.secondary300
                               : (message.isSeen
-                                  ? AppColors.secondary300
-                                  : Colors.white70),
+                                    ? AppColors.secondary300
+                                    : Colors.white70),
                         ),
                       ],
                     ],

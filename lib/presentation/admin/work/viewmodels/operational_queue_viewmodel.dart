@@ -33,9 +33,7 @@ class OperationalQueueViewModel extends ChangeNotifier {
     try {
       final user = await getCurrentUserUseCase.execute();
       if (user != null) {
-        final results = await getManyWorkOrdersUseCase.execute(
-          limit: 100,
-        );
+        final results = await getManyWorkOrdersUseCase.execute(limit: 100);
 
         var province = user.province.toUpperCase();
         if (province.isEmpty) {

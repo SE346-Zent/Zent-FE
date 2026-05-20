@@ -257,7 +257,7 @@ class _DetailedChatView extends StatelessWidget {
 
     final bubblePadding = hasImageOnly
         ? EdgeInsets.zero
-        : const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+        : const EdgeInsets.symmetric(horizontal: 12, vertical: 4);
 
     final bubbleBoxShadow = hasImageOnly
         ? <BoxShadow>[]
@@ -337,7 +337,6 @@ class _DetailedChatView extends StatelessWidget {
                     ),
                   ),
                 if (message.time.isNotEmpty) ...[
-                  const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: message.isMe
                         ? MainAxisAlignment.end

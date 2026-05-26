@@ -42,7 +42,11 @@ class LoginViewModel extends ChangeNotifier {
         debugPrint('Failed to get FCM token during login: $e');
       }
 
-      final user = await loginUseCase.execute(email, password, fcmToken: fcmToken);
+      final user = await loginUseCase.execute(
+        email,
+        password,
+        fcmToken: fcmToken,
+      );
       return user;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -73,7 +77,8 @@ class LoginViewModel extends ChangeNotifier {
         return null;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null || idToken.isEmpty) {
@@ -87,7 +92,10 @@ class LoginViewModel extends ChangeNotifier {
         debugPrint('Failed to get FCM token during Google login: $e');
       }
 
-      final user = await googleLoginUseCase.execute(idToken: idToken, fcmToken: fcmToken);
+      final user = await googleLoginUseCase.execute(
+        idToken: idToken,
+        fcmToken: fcmToken,
+      );
       return user;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');

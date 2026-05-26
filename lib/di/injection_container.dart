@@ -304,5 +304,7 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => const FlutterSecureStorage());
-  sl.registerLazySingleton<http.Client>(() => InterceptedHttpClient(http.Client(), sl()));
+  sl.registerLazySingleton<http.Client>(
+    () => InterceptedHttpClient(http.Client(), sl()),
+  );
 }

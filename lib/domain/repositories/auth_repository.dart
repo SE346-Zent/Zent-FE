@@ -1,7 +1,11 @@
 import 'package:zent_fe/domain/entities/user.dart';
 
 abstract class AuthRepository {
-  Future<User> login({required String email, required String password, String? fcmToken});
+  Future<User> login({
+    required String email,
+    required String password,
+    String? fcmToken,
+  });
   Future<User> googleLogin({required String idToken, String? fcmToken});
   Future<User?> getCurrentUser();
 

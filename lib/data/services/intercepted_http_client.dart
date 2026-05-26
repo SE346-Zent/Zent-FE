@@ -26,20 +26,27 @@ class InterceptedHttpClient extends http.BaseClient {
         !path.contains('/auth/google-login') &&
         !path.contains('/auth/refresh-token') &&
         !path.contains('/auth/register')) {
-      
-      debugPrint("InterceptedHttpClient: Intercepted 401 on ${request.url}. Attempting silent token refresh...");
+      debugPrint(
+        "InterceptedHttpClient: Intercepted 401 on ${request.url}. Attempting silent token refresh...",
+      );
 
       try {
         final newAccessToken = await _performTokenRefresh();
         if (newAccessToken != null) {
-          debugPrint("InterceptedHttpClient: Token refresh succeeded. Retrying request to ${request.url}...");
+          debugPrint(
+            "InterceptedHttpClient: Token refresh succeeded. Retrying request to ${request.url}...",
+          );
           final retriedRequest = _copyRequest(request, newAccessToken);
           return await _inner.send(retriedRequest);
         } else {
-          debugPrint("InterceptedHttpClient: Token refresh failed. Proceeding with original 401 response.");
+          debugPrint(
+            "InterceptedHttpClient: Token refresh failed. Proceeding with original 401 response.",
+          );
         }
       } catch (e) {
-        debugPrint("InterceptedHttpClient: Error during token refresh interception: $e");
+        debugPrint(
+          "InterceptedHttpClient: Error during token refresh interception: $e",
+        );
       }
     }
 
@@ -49,7 +56,9 @@ class InterceptedHttpClient extends http.BaseClient {
   Future<String?> _performTokenRefresh() async {
     // If there is an active refresh token operation running, reuse it to avoid duplicate network requests
     if (_refreshFuture != null) {
-      debugPrint("InterceptedHttpClient: Reusing ongoing token refresh operation...");
+      debugPrint(
+        "InterceptedHttpClient: Reusing ongoing token refresh operation...",
+      );
       return _refreshFuture;
     }
 
@@ -77,15 +86,17 @@ class InterceptedHttpClient extends http.BaseClient {
       final url = Uri.parse('$baseURL/auth/refresh-token');
 
       // Make direct request using _inner client to avoid recursive interception
-      final response = await _inner.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $refreshToken',
-        },
-        body: jsonEncode({'refresh_token': refreshToken}),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _inner
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $refreshToken',
+            },
+            body: jsonEncode({'refresh_token': refreshToken}),
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final jsonMap = jsonDecode(response.body);
@@ -95,24 +106,37 @@ class InterceptedHttpClient extends http.BaseClient {
           final newRefreshToken = data['refreshToken']?.toString();
 
           if (newAccessToken != null && newAccessToken.isNotEmpty) {
-            debugPrint("InterceptedHttpClient: Token refresh succeeded. Saving fresh credentials.");
-            await _secureStorage.write(key: 'ACCESS_TOKEN', value: newAccessToken);
+            debugPrint(
+              "InterceptedHttpClient: Token refresh succeeded. Saving fresh credentials.",
+            );
+            await _secureStorage.write(
+              key: 'ACCESS_TOKEN',
+              value: newAccessToken,
+            );
             if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
-              await _secureStorage.write(key: 'REFRESH_TOKEN', value: newRefreshToken);
+              await _secureStorage.write(
+                key: 'REFRESH_TOKEN',
+                value: newRefreshToken,
+              );
             }
             return newAccessToken;
           }
         }
       }
 
-      debugPrint("InterceptedHttpClient: Token refresh request returned status ${response.statusCode}: ${response.body}");
+      debugPrint(
+        "InterceptedHttpClient: Token refresh request returned status ${response.statusCode}: ${response.body}",
+      );
     } catch (e) {
       debugPrint("InterceptedHttpClient: Exception in _refreshTokenCall: $e");
     }
     return null;
   }
 
-  http.BaseRequest _copyRequest(http.BaseRequest original, String newAccessToken) {
+  http.BaseRequest _copyRequest(
+    http.BaseRequest original,
+    String newAccessToken,
+  ) {
     http.BaseRequest request;
 
     if (original is http.Request) {

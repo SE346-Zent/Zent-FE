@@ -7,9 +7,6 @@ class GoogleLoginUseCase {
   GoogleLoginUseCase(this.repository);
 
   Future<User> execute({required String idToken, String? fcmToken}) async {
-    return await repository.googleLogin(
-      idToken: idToken,
-      fcmToken: fcmToken,
-    );
+    return await repository.googleLogin(idToken: idToken, fcmToken: fcmToken);
   }
 }

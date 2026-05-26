@@ -7,7 +7,11 @@ import '../../models/auth_response_model.dart' show AuthResponseModel;
 import '../../models/api_response.dart' show ApiResponse;
 
 abstract class AuthRemoteDatasource {
-  Future<AuthResponseModel> login(String email, String password, {String? fcmToken});
+  Future<AuthResponseModel> login(
+    String email,
+    String password, {
+    String? fcmToken,
+  });
   Future<AuthResponseModel> googleLogin(String idToken, {String? fcmToken});
   Future<void> signup({
     required String fullName,
@@ -38,7 +42,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   AuthRemoteDatasourceImpl(this.client);
 
   @override
-  Future<AuthResponseModel> login(String email, String password, {String? fcmToken}) async {
+  Future<AuthResponseModel> login(
+    String email,
+    String password, {
+    String? fcmToken,
+  }) async {
     final url = Uri.parse('$_baseURL/auth/login');
     try {
       final Map<String, dynamic> bodyMap = {
@@ -81,12 +89,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<AuthResponseModel> googleLogin(String idToken, {String? fcmToken}) async {
+  Future<AuthResponseModel> googleLogin(
+    String idToken, {
+    String? fcmToken,
+  }) async {
     final url = Uri.parse('$_baseURL/auth/google-login');
     try {
-      final Map<String, dynamic> bodyMap = {
-        'idToken': idToken,
-      };
+      final Map<String, dynamic> bodyMap = {'idToken': idToken};
       if (fcmToken != null) {
         bodyMap['fcmToken'] = fcmToken;
       }

@@ -81,68 +81,80 @@ Future<UserRoles> _getRoleFromToken() async {
 const _publicPrefixes = [Routes.splash, Routes.onBoarding, Routes.login];
 
 Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
-  final location = state.matchedLocation;
-  final role = await _getRoleFromToken();
-  if (role == UserRoles.admin || role == UserRoles.technician) {
-    final settings = await FirebaseMessaging.instance.requestPermission();
-    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-      return Routes.login;
+  try {
+    final location = state.matchedLocation;
+    final role = await _getRoleFromToken();
+    if (role == UserRoles.admin || role == UserRoles.technician) {
+      try {
+        final settings = await FirebaseMessaging.instance.requestPermission();
+        if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+          return Routes.login;
+        }
+      } catch (e) {
+        debugPrint("Firebase Messaging permission request failed in redirect: $e");
+        // Cứ tiếp tục điều hướng nếu lỗi Firebase cấu hình ở môi trường Release
+      }
     }
+    final isPublic = _publicPrefixes.any(
+      (p) => location == p || location.startsWith('$p/'),
+    );
+
+    // ── Unauthenticated ─────────────────────────────────────────────────────
+    if (role == UserRoles.unauthenticated) {
+      return isPublic ? null : Routes.login;
+    }
+
+    // ── Authenticated on a public / auth route ───────────────────────────────
+    final isAuthFlow =
+        location.contains(Routes.verifyOtp) ||
+        location.contains(Routes.resetPassword) ||
+        location.contains(Routes.resetSuccessfully);
+
+    if (isPublic && !isAuthFlow) {
+      return switch (role) {
+        UserRoles.admin => Routes.adminDashboard,
+        UserRoles.technician => Routes.techHome,
+        UserRoles.customer => Routes.customerServices,
+        UserRoles.unauthenticated => null,
+      };
+    }
+
+    // ── Guard role-specific route sections ──────────────────────────────────
+    final isAdminRoute = location.startsWith('/admin');
+    final isTechRoute = location.startsWith('/tech');
+    final isCustomerRoute = location.startsWith('/customer');
+
+    if (isAdminRoute && role != UserRoles.admin) {
+      return switch (role) {
+        UserRoles.technician => Routes.techHome,
+        UserRoles.customer => Routes.customerServices,
+        _ => Routes.login,
+      };
+    }
+
+    if (isTechRoute && role != UserRoles.technician) {
+      return switch (role) {
+        UserRoles.admin => Routes.adminDashboard,
+        UserRoles.customer => Routes.customerServices,
+        _ => Routes.login,
+      };
+    }
+
+    if (isCustomerRoute && role != UserRoles.customer) {
+      return switch (role) {
+        UserRoles.admin => Routes.adminDashboard,
+        UserRoles.technician => Routes.techHome,
+        _ => Routes.login,
+      };
+    }
+
+    return null; // No redirect needed.
+  } catch (e, stack) {
+    debugPrint("GoRouter RBAC Redirect Exception: $e");
+    debugPrint(stack.toString());
+    // Trả về Routes.login hoặc null thay vì để sập cả app khi sập GoRouter
+    return Routes.login;
   }
-  final isPublic = _publicPrefixes.any(
-    (p) => location == p || location.startsWith('$p/'),
-  );
-
-  // ── Unauthenticated ─────────────────────────────────────────────────────
-  if (role == UserRoles.unauthenticated) {
-    return isPublic ? null : Routes.login;
-  }
-
-  // ── Authenticated on a public / auth route ───────────────────────────────
-  final isAuthFlow =
-      location.contains(Routes.verifyOtp) ||
-      location.contains(Routes.resetPassword) ||
-      location.contains(Routes.resetSuccessfully);
-
-  if (isPublic && !isAuthFlow) {
-    return switch (role) {
-      UserRoles.admin => Routes.adminDashboard,
-      UserRoles.technician => Routes.techHome,
-      UserRoles.customer => Routes.customerServices,
-      UserRoles.unauthenticated => null,
-    };
-  }
-
-  // ── Guard role-specific route sections ──────────────────────────────────
-  final isAdminRoute = location.startsWith('/admin');
-  final isTechRoute = location.startsWith('/tech');
-  final isCustomerRoute = location.startsWith('/customer');
-
-  if (isAdminRoute && role != UserRoles.admin) {
-    return switch (role) {
-      UserRoles.technician => Routes.techHome,
-      UserRoles.customer => Routes.customerServices,
-      _ => Routes.login,
-    };
-  }
-
-  if (isTechRoute && role != UserRoles.technician) {
-    return switch (role) {
-      UserRoles.admin => Routes.adminDashboard,
-      UserRoles.customer => Routes.customerServices,
-      _ => Routes.login,
-    };
-  }
-
-  if (isCustomerRoute && role != UserRoles.customer) {
-    return switch (role) {
-      UserRoles.admin => Routes.adminDashboard,
-      UserRoles.technician => Routes.techHome,
-      _ => Routes.login,
-    };
-  }
-
-  return null; // No redirect needed.
 }
 
 // ---------------------------------------------------------------------------

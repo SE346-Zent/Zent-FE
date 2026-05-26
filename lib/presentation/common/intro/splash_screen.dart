@@ -69,13 +69,22 @@ class _SplashScreenContentState extends State<_SplashScreenContent> {
     FlutterNativeSplash.remove();
 
     if (!mounted) return;
-    final splashViewModel = context.read<SplashViewModel>();
-    final isFirstTime = await splashViewModel.resolveFirstTimeFlow();
+    
+    try {
+      final splashViewModel = context.read<SplashViewModel>();
+      final isFirstTime = await splashViewModel.resolveFirstTimeFlow();
 
-    if (mounted) {
-      if (isFirstTime) {
-        context.goNamed(RouteNames.onBoarding);
-      } else {
+      if (mounted) {
+        if (isFirstTime) {
+          context.goNamed(RouteNames.onBoarding);
+        } else {
+          context.goNamed(RouteNames.login);
+        }
+      }
+    } catch (e) {
+      debugPrint("Error in Splash initialization flow: $e");
+      // Fallback an toàn: Cho người dùng chuyển sang trang Login nếu luồng khởi tạo gặp lỗi
+      if (mounted) {
         context.goNamed(RouteNames.login);
       }
     }

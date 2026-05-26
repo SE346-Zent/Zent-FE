@@ -34,31 +34,52 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  await dotenv.load(fileName: ".env");
-  await di.init();
+  
+  try {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    await dotenv.load(fileName: ".env");
+    await di.init();
+  } catch (e) {
+    developer.log("Local initialization failed: $e");
+  }
 
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    developer.log("Firebase initialization failed: $e");
+  }
 
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
-    ), // Use your app icon
-  );
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  try {
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      ), // Use your app icon
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-  // 4. Create the channel on the device
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-      >()
-      ?.createNotificationChannel(channel);
+    // 4. Create the channel on the device
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(channel);
+  } catch (e) {
+    developer.log("Local Notifications initialization failed: $e");
+  }
 
-  await _setupFCMForTesting();
+  try {
+    await _setupFCMForTesting();
+  } catch (e) {
+    developer.log("FCM Setup failed: $e");
+  }
 
-  _setupForegroundMessaging();
-  fetchInstallationId();
+  try {
+    _setupForegroundMessaging();
+    fetchInstallationId();
+  } catch (e) {
+    developer.log("Foreground messaging initialization failed: $e");
+  }
 
   runApp(const MyApp());
 }
@@ -113,20 +134,24 @@ Future<void> fetchInstallationId() async {
 }
 
 Future<void> _setupFCMForTesting() async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
+  try {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    String? token = await messaging.getToken();
-    developer.log('FCM TOKEN: $token');
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      String? token = await messaging.getToken();
+      developer.log('FCM TOKEN: $token');
 
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      developer.log('FCM TOKEN REFRESHED: $newToken');
-    });
+      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+        developer.log('FCM TOKEN REFRESHED: $newToken');
+      });
+    }
+  } catch (e) {
+    developer.log("Error during FCM setup: $e");
   }
 }
 

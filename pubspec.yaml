@@ -57,11 +57,12 @@ dependencies:
   firebase_core: ^3.12.1
   firebase_analytics: ^11.3.3
   firebase_in_app_messaging: ^0.8.0+13
-  firebase_installations: ^16.3.6
   flutter_local_notifications: ^17.1.2
+  native_exif: ^0.8.0
+  geolocator: ^14.0.1
+  web_socket_channel: ^3.0.3
   firebase_app_installations: ^0.3.3
   flutter_bloc: ^9.1.0
-
 
 dev_dependencies:
   flutter_test:

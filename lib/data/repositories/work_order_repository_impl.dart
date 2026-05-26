@@ -76,6 +76,37 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
+  Future<void> startWorkOrder(
+    String id,
+    double latitude,
+    double longitude,
+  ) async {
+    return await remoteDataSource.startWorkOrder(id, latitude, longitude);
+  }
+
+  @override
+  Future<void> uploadClosingFormPhoto(
+    String id,
+    String filePath,
+    double latitude,
+    double longitude,
+    String phase,
+  ) async {
+    return await remoteDataSource.uploadClosingFormPhoto(
+      id,
+      filePath,
+      latitude,
+      longitude,
+      phase,
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> getWorkOrderHistory(String id) async {
+    return await remoteDataSource.getWorkOrderHistory(id);
+  }
+
+  @override
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft) async {
     final model = WorkOrderCompletionDraftModel.fromEntity(draft);
     await localDataSource.cacheWorkOrderDraft(model);

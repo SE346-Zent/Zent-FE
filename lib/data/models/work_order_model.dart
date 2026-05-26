@@ -71,11 +71,7 @@ class WorkOrderModel extends WorkOrder {
           json['workOrderNumber'] as String? ??
           json['workOrderNum'] as String? ??
           '',
-      addressString:
-          json['address'] as String? ??
-          json['addressString'] as String? ??
-          json['address_string'] as String? ??
-          '',
+      addressString: _buildAddress(json),
       status: _parseStatus(
         json['work_order_status_id'] ??
             json['status_id'] ??
@@ -144,10 +140,18 @@ class WorkOrderModel extends WorkOrder {
   static WorkOrderStatus _parseStatus(dynamic statusVal) {
     if (statusVal == null) return WorkOrderStatus.pending;
 
+    var val = statusVal;
+    if (statusVal is String) {
+      final parsedInt = int.tryParse(statusVal);
+      if (parsedInt != null) {
+        val = parsedInt;
+      }
+    }
+
     // Explicit mapping based on DB:
     // 1: Pending, 2: Assigned, 3: InProg, 4: Closed, 5: Reject_InReview, 6: Rejected
-    if (statusVal is int) {
-      switch (statusVal) {
+    if (val is int) {
+      switch (val) {
         case 1:
           return WorkOrderStatus.pending;
         case 2:
@@ -166,7 +170,23 @@ class WorkOrderModel extends WorkOrder {
     }
 
     if (statusVal is String) {
-      final s = statusVal.toLowerCase();
+      final s = statusVal.toLowerCase().replaceAll('_', '').replaceAll(' ', '');
+      if (s == 'pending') {
+        return WorkOrderStatus.pending;
+      }
+      if (s == 'inprogress' || s == 'assigned' || s == 'inprog') {
+        return WorkOrderStatus.inProg;
+      }
+      if (s == 'complete' || s == 'completed' || s == 'closed') {
+        return WorkOrderStatus.complete;
+      }
+      if (s == 'rejectinreview' || s == 'reject_inreview') {
+        return WorkOrderStatus.rejectInReview;
+      }
+      if (s == 'rejected') {
+        return WorkOrderStatus.rejected;
+      }
+      // fallback partial match
       if (s.contains('pending')) {
         return WorkOrderStatus.pending;
       }
@@ -176,7 +196,7 @@ class WorkOrderModel extends WorkOrder {
       if (s.contains('complete') || s.contains('closed')) {
         return WorkOrderStatus.complete;
       }
-      if (s.contains('reject_inreview') || s.contains('rejectinreview')) {
+      if (s.contains('rejectinreview')) {
         return WorkOrderStatus.rejectInReview;
       }
       if (s.contains('rejected')) {
@@ -185,6 +205,29 @@ class WorkOrderModel extends WorkOrder {
     }
 
     return WorkOrderStatus.pending;
+  }
+
+  static String _buildAddress(Map<String, dynamic> json) {
+    // Try pre-built string first
+    final prebuilt =
+        json['addressString'] as String? ?? json['address_string'] as String?;
+    if (prebuilt != null && prebuilt.isNotEmpty) return prebuilt;
+
+    // Build from WorkOrderDetails fields: address, building, city, province, country
+    final parts = <String>[];
+    final address = json['address'] as String?;
+    final building = json['building'] as String?;
+    final city = json['city'] as String?;
+    final province = json['province'] as String?;
+    final country = json['country'] as String?;
+
+    if (building != null && building.isNotEmpty) parts.add(building);
+    if (address != null && address.isNotEmpty) parts.add(address);
+    if (city != null && city.isNotEmpty) parts.add(city);
+    if (province != null && province.isNotEmpty) parts.add(province);
+    if (country != null && country.isNotEmpty) parts.add(country);
+
+    return parts.join(', ');
   }
 
   Map<String, dynamic> toJson() {

@@ -136,7 +136,7 @@ class AdminSidebar extends StatelessWidget {
                       isActive: false,
                       onTap: () {
                         Navigator.pop(context);
-                        debugPrint("Navigating to Work Order History");
+                        context.goNamed(RouteNames.adminWorkOrderHistory);
                       },
                     ),
                     const SizedBox(height: AppDimens.spaceSm),

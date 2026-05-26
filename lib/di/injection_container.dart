@@ -12,6 +12,7 @@ import '../data/repositories/work_order_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../domain/repositories/work_order_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
+import '../domain/usecases/auth/google_login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
 import '../domain/usecases/auth/first_time_usecase.dart';
 import '../domain/usecases/auth/reset_password_usecase.dart';
@@ -73,6 +74,7 @@ import '../presentation/customer/account/viewmodels/security_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/notifications_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
 import 'package:zent_fe/data/services/chat_service.dart';
+import 'package:zent_fe/data/services/intercepted_http_client.dart';
 import '../presentation/customer/work/viewmodels/products_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
@@ -104,6 +106,7 @@ Future<void> init() async {
 
   // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => GoogleLoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
@@ -132,7 +135,7 @@ Future<void> init() async {
   // ViewModels
   sl.registerLazySingleton(() => AuthViewModel());
   sl.registerFactory(() => SplashViewModel(sl(), sl()));
-  sl.registerFactory(() => LoginViewModel(sl()));
+  sl.registerFactory(() => LoginViewModel(sl(), sl()));
   sl.registerFactory(() => RegisterViewModel(registerUseCase: sl()));
   sl.registerFactory(
     () => ForgotPasswordViewModel(forgotPasswordUseCase: sl()),
@@ -301,5 +304,5 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => const FlutterSecureStorage());
-  sl.registerLazySingleton(() => http.Client());
+  sl.registerLazySingleton<http.Client>(() => InterceptedHttpClient(http.Client(), sl()));
 }

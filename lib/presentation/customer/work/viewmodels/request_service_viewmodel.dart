@@ -335,9 +335,13 @@ class RequestServiceViewModel extends ChangeNotifier {
         try {
           final inputFormat = DateFormat("HH:mm, dd/MM/yyyy");
           final dateTime = inputFormat.parse(appointmentDate!);
-          // Format to ISO 8601: "yyyy-MM-ddTHH:mm:ssZ"
+          // Format to ISO 8601 with timezone offset (e.g. "+07:00" for Vietnam)
+          final offset = dateTime.timeZoneOffset;
+          final hours = offset.inHours.abs().toString().padLeft(2, '0');
+          final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+          final sign = offset.isNegative ? '-' : '+';
           formattedAppointment =
-              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}Z";
+              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}$sign$hours:$minutes";
         } catch (e) {
           debugPrint("Error parsing date: $e");
           formattedAppointment = appointmentDate!; // fallback

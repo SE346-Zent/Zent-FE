@@ -14,8 +14,35 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<User> login({required String email, required String password}) async {
-    final response = await authRemoteService.login(email, password);
+  Future<User> login({
+    required String email,
+    required String password,
+    String? fcmToken,
+  }) async {
+    final response = await authRemoteService.login(
+      email,
+      password,
+      fcmToken: fcmToken,
+    );
+
+    // 1. Save to Secure Storage (Persistence)
+    await authLocalDataSource.saveCredentials(
+      response.accessToken,
+      response.refreshToken,
+    );
+
+    // 2. Save User Info
+    await authLocalDataSource.saveUser(response.user);
+
+    return response.user;
+  }
+
+  @override
+  Future<User> googleLogin({required String idToken, String? fcmToken}) async {
+    final response = await authRemoteService.googleLogin(
+      idToken,
+      fcmToken: fcmToken,
+    );
 
     // 1. Save to Secure Storage (Persistence)
     await authLocalDataSource.saveCredentials(

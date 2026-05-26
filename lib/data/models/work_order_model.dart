@@ -134,6 +134,14 @@ class WorkOrderModel extends WorkOrder {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+      appointment: json['appointment'] != null
+          ? DateTime.tryParse(json['appointment'] as String)
+          : null,
+      building: json['building'] as String?,
+      city: json['city'] as String?,
+      country: json['country'] as String?,
+      email: json['email'] as String?,
+      firstName: json['first_name'] as String? ?? json['firstName'] as String?,
     );
   }
 

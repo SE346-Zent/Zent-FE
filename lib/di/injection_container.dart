@@ -280,7 +280,10 @@ Future<void> init() async {
     () => AuthLocalDataSourceImpl(secureStorage: sl(), sharedPreferences: sl()),
   );
   sl.registerLazySingleton<WorkOrderLocalDataSource>(
-    () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
+    () => WorkOrderLocalDataSourceImpl(
+      sharedPreferences: sl(),
+      secureStorage: sl(),
+    ),
   );
   sl.registerLazySingleton<WorkOrderRemoteDataSource>(
     () =>

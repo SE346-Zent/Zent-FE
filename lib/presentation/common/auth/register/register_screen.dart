@@ -14,6 +14,7 @@ import 'package:zent_fe/presentation/common/auth/login/widgets/auth_text_field.d
 import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
 import 'package:zent_fe/presentation/common/auth/login/widgets/auth_footer_link.dart';
 import 'package:zent_fe/presentation/common/auth/login/widgets/social_login_section.dart';
+import 'package:zent_fe/presentation/common/auth/login/view_models/login_view_model.dart';
 
 // ViewModel
 import 'package:zent_fe/presentation/common/auth/register/view_models/register_view_model.dart';
@@ -168,7 +169,10 @@ class _RegisterScreenContent extends StatelessWidget {
         const SizedBox(height: AppDimens.spaceLg),
 
         // "Or continue with" + Google button (same as login)
-        const SocialLoginSection(),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<LoginViewModel>(),
+          child: const SocialLoginSection(),
+        ),
 
         const SizedBox(height: AppDimens.spaceLg),
 

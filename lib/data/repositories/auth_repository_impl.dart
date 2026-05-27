@@ -3,6 +3,8 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -135,12 +137,19 @@ class AuthRepositoryImpl implements AuthRepository {
           response.refreshToken,
         );
         await authLocalDataSource.saveUser(response.user);
+
+        try {
+          sl<AuthViewModel>().setLoggedInUser(response.user);
+        } catch (e) {
+          debugPrint("Could not set user in AuthViewModel: $e");
+        }
+
         return true;
       }
       return false;
     } catch (e) {
       debugPrint("Restore session failed: $e");
-      await logout(); // Xóa sạch nếu lỗi
+      await logout();
       return false;
     }
   }

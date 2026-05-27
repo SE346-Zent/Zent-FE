@@ -21,7 +21,7 @@ class ActiveRepairsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final orders = await getManyWorkOrdersUseCase.execute(limit: 50);
+      final orders = await getManyWorkOrdersUseCase.execute(limit: 1000);
 
       final activeOrders = orders
           .where(
@@ -42,7 +42,11 @@ class ActiveRepairsViewModel extends ChangeNotifier {
       }
 
       final completedOrders = orders
-          .where((o) => o.status == WorkOrderStatus.complete)
+          .where(
+            (o) =>
+                o.status == WorkOrderStatus.complete ||
+                o.status == WorkOrderStatus.rejected,
+          )
           .toList();
       completedOrders.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 

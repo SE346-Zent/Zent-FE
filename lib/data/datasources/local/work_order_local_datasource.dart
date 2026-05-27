@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../models/work_order_completion_draft_model.dart';
 
 abstract class WorkOrderLocalDataSource {
@@ -10,20 +12,26 @@ abstract class WorkOrderLocalDataSource {
 
 class WorkOrderLocalDataSourceImpl implements WorkOrderLocalDataSource {
   final SharedPreferences sharedPreferences;
+  final FlutterSecureStorage secureStorage;
 
-  WorkOrderLocalDataSourceImpl({required this.sharedPreferences});
+  WorkOrderLocalDataSourceImpl({
+    required this.sharedPreferences,
+    required this.secureStorage,
+  });
 
   @override
   Future<void> cacheWorkOrderDraft(WorkOrderCompletionDraftModel draft) async {
     final jsonString = json.encode(draft.toJson());
-    await sharedPreferences.setString(_getKey(draft.workOrderId), jsonString);
+    final key = await _getKey(draft.workOrderId);
+    await sharedPreferences.setString(key, jsonString);
   }
 
   @override
   Future<WorkOrderCompletionDraftModel?> getWorkOrderDraft(
     String workOrderId,
   ) async {
-    final jsonString = sharedPreferences.getString(_getKey(workOrderId));
+    final key = await _getKey(workOrderId);
+    final jsonString = sharedPreferences.getString(key);
     if (jsonString != null) {
       return WorkOrderCompletionDraftModel.fromJson(json.decode(jsonString));
     }
@@ -32,8 +40,22 @@ class WorkOrderLocalDataSourceImpl implements WorkOrderLocalDataSource {
 
   @override
   Future<void> clearWorkOrderDraft(String workOrderId) async {
-    await sharedPreferences.remove(_getKey(workOrderId));
+    final key = await _getKey(workOrderId);
+    await sharedPreferences.remove(key);
   }
 
-  String _getKey(String workOrderId) => 'WO_DRAFT_$workOrderId';
+  Future<String> _getKey(String workOrderId) async {
+    String userPrefix = 'anonymous';
+    try {
+      final token = await secureStorage.read(key: 'ACCESS_TOKEN');
+      if (token != null && token.isNotEmpty) {
+        final payload = JwtDecoder.decode(token);
+        final id = payload['id'] ?? payload['sub'] ?? payload['userId'];
+        if (id != null) {
+          userPrefix = id.toString();
+        }
+      }
+    } catch (_) {}
+    return 'WO_DRAFT_${userPrefix}_$workOrderId';
+  }
 }

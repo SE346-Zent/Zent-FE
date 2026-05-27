@@ -63,6 +63,12 @@ class DetailedChatViewModel extends ChangeNotifier {
   final ChatService chatService;
   final GetCurrentUserUseCase getCurrentUserUseCase;
 
+  // Static RAM caches for instant room loading on re-entrance
+  static final Map<String, List<ChatMessage>> _roomMessagesCache = {};
+  static final Map<String, String> _roomPartnerNamesCache = {};
+  static final Map<String, bool> _hasMoreCache = {};
+  static String? _cachedUserId;
+
   String? currentChatId;
   String chatPartnerName = "";
   String? currentUserId;
@@ -149,6 +155,9 @@ class DetailedChatViewModel extends ChangeNotifier {
             }
           }
           _sortMessages();
+          if (currentChatId != null) {
+            _roomMessagesCache[currentChatId!] = List.from(messages);
+          }
           // Re-send VIEWING room frame to register session with server again
           chatService.startViewing(currentChatId!);
           notifyListeners();
@@ -162,44 +171,58 @@ class DetailedChatViewModel extends ChangeNotifier {
 
   Future<void> init(String chatId, {String? initialPartnerName}) async {
     currentChatId = chatId;
-    chatPartnerName = initialPartnerName ?? "";
-    isLoading = true;
-    hasMore = true;
+    
+    // Check if cache exists for instant room rendering
+    final hasCache = _roomMessagesCache.containsKey(chatId);
+    if (hasCache) {
+      messages = List.from(_roomMessagesCache[chatId]!);
+      chatPartnerName = _roomPartnerNamesCache[chatId] ?? (initialPartnerName ?? "");
+      hasMore = _hasMoreCache[chatId] ?? true;
+      isLoading = false;
+    } else {
+      chatPartnerName = initialPartnerName ?? "";
+      isLoading = true;
+      hasMore = true;
+    }
     isLoadMoreLoading = false;
+    currentUserId = _cachedUserId;
     notifyListeners();
 
     try {
-      // 1. Fetch current user
-      final user = await getCurrentUserUseCase.execute();
-      currentUserId = user?.id;
-      debugPrint(
-        "DetailedChatViewModel init: user loaded -> email: ${user?.email}, id: ${user?.id}",
-      );
+      // 1. Fetch current user if not cached
+      if (currentUserId == null) {
+        final user = await getCurrentUserUseCase.execute();
+        currentUserId = user?.id;
+        debugPrint(
+          "DetailedChatViewModel init: user loaded -> email: ${user?.email}, id: ${user?.id}",
+        );
 
-      // Fallback/Migration: If user is null, ID is empty, or is 'temp_id', extract ID from JWT token directly
-      if (currentUserId == null ||
-          currentUserId!.isEmpty ||
-          currentUserId == 'temp_id') {
-        try {
-          final token = await chatService.authLocalDataSource.getAccessToken();
-          if (token != null) {
-            final parts = token.split('.');
-            if (parts.length == 3) {
-              final payload = utf8.decode(
-                base64Url.decode(base64Url.normalize(parts[1])),
-              );
-              final payloadMap = jsonDecode(payload) as Map<String, dynamic>;
-              currentUserId = payloadMap['sub'] as String?;
-              debugPrint(
-                "DetailedChatViewModel init: Migrated session with sub/currentUserId = $currentUserId",
-              );
+        // Fallback/Migration: If user is null, ID is empty, or is 'temp_id', extract ID from JWT token directly
+        if (currentUserId == null ||
+            currentUserId!.isEmpty ||
+            currentUserId == 'temp_id') {
+          try {
+            final token = await chatService.authLocalDataSource.getAccessToken();
+            if (token != null) {
+              final parts = token.split('.');
+              if (parts.length == 3) {
+                final payload = utf8.decode(
+                  base64Url.decode(base64Url.normalize(parts[1])),
+                );
+                final payloadMap = jsonDecode(payload) as Map<String, dynamic>;
+                currentUserId = payloadMap['sub'] as String?;
+                debugPrint(
+                  "DetailedChatViewModel init: Migrated session with sub/currentUserId = $currentUserId",
+                );
+              }
             }
+          } catch (e) {
+            debugPrint(
+              "DetailedChatViewModel: Failed to decode token for currentUserId fallback: $e",
+            );
           }
-        } catch (e) {
-          debugPrint(
-            "DetailedChatViewModel: Failed to decode token for currentUserId fallback: $e",
-          );
         }
+        _cachedUserId = currentUserId;
       }
 
       // 2. Fetch messages from REST API
@@ -224,6 +247,9 @@ class DetailedChatViewModel extends ChangeNotifier {
           chatPartnerName = "Chat Partner";
         }
       }
+      
+      // Update partner name in cache
+      _roomPartnerNamesCache[chatId] = chatPartnerName;
 
       // Convert fetched messages to UI messages
       messages = fetchedMessages.reversed.map((msg) {
@@ -242,6 +268,10 @@ class DetailedChatViewModel extends ChangeNotifier {
       }).toList();
 
       _sortMessages();
+
+      // Update room messages and status in cache
+      _roomMessagesCache[chatId] = List.from(messages);
+      _hasMoreCache[chatId] = hasMore;
 
       // 3. Mark all unread incoming messages as read
       final unreadMessageIds = fetchedMessages
@@ -320,6 +350,9 @@ class DetailedChatViewModel extends ChangeNotifier {
 
                 if (tempIndex != -1) {
                   messages[tempIndex] = uiMsg;
+                  if (currentChatId != null) {
+                    _roomMessagesCache[currentChatId!] = List.from(messages);
+                  }
                   notifyListeners();
                   return;
                 }
@@ -329,6 +362,9 @@ class DetailedChatViewModel extends ChangeNotifier {
               if (!messages.any((m) => m.id == uiMsg.id)) {
                 messages.add(uiMsg);
                 _sortMessages();
+                if (currentChatId != null) {
+                  _roomMessagesCache[currentChatId!] = List.from(messages);
+                }
               }
 
               // Automatically send read receipt if this incoming message is from the other user
@@ -346,6 +382,9 @@ class DetailedChatViewModel extends ChangeNotifier {
               final index = messages.indexWhere((m) => m.id == msgId);
               if (index != -1) {
                 messages[index].isSeen = true;
+                if (currentChatId != null) {
+                  _roomMessagesCache[currentChatId!] = List.from(messages);
+                }
                 notifyListeners();
               }
             }
@@ -409,6 +448,11 @@ class DetailedChatViewModel extends ChangeNotifier {
           hasMore = false;
         }
       }
+
+      if (currentChatId != null) {
+        _roomMessagesCache[currentChatId!] = List.from(messages);
+        _hasMoreCache[currentChatId!] = hasMore;
+      }
     } catch (e) {
       debugPrint("DetailedChatViewModel loadMoreMessages failed: $e");
     } finally {
@@ -436,6 +480,10 @@ class DetailedChatViewModel extends ChangeNotifier {
       messages.add(uiMsg);
       _sortMessages();
 
+      if (currentChatId != null) {
+        _roomMessagesCache[currentChatId!] = List.from(messages);
+      }
+
       messageController.clear();
       notifyListeners();
     }
@@ -445,7 +493,12 @@ class DetailedChatViewModel extends ChangeNotifier {
     if (currentChatId == null) return;
 
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
     if (image == null) return;
 
     isLoading = true;
@@ -475,6 +528,10 @@ class DetailedChatViewModel extends ChangeNotifier {
       );
       messages.add(uiMsg);
       _sortMessages();
+
+      if (currentChatId != null) {
+        _roomMessagesCache[currentChatId!] = List.from(messages);
+      }
     } catch (e) {
       debugPrint("Failed to send image: $e");
     } finally {
@@ -487,7 +544,12 @@ class DetailedChatViewModel extends ChangeNotifier {
     if (currentChatId == null) return;
 
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.camera);
+    final image = await picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
     if (image == null) return;
 
     isLoading = true;
@@ -517,6 +579,10 @@ class DetailedChatViewModel extends ChangeNotifier {
       );
       messages.add(uiMsg);
       _sortMessages();
+
+      if (currentChatId != null) {
+        _roomMessagesCache[currentChatId!] = List.from(messages);
+      }
     } catch (e) {
       debugPrint("Failed to send image: $e");
     } finally {

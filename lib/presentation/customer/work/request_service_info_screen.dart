@@ -23,12 +23,12 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
   final TextEditingController descCtrl = TextEditingController();
   final AppointmentMaskController appointmentCtrl = AppointmentMaskController();
 
-  final FocusNode appointmentFocus = FocusNode();
+  int _lastStep = -1;
 
   bool get isNextEnabled =>
       selectedSymptom != null &&
-      appointmentCtrl.text.length == AppointmentInputFormatter.mask.length &&
-      !appointmentCtrl.text.contains('-');
+      appointmentCtrl.text.isNotEmpty &&
+      appointmentCtrl.text.length == 17;
 
   @override
   void initState() {
@@ -40,23 +40,8 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
     appointmentCtrl.text = vm.appointmentDate ?? '';
 
     appointmentCtrl.addListener(() => setState(() {}));
-
-    appointmentFocus.addListener(() {
-      if (appointmentFocus.hasFocus) {
-        if (appointmentCtrl.text.isEmpty) {
-          appointmentCtrl.text = AppointmentInputFormatter.mask;
-          Future.microtask(() {
-            appointmentCtrl.selection = const TextSelection.collapsed(
-              offset: 0,
-            );
-          });
-        }
-      } else {
-        if (appointmentCtrl.text == AppointmentInputFormatter.mask) {
-          appointmentCtrl.text = '';
-        }
-      }
-    });
+    ticketCtrl.addListener(() => setState(() {}));
+    descCtrl.addListener(() => setState(() {}));
   }
 
   @override
@@ -64,7 +49,6 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
     ticketCtrl.dispose();
     descCtrl.dispose();
     appointmentCtrl.dispose();
-    appointmentFocus.dispose();
     super.dispose();
   }
 
@@ -81,6 +65,15 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<RequestServiceViewModel>();
+
+    // Sync from draft when this step becomes active
+    if (viewModel.currentStep == 2 && _lastStep != 2) {
+      _lastStep = 2;
+      selectedSymptom = viewModel.symptom?.isEmpty == true ? null : viewModel.symptom;
+      ticketCtrl.text = viewModel.ticketRef ?? '';
+      descCtrl.text = viewModel.description ?? '';
+      appointmentCtrl.text = viewModel.appointmentDate ?? '';
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -112,13 +105,9 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
             label: 'Symptom',
             hint: 'Select Category',
             value: selectedSymptom,
-            items: [
-              'Screen Broken',
-              'Battery Issue',
-              'Software Glitch',
-              'Hardware Damage',
-              'Other',
-            ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            items: RequestServiceViewModel.symptomsList
+                .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                .toList(),
             onChanged: (v) {
               setState(() {
                 selectedSymptom = v;
@@ -146,6 +135,13 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
           CustomerTextField(
             label: 'Appointment',
             hint: 'Select a detailed appointment',
+            readOnly: true,
+            onTap: () async {
+              await viewModel.pickDate(context);
+              if (viewModel.appointmentDate != null) {
+                appointmentCtrl.text = viewModel.appointmentDate!;
+              }
+            },
             suffixIcon: IconButton(
               icon: const Icon(
                 Icons.calendar_month,
@@ -155,16 +151,10 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
                 await viewModel.pickDate(context);
                 if (viewModel.appointmentDate != null) {
                   appointmentCtrl.text = viewModel.appointmentDate!;
-                  appointmentCtrl.selection = TextSelection.collapsed(
-                    offset: appointmentCtrl.text.length,
-                  );
                 }
               },
             ),
             controller: appointmentCtrl,
-            focusNode: appointmentFocus,
-            inputFormatters: [AppointmentInputFormatter()],
-            keyboardType: TextInputType.number,
             isRequired: true,
           ),
           const SizedBox(height: AppDimens.spaceLg),

@@ -69,7 +69,7 @@ class _SplashScreenContentState extends State<_SplashScreenContent> {
     FlutterNativeSplash.remove();
 
     if (!mounted) return;
-    
+
     try {
       final splashViewModel = context.read<SplashViewModel>();
       final isFirstTime = await splashViewModel.resolveFirstTimeFlow();

@@ -171,12 +171,13 @@ class DetailedChatViewModel extends ChangeNotifier {
 
   Future<void> init(String chatId, {String? initialPartnerName}) async {
     currentChatId = chatId;
-    
+
     // Check if cache exists for instant room rendering
     final hasCache = _roomMessagesCache.containsKey(chatId);
     if (hasCache) {
       messages = List.from(_roomMessagesCache[chatId]!);
-      chatPartnerName = _roomPartnerNamesCache[chatId] ?? (initialPartnerName ?? "");
+      chatPartnerName =
+          _roomPartnerNamesCache[chatId] ?? (initialPartnerName ?? "");
       hasMore = _hasMoreCache[chatId] ?? true;
       isLoading = false;
     } else {
@@ -202,7 +203,8 @@ class DetailedChatViewModel extends ChangeNotifier {
             currentUserId!.isEmpty ||
             currentUserId == 'temp_id') {
           try {
-            final token = await chatService.authLocalDataSource.getAccessToken();
+            final token = await chatService.authLocalDataSource
+                .getAccessToken();
             if (token != null) {
               final parts = token.split('.');
               if (parts.length == 3) {
@@ -247,7 +249,7 @@ class DetailedChatViewModel extends ChangeNotifier {
           chatPartnerName = "Chat Partner";
         }
       }
-      
+
       // Update partner name in cache
       _roomPartnerNamesCache[chatId] = chatPartnerName;
 

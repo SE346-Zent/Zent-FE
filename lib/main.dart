@@ -34,7 +34,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     await dotenv.load(fileName: ".env");
@@ -51,11 +51,12 @@ Future<void> main() async {
   }
 
   try {
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: AndroidInitializationSettings(
-        '@mipmap/ic_launcher',
-      ), // Use your app icon
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: AndroidInitializationSettings(
+            '@mipmap/ic_launcher',
+          ), // Use your app icon
+        );
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     // 4. Create the channel on the device

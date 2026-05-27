@@ -69,7 +69,9 @@ class _RequestServiceInfoScreenState extends State<RequestServiceInfoScreen> {
     // Sync from draft when this step becomes active
     if (viewModel.currentStep == 2 && _lastStep != 2) {
       _lastStep = 2;
-      selectedSymptom = viewModel.symptom?.isEmpty == true ? null : viewModel.symptom;
+      selectedSymptom = viewModel.symptom?.isEmpty == true
+          ? null
+          : viewModel.symptom;
       ticketCtrl.text = viewModel.ticketRef ?? '';
       descCtrl.text = viewModel.description ?? '';
       appointmentCtrl.text = viewModel.appointmentDate ?? '';

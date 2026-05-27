@@ -91,7 +91,9 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
           return Routes.login;
         }
       } catch (e) {
-        debugPrint("Firebase Messaging permission request failed in redirect: $e");
+        debugPrint(
+          "Firebase Messaging permission request failed in redirect: $e",
+        );
         // Cứ tiếp tục điều hướng nếu lỗi Firebase cấu hình ở môi trường Release
       }
     }

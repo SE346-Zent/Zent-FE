@@ -3,6 +3,8 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -14,8 +16,35 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<User> login({required String email, required String password}) async {
-    final response = await authRemoteService.login(email, password);
+  Future<User> login({
+    required String email,
+    required String password,
+    String? fcmToken,
+  }) async {
+    final response = await authRemoteService.login(
+      email,
+      password,
+      fcmToken: fcmToken,
+    );
+
+    // 1. Save to Secure Storage (Persistence)
+    await authLocalDataSource.saveCredentials(
+      response.accessToken,
+      response.refreshToken,
+    );
+
+    // 2. Save User Info
+    await authLocalDataSource.saveUser(response.user);
+
+    return response.user;
+  }
+
+  @override
+  Future<User> googleLogin({required String idToken, String? fcmToken}) async {
+    final response = await authRemoteService.googleLogin(
+      idToken,
+      fcmToken: fcmToken,
+    );
 
     // 1. Save to Secure Storage (Persistence)
     await authLocalDataSource.saveCredentials(
@@ -108,12 +137,19 @@ class AuthRepositoryImpl implements AuthRepository {
           response.refreshToken,
         );
         await authLocalDataSource.saveUser(response.user);
+
+        try {
+          sl<AuthViewModel>().setLoggedInUser(response.user);
+        } catch (e) {
+          debugPrint("Could not set user in AuthViewModel: $e");
+        }
+
         return true;
       }
       return false;
     } catch (e) {
       debugPrint("Restore session failed: $e");
-      await logout(); // Xóa sạch nếu lỗi
+      await logout();
       return false;
     }
   }

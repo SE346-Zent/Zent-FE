@@ -129,6 +129,14 @@ class _LoginScreenContent extends StatelessWidget {
                                     default:
                                       break;
                                   }
+                                } else if (viewModel.errorMessage != null &&
+                                    context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(viewModel.errorMessage!),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
                                 }
                               },
                             ),

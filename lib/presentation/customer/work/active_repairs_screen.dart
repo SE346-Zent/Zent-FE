@@ -123,7 +123,7 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                       bottom: AppDimens.spaceMd,
                     ),
                     child: viewModel.recentCompleted.isEmpty
-                        ? const Center(child: Text('No completed repairs yet.'))
+                        ? const Center(child: Text(''))
                         : RecentCompletedList(
                             recentCompleted: viewModel.recentCompleted,
                           ),

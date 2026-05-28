@@ -51,7 +51,7 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
       if (currentUser != null) {
         // Fetch all work orders for the system
         final results = await getManyWorkOrdersUseCase.execute(
-          limit: 100,
+          limit: 1000,
           technicianId: currentUser!.role == UserRoles.technician
               ? currentUser!.id
               : null,
@@ -105,11 +105,7 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier {
             wo.technicianId.replaceAll('-', '').toLowerCase() == cleanCurrentId,
       );
     } else if (role == UserRoles.customer) {
-      filtered = filtered.where(
-        (wo) =>
-            wo.status == WorkOrderStatus.complete ||
-            wo.status == WorkOrderStatus.rejected,
-      );
+      // History should get all statuses for customer as well, so status filtering is removed
     } else if (role == UserRoles.admin) {
       var province = currentUser!.province.toUpperCase();
       if (province.isEmpty) {

@@ -7,7 +7,12 @@ import '../../models/auth_response_model.dart' show AuthResponseModel;
 import '../../models/api_response.dart' show ApiResponse;
 
 abstract class AuthRemoteDatasource {
-  Future<AuthResponseModel> login(String email, String password);
+  Future<AuthResponseModel> login(
+    String email,
+    String password, {
+    String? fcmToken,
+  });
+  Future<AuthResponseModel> googleLogin(String idToken, {String? fcmToken});
   Future<void> signup({
     required String fullName,
     required String phone,
@@ -37,9 +42,20 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   AuthRemoteDatasourceImpl(this.client);
 
   @override
-  Future<AuthResponseModel> login(String email, String password) async {
+  Future<AuthResponseModel> login(
+    String email,
+    String password, {
+    String? fcmToken,
+  }) async {
     final url = Uri.parse('$_baseURL/auth/login');
     try {
+      final Map<String, dynamic> bodyMap = {
+        'email': email,
+        'password': password,
+      };
+      if (fcmToken != null) {
+        bodyMap['fcm_token'] = fcmToken;
+      }
       final response = await client
           .post(
             url,
@@ -47,7 +63,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
             },
-            body: jsonEncode({'email': email, 'password': password}),
+            body: jsonEncode(bodyMap),
           )
           .timeout(_timeOut);
 
@@ -69,6 +85,49 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Login error: $e');
+    }
+  }
+
+  @override
+  Future<AuthResponseModel> googleLogin(
+    String idToken, {
+    String? fcmToken,
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/google-login');
+    try {
+      final Map<String, dynamic> bodyMap = {'idToken': idToken};
+      if (fcmToken != null) {
+        bodyMap['fcmToken'] = fcmToken;
+      }
+      final response = await client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode(bodyMap),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<AuthResponseModel>.fromJson(
+        jsonMap,
+        (data) => AuthResponseModel.fromJson(data),
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!;
+      } else {
+        throw Exception(apiResponse.message ?? 'Google Login Failed');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Google Login error: $e');
     }
   }
 

@@ -222,12 +222,14 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-          onTap: () {
-            context.pushNamed(
-              RouteNames.adminDetailedHistory,
-              pathParameters: {'workOrderId': wo.id},
-            );
-          },
+          onTap: isCustomer
+              ? null
+              : () {
+                  context.pushNamed(
+                    RouteNames.adminDetailedHistory,
+                    pathParameters: {'workOrderId': wo.id},
+                  );
+                },
           child: Padding(
             padding: const EdgeInsets.only(
               top: 12.0,
@@ -399,15 +401,12 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildCustomerPopupMenu(BuildContext context, WorkOrder wo) {
     return PopupMenuButton<String>(
-      constraints: const BoxConstraints(minWidth: 181.0, maxWidth: 181.0),
+      constraints: const BoxConstraints(minWidth: 140.0, maxWidth: 140.0),
       padding: EdgeInsets.zero,
-      offset: const Offset(0, 36),
-      elevation: 8,
-      color: Colors.white,
-      shadowColor: BoxShadowStyles.overlay.color,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimens.boraSm),
-      ),
+      offset: const Offset(0, 10),
+      elevation: 0,
+      color: Colors.transparent,
+      shadowColor: Colors.transparent,
       child: const Icon(
         Icons.more_horiz,
         color: AppColors.secondary400,
@@ -419,65 +418,29 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
           padding: EdgeInsets.zero,
           child: Container(
             width: double.infinity,
-            height: 88,
-            padding: const EdgeInsets.only(
-              left: 10.0,
-              right: 2.0,
-              top: 2.0,
-              bottom: 2.0,
-            ),
-            child: Column(
-              children: [
-                // Survey Button
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showSurveyDialog(context, wo);
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppDimens.boraXs),
-                      boxShadow: [BoxShadowStyles.subtle],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Survey",
-                      style: TextStyles.label.copyWith(
-                        color: AppColors.primary500,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+            height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                _showRatingDialog(context, wo);
+              },
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppDimens.boraXs),
+                  border: Border.all(color: AppColors.secondary200, width: 1.0),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  "Rate",
+                  style: TextStyles.label.copyWith(
+                    color: AppColors.primary500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8.0),
-                // Complaint Button
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showComplaintDialog(context, wo);
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: AppColors.error50,
-                      borderRadius: BorderRadius.circular(AppDimens.boraXs),
-                      boxShadow: [BoxShadowStyles.subtle],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Complaint",
-                      style: TextStyles.label.copyWith(
-                        color: AppColors.error500,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -486,169 +449,177 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // Customer Survey / Complaint Popup Screens
+  // Customer Rating Popup Screen
   // ──────────────────────────────────────────────────────────────────────────
-  void _showSurveyDialog(BuildContext context, WorkOrder wo) {
+  void _showRatingDialog(BuildContext context, WorkOrder wo) {
     int rating = 5;
-    final notesController = TextEditingController();
+    final commentController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (context, setState) => Dialog(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24.0,
+            vertical: 24.0,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimens.boraSm),
           ),
-          title: Text(
-            'Work Order Survey',
-            style: TextStyles.title.copyWith(
-              color: AppColors.primary500,
-              fontWeight: FontWeight.bold,
+          child: Container(
+            width: 340,
+            padding: const EdgeInsets.all(AppDimens.spaceLg),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppDimens.boraSm),
+              boxShadow: [BoxShadowStyles.overlay],
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'How would you rate our repair service?',
-                style: TextStyles.bodyLarge,
-              ),
-              const SizedBox(height: AppDimens.spaceSm),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  final score = index + 1;
-                  return IconButton(
-                    icon: Icon(
-                      score <= rating ? Icons.star : Icons.star_border,
-                      color: AppColors.warning500,
-                      size: 32,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    'Rating this work order',
+                    style: TextStyles.title.copyWith(
+                      color: AppColors.primary500,
+                      fontWeight: FontWeight.bold,
                     ),
-                    onPressed: () => setState(() => rating = score),
-                  );
-                }),
-              ),
-              const SizedBox(height: AppDimens.spaceMd),
-              TextField(
-                controller: notesController,
-                maxLines: 3,
-                style: TextStyles.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'Share your feedback details...',
-                  hintStyle: TextStyle(color: AppColors.secondary200),
-                  border: OutlineInputBorder(
+                  ),
+                ),
+                const SizedBox(height: AppDimens.spaceLg),
+                Text(
+                  'Rating',
+                  style: TextStyles.bodyLarge.copyWith(
+                    color: AppColors.primary500,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppDimens.spaceSm),
+                Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        final score = index + 1;
+                        final isFilled = score <= rating;
+                        return GestureDetector(
+                          onTap: () => setState(() => rating = score),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Outer smooth black border backing the star peak
+                                const Icon(
+                                  Icons.star_rounded,
+                                  color: Colors.black87,
+                                  size: 38,
+                                ),
+                                // Inner filled star (gold if filled, clean white if empty)
+                                Icon(
+                                  Icons.star_rounded,
+                                  color: isFilled
+                                      ? const Color(0xFFFBBC05)
+                                      : Colors.white,
+                                  size: 34,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppDimens.spaceLg),
+                Text(
+                  'Comment',
+                  style: TextStyles.bodyLarge.copyWith(
+                    color: AppColors.primary500,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppDimens.spaceSm),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface50,
                     borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                    borderSide: const BorderSide(color: AppColors.secondary200),
+                    border: Border.all(
+                      color: AppColors.secondary200,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: commentController,
+                    maxLines: 4,
+                    style: TextStyles.bodyMedium.copyWith(
+                      color: AppColors.secondary500,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(AppDimens.spaceSm),
+                      hintText: 'Share your feeling about this work order',
+                      hintStyle: TextStyles.bodyMedium.copyWith(
+                        color: AppColors.secondary200,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: AppColors.secondary400),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary500,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                const SizedBox(height: AppDimens.spaceLg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyles.bodyMedium.copyWith(
+                          color: AppColors.secondary400,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppDimens.spaceSm),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary500,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.spaceMd,
+                          vertical: 10,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Rating submitted successfully! Thank you.',
+                            ),
+                            backgroundColor: AppColors.success500,
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Submit',
+                        style: TextStyles.bodyMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Survey submitted successfully! Thank you.'),
-                    backgroundColor: AppColors.success500,
-                  ),
-                );
-              },
-              child: const Text(
-                'Submit',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showComplaintDialog(BuildContext context, WorkOrder wo) {
-    final complaintController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimens.boraSm),
-        ),
-        title: Text(
-          'Submit Complaint',
-          style: TextStyles.title.copyWith(
-            color: AppColors.error500,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Please describe your issue below:',
-              style: TextStyles.bodyLarge,
-            ),
-            const SizedBox(height: AppDimens.spaceSm),
-            TextField(
-              controller: complaintController,
-              maxLines: 4,
-              style: TextStyles.bodyLarge,
-              decoration: InputDecoration(
-                hintText: 'Enter your complaint details here...',
-                hintStyle: TextStyle(color: AppColors.secondary200),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                  borderSide: const BorderSide(color: AppColors.error200),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.secondary400),
+              ],
             ),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error500,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimens.boraSm),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Complaint submitted successfully. We will review it shortly.',
-                  ),
-                  backgroundColor: AppColors.error500,
-                ),
-              );
-            },
-            child: const Text('Submit', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+        ),
       ),
     );
   }

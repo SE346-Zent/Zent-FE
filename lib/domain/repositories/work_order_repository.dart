@@ -10,6 +10,11 @@ abstract class WorkOrderRepository {
   Future<void> refuseWorkOrder(String id, RefuseWorkOrderRequest request);
   Future<void> approveRefusal(String id, ApproveRefusalRequest request);
   Future<void> denyRefusal(String id);
+  Future<void> changeAppointment(String id, DateTime newDate);
+  Future<void> reassignWorkOrder(String id, String newTechnicianId);
+  Future<void> cancelWorkOrder(String id, String? reason);
+  Future<List<Map<String, dynamic>>> getTechnicians();
+  Future<void> assignWorkOrder(String id, String technicianId);
   Future<List<WorkOrder>> getWorkOrders({
     int page = 1,
     int limit = 20,

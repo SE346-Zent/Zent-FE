@@ -26,6 +26,11 @@ abstract class WorkOrderRemoteDataSource {
   Future<void> approveRefusal(String id, ApproveRefusalRequest request);
   Future<void> denyRefusal(String id);
   Future<List<WorkOrderModel>> getActiveRepairs(String customerId);
+  Future<void> changeAppointment(String id, DateTime newDate);
+  Future<void> reassignWorkOrder(String id, String newTechnicianId);
+  Future<void> cancelWorkOrder(String id, String? reason);
+  Future<List<Map<String, dynamic>>> getTechnicians();
+  Future<void> assignWorkOrder(String id, String technicianId);
 }
 
 class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
@@ -64,13 +69,16 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     String? province,
     String? technicianId,
   }) async {
-    final queryParameters = {
-      'page': page.toString(),
-      'limit': limit.toString(),
-      ?role: role,
-      ?province: province,
-      'technician_id': technicianId,
-    };
+    final queryParameters = <String, String>{};
+    if (role != null && role.isNotEmpty) {
+      queryParameters['role'] = role;
+    }
+    if (province != null && province.isNotEmpty) {
+      queryParameters['province'] = province;
+    }
+    if (technicianId != null && technicianId.isNotEmpty) {
+      queryParameters['technician_id'] = technicianId;
+    }
 
     final url = Uri.parse(
       '$_baseURL/work_orders',
@@ -286,6 +294,100 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       }
     } catch (e) {
       throw Exception('Error denying refusal: $e');
+    }
+  }
+
+  @override
+  Future<void> changeAppointment(String id, DateTime newDate) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id/change-appointment');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode({
+        'newAppointment': newDate.toUtc().toIso8601String(),
+      });
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error changing appointment: $e');
+    }
+  }
+
+  @override
+  Future<void> reassignWorkOrder(String id, String newTechnicianId) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id/reassign');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode({
+        'technicianId': newTechnicianId,
+      });
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error changing technician: $e');
+    }
+  }
+
+  @override
+  Future<void> cancelWorkOrder(String id, String? reason) async {
+  final url = Uri.parse('$_baseURL/work_orders/$id/cancel');
+  final headers = await _getHeaders();
+  final body = jsonEncode({'reason': reason}); 
+
+  final response = await client.post(url, headers: headers, body: body).timeout(_timeOut);
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    _handleErrorResponse(response);
+  }
+}
+
+  @override
+  Future<List<Map<String, dynamic>>> getTechnicians() async {
+    final url = Uri.parse('$_baseURL/users?page=1&page_size=50&role=technician');
+    try {
+      final headers = await _getHeaders();
+      final response = await client.get(url, headers: headers).timeout(_timeOut);
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final users = body['data']['users'] as List<dynamic>;
+        return users.map((u) => u as Map<String, dynamic>).toList();
+      } else {
+        _handleErrorResponse(response);
+        return [];
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error fetching technicians: $e');
+    }
+  }
+
+  @override
+  Future<void> assignWorkOrder(String id, String technicianId) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id/assign');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode({'technicianId': technicianId});
+
+      final response = await client.post(url, headers: headers, body: body).timeout(_timeOut);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error assigning work order: $e');
     }
   }
 

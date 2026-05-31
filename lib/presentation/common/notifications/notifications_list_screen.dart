@@ -244,7 +244,7 @@ class _NotificationsListScreenContentState
                         );
                       } else {
                         context.pushNamed(
-                          RouteNames.adminWorkOrderDetails,
+                          RouteNames.adminAssignWorkOrder,
                           pathParameters: {'workOrderId': workOrderId},
                         );
                       }

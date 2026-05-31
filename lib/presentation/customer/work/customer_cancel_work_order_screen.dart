@@ -190,6 +190,8 @@ class _CustomerCancelWorkOrderContent extends StatelessWidget {
   }
 
   Widget _buildBottomButton(BuildContext context) {
+    final viewModel = context.watch<CustomerCancelWorkOrderViewModel>();
+
     return Container(
       padding: const EdgeInsets.fromLTRB(
         AppDimens.spaceLg,
@@ -208,20 +210,53 @@ class _CustomerCancelWorkOrderContent extends StatelessWidget {
             boxShadow: [BoxShadowStyles.raised],
           ),
           child: ElevatedButton(
-            onPressed: () {
-              context.pop();
-            },
+            onPressed: viewModel.isLoading
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    
+                    final success = await viewModel.submitCancel();
+                    
+                    if (!context.mounted) return;
+
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Work order cancelled successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      context.pop(true);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: ${viewModel.errorMessage}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error500,
+              disabledBackgroundColor: AppColors.error200,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimens.boraSm),
               ),
             ),
-            child: Text(
-              'Confirm Cancellation',
-              style: TextStyles.title.copyWith(color: Colors.white),
-            ),
+            child: viewModel.isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                : Text(
+                    'Confirm Cancellation',
+                    style: TextStyles.title.copyWith(color: Colors.white),
+                  ),
           ),
         ),
       ),

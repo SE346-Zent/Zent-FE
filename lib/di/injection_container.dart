@@ -21,6 +21,7 @@ import '../domain/usecases/auth/verify_otp_usecase.dart';
 import '../domain/usecases/auth/resend_otp_usecase.dart';
 import '../domain/usecases/auth/forgot_password_usecase.dart';
 import '../domain/usecases/auth/verify_forgot_otp_usecase.dart';
+import '../domain/usecases/work_order/reassign_work_order_usecase.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
@@ -29,6 +30,10 @@ import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
 import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../domain/usecases/work_order/approve_refusal_usecase.dart';
 import '../domain/usecases/work_order/deny_refusal_usecase.dart';
+import '../domain/usecases/work_order/change_appointment_usecase.dart';
+import '../domain/usecases/work_order/cancel_work_order_usecase.dart';
+import '../domain/usecases/work_order/assign_work_order_usecase.dart';
+import '../domain/usecases/work_order/get_technicians_usecase.dart';
 import '../domain/usecases/product/get_my_products_usecase.dart';
 import '../domain/repositories/product_repository.dart';
 import '../data/repositories/product_repository_impl.dart';
@@ -57,9 +62,10 @@ import '../presentation/admin/dashboard/viewmodels/admin_dashboard_viewmodel.dar
 import '../presentation/admin/dashboard/viewmodels/admin_notifications_viewmodel.dart';
 import '../presentation/admin/reports/viewmodels/admin_reports_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/operational_queue_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/assign_work_order_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/assigned_work_order_detail_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/view_schedule_viewmodel.dart';
+import '../presentation/admin/queue/viewmodels/change_appointment_viewmodel.dart';
 import '../presentation/admin/queue/viewmodels/reassign_work_order_viewmodel.dart';
 import '../presentation/admin/rejections/viewmodels/rejected_work_orders_viewmodel.dart';
 import '../presentation/admin/rejections/viewmodels/rejection_detail_viewmodel.dart';
@@ -121,6 +127,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => ApproveRefusalUseCase(sl()));
   sl.registerLazySingleton(() => DenyRefusalUseCase(sl()));
+  sl.registerLazySingleton(() => ChangeAppointmentUseCase(repository: sl()));
+  sl.registerLazySingleton(() => ReassignWorkOrderUseCase(repository: sl()));
+  sl.registerLazySingleton(() => CancelWorkOrderUseCase(repository: sl()));
+  sl.registerLazySingleton(() => GetTechniciansUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AssignWorkOrderUseCase(repository: sl()));
 
   // Notification Use Cases
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
@@ -154,10 +165,14 @@ Future<void> init() async {
       getCurrentUserUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => WorkOrderDetailViewModel());
+  sl.registerFactory(() => AssignWorkOrderViewModel(
+        getTechniciansUseCase: sl(),
+        assignWorkOrderUseCase: sl(),
+      ));
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
   sl.registerFactory(() => ViewScheduleViewModel());
-  sl.registerFactory(() => ReassignWorkOrderViewModel());
+  sl.registerFactory(() => ReassignWorkOrderViewModel(reassignWorkOrderUseCase: sl()));
+  sl.registerFactory(() => ChangeAppointmentViewModel(changeAppointmentUseCase: sl()));
   sl.registerFactory(
     () => RejectedWorkOrdersViewModel(
       getManyWorkOrdersUseCase: sl(),
@@ -201,7 +216,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
   );
-  sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
+  sl.registerFactory(() => CustomerCancelWorkOrderViewModel(cancelWorkOrderUseCase: sl()));
   sl.registerFactory(() => DetailedChatViewModel());
   sl.registerFactory(() => DeviceRegistrationViewModel());
   sl.registerFactory(() => PartsViewModel());

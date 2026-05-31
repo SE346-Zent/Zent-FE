@@ -107,7 +107,7 @@ class _RequestServiceReviewScreenState
         emailVal: emailCtrl.text,
         phoneVal: phoneCtrl.text,
         countryVal: vm.country,
-        provinceVal: vm.province,
+        wardVal: vm.ward,
         cityVal: vm.city,
         addressVal: vm.address,
         buildingVal: vm.building,
@@ -125,7 +125,7 @@ class _RequestServiceReviewScreenState
         emailVal: vm.email,
         phoneVal: vm.phone,
         countryVal: vm.country,
-        provinceVal: vm.province,
+        wardVal: vm.ward,
         cityVal: vm.city,
         addressVal: addressCtrl.text,
         buildingVal: buildingCtrl.text,
@@ -388,14 +388,14 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'Province',
-                  value: viewModel.province,
-                  items: viewModel.provinces
+                  label: 'Ward',
+                  value: viewModel.ward,
+                  items: viewModel.wards
                       .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateProvince(v);
+                      viewModel.updateWard(v);
                     }
                   },
                   isRequired: true,

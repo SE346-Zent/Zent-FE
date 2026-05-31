@@ -50,7 +50,7 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   // Step 3 Data: Address Info
   String? country = 'Vietnam';
-  String? province;
+  String? ward;
   String? city;
   String? address;
   String? building;
@@ -72,11 +72,11 @@ class RequestServiceViewModel extends ChangeNotifier {
   }
 
   final List<String> countries = ['Vietnam'];
-  final List<String> provinces = [];
-  final Map<String, List<String>> _citiesByProvince = {};
+  final List<String> wards = [];
+  final Map<String, List<String>> _citiesByWard = {};
 
   Future<void> loadLocationData() async {
-    if (provinces.isNotEmpty) return;
+    if (wards.isNotEmpty) return;
 
     try {
       final String response = await rootBundle.loadString(
@@ -84,31 +84,31 @@ class RequestServiceViewModel extends ChangeNotifier {
       );
       final List<dynamic> data = json.decode(response);
 
-      provinces.clear();
-      _citiesByProvince.clear();
+      wards.clear();
+      _citiesByWard.clear();
 
       for (var item in data) {
-        final provinceName = item['name'] as String;
+        final wardName = item['name'] as String;
         final citiesList = (item['cities'] as List)
             .map((e) => e.toString())
             .toList();
 
-        provinces.add(provinceName);
-        _citiesByProvince[provinceName] = citiesList;
+        wards.add(wardName);
+        _citiesByWard[wardName] = citiesList;
       }
 
       notifyListeners();
     } catch (e) {
-      debugPrint("Lỗi tải file địa giới hành chính: $e");
+      debugPrint("Error loading location data: $e");
     }
   }
 
   List<String> get availableCities =>
-      province != null ? (_citiesByProvince[province!] ?? []) : [];
+      ward != null ? (_citiesByWard[ward!] ?? []) : [];
 
-  void updateProvince(String newProvince) {
-    if (province != newProvince) {
-      province = newProvince;
+  void updateWard(String newWard) {
+    if (ward != newWard) {
+      ward = newWard;
       city = null;
       notifyListeners();
     }
@@ -119,7 +119,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Selected service type (old - keeping for compatibility)
+  // Selected service type
   String? selectedServiceId;
 
   final List<ServiceTypeData> serviceTypes = [
@@ -156,7 +156,6 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   void initContactInfo() {
     loadLocationData();
-    // Auto-fill from logged-in user if not set
     final user = sl<AuthViewModel>().currentUser;
     if (user != null) {
       if (firstName == null || firstName!.isEmpty) {
@@ -174,7 +173,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     String? emailVal,
     String? phoneVal,
     String? countryVal,
-    String? provinceVal,
+    String? wardVal,
     String? cityVal,
     String? addressVal,
     String? buildingVal,
@@ -184,7 +183,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     email = emailVal;
     phone = phoneVal;
     country = countryVal;
-    province = provinceVal;
+    ward = wardVal;
     city = cityVal;
     address = addressVal;
     building = buildingVal;
@@ -374,14 +373,14 @@ class RequestServiceViewModel extends ChangeNotifier {
       }
 
       String finalCity = city ?? '';
-      String finalProvince = province ?? '';
+      String finalWard = ward ?? '';
 
       // Map full names to short codes for Backend
-      if (finalProvince.contains('Hồ Chí Minh')) {
-        finalProvince = 'HCM';
+      if (finalWard.contains('Hồ Chí Minh')) {
+        finalWard = 'HCM';
         finalCity = 'HCM';
-      } else if (finalProvince.contains('Hà Nội')) {
-        finalProvince = 'HN';
+      } else if (finalWard.contains('Hà Nội')) {
+        finalWard = 'HN';
         finalCity = 'HN';
       }
 
@@ -400,7 +399,7 @@ class RequestServiceViewModel extends ChangeNotifier {
         referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
             ? ticketRef
             : null,
-        province: finalProvince,
+        ward: finalWard,
         workOrderSymptomId: symptomId,
       );
 
@@ -430,7 +429,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     email = null;
     phone = null;
     country = 'Vietnam';
-    province = null;
+    ward = null;
     city = null;
     address = null;
     building = null;

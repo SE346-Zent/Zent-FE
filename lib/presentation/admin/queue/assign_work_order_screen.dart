@@ -9,17 +9,18 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
-import 'viewmodels/work_order_detail_viewmodel.dart';
+import 'viewmodels/assign_work_order_viewmodel.dart';
+import 'viewmodels/change_appointment_viewmodel.dart';
 
-class WorkOrderDetailScreen extends StatelessWidget {
+class AssignWorkOrderScreen extends StatelessWidget {
   final String workOrderId;
 
-  const WorkOrderDetailScreen({super.key, required this.workOrderId});
+  const AssignWorkOrderScreen({super.key, required this.workOrderId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<WorkOrderDetailViewModel>()..initData(workOrderId),
+      create: (_) => di.sl<AssignWorkOrderViewModel>()..initData(workOrderId),
       child: _WorkOrderDetailScreenContent(),
     );
   }
@@ -148,9 +149,60 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
+  void _showChangeAppointmentDialog(BuildContext context, String workOrderId, AssignWorkOrderViewModel mainViewModel) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary500,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate == null) return;
+    if (!context.mounted) return;
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime == null) return; 
+    final newAppointment = DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    );
+    if (!context.mounted) return;
+    final changeApptVM = di.sl<ChangeAppointmentViewModel>();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Changing appointment...')),
+    );
+    final success = await changeApptVM.submitNewAppointment(workOrderId, newAppointment);
+    if (!context.mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Appointment changed successfully!'), backgroundColor: Colors.green),
+      );
+      mainViewModel.initData(workOrderId); 
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${changeApptVM.errorMessage}'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<WorkOrderDetailViewModel>();
+    final viewModel = context.watch<AssignWorkOrderViewModel>();
 
     return Scaffold(
       backgroundColor: AppColors.background500,
@@ -166,7 +218,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                 onPressed: () => context.pop(),
               ),
               title: Text(
-                'Work Order Detail',
+                'Assign',
                 style: TextStyles.headline.copyWith(
                   color: AppColors.primary500,
                 ),
@@ -264,6 +316,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                       child: _buildInfoCard(
                         Icons.location_on_outlined,
                         viewModel.location,
+                        null,
                       ),
                     ),
                     const SizedBox(width: AppDimens.spaceMd),
@@ -271,6 +324,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                       child: _buildInfoCard(
                         Icons.calendar_today_outlined,
                         viewModel.time,
+                        () => _showChangeAppointmentDialog(context, viewModel.orderId.replaceAll('#', ''), viewModel),
                       ),
                     ),
                   ],
@@ -293,16 +347,24 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               ),
               const SizedBox(height: AppDimens.spaceXs),
               Text(
-                'Assign the best-fit specialist based on proximity and experties',
+                'Assign the best-fit specialist based on proximity and expertise',
                 style: TextStyles.bodyMedium.copyWith(
                   color: AppColors.secondary500,
                 ),
               ),
 
               const SizedBox(height: AppDimens.spaceLg),
-              ...viewModel.technicians.map(
-                (t) => _buildTechnicianCard(context, t),
-              ),
+              if (viewModel.isLoadingTechs)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(AppDimens.spaceLg),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                ...viewModel.technicians.map(
+                  (t) => _buildTechnicianCard(context, viewModel, t),
+                ),
             ],
           ),
         ),
@@ -310,41 +372,47 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimens.spaceSm,
-        vertical: AppDimens.spaceMd,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        boxShadow: [BoxShadowStyles.raised],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              color: AppColors.surface600,
-              borderRadius: BorderRadius.circular(AppDimens.boraSm),
+  Widget _buildInfoCard(IconData icon, String text, VoidCallback? onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.spaceSm,
+          vertical: AppDimens.spaceMd,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+          boxShadow: [BoxShadowStyles.raised],
+          border: onTap != null ? Border.all(color: AppColors.secondary100) : null,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6.0),
+              decoration: BoxDecoration(
+                color: AppColors.surface600,
+                borderRadius: BorderRadius.circular(AppDimens.boraSm),
+              ),
+              child: Icon(icon, color: AppColors.secondary400, size: 22),
             ),
-            child: Icon(icon, color: AppColors.secondary400, size: 22),
-          ),
-          const SizedBox(width: 8.0),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyles.label.copyWith(color: Colors.black),
+            const SizedBox(width: 8.0),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyles.label.copyWith(color: Colors.black),
+              ),
             ),
-          ),
-        ],
+            if (onTap != null)
+              const Icon(Icons.edit, size: 16, color: AppColors.primary500),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildTechnicianCard(BuildContext context, Map<String, dynamic> data) {
+  Widget _buildTechnicianCard(BuildContext context, AssignWorkOrderViewModel viewModel, Map<String, dynamic> data) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -436,7 +504,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     onPressed: () {
                       context.pushNamed(
                         'adminViewSchedule',
-                        pathParameters: {'techId': 'TECH-9999'},
+                        pathParameters: {'techId': data['id'] ?? 'TECH-9999'},
                       );
                     },
                     style: OutlinedButton.styleFrom(
@@ -471,7 +539,38 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     boxShadow: [BoxShadowStyles.glowing],
                   ),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: viewModel.isAssigning
+                        ? null
+                        : () async {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Assigning technician...')),
+                            );
+
+                            final success = await viewModel.submitAssign(data['id']);
+
+                            if (!context.mounted) return;
+
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Technician assigned successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              final cleanId = viewModel.orderId.replaceAll('#', '');
+                              context.pushReplacementNamed(
+                                RouteNames.adminAssignedWorkOrderDetails,
+                                pathParameters: {'workOrderId': cleanId},
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: ${viewModel.errorMessage}'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.tertiary500,
                       elevation: 0,
@@ -484,10 +583,16 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppDimens.boraSm),
                       ),
                     ),
-                    child: Text(
-                      'Assign',
-                      style: TextStyles.middle.copyWith(color: Colors.white),
-                    ),
+                    child: viewModel.isAssigning
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text(
+                            'Assign',
+                            style: TextStyles.middle.copyWith(color: Colors.white),
+                          ),
                   ),
                 ),
               ),

@@ -21,7 +21,7 @@ import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
 import '../presentation/admin/dashboard/admin_dashboard_screen.dart';
 import '../presentation/admin/queue/operational_queue_screen.dart';
-import '../presentation/admin/queue/work_order_detail_screen.dart';
+import '../presentation/admin/queue/assign_work_order_screen.dart';
 import '../presentation/admin/queue/assigned_work_order_detail_screen.dart';
 import '../presentation/admin/rejections/rejected_work_orders_screen.dart';
 import '../presentation/admin/rejections/rejection_detail_screen.dart';
@@ -344,12 +344,12 @@ final GoRouter appRouter = GoRouter(
               },
               routes: [
                 GoRoute(
-                  name: RouteNames.adminWorkOrderDetails,
-                  path: Routes.adminWorkOrderDetails,
+                  name: RouteNames.adminAssignWorkOrder,
+                  path: Routes.adminAssignWorkOrder,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) {
                     final id = state.pathParameters['workOrderId'] ?? '';
-                    return WorkOrderDetailScreen(workOrderId: id);
+                    return AssignWorkOrderScreen(workOrderId: id);
                   },
                 ),
                 GoRoute(

@@ -11,7 +11,7 @@ class CreateWorkOrderRequest {
   final String? phoneNumber;
   final String productId;
   final String? referenceTicketId;
-  final String province;
+  final String ward;
   final int workOrderSymptomId;
 
   CreateWorkOrderRequest({
@@ -27,7 +27,7 @@ class CreateWorkOrderRequest {
     this.phoneNumber,
     required this.productId,
     this.referenceTicketId,
-    required this.province,
+    required this.ward,
     required this.workOrderSymptomId,
   });
 
@@ -45,7 +45,7 @@ class CreateWorkOrderRequest {
       'phone_number': phoneNumber,
       'product_id': productId,
       'reference_ticket_id': referenceTicketId,
-      'province': province,
+      'ward': ward,
       'work_order_symptom_id': workOrderSymptomId,
     };
   }

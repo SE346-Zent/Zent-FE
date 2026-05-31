@@ -269,9 +269,11 @@ Future<void> init() async {
   sl.registerFactory(() => PartsViewModel(getPartCatalogUseCase: sl()));
   sl.registerFactory(() => NotificationsViewModel());
 
-  // Tech ViewModels
   sl.registerFactory(
-    () => TechnicianHomeViewModel(getManyWorkOrdersUseCase: sl()),
+    () => TechnicianHomeViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
   );
   sl.registerFactory(
     () => TechWorkOrderViewModel(

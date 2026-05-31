@@ -25,6 +25,8 @@ class _RequestServiceContactScreenState
   final TextEditingController addressCtrl = TextEditingController();
   final TextEditingController buildingCtrl = TextEditingController();
 
+  int _lastStep = -1;
+
   bool get isNextEnabled {
     final vm = context.read<RequestServiceViewModel>();
     return firstNameCtrl.text.isNotEmpty &&
@@ -39,7 +41,6 @@ class _RequestServiceContactScreenState
   void initState() {
     super.initState();
     final vm = context.read<RequestServiceViewModel>();
-    vm.initContactInfo();
 
     firstNameCtrl.text = vm.firstName ?? '';
     lastNameCtrl.text = vm.lastName ?? '';
@@ -52,6 +53,26 @@ class _RequestServiceContactScreenState
     lastNameCtrl.addListener(_onTextChanged);
     emailCtrl.addListener(_onTextChanged);
     addressCtrl.addListener(_onTextChanged);
+
+    _initAsync(vm);
+  }
+
+  Future<void> _initAsync(RequestServiceViewModel vm) async {
+    await vm.initContactInfo();
+    if (mounted) {
+      if (firstNameCtrl.text.isEmpty && (vm.firstName ?? '').isNotEmpty) {
+        firstNameCtrl.text = vm.firstName!;
+      }
+      if (lastNameCtrl.text.isEmpty && (vm.lastName ?? '').isNotEmpty) {
+        lastNameCtrl.text = vm.lastName!;
+      }
+      if (emailCtrl.text.isEmpty && (vm.email ?? '').isNotEmpty) {
+        emailCtrl.text = vm.email!;
+      }
+      if (phoneCtrl.text.isEmpty && (vm.phone ?? '').isNotEmpty) {
+        phoneCtrl.text = vm.phone!;
+      }
+    }
   }
 
   void _onTextChanged() => setState(() {});
@@ -85,6 +106,17 @@ class _RequestServiceContactScreenState
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<RequestServiceViewModel>();
+
+    // Sync from draft when this step becomes active
+    if (viewModel.currentStep == 3 && _lastStep != 3) {
+      _lastStep = 3;
+      firstNameCtrl.text = viewModel.firstName ?? '';
+      lastNameCtrl.text = viewModel.lastName ?? '';
+      emailCtrl.text = viewModel.email ?? '';
+      phoneCtrl.text = viewModel.phone ?? '';
+      addressCtrl.text = viewModel.address ?? '';
+      buildingCtrl.text = viewModel.building ?? '';
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -205,7 +237,7 @@ class _RequestServiceContactScreenState
           const SizedBox(height: AppDimens.spaceMd),
 
           CustomerDropdownField<String>(
-            label: 'City',
+            label: 'Ward',
             value: viewModel.city,
             items: viewModel.availableCities
                 .map((c) => DropdownMenuItem(value: c, child: Text(c)))

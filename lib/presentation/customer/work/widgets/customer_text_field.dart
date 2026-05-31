@@ -68,7 +68,9 @@ class CustomerTextField extends StatelessWidget {
 
         Container(
           decoration: BoxDecoration(
-            color: readOnly ? AppColors.secondary50 : AppColors.surface100,
+            color: (readOnly && onTap == null)
+                ? AppColors.secondary50
+                : AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary200, width: 1.0),
             boxShadow: [BoxShadowStyles.subtle],
@@ -83,7 +85,9 @@ class CustomerTextField extends StatelessWidget {
             keyboardType: keyboardType,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
-              color: readOnly ? AppColors.secondary200 : AppColors.primary500,
+              color: (readOnly && onTap == null)
+                  ? AppColors.secondary200
+                  : AppColors.primary500,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,

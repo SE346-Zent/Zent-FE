@@ -131,6 +131,18 @@ class TechSidebar extends StatelessWidget {
                         context.goNamed(RouteNames.techPartSearch);
                       },
                     ),
+                    SidebarMenuItem(
+                      title: "Work Order History",
+                      icon: const Icon(
+                        Icons.history,
+                        color: AppColors.primary500,
+                      ),
+                      isActive: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.goNamed(RouteNames.techWorkOrderHistory);
+                      },
+                    ),
                     const SizedBox(height: AppDimens.spaceSm),
                     Container(height: 1.0, color: AppColors.secondary50),
                     const SizedBox(height: AppDimens.spaceMd),

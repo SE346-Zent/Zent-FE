@@ -50,6 +50,7 @@ class DiagnosticSection extends StatelessWidget {
             isMultiline: true,
             height: 300,
             labelColor: AppColors.secondary400,
+            enabled: !viewModel.isReadOnly,
           ),
         ],
       ),

@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
+import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
+import 'package:zent_fe/di/injection_container.dart';
 
 class TaskChecklistItem {
   final String title;
@@ -16,23 +23,46 @@ class WorkOrderArtifact {
 
 class TechWorkOrderDetailsViewModel extends ChangeNotifier {
   final String workOrderId;
+  final GetSingleWorkOrderUseCase getSingleWorkOrderUseCase;
+  final SharedPreferences sharedPreferences;
 
-  TechWorkOrderDetailsViewModel({required this.workOrderId}) {
-    // Initialize with mock data
+  WorkOrder? workOrder;
+  bool _isLoading = true;
+  bool get isLoading => _isLoading;
+
+  TechWorkOrderDetailsViewModel({
+    required this.workOrderId,
+    required this.getSingleWorkOrderUseCase,
+    required this.sharedPreferences,
+  }) {
     _loadDetails();
   }
 
-  final String _jobName = "Laptop Repair";
-  String get jobName => _jobName;
+  String get jobName => workOrder?.title ?? "Laptop Repair";
+  String get status {
+    if (workOrder == null) return "In Progress";
+    switch (workOrder!.status) {
+      case WorkOrderStatus.pending:
+        return "Pending";
+      case WorkOrderStatus.inProg:
+        return "In Progress";
+      case WorkOrderStatus.complete:
+        return "Complete";
+      case WorkOrderStatus.rejectInReview:
+        return "Reject In Review";
+      case WorkOrderStatus.rejected:
+        return "Rejected";
+    }
+  }
 
-  final String _status = "In Progress";
-  String get status => _status;
+  String get customerName => workOrder?.customerName ?? "John Doe";
+  String get customerAddress =>
+      workOrder?.addressString ?? "123 Hoa Binh, Quan Tan Phu, TPHCM";
 
-  final String _customerName = "John Doe";
-  String get customerName => _customerName;
-
-  final String _customerAddress = "123 Hoa Binh, Quan Tan Phu, TPHCM";
-  String get customerAddress => _customerAddress;
+  String get displayWorkOrderNum =>
+      (workOrder?.workOrderNum != null && workOrder!.workOrderNum.isNotEmpty)
+      ? workOrder!.workOrderNum
+      : workOrderId;
 
   // Timer state
   final int _hours = 12;
@@ -45,17 +75,32 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier {
 
   // Checklist state
   final List<TaskChecklistItem> _checklist = [
-    TaskChecklistItem(title: "Check valid serial number", isCompleted: true),
+    TaskChecklistItem(title: "Post-Repair Cosmetic Check", isCompleted: false),
+    TaskChecklistItem(title: "AC adapter/battery charging", isCompleted: false),
     TaskChecklistItem(
-      title: "Use tester to check the status",
-      isCompleted: true,
+      title: "Lan Port/Wifi/WWAN/Bluetooth",
+      isCompleted: false,
     ),
+    TaskChecklistItem(title: "LCD touch/rotate/flip test", isCompleted: false),
     TaskChecklistItem(
-      title: "Use tester to check the status",
+      title: "LCD Lid open/close degree check no flickering",
+      isCompleted: false,
+    ),
+    TaskChecklistItem(title: "No part Replacement", isCompleted: false),
+    TaskChecklistItem(
+      title: "Speaker/Audio jack/Webcam/Microphone",
       isCompleted: false,
     ),
     TaskChecklistItem(
-      title: "Use tester to check the status",
+      title: "Update latest BIOS/FW/Driver",
+      isCompleted: false,
+    ),
+    TaskChecklistItem(
+      title: "Update MTM/SN/UUID/Product Name",
+      isCompleted: false,
+    ),
+    TaskChecklistItem(
+      title: "USB & I/O Ports/SD Slot/Sim Slot",
       isCompleted: false,
     ),
   ];
@@ -73,24 +118,53 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier {
 
   List<WorkOrderArtifact> get artifacts => _artifacts;
 
-  void _loadDetails() {
-    // In a real app, fetch data from repository using workOrderId
+  Future<void> _loadChecklistFromLocal() async {
+    final key = "details_checklist_${workOrderId.replaceAll('#', '')}";
+    final savedList = sharedPreferences.getStringList(key);
+    if (savedList != null) {
+      for (int i = 0; i < _checklist.length && i < savedList.length; i++) {
+        _checklist[i].isCompleted = savedList[i] == 'true';
+      }
+    }
+  }
+
+  Future<void> _saveChecklistToLocal() async {
+    final key = "details_checklist_${workOrderId.replaceAll('#', '')}";
+    final listToSave = _checklist
+        .map((item) => item.isCompleted.toString())
+        .toList();
+    await sharedPreferences.setStringList(key, listToSave);
+  }
+
+  Future<void> _loadDetails() async {
+    _isLoading = true;
     notifyListeners();
+    try {
+      final cleanId = workOrderId.replaceAll('#', '');
+      workOrder = await getSingleWorkOrderUseCase.execute(cleanId);
+      await _loadChecklistFromLocal();
+    } catch (e) {
+      debugPrint("Error loading work order: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void toggleTask(int index) {
     if (index >= 0 && index < _checklist.length) {
       _checklist[index].isCompleted = !_checklist[index].isCompleted;
+      _saveChecklistToLocal();
       notifyListeners();
     }
   }
 
   void onNavigatePressed() {
-    debugPrint("action triggered: Navigate to $_customerAddress");
+    debugPrint("action triggered: Navigate to $customerAddress");
   }
 
   void onContactPressed() {
-    debugPrint("action triggered: Contact $_customerName");
+    debugPrint("action triggered: Contact $customerName");
   }
 
   void onPausePressed() {
@@ -99,5 +173,80 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier {
 
   void onFillFormPressed(BuildContext context) {
     debugPrint("action triggered: Fill Form");
+  }
+
+  // Start Job with Geofencing
+  Future<void> startJob(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      // 1. Get current GPS location
+      final pos = await _getCurrentLocation();
+      final lat = pos?.latitude ?? 10.7769; // Fallback to HCM
+      final lng = pos?.longitude ?? 106.7009;
+
+      // 2. Call Start Job API
+      final repo = sl<WorkOrderRepositoryImpl>();
+      final cleanId = workOrderId.replaceAll('#', '');
+      await repo.startWorkOrder(cleanId, lat, lng);
+
+      // 3. Refresh work order details
+      await _loadDetails();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Job started successfully!')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Start Job Failed'),
+            content: Text(
+              'Geofencing / Verification Error:\n\n${e.toString().replaceAll('Exception: ', '')}\n\nYou must be within 2 km of the address to start this job.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Position?> _getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return null;
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return null;
+      }
+
+      if (permission == LocationPermission.deniedForever) return null;
+
+      try {
+        return await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeLimit: Duration(seconds: 5),
+          ),
+        );
+      } catch (_) {
+        return null;
+      }
+    } catch (_) {
+      return null;
+    }
   }
 }

@@ -22,6 +22,7 @@ class ServiceActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+      constraints: const BoxConstraints(minHeight: 88.0),
       decoration: BoxDecoration(
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
@@ -59,22 +60,27 @@ class ServiceActionCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppDimens.spaceMd),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyles.title.copyWith(
-                          color: AppColors.secondary500,
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 60.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyles.title.copyWith(
+                            color: AppColors.secondary500,
+                          ),
                         ),
-                      ),
-                      Text(
-                        subtitle,
-                        style: TextStyles.bodyLarge.copyWith(
-                          color: AppColors.secondary500,
+                        const SizedBox(height: 2.0),
+                        Text(
+                          subtitle,
+                          style: TextStyles.bodyLarge.copyWith(
+                            color: AppColors.secondary500,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppDimens.spaceSm),

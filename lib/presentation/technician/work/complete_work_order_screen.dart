@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
-import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/complete_work_order_viewmodel.dart';
@@ -37,42 +36,102 @@ class _CompleteWorkOrderContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<CompleteWorkOrderViewModel>();
 
+    // Show verification error popup if any
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (viewModel.photoUploadError != null) {
+        final err = viewModel.photoUploadError;
+        viewModel.clearPhotoUploadError();
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Verification Failed'),
+            content: Text(
+              'The captured image failed EXIF & Geofencing verification:\n\n$err\n\nPlease capture the image while physically present at the work order site.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            AccountHeader(
-              title: "Complete Work Order",
-              subtitle: "${viewModel.workOrderId} • 12h30 AM",
-              showDivider: true,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: viewModel.currentStep == 4
-                    ? const NeverScrollableScrollPhysics()
-                    : null,
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    StepIndicator(
-                      currentStep: viewModel.currentStep,
-                      totalSteps: CompleteWorkOrderViewModel.totalSteps,
+            Column(
+              children: [
+                AccountHeader(
+                  title: "Complete Work Order",
+                  subtitle:
+                      "${viewModel.workOrderNum.isNotEmpty ? viewModel.workOrderNum : viewModel.workOrderId} • 12h30 AM",
+                  showDivider: true,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: viewModel.currentStep == 4
+                        ? const NeverScrollableScrollPhysics()
+                        : null,
+                    padding: const EdgeInsets.all(AppDimens.spaceMd),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        StepIndicator(
+                          currentStep: viewModel.currentStep,
+                          totalSteps: CompleteWorkOrderViewModel.totalSteps,
+                        ),
+                        const SizedBox(height: AppDimens.spaceMd),
+                        _buildStepContent(viewModel),
+                        const SizedBox(height: AppDimens.spaceLg),
+                      ],
                     ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    _buildStepContent(viewModel),
-                    const SizedBox(height: AppDimens.spaceLg),
-                  ],
+                  ),
+                ),
+                StepNavigationButtons(
+                  currentStep: viewModel.currentStep,
+                  totalSteps: CompleteWorkOrderViewModel.totalSteps,
+                  onBackPressed: () => _onBackPressed(context, viewModel),
+                  onNextPressed: () => _onNextPressed(context, viewModel),
+                ),
+              ],
+            ),
+            if (viewModel.isPhotoUploading || viewModel.isLoading)
+              Container(
+                color: Colors.black38,
+                child: Center(
+                  child: Card(
+                    margin: const EdgeInsets.all(32),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primary500,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            viewModel.isPhotoUploading
+                                ? "Verifying EXIF & GPS Location..."
+                                : "Submitting Completion Report...",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            StepNavigationButtons(
-              currentStep: viewModel.currentStep,
-              totalSteps: CompleteWorkOrderViewModel.totalSteps,
-              onBackPressed: () => _onBackPressed(context, viewModel),
-              onNextPressed: () => _onNextPressed(context, viewModel),
-            ),
           ],
         ),
       ),
@@ -110,6 +169,7 @@ class _CompleteWorkOrderContent extends StatelessWidget {
           maxPhotosPosition: MaxPhotosPosition.below,
           onPhotoAdded: (path) => viewModel.addPhoto(path, 'pre'),
           onPhotoRemoved: (index) => viewModel.removePhoto(index, 'pre'),
+          isReadOnly: viewModel.isReadOnly,
         ),
       ],
     );
@@ -132,6 +192,7 @@ class _CompleteWorkOrderContent extends StatelessWidget {
           maxPhotosPosition: MaxPhotosPosition.inline,
           onPhotoAdded: (path) => viewModel.addPhoto(path, 'during'),
           onPhotoRemoved: (index) => viewModel.removePhoto(index, 'during'),
+          isReadOnly: viewModel.isReadOnly,
         ),
       ],
     );
@@ -154,49 +215,28 @@ class _CompleteWorkOrderContent extends StatelessWidget {
           maxPhotosPosition: MaxPhotosPosition.inline,
           onPhotoAdded: (path) => viewModel.addPhoto(path, 'post'),
           onPhotoRemoved: (index) => viewModel.removePhoto(index, 'post'),
+          isReadOnly: viewModel.isReadOnly,
         ),
       ],
     );
   }
 
-  /// Step 4: Checklist + Diagnostic Section
+  /// Step 4: Diagnostic Section (Checklist completed on Detailed Work screen)
   Widget _buildStep4(CompleteWorkOrderViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Verification Checklist',
-          style: TextStyles.title.copyWith(color: AppColors.primary500),
-        ),
-        const SizedBox(height: AppDimens.spaceSm),
-        ...viewModel.checklist.map((item) {
-          return CheckboxListTile(
-            title: Text(item.notes ?? '', style: TextStyles.bodyLarge),
-            value: item.result,
-            onChanged: (val) {
-              if (val != null) {
-                viewModel.toggleChecklistItem(item.id, val);
-              }
-            },
-            controlAffinity: ListTileControlAffinity.leading,
-            contentPadding: EdgeInsets.zero,
-            activeColor: AppColors.primary500,
-          );
-        }),
-        const SizedBox(height: AppDimens.spaceLg),
-        DiagnosticSection(viewModel: viewModel),
-      ],
-    );
+    return DiagnosticSection(viewModel: viewModel);
   }
 
   /// Step 5: Customer Signature
   Widget _buildStep5(CompleteWorkOrderViewModel viewModel) {
     return CustomerSignatureStep(
-      workOrderId: viewModel.workOrderId,
+      workOrderId: viewModel.workOrderNum.isNotEmpty
+          ? viewModel.workOrderNum
+          : viewModel.workOrderId,
       date: viewModel.currentDate,
       technicianName: viewModel.technicianName,
       initialPoints: viewModel.signaturePoints,
       onSignatureUpdated: viewModel.signaturePointsUpdated,
+      isReadOnly: viewModel.isReadOnly,
     );
   }
 
@@ -216,6 +256,50 @@ class _CompleteWorkOrderContent extends StatelessWidget {
     BuildContext context,
     CompleteWorkOrderViewModel viewModel,
   ) {
+    if (!viewModel.isReadOnly) {
+      if (viewModel.currentStep == 0) {
+        if (viewModel.prePhotos.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Vui lòng chụp ít nhất 1 ảnh trước tháo (Pre-disassembly)!',
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+          return;
+        }
+      }
+
+      if (viewModel.currentStep == 1) {
+        if (viewModel.duringPhotos.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Vui lòng chụp ít nhất 1 ảnh đang tháo (Disassembled)!',
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+          return;
+        }
+      }
+
+      if (viewModel.currentStep == 2) {
+        if (viewModel.postPhotos.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Vui lòng chụp ít nhất 1 ảnh hoàn thiện (Post-assembly)!',
+              ),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+          return;
+        }
+      }
+    }
+
     if (viewModel.currentStep == CompleteWorkOrderViewModel.totalSteps - 1) {
       viewModel.submitPressed(context);
     } else {

@@ -31,6 +31,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
   final MaxPhotosPosition maxPhotosPosition;
   final void Function(String path) onPhotoAdded;
   final void Function(int index) onPhotoRemoved;
+  final bool isReadOnly;
 
   const SinglePhaseEvidencePhotos({
     super.key,
@@ -42,6 +43,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
     this.maxPhotosPosition = MaxPhotosPosition.inline,
     required this.onPhotoAdded,
     required this.onPhotoRemoved,
+    this.isReadOnly = false,
   });
 
   @override
@@ -134,6 +136,25 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
 
   Widget _buildPhotoArea(BuildContext context) {
     if (photos.isEmpty) {
+      if (isReadOnly) {
+        return Container(
+          height: 100,
+          decoration: BoxDecoration(
+            color: AppColors.surface600,
+            borderRadius: BorderRadius.circular(AppDimens.boraSm),
+            border: Border.all(color: AppColors.secondary200),
+          ),
+          child: const Center(
+            child: Text(
+              "No photos captured",
+              style: TextStyle(
+                color: AppColors.secondary300,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        );
+      }
       return GestureDetector(
         onTap: () => _onOpenCamera(context),
         child: DashedBorderContainer(
@@ -151,11 +172,13 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
       );
     }
 
+    final showAddButton = !isReadOnly && (photos.length < maxPhotos);
+
     return SizedBox(
       height: 100,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: photos.length + (photos.length < maxPhotos ? 1 : 0),
+        itemCount: photos.length + (showAddButton ? 1 : 0),
         separatorBuilder: (context, index) =>
             const SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
@@ -192,21 +215,22 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(
-          top: 4,
-          right: 4,
-          child: GestureDetector(
-            onTap: () => onPhotoRemoved(index),
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(
-                color: Colors.black54,
-                shape: BoxShape.circle,
+        if (!isReadOnly)
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () => onPhotoRemoved(index),
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 16),
               ),
-              child: const Icon(Icons.close, color: Colors.white, size: 16),
             ),
           ),
-        ),
       ],
     );
   }

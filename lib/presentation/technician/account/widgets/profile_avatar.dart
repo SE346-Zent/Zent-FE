@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 // Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/avatar_utils.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -13,26 +13,9 @@ class ProfileAvatar extends StatelessWidget {
 
   const ProfileAvatar({super.key, this.imageUrl, required this.name});
 
-  String get _initials {
-    if (name.isEmpty) return 'U';
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.length > 1) {
-      return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
-    }
-    return name.substring(0, min(2, name.length)).toUpperCase();
-  }
+  String get _initials => AvatarUtils.getInitials(name);
 
-  Color get _randomColor {
-    final colors = [
-      AppColors.primary300,
-      AppColors.secondary400,
-      AppColors.tertiary400,
-      AppColors.success400,
-      AppColors.error400,
-    ];
-    final index = name.hashCode.abs() % colors.length;
-    return colors[index];
-  }
+  Color get _randomColor => AvatarUtils.getColor(name);
 
   @override
   Widget build(BuildContext context) {

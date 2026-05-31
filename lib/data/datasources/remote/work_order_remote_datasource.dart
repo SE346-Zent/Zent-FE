@@ -36,6 +36,7 @@ abstract class WorkOrderRemoteDataSource {
     String phase,
   );
   Future<Map<String, dynamic>> getWorkOrderHistory(String id);
+  Future<void> rateWorkOrder(String id, int rating, String? comment);
 }
 
 class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
@@ -444,6 +445,25 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       return jsonMap;
     } catch (e) {
       throw Exception('Error fetching work order history: $e');
+    }
+  }
+
+  @override
+  Future<void> rateWorkOrder(String id, int rating, String? comment) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id/rate');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode({'rating': rating, 'comment': comment});
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Status ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error rating work order: $e');
     }
   }
 

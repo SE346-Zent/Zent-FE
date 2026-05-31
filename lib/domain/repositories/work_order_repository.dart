@@ -30,6 +30,7 @@ abstract class WorkOrderRepository {
     String phase,
   );
   Future<Map<String, dynamic>> getWorkOrderHistory(String id);
+  Future<void> rateWorkOrder(String id, int rating, String? comment);
 
   // Drafts (Local)
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft);

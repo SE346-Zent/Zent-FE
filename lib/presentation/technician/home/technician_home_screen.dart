@@ -9,6 +9,8 @@ import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'viewmodels/technician_home_viewmodel.dart';
 import 'widgets/tech_home_header.dart';
@@ -34,8 +36,27 @@ class TechnicianHomeScreen extends StatelessWidget {
   }
 }
 
-class _TechnicianHomeContent extends StatelessWidget {
+class _TechnicianHomeContent extends StatefulWidget {
   const _TechnicianHomeContent();
+
+  @override
+  State<_TechnicianHomeContent> createState() => _TechnicianHomeContentState();
+}
+
+class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
+  bool _pendingProcessed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_pendingProcessed) {
+      _pendingProcessed = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final role = context.read<AuthViewModel>().role;
+        NotificationNavigator.processPendingNotification(context, role);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

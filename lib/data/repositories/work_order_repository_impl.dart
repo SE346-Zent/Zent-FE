@@ -109,6 +109,11 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
+  Future<void> rateWorkOrder(String id, int rating, String? comment) async {
+    return await remoteDataSource.rateWorkOrder(id, rating, comment);
+  }
+
+  @override
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft) async {
     final model = WorkOrderCompletionDraftModel.fromEntity(draft);
     await localDataSource.cacheWorkOrderDraft(model);

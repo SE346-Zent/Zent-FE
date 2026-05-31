@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import '../../../../domain/entities/notification_item.dart';
 
 class NotificationTile extends StatefulWidget {
@@ -60,19 +61,12 @@ class _NotificationTileState extends State<NotificationTile> {
             // Avatar
             Padding(
               padding: EdgeInsets.only(top: _isExpanded ? 4.0 : 0),
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      widget.notification.data?['avatarUrl'] ??
-                          'https://i.pravatar.cc/150?u=${widget.notification.notificationId}',
-                    ),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              child: UserAvatar(
+                avatarUrl: widget.notification.data?['avatarUrl'],
+                name:
+                    widget.notification.data?['senderName'] ??
+                    widget.notification.title,
+                size: 44,
               ),
             ),
             const SizedBox(width: AppDimens.spaceMd),

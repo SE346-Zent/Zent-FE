@@ -69,9 +69,11 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   static final Map<String, String> _roomPartnerNamesCache = {};
   static final Map<String, bool> _hasMoreCache = {};
   static String? _cachedUserId;
+  static String? _cachedMyName;
 
   String? currentChatId;
   String chatPartnerName = "";
+  String myName = "";
   String? currentUserId;
   bool isLoading = false;
   bool isLoadMoreLoading = false;
@@ -188,6 +190,7 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
     }
     isLoadMoreLoading = false;
     currentUserId = _cachedUserId;
+    myName = _cachedMyName ?? "";
     notifyListeners();
 
     try {
@@ -195,6 +198,8 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
       if (currentUserId == null) {
         final user = await getCurrentUserUseCase.execute();
         currentUserId = user?.id;
+        myName = user?.name ?? user?.email ?? "Me";
+        _cachedMyName = myName;
         debugPrint(
           "DetailedChatViewModel init: user loaded -> email: ${user?.email}, id: ${user?.id}",
         );
@@ -256,9 +261,10 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
 
       // Convert fetched messages to UI messages
       messages = fetchedMessages.reversed.map((msg) {
-        final parsedDt =
-            ChatMessage.parseDateTime(msg.createdAt) ?? DateTime.now();
-        final formattedTime = DateFormat('HH:mm').format(parsedDt.toLocal());
+        final parsedDt = ChatMessage.parseDateTime(msg.createdAt);
+        final formattedTime = parsedDt != null
+            ? DateFormat('HH:mm').format(parsedDt.toLocal())
+            : '';
         return ChatMessage(
           id: msg.id,
           text: msg.content ?? "",
@@ -266,7 +272,7 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
           time: formattedTime,
           imageUrl: msg.imageUrl,
           isSeen: _isMe(msg.senderId) && msg.readBy.any((id) => !_isMe(id)),
-          dateTime: parsedDt,
+          dateTime: parsedDt ?? DateTime.fromMillisecondsSinceEpoch(0),
         );
       }).toList();
 

@@ -111,6 +111,7 @@ class ChatService extends ChangeNotifier {
   bool get isConnecting => _isConnecting;
 
   String? _currentViewingRoomId;
+  String? get currentViewingRoomId => _currentViewingRoomId;
 
   static final String _baseURL = dotenv.get("BASE_URL");
 

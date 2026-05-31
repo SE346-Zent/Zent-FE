@@ -31,6 +31,7 @@ import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
 import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../domain/usecases/work_order/approve_refusal_usecase.dart';
 import '../domain/usecases/work_order/deny_refusal_usecase.dart';
+import '../domain/usecases/work_order/rate_work_order_usecase.dart';
 import '../domain/usecases/user/get_users_usecase.dart';
 import '../domain/usecases/product/get_my_products_usecase.dart';
 import '../domain/repositories/product_repository.dart';
@@ -137,6 +138,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => ApproveRefusalUseCase(sl()));
   sl.registerLazySingleton(() => DenyRefusalUseCase(sl()));
+  sl.registerLazySingleton(() => RateWorkOrderUseCase(sl()));
 
   // User Use Cases
   sl.registerLazySingleton(() => GetUsersUseCase(sl()));
@@ -232,7 +234,7 @@ Future<void> init() async {
   );
   sl.registerFactory(() => CustomerProfileViewModel(sl(), sl()));
   sl.registerFactory(() => PersonalInfoViewModel(sl()));
-  sl.registerFactory(() => ServiceViewModel());
+  sl.registerFactory(() => ServiceViewModel(getCurrentUserUseCase: sl()));
   sl.registerFactory(() => ChatViewModel(chatService: sl()));
   sl.registerFactory(
     () => CustomerSecurityViewModel(getLoginHistoryUseCase: sl()),
@@ -313,6 +315,7 @@ Future<void> init() async {
     () => WorkOrdersHistoryViewModel(
       getManyWorkOrdersUseCase: sl(),
       getCurrentUserUseCase: sl(),
+      rateWorkOrderUseCase: sl(),
     ),
   );
   sl.registerFactoryParam<DetailedHistoryViewModel, String, void>(

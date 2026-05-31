@@ -5,16 +5,19 @@ import '../../../../domain/entities/user.dart';
 import '../../../../domain/entities/enums/user_roles.dart';
 import '../../../../domain/entities/enums/work_order_status.dart';
 import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../../../../domain/usecases/work_order/rate_work_order_usecase.dart';
 import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 
 class WorkOrdersHistoryViewModel extends ChangeNotifier
     with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;
+  final RateWorkOrderUseCase rateWorkOrderUseCase;
 
   WorkOrdersHistoryViewModel({
     required this.getManyWorkOrdersUseCase,
     required this.getCurrentUserUseCase,
+    required this.rateWorkOrderUseCase,
   });
 
   User? currentUser;
@@ -83,6 +86,24 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier
     notifyListeners();
   }
 
+  Future<bool> rateWorkOrder(
+    String workOrderId,
+    int rating,
+    String? comment,
+  ) async {
+    try {
+      await rateWorkOrderUseCase.execute(
+        workOrderId: workOrderId,
+        rating: rating,
+        comment: comment,
+      );
+      return true;
+    } catch (e) {
+      debugPrint('Error rating work order: $e');
+      return false;
+    }
+  }
+
   void setFilterIndex(int index) {
     selectedFilterIndex = index;
     _applyFilters();
@@ -142,13 +163,15 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier
       }
     }
 
-    // 2. Search query filtering (matches workOrderNum case-insensitive)
+    // 2. Search query filtering (matches workOrderNum, customerName, productName, title)
     if (searchQuery.isNotEmpty) {
       final query = searchQuery.trim().toLowerCase();
       filtered = filtered.where(
         (wo) =>
             wo.workOrderNum.toLowerCase().contains(query) ||
-            wo.title.toLowerCase().contains(query),
+            wo.title.toLowerCase().contains(query) ||
+            wo.customerName.toLowerCase().contains(query) ||
+            (wo.productName?.toLowerCase().contains(query) ?? false),
       );
     }
 

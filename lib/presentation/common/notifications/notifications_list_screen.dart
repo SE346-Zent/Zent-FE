@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
-import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
 
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -12,7 +12,6 @@ import 'package:zent_fe/domain/entities/notification_item.dart';
 import 'viewmodels/notifications_viewmodel.dart';
 import 'widgets/notification_tile.dart';
 import '../auth/auth_view_model.dart';
-import '../../../domain/entities/enums/user_roles.dart';
 
 class NotificationsListScreen extends StatelessWidget {
   const NotificationsListScreen({super.key});
@@ -223,41 +222,8 @@ class _NotificationsListScreenContentState
               onTap: () {
                 viewModel.markAsRead(item.notificationId);
 
-                // Handle navigation based on notification data and user role
-                final data = item.data;
-                if (data != null) {
-                  final workOrderId =
-                      (data['workOrderId'] ??
-                              data['id'] ??
-                              data['work_order_id'])
-                          ?.toString();
-
-                  if (workOrderId != null) {
-                    final category = item.categoryName.toLowerCase();
-                    final role = context.read<AuthViewModel>().role;
-
-                    if (role == UserRoles.admin) {
-                      if (category.contains('reject')) {
-                        context.pushNamed(
-                          RouteNames.adminRejectionDetail,
-                          pathParameters: {'id': workOrderId},
-                        );
-                      } else {
-                        context.pushNamed(
-                          RouteNames.adminWorkOrderDetails,
-                          pathParameters: {'workOrderId': workOrderId},
-                        );
-                      }
-                    } else if (role == UserRoles.technician) {
-                      context.pushNamed(
-                        RouteNames.techWorkOrderDetails,
-                        pathParameters: {'workOrderId': workOrderId},
-                      );
-                    } else if (role == UserRoles.customer) {
-                      context.pushNamed(RouteNames.customerActiveRepairs);
-                    }
-                  }
-                }
+                final role = context.read<AuthViewModel>().role;
+                NotificationNavigator.navigate(context, item, role);
               },
             ),
           ),

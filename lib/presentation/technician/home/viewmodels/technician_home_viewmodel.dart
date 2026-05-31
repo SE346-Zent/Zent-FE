@@ -30,7 +30,9 @@ class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
     this.getCurrentUserUseCase,
   });
 
-  String get userName => sl<AuthViewModel>().currentUser?.name ?? 'Technician';
+  String? _fetchedUserName;
+  String get userName =>
+      _fetchedUserName ?? sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
   final int _jobsDone = 10;
   int get jobsDone => _jobsDone;
@@ -49,6 +51,13 @@ class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
 
     try {
       final user = await getCurrentUserUseCase?.execute();
+      if (user != null) {
+        _fetchedUserName = user.name.isNotEmpty ? user.name : user.email;
+        if (sl<AuthViewModel>().currentUser == null) {
+          sl<AuthViewModel>().setLoggedInUser(user);
+        }
+      }
+
       if (user != null && getManyWorkOrdersUseCase != null) {
         final results = await getManyWorkOrdersUseCase!.execute(
           technicianId: user.id,

@@ -5,12 +5,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
 import 'package:zent_fe/routing/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:zent_fe/presentation/common/core/ui/chat_banner_listener.dart';
 
 // 1. Create a GlobalKey to control SnackBars from anywhere
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
@@ -59,7 +62,42 @@ Future<void> main() async {
             '@mipmap/ic_launcher',
           ), // Use your app icon
         );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // Handle foreground notification tap
+        final payload = response.payload;
+        if (payload != null && payload.isNotEmpty) {
+          developer.log('Foreground notification tapped: $payload');
+          try {
+            // First decode the Map string representation (which is not valid JSON)
+            // But actually we serialized it as: payload: jsonEncode(message.data)
+            // Let's just pass it as jsonDecode(payload)
+            final dynamic decoded = jsonDecode(payload);
+            if (decoded is Map<String, dynamic>) {
+              // We need to make sure the categoryName is carried over if it's not in the payload
+              NotificationNavigator.savePendingNotification(decoded);
+            }
+          } catch (e) {
+            developer.log('Error parsing foreground notification payload: $e');
+            // Fallback for old naive format if it wasn't JSON encoded
+            try {
+              final data = <String, dynamic>{};
+              final cleaned = payload.replaceAll('{', '').replaceAll('}', '');
+              for (final pair in cleaned.split(', ')) {
+                final kv = pair.split(': ');
+                if (kv.length == 2) {
+                  data[kv[0].trim()] = kv[1].trim();
+                }
+              }
+              if (data.isNotEmpty) {
+                NotificationNavigator.savePendingNotification(data);
+              }
+            } catch (_) {}
+          }
+        }
+      },
+    );
 
     // 4. Create the channel on the device
     await flutterLocalNotificationsPlugin
@@ -79,6 +117,7 @@ Future<void> main() async {
 
   try {
     _setupForegroundMessaging();
+    _setupNotificationTapHandler();
     fetchInstallationId();
   } catch (e) {
     developer.log("Foreground messaging initialization failed: $e");
@@ -95,11 +134,24 @@ void _setupForegroundMessaging() {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
 
+    // If it's a chat message, let the WebSocket banner handle it
+    final isChatMessage =
+        message.data.containsKey('room_id') ||
+        message.data.containsKey('roomId') ||
+        (message.data.containsKey('payload') &&
+            message.data['payload'].toString().contains('room_id'));
+    if (isChatMessage) {
+      developer.log(
+        'Suppressing native FCM banner because it is a chat message handled by in-app banner',
+      );
+      return;
+    }
+
     // If the message has a notification and we are on Android
     if (notification != null && android != null) {
       developer.log('Triggering native Android foreground banner');
 
-      // Trigger the native system notification instead of a SnackBar
+      // Use jsonEncode so we can properly parse it in onDidReceiveNotificationResponse
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
@@ -110,13 +162,35 @@ void _setupForegroundMessaging() {
             channel.name,
             channelDescription: channel.description,
             icon: '@mipmap/ic_launcher',
-            // These two properties force the heads-up banner
             importance: Importance.max,
             priority: Priority.high,
           ),
         ),
+        payload: message.data.isNotEmpty ? jsonEncode(message.data) : null,
       );
     }
+  });
+}
+
+/// Handle notification taps when app is opened from background/killed state.
+/// Saves notification data for deferred navigation after app is fully loaded.
+void _setupNotificationTapHandler() {
+  // App was opened by tapping a notification (killed state)
+  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+    if (message != null) {
+      developer.log(
+        'App opened from killed state via notification: ${message.data}',
+      );
+      NotificationNavigator.savePendingNotification(message.data);
+    }
+  });
+
+  // App was in background, user tapped notification
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    developer.log(
+      'App opened from background via notification: ${message.data}',
+    );
+    NotificationNavigator.processNotificationDataDirectly(message.data);
   });
 }
 
@@ -174,6 +248,9 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
         routerConfig: appRouter,
+        builder: (context, child) {
+          return ChatBannerListener(child: child ?? const SizedBox.shrink());
+        },
       ),
     );
   }

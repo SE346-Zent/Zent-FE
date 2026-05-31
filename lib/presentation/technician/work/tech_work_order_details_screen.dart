@@ -136,7 +136,7 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -165,7 +165,7 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),

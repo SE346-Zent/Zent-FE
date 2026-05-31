@@ -149,7 +149,11 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
-  void _showChangeAppointmentDialog(BuildContext context, String workOrderId, AssignWorkOrderViewModel mainViewModel) async {
+  void _showChangeAppointmentDialog(
+    BuildContext context,
+    String workOrderId,
+    AssignWorkOrderViewModel mainViewModel,
+  ) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -158,9 +162,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary500,
-            ),
+            colorScheme: ColorScheme.light(primary: AppColors.primary500),
           ),
           child: child!,
         );
@@ -173,7 +175,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (pickedTime == null) return; 
+    if (pickedTime == null) return;
     final newAppointment = DateTime(
       pickedDate.year,
       pickedDate.month,
@@ -183,19 +185,28 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
     if (!context.mounted) return;
     final changeApptVM = di.sl<ChangeAppointmentViewModel>();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Changing appointment...')),
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Changing appointment...')));
+    final success = await changeApptVM.submitNewAppointment(
+      workOrderId,
+      newAppointment,
     );
-    final success = await changeApptVM.submitNewAppointment(workOrderId, newAppointment);
     if (!context.mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Appointment changed successfully!'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Appointment changed successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
-      mainViewModel.initData(workOrderId); 
+      mainViewModel.initData(workOrderId);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${changeApptVM.errorMessage}'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Error: ${changeApptVM.errorMessage}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -324,7 +335,11 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                       child: _buildInfoCard(
                         Icons.calendar_today_outlined,
                         viewModel.time,
-                        () => _showChangeAppointmentDialog(context, viewModel.orderId.replaceAll('#', ''), viewModel),
+                        () => _showChangeAppointmentDialog(
+                          context,
+                          viewModel.orderId.replaceAll('#', ''),
+                          viewModel,
+                        ),
                       ),
                     ),
                   ],
@@ -384,7 +399,9 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
           boxShadow: [BoxShadowStyles.raised],
-          border: onTap != null ? Border.all(color: AppColors.secondary100) : null,
+          border: onTap != null
+              ? Border.all(color: AppColors.secondary100)
+              : null,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,7 +429,11 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTechnicianCard(BuildContext context, AssignWorkOrderViewModel viewModel, Map<String, dynamic> data) {
+  Widget _buildTechnicianCard(
+    BuildContext context,
+    AssignWorkOrderViewModel viewModel,
+    Map<String, dynamic> data,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -543,21 +564,30 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                         ? null
                         : () async {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Assigning technician...')),
+                              const SnackBar(
+                                content: Text('Assigning technician...'),
+                              ),
                             );
 
-                            final success = await viewModel.submitAssign(data['id']);
+                            final success = await viewModel.submitAssign(
+                              data['id'],
+                            );
 
                             if (!context.mounted) return;
 
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Technician assigned successfully!'),
+                                  content: Text(
+                                    'Technician assigned successfully!',
+                                  ),
                                   backgroundColor: Colors.green,
                                 ),
                               );
-                              final cleanId = viewModel.orderId.replaceAll('#', '');
+                              final cleanId = viewModel.orderId.replaceAll(
+                                '#',
+                                '',
+                              );
                               context.pushReplacementNamed(
                                 RouteNames.adminAssignedWorkOrderDetails,
                                 pathParameters: {'workOrderId': cleanId},
@@ -565,7 +595,9 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Error: ${viewModel.errorMessage}'),
+                                  content: Text(
+                                    'Error: ${viewModel.errorMessage}',
+                                  ),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -587,11 +619,16 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           )
                         : Text(
                             'Assign',
-                            style: TextStyles.middle.copyWith(color: Colors.white),
+                            style: TextStyles.middle.copyWith(
+                              color: Colors.white,
+                            ),
                           ),
                   ),
                 ),

@@ -13,18 +13,21 @@ class OperationalQueueJobCard extends StatelessWidget {
 
   const OperationalQueueJobCard({super.key, required this.job});
 
-  Future<void> _handleNavigation(BuildContext context, String actionType) async {
+  Future<void> _handleNavigation(
+    BuildContext context,
+    String actionType,
+  ) async {
     final cleanId = job['id'].toString().replaceAll('#', '');
     final statusEnum = job['statusEnum'].toString();
 
     if (statusEnum == 'unassigned') {
       await context.pushNamed(
-        RouteNames.adminAssignWorkOrder, 
+        RouteNames.adminAssignWorkOrder,
         pathParameters: {'workOrderId': cleanId},
       );
     } else {
       await context.pushNamed(
-        RouteNames.adminAssignedWorkOrderDetails, 
+        RouteNames.adminAssignedWorkOrderDetails,
         pathParameters: {'workOrderId': cleanId},
       );
     }
@@ -38,14 +41,15 @@ class OperationalQueueJobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final String statusEnum = job['statusEnum'].toString();
     final bool isUnassigned = statusEnum == 'unassigned';
-    
-    final String assigneeName = job['assignee']; 
-    
-    final Color dotColor = (statusEnum == 'unassigned' || statusEnum == 'pending_acceptance') 
-        ? AppColors.warning500 
+
+    final String assigneeName = job['assignee'];
+
+    final Color dotColor =
+        (statusEnum == 'unassigned' || statusEnum == 'pending_acceptance')
+        ? AppColors.warning500
         : (statusEnum == 'reject_in_review' || statusEnum == 'rejected')
-            ? AppColors.error500
-            : AppColors.primary500; 
+        ? AppColors.error500
+        : AppColors.primary500;
 
     return Material(
       color: Colors.transparent,
@@ -56,7 +60,7 @@ class OperationalQueueJobCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            boxShadow: [BoxShadowStyles.raised], 
+            boxShadow: [BoxShadowStyles.raised],
           ),
           clipBehavior: Clip.antiAlias,
           child: IntrinsicHeight(
@@ -86,13 +90,19 @@ class OperationalQueueJobCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: AppDimens.spaceSm),
-                        
+
                         _buildIconTextRow(Icons.person_outline, assigneeName),
                         const SizedBox(height: 4.0),
-                        _buildIconTextRow(Icons.location_on_outlined, job['location']),
+                        _buildIconTextRow(
+                          Icons.location_on_outlined,
+                          job['location'],
+                        ),
                         const SizedBox(height: 4.0),
-                        _buildIconTextRow(Icons.calendar_today_outlined, job['time']),
-                        
+                        _buildIconTextRow(
+                          Icons.calendar_today_outlined,
+                          job['time'],
+                        ),
+
                         const SizedBox(height: AppDimens.spaceMd),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,21 +126,30 @@ class OperationalQueueJobCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            
-                            if (statusEnum == 'unassigned' || statusEnum == 'pending_acceptance')
+
+                            if (statusEnum == 'unassigned' ||
+                                statusEnum == 'pending_acceptance')
                               ElevatedButton(
-                                onPressed: () => _handleNavigation(context, 'button_tap'),
+                                onPressed: () =>
+                                    _handleNavigation(context, 'button_tap'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary500, 
+                                  backgroundColor: AppColors.primary500,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimens.boraSm,
+                                    ),
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 0,
+                                  ),
                                   minimumSize: const Size(0, 36),
                                 ),
                                 child: Text(
                                   isUnassigned ? 'Assign' : 'Detail',
-                                  style: TextStyles.middle.copyWith(color: Colors.white),
+                                  style: TextStyles.middle.copyWith(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                           ],
@@ -155,7 +174,9 @@ class OperationalQueueJobCard extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary500),
+            style: TextStyles.bodyMedium.copyWith(
+              color: AppColors.secondary500,
+            ),
           ),
         ),
       ],

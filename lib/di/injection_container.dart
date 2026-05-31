@@ -66,7 +66,7 @@ import '../presentation/admin/work/viewmodels/operational_queue_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/assign_work_order_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/assigned_work_order_detail_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/view_schedule_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/change_appointment_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/change_appointment_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/reassign_work_order_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/rejected_work_orders_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/rejection_detail_viewmodel.dart';
@@ -171,14 +171,20 @@ Future<void> init() async {
       getCurrentUserUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => AssignWorkOrderViewModel(
-        getTechniciansUseCase: sl(),
-        assignWorkOrderUseCase: sl(),
-      ));
+  sl.registerFactory(
+    () => AssignWorkOrderViewModel(
+      getTechniciansUseCase: sl(),
+      assignWorkOrderUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
   sl.registerFactory(() => ViewScheduleViewModel());
-  sl.registerFactory(() => ReassignWorkOrderViewModel(reassignWorkOrderUseCase: sl()));
-  sl.registerFactory(() => ChangeAppointmentViewModel(changeAppointmentUseCase: sl()));
+  sl.registerFactory(
+    () => ReassignWorkOrderViewModel(reassignWorkOrderUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => ChangeAppointmentViewModel(changeAppointmentUseCase: sl()),
+  );
   sl.registerFactory(
     () => RejectedWorkOrdersViewModel(
       getManyWorkOrdersUseCase: sl(),
@@ -222,7 +228,9 @@ Future<void> init() async {
   sl.registerFactory(
     () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
   );
-  sl.registerFactory(() => CustomerCancelWorkOrderViewModel(cancelWorkOrderUseCase: sl()));
+  sl.registerFactory(
+    () => CustomerCancelWorkOrderViewModel(cancelWorkOrderUseCase: sl()),
+  );
   sl.registerFactory(
     () => DetailedChatViewModel(chatService: sl(), getCurrentUserUseCase: sl()),
   );

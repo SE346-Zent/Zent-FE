@@ -333,9 +333,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     final url = Uri.parse('$_baseURL/work_orders/$id/reassign');
     try {
       final headers = await _getHeaders();
-      final body = jsonEncode({
-        'technicianId': newTechnicianId,
-      });
+      final body = jsonEncode({'technicianId': newTechnicianId});
 
       final response = await client
           .post(url, headers: headers, body: body)
@@ -352,22 +350,28 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
 
   @override
   Future<void> cancelWorkOrder(String id, String? reason) async {
-  final url = Uri.parse('$_baseURL/work_orders/$id/cancel');
-  final headers = await _getHeaders();
-  final body = jsonEncode({'reason': reason}); 
+    final url = Uri.parse('$_baseURL/work_orders/$id/cancel');
+    final headers = await _getHeaders();
+    final body = jsonEncode({'reason': reason});
 
-  final response = await client.post(url, headers: headers, body: body).timeout(_timeOut);
-  if (response.statusCode < 200 || response.statusCode >= 300) {
-    _handleErrorResponse(response);
+    final response = await client
+        .post(url, headers: headers, body: body)
+        .timeout(_timeOut);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      _handleErrorResponse(response);
+    }
   }
-}
 
   @override
   Future<List<Map<String, dynamic>>> getTechnicians() async {
-    final url = Uri.parse('$_baseURL/users?page=1&page_size=50&role=technician');
+    final url = Uri.parse(
+      '$_baseURL/users?page=1&page_size=50&role=technician',
+    );
     try {
       final headers = await _getHeaders();
-      final response = await client.get(url, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -390,7 +394,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       final headers = await _getHeaders();
       final body = jsonEncode({'technicianId': technicianId});
 
-      final response = await client.post(url, headers: headers, body: body).timeout(_timeOut);
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
       if (response.statusCode < 200 || response.statusCode >= 300) {
         _handleErrorResponse(response);
       }

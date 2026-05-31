@@ -29,7 +29,7 @@ class OperationalQueueViewModel extends ChangeNotifier {
     if (_activeTabIndex != index) {
       _activeTabIndex = index;
       notifyListeners();
-      loadWorkOrders(); 
+      loadWorkOrders();
     }
   }
 
@@ -89,7 +89,7 @@ class OperationalQueueViewModel extends ChangeNotifier {
 
   List<Map<String, dynamic>> get currentJobs {
     final List<Map<String, dynamic>> jobs = _allWorkOrders.map((wo) {
-      String backendStatus = wo.status.name; 
+      String backendStatus = wo.status.name;
       String uiStatusEnum = '';
       String statusDisplay = '';
       bool isAssigned = false;
@@ -135,7 +135,8 @@ class OperationalQueueViewModel extends ChangeNotifier {
         if (wo.technicianName != null && wo.technicianName!.isNotEmpty) {
           assigneeText = wo.technicianName!;
         } else {
-          assigneeText = 'Tech (ID: ${wo.technicianId.isNotEmpty ? wo.technicianId.substring(0,4) : 'N/A'})';
+          assigneeText =
+              'Tech (ID: ${wo.technicianId.isNotEmpty ? wo.technicianId.substring(0, 4) : 'N/A'})';
         }
       }
 
@@ -153,13 +154,28 @@ class OperationalQueueViewModel extends ChangeNotifier {
 
     switch (_activeTabIndex) {
       case 1: // Assigned
-        return jobs.where((j) => j['isAssigned'] == true && j['statusEnum'] != 'completed' && j['statusEnum'] != 'rejected').toList();
+        return jobs
+            .where(
+              (j) =>
+                  j['isAssigned'] == true &&
+                  j['statusEnum'] != 'completed' &&
+                  j['statusEnum'] != 'rejected',
+            )
+            .toList();
       case 2: // Unassigned
         return jobs.where((j) => j['statusEnum'] == 'unassigned').toList();
       case 3: // Completed
-        return jobs.where((j) => j['statusEnum'] == 'completed' || j['statusEnum'] == 'rejected').toList();
+        return jobs
+            .where(
+              (j) =>
+                  j['statusEnum'] == 'completed' ||
+                  j['statusEnum'] == 'rejected',
+            )
+            .toList();
       case 4: // Rejections
-        return jobs.where((j) => j['statusEnum'] == 'reject_in_review').toList();
+        return jobs
+            .where((j) => j['statusEnum'] == 'reject_in_review')
+            .toList();
       case 0: // All Jobs
       default:
         return jobs;

@@ -1,4 +1,4 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../../../domain/usecases/work_order/change_appointment_usecase.dart';
 
 class ChangeAppointmentViewModel extends ChangeNotifier {
@@ -9,14 +9,17 @@ class ChangeAppointmentViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  Future<bool> submitNewAppointment(String workOrderId, DateTime newDate) async {
+  Future<bool> submitNewAppointment(
+    String workOrderId,
+    DateTime newDate,
+  ) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
 
     try {
       await changeAppointmentUseCase.execute(workOrderId, newDate);
-      
+
       isLoading = false;
       notifyListeners();
       return true;
@@ -24,7 +27,7 @@ class ChangeAppointmentViewModel extends ChangeNotifier {
       errorMessage = e.toString().replaceAll('Exception: ', '');
       isLoading = false;
       notifyListeners();
-      return false; 
+      return false;
     }
   }
 }

@@ -88,11 +88,16 @@ class TrackingCard extends StatelessWidget {
                                   final result = await context.pushNamed(
                                     RouteNames.customerCancelWorkOrder,
                                     pathParameters: {
-                                      'workOrderId': workOrder.id.replaceAll('#', ''), 
+                                      'workOrderId': workOrder.id.replaceAll(
+                                        '#',
+                                        '',
+                                      ),
                                     },
                                   );
                                   if (result == true && context.mounted) {
-                                    context.read<ActiveRepairsViewModel>().fetchWorkOrders();
+                                    context
+                                        .read<ActiveRepairsViewModel>()
+                                        .fetchWorkOrders();
                                   }
                                 },
                               ),

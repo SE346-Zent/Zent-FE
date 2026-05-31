@@ -5,7 +5,7 @@ import 'package:zent_fe/domain/repositories/work_order_repository.dart';
 
 class ReassignWorkOrderViewModel extends ChangeNotifier {
   final ReassignWorkOrderUseCase reassignWorkOrderUseCase;
-  
+
   String _orderId = '';
   String get orderId => _orderId;
 
@@ -29,10 +29,11 @@ class ReassignWorkOrderViewModel extends ChangeNotifier {
     try {
       final repo = sl<WorkOrderRepository>();
       final realTechs = await repo.getTechnicians();
-      
+
       technicians = realTechs;
     } catch (e) {
-      errorMessage = 'Error loading technicians: ${e.toString().replaceAll('Exception: ', '')}';
+      errorMessage =
+          'Error loading technicians: ${e.toString().replaceAll('Exception: ', '')}';
     } finally {
       isLoading = false;
       notifyListeners();
@@ -47,12 +48,13 @@ class ReassignWorkOrderViewModel extends ChangeNotifier {
     try {
       final cleanId = _orderId.replaceAll('#', '');
       await reassignWorkOrderUseCase.execute(cleanId, newTechnicianId);
-      
+
       isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      errorMessage = 'Error submitting reassignment: ${e.toString().replaceAll('Exception: ', '')}';
+      errorMessage =
+          'Error submitting reassignment: ${e.toString().replaceAll('Exception: ', '')}';
       isLoading = false;
       notifyListeners();
       return false;

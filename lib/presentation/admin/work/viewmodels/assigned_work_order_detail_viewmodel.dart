@@ -21,7 +21,7 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier {
     'rating': 5.0,
   };
 
-  bool _isRejectInReview = false; 
+  bool _isRejectInReview = false;
   bool get isRejectInReview => _isRejectInReview;
 
   bool _isLoading = false;
@@ -35,26 +35,31 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier {
     try {
       final repo = sl<WorkOrderRepository>();
       final cleanId = id.replaceAll('#', '');
-      
+
       final workOrder = await repo.getWorkOrderDetail(id: cleanId);
 
       symptom = workOrder.symptomName ?? 'N/A';
       description = workOrder.description;
       location = workOrder.addressString;
-      
-      time = DateFormat('MMM dd, yyyy - hh:mm a').format(workOrder.createdAt.toLocal());
-      techAssignedTime = DateFormat('MMM dd, hh:mm a').format(workOrder.updatedAt.toLocal());
+
+      time = DateFormat(
+        'MMM dd, yyyy - hh:mm a',
+      ).format(workOrder.createdAt.toLocal());
+      techAssignedTime = DateFormat(
+        'MMM dd, hh:mm a',
+      ).format(workOrder.updatedAt.toLocal());
       final backendStatus = workOrder.status.name;
       _isRejectInReview = backendStatus == 'rejectInReview';
 
       technician = {
         'id': workOrder.technicianId,
-        'name': (workOrder.technicianName != null && workOrder.technicianName!.isNotEmpty) 
-            ? workOrder.technicianName 
+        'name':
+            (workOrder.technicianName != null &&
+                workOrder.technicianName!.isNotEmpty)
+            ? workOrder.technicianName
             : 'Tech (ID: ${workOrder.technicianId.substring(0, 4)})',
         'rating': 5.0,
       };
-
     } catch (e) {
       debugPrint("Lỗi lấy chi tiết đơn hàng: $e");
     } finally {

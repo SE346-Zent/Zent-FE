@@ -214,9 +214,9 @@ class _CustomerCancelWorkOrderContent extends StatelessWidget {
                 ? null
                 : () async {
                     FocusScope.of(context).unfocus();
-                    
+
                     final success = await viewModel.submitCancel();
-                    
+
                     if (!context.mounted) return;
 
                     if (success) {

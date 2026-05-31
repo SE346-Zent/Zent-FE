@@ -74,9 +74,8 @@ class WorkOrderModel extends WorkOrder {
           json['workOrderNum'] as String? ??
           '',
       addressString: _buildAddress(json),
-      symptomName: 
-          json['symptomName'] as String? ?? 
-          json['symptom_name'] as String?,
+      symptomName:
+          json['symptomName'] as String? ?? json['symptom_name'] as String?,
       status: _parseStatus(
         json['work_order_status_id'] ??
             json['status_id'] ??
@@ -186,7 +185,7 @@ class WorkOrderModel extends WorkOrder {
         return WorkOrderStatus.pending;
       }
       if (s == 'inprogress' || s == 'assigned' || s == 'inprog') {
-        return WorkOrderStatus.inProg;
+        return WorkOrderStatus.assigned;
       }
       if (s == 'complete' || s == 'completed' || s == 'closed') {
         return WorkOrderStatus.complete;

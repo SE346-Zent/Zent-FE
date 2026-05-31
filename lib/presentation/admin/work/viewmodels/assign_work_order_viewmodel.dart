@@ -5,7 +5,10 @@ import '../../../../domain/usecases/work_order/assign_work_order_usecase.dart';
 class AssignWorkOrderViewModel extends ChangeNotifier {
   final GetTechniciansUseCase getTechniciansUseCase;
   final AssignWorkOrderUseCase assignWorkOrderUseCase;
-  AssignWorkOrderViewModel({required this.getTechniciansUseCase, required this.assignWorkOrderUseCase});
+  AssignWorkOrderViewModel({
+    required this.getTechniciansUseCase,
+    required this.assignWorkOrderUseCase,
+  });
 
   String _orderId = '';
   String get orderId => _orderId;
@@ -16,7 +19,7 @@ class AssignWorkOrderViewModel extends ChangeNotifier {
   String time = 'Oct 30, 2026 - 10h00 AM';
 
   List<Map<String, dynamic>> technicians = [];
-  
+
   bool isLoadingTechs = false;
   bool isAssigning = false;
   String? errorMessage;
@@ -34,12 +37,16 @@ class AssignWorkOrderViewModel extends ChangeNotifier {
     try {
       final realUsers = await getTechniciansUseCase.execute();
 
-      technicians = realUsers.map((user) => {
-        'id': user['id'],
-        'name': user['fullName'] ?? 'Unknown Technician',
-        'rating': 4.5,
-        'workload': 2,
-      }).toList();
+      technicians = realUsers
+          .map(
+            (user) => {
+              'id': user['id'],
+              'name': user['fullName'] ?? 'Unknown Technician',
+              'rating': 4.5,
+              'workload': 2,
+            },
+          )
+          .toList();
 
       isLoadingTechs = false;
       notifyListeners();

@@ -44,9 +44,7 @@ class TechWorkOrderViewModel extends ChangeNotifier {
     try {
       final user = await getCurrentUserUseCase.execute();
       if (user != null) {
-        final results = await getManyWorkOrdersUseCase.execute(
-          limit: 100,
-        );
+        final results = await getManyWorkOrdersUseCase.execute(limit: 100);
         // The server already filters work orders by the technician's token identity.
         _allOrders = results;
       }

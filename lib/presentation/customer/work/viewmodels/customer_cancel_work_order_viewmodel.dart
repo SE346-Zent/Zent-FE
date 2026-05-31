@@ -37,11 +37,12 @@ class CustomerCancelWorkOrderViewModel extends ChangeNotifier {
 
   Future<bool> submitCancel() async {
     if (_selectedReasonId == null && notesController.text.trim().isEmpty) {
-      errorMessage = 'Please select a reason or add comments before cancelling.';
+      errorMessage =
+          'Please select a reason or add comments before cancelling.';
       notifyListeners();
       return false;
     }
-    
+
     isLoading = true;
     errorMessage = null;
     notifyListeners();
@@ -49,18 +50,23 @@ class CustomerCancelWorkOrderViewModel extends ChangeNotifier {
     try {
       String finalReason = '';
       if (_selectedReasonId != null) {
-        final reasonObj = cancelReasons.firstWhere((r) => r['id'] == _selectedReasonId);
+        final reasonObj = cancelReasons.firstWhere(
+          (r) => r['id'] == _selectedReasonId,
+        );
         finalReason = reasonObj['title'] ?? '';
       }
-      
+
       final notes = notesController.text.trim();
       if (notes.isNotEmpty) {
         finalReason += finalReason.isEmpty ? notes : ' - $notes';
       }
 
       final cleanId = _workOrderId.replaceAll('#', '');
-      
-      await cancelWorkOrderUseCase.execute(cleanId, finalReason.isEmpty ? null : finalReason);
+
+      await cancelWorkOrderUseCase.execute(
+        cleanId,
+        finalReason.isEmpty ? null : finalReason,
+      );
 
       isLoading = false;
       notifyListeners();

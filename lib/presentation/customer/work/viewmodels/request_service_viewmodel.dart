@@ -566,7 +566,7 @@ class RequestServiceViewModel extends ChangeNotifier {
         'email': email,
         'phone': phone,
         'country': country,
-        'province': province,
+        'ward': ward,
         'city': city,
         'address': address,
         'building': building,
@@ -602,14 +602,14 @@ class RequestServiceViewModel extends ChangeNotifier {
         email = draftMap['email'] as String?;
         phone = draftMap['phone'] as String?;
         country = draftMap['country'] as String? ?? 'Vietnam';
-        province = draftMap['province'] as String?;
+        ward = draftMap['ward'] as String?;
         city = draftMap['city'] as String?;
         address = draftMap['address'] as String?;
         building = draftMap['building'] as String?;
         _currentStep = draftMap['currentStep'] as int? ?? 1;
         selectedServiceId = draftMap['selectedServiceId'] as String?;
 
-        if (province != null) {
+        if (ward != null) {
           loadLocationData();
         }
       } else {

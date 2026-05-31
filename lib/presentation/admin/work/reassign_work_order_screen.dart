@@ -98,7 +98,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppDimens.spaceLg),
-                
+
                 if (viewModel.isLoading && viewModel.technicians.isEmpty)
                   const Padding(
                     padding: EdgeInsets.only(top: 40.0),
@@ -110,7 +110,9 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'No available technicians found.',
-                        style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
                       ),
                     ),
                   )
@@ -187,7 +189,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['fullName'] ?? data['name'] ?? 'Unknown Technician', 
+                      data['fullName'] ?? data['name'] ?? 'Unknown Technician',
                       style: TextStyles.title.copyWith(color: Colors.black),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -251,7 +253,9 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                   onPressed: () {
                     context.pushNamed(
                       'adminViewSchedule',
-                      pathParameters: {'techId': data['id']?.toString() ?? 'TECH-9999'},
+                      pathParameters: {
+                        'techId': data['id']?.toString() ?? 'TECH-9999',
+                      },
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -299,14 +303,18 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                             ),
                           );
 
-                          final success = await viewModel.submitReassign(techId);
+                          final success = await viewModel.submitReassign(
+                            techId,
+                          );
 
                           if (!context.mounted) return;
 
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Technician reassigned successfully!'),
+                                content: Text(
+                                  'Technician reassigned successfully!',
+                                ),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -314,7 +322,9 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Error: ${viewModel.errorMessage}'),
+                                content: Text(
+                                  'Error: ${viewModel.errorMessage}',
+                                ),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -343,7 +353,9 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                         )
                       : Text(
                           'Assign',
-                          style: TextStyles.middle.copyWith(color: Colors.white),
+                          style: TextStyles.middle.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
                 ),
               ),

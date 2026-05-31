@@ -7,6 +7,8 @@ import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
 import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
 import 'package:zent_fe/di/injection_container.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:zent_fe/main.dart' show rootScaffoldMessengerKey;
 
 class TaskChecklistItem {
   final String title;
@@ -59,7 +61,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
   String get customerName => workOrder?.customerName ?? "John Doe";
   String get customerAddress =>
-      workOrder?.addressString ?? "123 Hoa Binh, Quan Tan Phu, TPHCM";
+      "Đường Tạ Quang Bửu, Khu phố 33, Đông Hòa, Hồ Chí Minh, Việt Nam";
 
   String get displayWorkOrderNum =>
       (workOrder?.workOrderNum != null && workOrder!.workOrderNum.isNotEmpty)
@@ -161,12 +163,43 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     }
   }
 
-  void onNavigatePressed() {
-    debugPrint("action triggered: Navigate to $customerAddress");
+  Future<void> onNavigatePressed() async {
+    final address = customerAddress;
+    if (address.isEmpty) return;
+
+    final url = Uri.parse(
+      "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}",
+    );
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint("Error launching maps: $e");
+    }
   }
 
-  void onContactPressed() {
-    debugPrint("action triggered: Contact $customerName");
+  Future<void> onContactPressed() async {
+    final phone = "0334901152";
+    if (phone.isEmpty) {
+      debugPrint("No phone number available for contact");
+      rootScaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          content: Text('No phone number available for this customer.'),
+        ),
+      );
+      return;
+    }
+
+    final url = Uri.parse("tel:${phone.replaceAll(' ', '')}");
+    try {
+      await launchUrl(url);
+    } catch (e) {
+      debugPrint("Error launching phone dialer: $e");
+      rootScaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text('Could not open phone dialer: $e'),
+        ),
+      );
+    }
   }
 
   void onPausePressed() {

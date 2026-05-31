@@ -92,6 +92,8 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
         _handleErrorResponse(response);
       }
 
+      debugPrint('=== [API Response] GET /work_orders: ${response.body} ===');
+
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<List<dynamic>>.fromJson(
         jsonMap,
@@ -126,6 +128,8 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       if (response.statusCode != 200) {
         _handleErrorResponse(response);
       }
+
+      debugPrint('=== [API Response] GET /work_orders/$id: ${response.body} ===');
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(

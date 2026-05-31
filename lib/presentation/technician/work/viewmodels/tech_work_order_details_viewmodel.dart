@@ -61,7 +61,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
   String get customerName => workOrder?.customerName ?? "John Doe";
   String get customerAddress =>
-      "Đường Tạ Quang Bửu, Khu phố 33, Đông Hòa, Hồ Chí Minh, Việt Nam";
+      workOrder?.addressString ?? "123 Hoa Binh, Quan Tan Phu, TPHCM";
 
   String get displayWorkOrderNum =>
       (workOrder?.workOrderNum != null && workOrder!.workOrderNum.isNotEmpty)
@@ -178,8 +178,8 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
   }
 
   Future<void> onContactPressed() async {
-    final phone = "0334901152";
-    if (phone.isEmpty) {
+    final phone = workOrder?.phoneNumber;
+    if (phone == null || phone.isEmpty) {
       debugPrint("No phone number available for contact");
       rootScaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(

@@ -60,6 +60,7 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   }) async {
     return await remoteDataSource.getWorkOrders(
       page: page,
@@ -67,6 +68,7 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
       role: role,
       province: province,
       technicianId: technicianId,
+      date: date,
     );
   }
 

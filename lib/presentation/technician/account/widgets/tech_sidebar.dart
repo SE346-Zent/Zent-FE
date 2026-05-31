@@ -107,18 +107,7 @@ class TechSidebar extends StatelessWidget {
                         );
                       },
                     ),
-                    SidebarMenuItem(
-                      title: "Add New Part",
-                      icon: const Icon(
-                        Icons.add_circle_outline,
-                        color: AppColors.primary500,
-                      ),
-                      isActive: false,
-                      onTap: () {
-                        Navigator.pop(context);
-                        context.goNamed(RouteNames.techAddNewPart);
-                      },
-                    ),
+
                     SidebarMenuItem(
                       title: "Part Search",
                       icon: const Icon(

@@ -403,7 +403,7 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'City',
+                  label: 'Ward',
                   value: viewModel.city,
                   items: viewModel.availableCities
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))

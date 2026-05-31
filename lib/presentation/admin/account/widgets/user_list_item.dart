@@ -8,23 +8,27 @@ import 'package:zent_fe/presentation/admin/account/viewmodels/user_management_vi
 import 'package:zent_fe/domain/entities/enums/account_status.dart';
 
 class UserListItem extends StatelessWidget {
+  final String userId;
   final String userName;
   final String userRole;
   final String? avatarUrl;
+  final String? phoneNumber;
   final VoidCallback onEditTap;
 
   const UserListItem({
     super.key,
+    required this.userId,
     required this.userName,
     required this.userRole,
     this.avatarUrl,
+    this.phoneNumber,
     required this.onEditTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Selector<UserManagementViewModel, AccountStatus>(
-      selector: (_, vm) => vm.getStatusFor(userName),
+      selector: (_, vm) => vm.getStatusForUser(userId),
       builder: (context, status, _) {
         return Container(
           width: double.infinity,

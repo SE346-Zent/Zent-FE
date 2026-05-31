@@ -7,18 +7,23 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 class UserRoleTabs extends StatelessWidget {
   final int activeIndex;
   final ValueChanged<int> onTabChanged;
+  final bool showBothTabs;
 
   const UserRoleTabs({
     super.key,
     required this.activeIndex,
     required this.onTabChanged,
+    this.showBothTabs = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final tabCount = showBothTabs ? 2 : 1;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final indicatorWidth = (constraints.maxWidth - 8.0) / 2;
+        final indicatorWidth =
+            (constraints.maxWidth - (tabCount == 1 ? 0 : 8.0)) / tabCount;
 
         return Container(
           width: double.infinity,
@@ -49,7 +54,8 @@ class UserRoleTabs extends StatelessWidget {
               Row(
                 children: [
                   _buildTab(context, title: 'Technicians', index: 0),
-                  _buildTab(context, title: 'Admin', index: 1),
+                  if (showBothTabs)
+                    _buildTab(context, title: 'Admin', index: 1),
                 ],
               ),
             ],

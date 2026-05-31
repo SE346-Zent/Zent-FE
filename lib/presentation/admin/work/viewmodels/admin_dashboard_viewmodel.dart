@@ -1,8 +1,9 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
-class AdminDashboardViewModel extends ChangeNotifier {
+class AdminDashboardViewModel extends ChangeNotifier with SafeChangeNotifier {
   final int _activeJobs = 120;
   final double _activeJobsTrend = 10.0;
   final double _overallRating = 4.64;

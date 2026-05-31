@@ -1,6 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class AdminNotificationsViewModel extends ChangeNotifier {
+class AdminNotificationsViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   final int todayCount = 3;
 
   final List<Map<String, dynamic>> todayNotifications = [

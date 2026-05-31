@@ -1,6 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
 
 class TechScheduleItem {
   final String time;
@@ -16,7 +18,11 @@ class TechScheduleItem {
   });
 }
 
-class TechnicianHomeViewModel extends ChangeNotifier {
+class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
+  final GetManyWorkOrdersUseCase? getManyWorkOrdersUseCase;
+
+  TechnicianHomeViewModel({this.getManyWorkOrdersUseCase});
+
   String get userName => sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
   final int _jobsDone = 10;

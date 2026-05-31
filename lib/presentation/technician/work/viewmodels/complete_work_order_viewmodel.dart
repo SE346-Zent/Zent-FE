@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:native_exif/native_exif.dart';
@@ -11,7 +12,8 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 
-class CompleteWorkOrderViewModel extends ChangeNotifier {
+class CompleteWorkOrderViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   bool _isDisposed = false;
 
   final String workOrderId;

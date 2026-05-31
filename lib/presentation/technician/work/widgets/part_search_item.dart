@@ -15,7 +15,6 @@ class PartSearchItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
-      height: 63.0,
       decoration: BoxDecoration(
         color: AppColors.surface100,
         borderRadius: BorderRadius.circular(AppDimens.boraSm),
@@ -27,7 +26,10 @@ class PartSearchItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimens.spaceMd,
+              vertical: 12.0,
+            ),
             child: Row(
               children: [
                 // Part Image
@@ -57,17 +59,14 @@ class PartSearchItem extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 2.0),
                       Text(
-                        'Part No: ${part.partNo}',
+                        'Part No: ${part.partNo} | Commodity: ${part.commodity}',
                         style: TextStyles.label.copyWith(
                           color: AppColors.secondary500,
                         ),
-                      ),
-                      Text(
-                        'Commodity: ${part.commodity}',
-                        style: TextStyles.label.copyWith(
-                          color: AppColors.secondary500,
-                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

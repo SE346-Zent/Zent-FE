@@ -12,6 +12,7 @@ class GetManyWorkOrdersUseCase {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   }) async {
     return await repository.getWorkOrders(
       page: page,
@@ -19,6 +20,7 @@ class GetManyWorkOrdersUseCase {
       role: role,
       province: province,
       technicianId: technicianId,
+      date: date,
     );
   }
 }

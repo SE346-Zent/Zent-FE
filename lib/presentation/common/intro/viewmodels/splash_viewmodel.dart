@@ -1,8 +1,9 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zent_fe/domain/usecases/auth/first_time_usecase.dart';
 import 'package:zent_fe/domain/repositories/auth_repository.dart';
 
-class SplashViewModel extends ChangeNotifier {
+class SplashViewModel extends ChangeNotifier with SafeChangeNotifier {
   final FirstTimeUseCase _firstTimeUseCase;
   final AuthRepository _authRepository;
 

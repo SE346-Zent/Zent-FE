@@ -56,7 +56,10 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
                       const SizedBox(height: AppDimens.spaceXl),
                       const RecoveryEmailSection(),
                       const SizedBox(height: AppDimens.spaceXl),
-                      const LoginHistorySection(),
+                      LoginHistorySection(
+                        history: viewModel.loginHistory,
+                        isLoading: viewModel.isLoadingHistory,
+                      ),
                     ],
                   ),
                 ),

@@ -1,6 +1,7 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class ViewScheduleViewModel extends ChangeNotifier {
+class ViewScheduleViewModel extends ChangeNotifier with SafeChangeNotifier {
   String _techId = '';
   String get techId => _techId;
 

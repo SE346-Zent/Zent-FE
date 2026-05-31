@@ -16,6 +16,7 @@ abstract class WorkOrderRepository {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   });
 
   Future<WorkOrder> getWorkOrderDetail({required String id});

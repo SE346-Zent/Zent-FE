@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +26,7 @@ class ServiceTypeData {
   });
 }
 
-class RequestServiceViewModel extends ChangeNotifier {
+class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   final CreateWorkOrderUseCase createWorkOrderUseCase;
 
   static const List<String> symptomsList = [
@@ -460,7 +461,7 @@ class RequestServiceViewModel extends ChangeNotifier {
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        city: finalCity,
+        ward: finalCity,
         country: country ?? 'Vietnam',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,

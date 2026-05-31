@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -59,7 +60,7 @@ class ChatMessage {
   }
 }
 
-class DetailedChatViewModel extends ChangeNotifier {
+class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ChatService chatService;
   final GetCurrentUserUseCase getCurrentUserUseCase;
 

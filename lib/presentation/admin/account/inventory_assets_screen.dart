@@ -18,7 +18,7 @@ class InventoryAssetsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<InventoryAssetsViewModel>(),
+      create: (_) => di.sl<InventoryAssetsViewModel>()..loadAssets(),
       child: const _InventoryAssetsScreenContent(),
     );
   }

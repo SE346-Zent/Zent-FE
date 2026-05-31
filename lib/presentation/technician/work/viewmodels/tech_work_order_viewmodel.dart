@@ -1,9 +1,10 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 
-class TechWorkOrderViewModel extends ChangeNotifier {
+class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;
 

@@ -23,68 +23,64 @@ class _NotificationTileState extends State<NotificationTile> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _isExpanded = !_isExpanded;
-        });
-        widget.onTap();
-      },
-      child: AnimatedSize(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 52),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimens.spaceXs,
-            vertical: AppDimens.spaceXs,
-          ),
-          child: Row(
-            crossAxisAlignment: _isExpanded
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.center,
-            children: [
-              // Unread dot
-              Padding(
-                padding: EdgeInsets.only(top: _isExpanded ? 8.0 : 0),
-                child: SizedBox(
-                  width: 14,
-                  child: Center(
-                    child: !widget.notification.isRead
-                        ? Container(
-                            width: 7,
-                            height: 7,
-                            decoration: const BoxDecoration(
-                              color: AppColors.tertiary500,
-                              shape: BoxShape.circle,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 52),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.spaceXs,
+          vertical: AppDimens.spaceXs,
+        ),
+        child: Row(
+          crossAxisAlignment: _isExpanded
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
+          children: [
+            // Unread dot
+            Padding(
+              padding: EdgeInsets.only(top: _isExpanded ? 8.0 : 0),
+              child: SizedBox(
+                width: 14,
+                child: Center(
+                  child: !widget.notification.isRead
+                      ? Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(
+                            color: AppColors.tertiary500,
+                            shape: BoxShape.circle,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ),
-              const SizedBox(width: AppDimens.spaceXs),
-              // Avatar
-              Padding(
-                padding: EdgeInsets.only(top: _isExpanded ? 4.0 : 0),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        widget.notification.data?['avatarUrl'] ??
-                            'https://i.pravatar.cc/150?u=${widget.notification.notificationId}',
-                      ),
-                      fit: BoxFit.cover,
+            ),
+            const SizedBox(width: AppDimens.spaceXs),
+            // Avatar
+            Padding(
+              padding: EdgeInsets.only(top: _isExpanded ? 4.0 : 0),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      widget.notification.data?['avatarUrl'] ??
+                          'https://i.pravatar.cc/150?u=${widget.notification.notificationId}',
                     ),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              const SizedBox(width: AppDimens.spaceMd),
-              // Content
-              Expanded(
+            ),
+            const SizedBox(width: AppDimens.spaceMd),
+            // Content — body tap navigates, NOT expand/collapse
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.onTap,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,9 +118,17 @@ class _NotificationTileState extends State<NotificationTile> {
                   ],
                 ),
               ),
-              const SizedBox(width: AppDimens.spaceSm),
-              // Expand arrow
-              Padding(
+            ),
+            const SizedBox(width: AppDimens.spaceSm),
+            // Expand arrow — only toggles expand/collapse
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              child: Padding(
                 padding: EdgeInsets.only(top: _isExpanded ? 8.0 : 0),
                 child: AnimatedRotation(
                   turns: _isExpanded ? 0.5 : 0,
@@ -136,8 +140,8 @@ class _NotificationTileState extends State<NotificationTile> {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

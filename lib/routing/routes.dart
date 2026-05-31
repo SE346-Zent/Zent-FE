@@ -43,7 +43,7 @@ abstract final class Routes {
   static const adminCreateAccount = 'admin-create-account';
   static const adminPartRequests = 'admin-part-requests';
   static const adminInventoryAssets = 'admin-inventory-assets';
-  static const adminDetailRequest = 'detail-request';
+  static const adminDetailRequest = 'detail-request/:partId';
   static const adminRejectedWorkOrders = 'rejected-work-orders';
   static const adminRejectionDetail = 'rejection-detail/:id';
   static const adminWorkOrderDetails = 'work-order-details/:workOrderId';

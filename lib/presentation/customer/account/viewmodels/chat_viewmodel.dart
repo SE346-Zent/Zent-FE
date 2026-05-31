@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +22,7 @@ class ChatPreview {
   });
 }
 
-class ChatViewModel extends ChangeNotifier {
+class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ChatService chatService;
   StreamSubscription<dynamic>? _wsSubscription;
 

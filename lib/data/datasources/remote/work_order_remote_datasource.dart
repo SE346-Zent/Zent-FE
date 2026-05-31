@@ -18,6 +18,7 @@ abstract class WorkOrderRemoteDataSource {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   });
   Future<WorkOrderModel> getWorkOrderDetail(String id);
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
@@ -42,10 +43,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   final AuthLocalDataSource authLocalDataSource;
 
   // The BASE_URL should be something like http://.../api/v1
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "http://localhost:3000/api/v1",
-  );
+  static final String _baseURL = dotenv.get("BASE_URL");
 
   static final Duration _timeOut = Duration(
     seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
@@ -72,12 +70,13 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   }) async {
-    final queryParameters = {
-      'role': ?role,
-      'province': ?province,
-      'technician_id': ?technicianId,
-    };
+    final queryParameters = <String, String>{};
+    if (role != null) queryParameters['role'] = role;
+    if (province != null) queryParameters['province'] = province;
+    if (technicianId != null) queryParameters['technician_id'] = technicianId;
+    if (date != null) queryParameters['date'] = date;
 
     final url = Uri.parse(
       '$_baseURL/work_orders',

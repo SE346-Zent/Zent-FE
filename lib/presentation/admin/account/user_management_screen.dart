@@ -57,6 +57,7 @@ class _UserManagementScreenContent extends StatelessWidget {
                   activeIndex: viewModel.activeTabIndex,
                   onTabChanged: (index) =>
                       context.read<UserManagementViewModel>().changeTab(index),
+                  showBothTabs: viewModel.showBothTabs,
                 ),
               ),
               const SizedBox(height: AppDimens.spaceLg),

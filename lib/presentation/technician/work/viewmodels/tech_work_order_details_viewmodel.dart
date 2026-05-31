@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,7 +22,8 @@ class WorkOrderArtifact {
   WorkOrderArtifact({required this.name, required this.type});
 }
 
-class TechWorkOrderDetailsViewModel extends ChangeNotifier {
+class TechWorkOrderDetailsViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   final String workOrderId;
   final GetSingleWorkOrderUseCase getSingleWorkOrderUseCase;
   final SharedPreferences sharedPreferences;

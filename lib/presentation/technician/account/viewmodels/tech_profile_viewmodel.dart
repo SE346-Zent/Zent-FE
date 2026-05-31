@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
@@ -16,7 +17,7 @@ class UserProfileInfo {
   });
 }
 
-class TechProfileViewModel extends ChangeNotifier {
+class TechProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final LogoutUseCase logoutUseCase;
 

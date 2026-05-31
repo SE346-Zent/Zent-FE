@@ -312,6 +312,41 @@ class _DetailedChatView extends StatelessWidget {
                           message.imageUrl!,
                         ),
                         fit: BoxFit.cover,
+                        loadingBuilder:
+                            (
+                              BuildContext context,
+                              Widget child,
+                              ImageChunkEvent? loadingProgress,
+                            ) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Container(
+                                width: 150,
+                                height: 150,
+                                color: AppColors.secondary50,
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                          AppColors.secondary400,
+                                        ),
+                                  ),
+                                ),
+                              );
+                            },
                         errorBuilder: (context, error, stackTrace) => Container(
                           padding: const EdgeInsets.all(8),
                           color: Colors.red.shade100,

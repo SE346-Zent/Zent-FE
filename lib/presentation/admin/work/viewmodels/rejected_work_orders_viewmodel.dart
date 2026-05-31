@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/foundation.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/entities/enums/work_order_status.dart';
@@ -6,7 +7,8 @@ import '../../../../domain/usecases/work_order/approve_refusal_usecase.dart';
 import '../../../../domain/usecases/work_order/deny_refusal_usecase.dart';
 import '../../../../data/models/refuse_work_order_request.dart';
 
-class RejectedWorkOrdersViewModel extends ChangeNotifier {
+class RejectedWorkOrdersViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
   final ApproveRefusalUseCase approveRefusalUseCase;
   final DenyRefusalUseCase denyRefusalUseCase;

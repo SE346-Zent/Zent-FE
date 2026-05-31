@@ -80,9 +80,12 @@ class _ChatBannerListenerState extends State<ChatBannerListener> {
         chatService.connect();
       }
       final stream = chatService.messageStream;
-      if (stream == null) return;
-      if (_currentStream == stream)
+      if (stream == null) {
+        return;
+      }
+      if (_currentStream == stream) {
         return; // Already listening to the latest stream
+      }
 
       _wsSubscription?.cancel();
       _currentStream = stream;

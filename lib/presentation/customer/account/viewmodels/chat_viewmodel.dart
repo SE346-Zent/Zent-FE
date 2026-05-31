@@ -127,17 +127,25 @@ class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
 
       // Sort by most recent message first
       _chats.sort((a, b) {
-        if (a.latestMessageAt == null && b.latestMessageAt == null) return 0;
-        if (a.latestMessageAt == null) return 1;
-        if (b.latestMessageAt == null) return -1;
+        if (a.latestMessageAt == null && b.latestMessageAt == null) {
+          return 0;
+        }
+        if (a.latestMessageAt == null) {
+          return 1;
+        }
+        if (b.latestMessageAt == null) {
+          return -1;
+        }
         try {
           String aStr = a.latestMessageAt!;
-          if (aStr.endsWith(' +00:00:00'))
+          if (aStr.endsWith(' +00:00:00')) {
             aStr = aStr.replaceAll(' +00:00:00', 'Z');
+          }
 
           String bStr = b.latestMessageAt!;
-          if (bStr.endsWith(' +00:00:00'))
+          if (bStr.endsWith(' +00:00:00')) {
             bStr = bStr.replaceAll(' +00:00:00', 'Z');
+          }
 
           final aDt = DateTime.parse(aStr);
           final bDt = DateTime.parse(bStr);

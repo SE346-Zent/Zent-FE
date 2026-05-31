@@ -144,7 +144,10 @@ class WorkOrderModel extends WorkOrder {
       country: json['country'] as String?,
       email: json['email'] as String?,
       firstName: json['first_name'] as String? ?? json['firstName'] as String?,
-      phoneNumber: json['phoneNumber'] as String? ?? json['phone_number'] as String? ?? json['phone'] as String?,
+      phoneNumber:
+          json['phoneNumber'] as String? ??
+          json['phone_number'] as String? ??
+          json['phone'] as String?,
     );
   }
 

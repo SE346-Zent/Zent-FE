@@ -195,9 +195,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     } catch (e) {
       debugPrint("Error launching phone dialer: $e");
       rootScaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(
-          content: Text('Could not open phone dialer: $e'),
-        ),
+        SnackBar(content: Text('Could not open phone dialer: $e')),
       );
     }
   }

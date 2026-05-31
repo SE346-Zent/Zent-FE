@@ -129,7 +129,9 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
         _handleErrorResponse(response);
       }
 
-      debugPrint('=== [API Response] GET /work_orders/$id: ${response.body} ===');
+      debugPrint(
+        '=== [API Response] GET /work_orders/$id: ${response.body} ===',
+      );
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(

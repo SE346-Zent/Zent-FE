@@ -125,19 +125,19 @@ class _TechSecurityViewState extends State<TechSecurityView> {
                             vertical: 4.0,
                           ),
                           title: Text(
-                            item.device,
+                            item.deviceName,
                             style: TextStyles.bodyLarge.copyWith(
                               color: AppColors.primary500,
                             ),
                           ),
                           subtitle: Text(
-                            item.location,
+                            item.location ?? 'Unknown',
                             style: TextStyles.label.copyWith(
                               color: AppColors.secondary300,
                             ),
                           ),
                           trailing: Text(
-                            item.date,
+                            '${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}',
                             style: TextStyles.label.copyWith(
                               color: AppColors.secondary500,
                             ),

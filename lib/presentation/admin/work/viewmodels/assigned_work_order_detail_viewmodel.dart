@@ -1,10 +1,12 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/repositories/work_order_repository.dart';
 import 'package:zent_fe/data/models/refuse_work_order_request.dart';
 import 'package:intl/intl.dart';
 
-class AssignedWorkOrderDetailViewModel extends ChangeNotifier {
+class AssignedWorkOrderDetailViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   String _orderId = '';
 
   String get orderId => _orderId;

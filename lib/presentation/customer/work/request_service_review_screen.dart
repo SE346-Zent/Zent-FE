@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'widgets/customer_text_field.dart';
 import 'widgets/customer_dropdown_field.dart';
 import 'viewmodels/request_service_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 
 class RequestServiceReviewScreen extends StatefulWidget {
   const RequestServiceReviewScreen({super.key});
@@ -135,18 +136,9 @@ class _RequestServiceReviewScreenState
   }
 
   void _onSubmit(RequestServiceViewModel vm) async {
-    try {
-      await vm.submitTicket(context);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to submit: ${e.toString()}'),
-            backgroundColor: AppColors.error500,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+    final success = await vm.submitTicket(context);
+    if (!success && mounted && vm.errorMessage != null) {
+      ZentErrorPopup.show(context, vm.errorMessage!);
     }
   }
 
@@ -403,7 +395,7 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'City',
+                  label: 'Ward',
                   value: viewModel.city,
                   items: viewModel.availableCities
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))

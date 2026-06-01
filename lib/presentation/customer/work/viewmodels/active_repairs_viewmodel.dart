@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart'; // Sửa lại đường dẫn import này cho đúng nhé
+import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/entities/enums/work_order_status.dart';
+import '../../../common/core/safe_change_notifier.dart';
 
-class ActiveRepairsViewModel extends ChangeNotifier {
+class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
 
   ActiveRepairsViewModel({required this.getManyWorkOrdersUseCase});

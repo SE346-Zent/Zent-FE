@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/text_styles.dart';
 import '../../../common/core/themes/boxshadow.dart';
-import 'dart:math';
+import 'avatar_utils.dart';
 
 /// A circular user avatar that supports images, initials, and an edit badge.
 ///
@@ -33,26 +33,9 @@ class Avatar extends StatelessWidget {
     this.showEditIcon = true,
   });
 
-  String get _initials {
-    if (name.isEmpty) return 'U';
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.length > 1) {
-      return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
-    }
-    return name.substring(0, min(2, name.length)).toUpperCase();
-  }
+  String get _initials => AvatarUtils.getInitials(name);
 
-  Color get _randomColor {
-    final colors = [
-      AppColors.primary300,
-      AppColors.secondary400,
-      AppColors.tertiary400,
-      AppColors.success400,
-      AppColors.error400,
-    ];
-    final index = name.hashCode.abs() % colors.length;
-    return colors[index];
-  }
+  Color get _backgroundColor => AvatarUtils.getColor(name);
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +45,7 @@ class Avatar extends StatelessWidget {
           width: 100.0,
           height: 100.0,
           decoration: BoxDecoration(
-            color: imageUrl == null ? _randomColor : AppColors.surface100,
+            color: imageUrl == null ? _backgroundColor : AppColors.surface100,
             shape: BoxShape.circle,
             image: imageUrl != null && imageUrl!.isNotEmpty
                 ? DecorationImage(

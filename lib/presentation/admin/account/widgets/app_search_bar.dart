@@ -6,8 +6,14 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 class AppSearchBar extends StatelessWidget {
   final String hintText;
   final Widget? trailingIcon;
+  final ValueChanged<String>? onChanged;
 
-  const AppSearchBar({super.key, required this.hintText, this.trailingIcon});
+  const AppSearchBar({
+    super.key,
+    required this.hintText,
+    this.trailingIcon,
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +32,7 @@ class AppSearchBar extends StatelessWidget {
           const SizedBox(width: AppDimens.spaceSm),
           Expanded(
             child: TextField(
+              onChanged: onChanged,
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: TextStyles.bodyLarge.copyWith(

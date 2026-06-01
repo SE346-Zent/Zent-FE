@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -30,6 +31,12 @@ class ChatMessage {
     try {
       String cleanStr = dateStr.trim();
 
+      // Remove any spaces before + or - timezone offsets
+      cleanStr = cleanStr.replaceAll(
+        RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'),
+        r'$1',
+      );
+
       // Normalize timezone offset with seconds (e.g. '+00:00:00' -> '+00:00')
       final match = RegExp(r'([+-]\d{2}:\d{2}):\d{2}$').firstMatch(cleanStr);
       if (match != null) {
@@ -59,7 +66,7 @@ class ChatMessage {
   }
 }
 
-class DetailedChatViewModel extends ChangeNotifier {
+class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ChatService chatService;
   final GetCurrentUserUseCase getCurrentUserUseCase;
 
@@ -68,9 +75,11 @@ class DetailedChatViewModel extends ChangeNotifier {
   static final Map<String, String> _roomPartnerNamesCache = {};
   static final Map<String, bool> _hasMoreCache = {};
   static String? _cachedUserId;
+  static String? _cachedMyName;
 
   String? currentChatId;
   String chatPartnerName = "";
+  String myName = "";
   String? currentUserId;
   bool isLoading = false;
   bool isLoadMoreLoading = false;
@@ -187,6 +196,7 @@ class DetailedChatViewModel extends ChangeNotifier {
     }
     isLoadMoreLoading = false;
     currentUserId = _cachedUserId;
+    myName = _cachedMyName ?? "";
     notifyListeners();
 
     try {
@@ -194,6 +204,8 @@ class DetailedChatViewModel extends ChangeNotifier {
       if (currentUserId == null) {
         final user = await getCurrentUserUseCase.execute();
         currentUserId = user?.id;
+        myName = user?.name ?? user?.email ?? "Me";
+        _cachedMyName = myName;
         debugPrint(
           "DetailedChatViewModel init: user loaded -> email: ${user?.email}, id: ${user?.id}",
         );
@@ -255,9 +267,10 @@ class DetailedChatViewModel extends ChangeNotifier {
 
       // Convert fetched messages to UI messages
       messages = fetchedMessages.reversed.map((msg) {
-        final parsedDt =
-            ChatMessage.parseDateTime(msg.createdAt) ?? DateTime.now();
-        final formattedTime = DateFormat('HH:mm').format(parsedDt.toLocal());
+        final parsedDt = ChatMessage.parseDateTime(msg.createdAt);
+        final formattedTime = parsedDt != null
+            ? DateFormat('HH:mm').format(parsedDt.toLocal())
+            : '';
         return ChatMessage(
           id: msg.id,
           text: msg.content ?? "",
@@ -265,7 +278,7 @@ class DetailedChatViewModel extends ChangeNotifier {
           time: formattedTime,
           imageUrl: msg.imageUrl,
           isSeen: _isMe(msg.senderId) && msg.readBy.any((id) => !_isMe(id)),
-          dateTime: parsedDt,
+          dateTime: parsedDt ?? DateTime.fromMillisecondsSinceEpoch(0),
         );
       }).toList();
 

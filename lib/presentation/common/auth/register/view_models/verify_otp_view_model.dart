@@ -1,9 +1,10 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/auth/verify_otp_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/resend_otp_usecase.dart';
 
-class VerifyOtpViewModel extends ChangeNotifier {
+class VerifyOtpViewModel extends ChangeNotifier with SafeChangeNotifier {
   final VerifyOtpUseCase verifyOtpUseCase;
   final ResendOtpUseCase resendOtpUseCase;
 

@@ -10,6 +10,7 @@ import '../account/widgets/customer_app_bar.dart';
 import 'widgets/customer_text_field.dart';
 import 'widgets/customer_dropdown_field.dart';
 import 'viewmodels/device_registration_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 
 class DeviceRegistrationScreen extends StatelessWidget {
   const DeviceRegistrationScreen({super.key});
@@ -93,7 +94,9 @@ class _DeviceRegistrationView extends StatelessWidget {
                       boxShadow: [BoxShadowStyles.glowing],
                     ),
                     child: ElevatedButton(
-                      onPressed: viewModel.submitDevice,
+                      onPressed: viewModel.isCheckingWarranty
+                          ? null
+                          : viewModel.submitDevice,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
@@ -102,14 +105,44 @@ class _DeviceRegistrationView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppDimens.boraSm),
                         ),
                       ),
-                      child: Text(
-                        'Submit',
-                        style: TextStyles.title.copyWith(color: Colors.white),
-                      ),
+                      child: viewModel.isCheckingWarranty
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'Submit',
+                              style: TextStyles.title.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
                 ],
               ),
+              if (viewModel.warrantyMessage != null) ...[
+                const SizedBox(height: AppDimens.spaceSm),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimens.spaceXs,
+                  ),
+                  child: Text(
+                    viewModel.warrantyMessage!,
+                    style: TextStyles.bodyMedium.copyWith(
+                      color: viewModel.warrantyMessage == 'Expired'
+                          ? AppColors.warning500
+                          : (viewModel.isStep2Enabled
+                                ? AppColors.success500
+                                : AppColors.error500),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: AppDimens.spaceXl),
 
               InkWell(
@@ -173,28 +206,28 @@ class _DeviceRegistrationView extends StatelessWidget {
         CustomerTextField(
           label: 'Country/Region',
           hint: '',
-          controller: TextEditingController(text: viewModel.country),
+          controller: viewModel.countryCtrl,
           isRequired: true,
           readOnly: true,
         ),
         const SizedBox(height: AppDimens.spaceMd),
         CustomerDropdownField<String>(
-          label: 'State',
+          label: 'Province',
           value: viewModel.stateVal,
           items: viewModel.states
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
-          onChanged: (v) => viewModel.stateVal = v,
+          onChanged: viewModel.onStateChanged,
           isRequired: true,
         ),
         const SizedBox(height: AppDimens.spaceMd),
         CustomerDropdownField<String>(
-          label: 'City',
+          label: 'Ward',
           value: viewModel.cityVal,
           items: viewModel.cities
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
-          onChanged: (v) => viewModel.cityVal = v,
+          onChanged: viewModel.onCityChanged,
           isRequired: true,
         ),
         const SizedBox(height: AppDimens.spaceMd),
@@ -312,7 +345,15 @@ class _DeviceRegistrationView extends StatelessWidget {
                   boxShadow: [BoxShadowStyles.glowing],
                 ),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final success = await viewModel.submitRegistration();
+                    if (success && context.mounted) {
+                      context.pop(true);
+                    } else if (context.mounted &&
+                        viewModel.errorMessage != null) {
+                      ZentErrorPopup.show(context, viewModel.errorMessage!);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -320,10 +361,19 @@ class _DeviceRegistrationView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
                     ),
                   ),
-                  child: Text(
-                    'Register',
-                    style: TextStyles.title.copyWith(color: Colors.white),
-                  ),
+                  child: viewModel.isRegistering
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Register',
+                          style: TextStyles.title.copyWith(color: Colors.white),
+                        ),
                 ),
               ),
             ),

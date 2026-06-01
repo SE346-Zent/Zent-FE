@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
@@ -14,6 +15,8 @@ import 'viewmodels/admin_dashboard_viewmodel.dart';
 import 'widgets/admin_dashboard_quick_actions.dart';
 import 'widgets/admin_dashboard_stat_card.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -34,8 +37,29 @@ class AdminDashboardScreen extends StatelessWidget {
   }
 }
 
-class _AdminDashboardScreenContent extends StatelessWidget {
+class _AdminDashboardScreenContent extends StatefulWidget {
   const _AdminDashboardScreenContent();
+
+  @override
+  State<_AdminDashboardScreenContent> createState() =>
+      _AdminDashboardScreenContentState();
+}
+
+class _AdminDashboardScreenContentState
+    extends State<_AdminDashboardScreenContent> {
+  bool _pendingProcessed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_pendingProcessed) {
+      _pendingProcessed = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final role = context.read<AuthViewModel>().role;
+        NotificationNavigator.processPendingNotification(context, role);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +138,7 @@ class _AdminDashboardScreenContent extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 2.0),
                         boxShadow: [BoxShadowStyles.raised],
                       ),
-                      child: const CircleAvatar(
-                        radius: 16,
-                        backgroundImage: NetworkImage(
-                          'https://i.pravatar.cc/150?img=11',
-                        ),
-                      ),
+                      child: UserAvatar(name: viewModel.userName, size: 32),
                     ),
                   ),
                 ],

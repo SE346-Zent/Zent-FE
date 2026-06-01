@@ -20,44 +20,56 @@ class AddNewPartForm extends StatelessWidget {
         const AddPartInfoBox(),
         const SizedBox(height: AppDimens.spaceLg),
 
-        const InputField(label: "Part Name", hintText: "e.g Motherboard"),
+        InputField(
+          label: "Part Name",
+          hintText: "e.g Motherboard",
+          controller: viewModel.partNameController,
+        ),
         const SizedBox(height: AppDimens.spaceMd),
 
         SelectBoxField(
           label: "Part Category",
           hintText: "Select Category",
-          dropdownItems: const [
-            'Control Board',
-            'Display Panel',
-            'Battery',
-            'Motor',
-            'Other',
-          ],
+          dropdownItems: viewModel.categories.isNotEmpty
+              ? viewModel.categories
+              : const [
+                  'Control Board',
+                  'Display Panel',
+                  'Battery',
+                  'Motor',
+                  'Other',
+                ],
           selectedValue: viewModel.category,
           onChanged: viewModel.setCategory,
         ),
         const SizedBox(height: AppDimens.spaceMd),
 
         Row(
-          children: const [
+          children: [
             Expanded(
-              child: InputField(label: "MTM", hintText: "e.g 234931043"),
+              child: InputField(
+                label: "MTM",
+                hintText: "e.g 234931043",
+                controller: viewModel.mtmController,
+              ),
             ),
-            SizedBox(width: AppDimens.spaceMd),
+            const SizedBox(width: AppDimens.spaceMd),
             Expanded(
-              child: InputField(label: "Serial Number", hintText: "e.g 123456"),
+              child: InputField(
+                label: "Serial Number",
+                hintText: "e.g 123456",
+                controller: viewModel.serialNumberController,
+              ),
             ),
           ],
         ),
-        const SizedBox(height: AppDimens.spaceMd),
 
-        const InputField(
+        InputField(
           label: "Description / Notes",
           hintText: "Describe how it was used or any specific details...",
           maxLines: 4,
+          controller: viewModel.descriptionController,
         ),
-        const SizedBox(height: AppDimens.spaceLg),
-
         const SizedBox(height: AppDimens.spaceLg),
         PartPhotoUpload(
           photos: viewModel.photos,

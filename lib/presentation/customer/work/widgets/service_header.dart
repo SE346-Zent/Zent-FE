@@ -6,8 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart'
-    show AppAssets;
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
 class ServiceHeader extends StatelessWidget {
   final String userName;
@@ -81,24 +80,17 @@ class ServiceHeader extends StatelessWidget {
                   InkWell(
                     onTap: () => _onAvatarTap(context),
                     child: Container(
-                      width: 32.0,
-                      height: 32.0,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.surface100,
                         border: Border.all(
                           color: AppColors.surface100,
                           width: 1.5,
                         ),
-                        image: avatarUrl != null
-                            ? DecorationImage(
-                                image: NetworkImage(avatarUrl!),
-                                fit: BoxFit.cover,
-                              )
-                            : const DecorationImage(
-                                image: AssetImage(AppAssets.onboarding1),
-                                fit: BoxFit.cover,
-                              ),
+                      ),
+                      child: UserAvatar(
+                        avatarUrl: avatarUrl,
+                        name: userName,
+                        size: 32,
                       ),
                     ),
                   ),
@@ -130,7 +122,7 @@ class ServiceHeader extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: userName,
+                      text: "Zent",
                       style: TextStyles.headline.copyWith(
                         color: AppColors.tertiary500, // Highlight blue
                       ),

@@ -22,8 +22,24 @@ class AdminReportsScreen extends StatelessWidget {
   }
 }
 
-class _AdminReportsScreenContent extends StatelessWidget {
+class _AdminReportsScreenContent extends StatefulWidget {
   const _AdminReportsScreenContent();
+
+  @override
+  State<_AdminReportsScreenContent> createState() =>
+      _AdminReportsScreenContentState();
+}
+
+class _AdminReportsScreenContentState
+    extends State<_AdminReportsScreenContent> {
+  @override
+  void initState() {
+    super.initState();
+    // Schedule after first frame to ensure context is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AdminReportsViewModel>().init();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +63,23 @@ class _AdminReportsScreenContent extends StatelessWidget {
                 onTabChanged: viewModel.changeTab,
               ),
               const SizedBox(height: AppDimens.spaceLg),
+              if (viewModel.isLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32.0),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (viewModel.error != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Center(
+                    child: Text(
+                      'Could not load analytics. Showing fallback data.',
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.error500,
+                      ),
+                    ),
+                  ),
+                ),
               _buildStatCard(
                 title: 'TOTAL JOBS',
                 value: viewModel.totalJobs,

@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/reassign_work_order_viewmodel.dart';
@@ -177,12 +178,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(
-                  'https://i.pravatar.cc/150?img=11',
-                ),
-              ),
+              UserAvatar(name: data['name'] ?? '', size: 40),
               const SizedBox(width: 12.0),
               Expanded(
                 child: Column(

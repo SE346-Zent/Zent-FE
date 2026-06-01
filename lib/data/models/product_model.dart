@@ -7,6 +7,7 @@ class ProductModel extends Product {
     required super.model,
     required super.serialNumber,
     super.warrantyUntil,
+    super.productImageUrl,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,7 @@ class ProductModel extends Product {
       warrantyUntil: json['warrantyUntil'] != null
           ? DateTime.parse(json['warrantyUntil'] as String)
           : null,
+      productImageUrl: json['productImageUrl'] as String?,
     );
   }
 
@@ -28,6 +30,7 @@ class ProductModel extends Product {
       'model': model,
       'serialNumber': serialNumber,
       'warrantyUntil': warrantyUntil?.toIso8601String(),
+      'productImageUrl': productImageUrl,
     };
   }
 }

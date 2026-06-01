@@ -1,6 +1,7 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class CreateAccountViewModel extends ChangeNotifier {
+class CreateAccountViewModel extends ChangeNotifier with SafeChangeNotifier {
   String basicRole = '';
 
   final fullNameController = TextEditingController();

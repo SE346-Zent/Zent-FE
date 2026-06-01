@@ -6,8 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart'
-    show AppAssets;
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'viewmodels/detailed_chat_viewmodel.dart';
 
@@ -95,8 +94,21 @@ class _DetailedChatView extends StatelessWidget {
                         itemCount:
                             viewModel.messages.length +
                             (viewModel.isLoadMoreLoading ? 1 : 0),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 2.0),
+                        separatorBuilder: (context, index) {
+                          final isLoadMore = viewModel.isLoadMoreLoading;
+                          final msgIdx = isLoadMore ? index - 1 : index;
+                          final nextMsgIdx = msgIdx + 1;
+                          if (msgIdx < 0 ||
+                              nextMsgIdx >= viewModel.messages.length) {
+                            return const SizedBox(height: 3.0);
+                          }
+                          final currentMsg = viewModel.messages[msgIdx];
+                          final nextMsg = viewModel.messages[nextMsgIdx];
+                          final gap = currentMsg.isMe != nextMsg.isMe
+                              ? 6.0
+                              : 3.0;
+                          return SizedBox(height: gap);
+                        },
                         itemBuilder: (context, index) {
                           if (viewModel.isLoadMoreLoading && index == 0) {
                             return const Center(
@@ -224,10 +236,15 @@ class _DetailedChatView extends StatelessWidget {
       titleSpacing: 0,
       title: Row(
         children: [
-          const CircleAvatar(
-            radius: 18,
-            backgroundImage: AssetImage(AppAssets.onboarding1),
-            backgroundColor: AppColors.secondary200,
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 1.5),
+            ),
+            child: UserAvatar(
+              name: name.isEmpty ? 'Chat Partner' : name,
+              size: 36,
+            ),
           ),
           const SizedBox(width: AppDimens.spaceSm),
           Expanded(
@@ -270,10 +287,7 @@ class _DetailedChatView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (!message.isMe) ...[
-          const CircleAvatar(
-            radius: 16,
-            backgroundImage: AssetImage(AppAssets.onboarding1),
-          ),
+          UserAvatar(name: viewModel.chatPartnerName, size: 32),
           const SizedBox(width: 8),
         ],
         Flexible(
@@ -312,6 +326,41 @@ class _DetailedChatView extends StatelessWidget {
                           message.imageUrl!,
                         ),
                         fit: BoxFit.cover,
+                        loadingBuilder:
+                            (
+                              BuildContext context,
+                              Widget child,
+                              ImageChunkEvent? loadingProgress,
+                            ) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Container(
+                                width: 150,
+                                height: 150,
+                                color: AppColors.secondary50,
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                          AppColors.secondary400,
+                                        ),
+                                  ),
+                                ),
+                              );
+                            },
                         errorBuilder: (context, error, stackTrace) => Container(
                           padding: const EdgeInsets.all(8),
                           color: Colors.red.shade100,
@@ -375,10 +424,7 @@ class _DetailedChatView extends StatelessWidget {
         ),
         if (message.isMe) ...[
           const SizedBox(width: 8),
-          const CircleAvatar(
-            radius: 16,
-            backgroundImage: AssetImage(AppAssets.onboarding1),
-          ),
+          UserAvatar(name: viewModel.myName, size: 32),
         ],
       ],
     );

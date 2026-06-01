@@ -1,6 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class CustomerNotificationsViewModel extends ChangeNotifier {
+class CustomerNotificationsViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   bool directMessage = true;
   bool tracking = true;
   bool appointmentReminders = true;

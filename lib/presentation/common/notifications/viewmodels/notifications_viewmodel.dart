@@ -1,10 +1,11 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/entities/notification_item.dart';
 import 'package:zent_fe/domain/usecases/notification/get_notifications_usecase.dart';
 import 'package:zent_fe/domain/usecases/notification/get_unread_count_usecase.dart';
 import 'package:zent_fe/di/injection_container.dart';
 
-class NotificationsViewModel extends ChangeNotifier {
+class NotificationsViewModel extends ChangeNotifier with SafeChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 

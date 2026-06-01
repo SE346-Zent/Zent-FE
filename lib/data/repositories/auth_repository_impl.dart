@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/user.dart';
+import '../../domain/entities/login_history_entry.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
+import '../models/user_model.dart';
+import '../models/login_history_entry_model.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
@@ -183,6 +186,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  @override
+  Future<List<User>> getUsers({
+    int page = 1,
+    int pageSize = 50,
+    String? role,
+  }) async {
+    final usersJson = await authRemoteService.getUsers(
+      page: page,
+      pageSize: pageSize,
+      role: role,
+    );
+    return usersJson.map((json) => UserModel.fromJson(json)).toList();
+  }
+
+  @override
   Future<bool> resetPassword({
     required String email,
     required String token,
@@ -193,5 +211,17 @@ class AuthRepositoryImpl implements AuthRepository {
       token: token,
       newPassword: newPassword,
     );
+  }
+
+  @override
+  Future<List<LoginHistoryEntry>> getLoginHistory() async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    final historyJson = await authRemoteService.getLoginHistory(accessToken);
+    return historyJson
+        .map((json) => LoginHistoryEntryModel.fromJson(json))
+        .toList();
   }
 }

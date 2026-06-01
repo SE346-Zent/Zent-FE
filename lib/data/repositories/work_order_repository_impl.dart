@@ -85,6 +85,7 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   }) async {
     return await remoteDataSource.getWorkOrders(
       page: page,
@@ -92,6 +93,7 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
       role: role,
       province: province,
       technicianId: technicianId,
+      date: date,
     );
   }
 
@@ -129,6 +131,11 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   @override
   Future<Map<String, dynamic>> getWorkOrderHistory(String id) async {
     return await remoteDataSource.getWorkOrderHistory(id);
+  }
+
+  @override
+  Future<void> rateWorkOrder(String id, int rating, String? comment) async {
+    return await remoteDataSource.rateWorkOrder(id, rating, comment);
   }
 
   @override

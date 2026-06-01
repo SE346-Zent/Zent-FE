@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
-import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
 class TechHomeHeader extends StatelessWidget {
   final String userName;
@@ -93,13 +93,7 @@ class TechHomeHeader extends StatelessWidget {
                   const SizedBox(width: AppDimens.spaceSm),
                   GestureDetector(
                     onTap: onProfileTapped,
-                    child: SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: FittedBox(
-                        child: Avatar(name: userName, showEditIcon: false),
-                      ),
-                    ),
+                    child: UserAvatar(name: userName, size: 30),
                   ),
                 ],
               ),

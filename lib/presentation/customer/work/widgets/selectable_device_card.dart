@@ -49,12 +49,59 @@ class SelectableDeviceCard extends StatelessWidget {
             RepaintBoundary(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                child: Image.asset(
-                  imagePath,
-                  width: 64, // Slightly larger for better balance
-                  height: 64,
-                  fit: BoxFit.cover,
-                ),
+                child:
+                    imagePath.startsWith('http') ||
+                        imagePath.startsWith('https')
+                    ? Image.network(
+                        imagePath,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          debugPrint(
+                            '=== [SelectableDeviceCard] Network Image Error for $imagePath: $error ===',
+                          );
+                          return Container(
+                            width: 64,
+                            height: 64,
+                            color: AppColors.secondary50,
+                            child: const Icon(
+                              Icons.broken_image,
+                              color: AppColors.secondary200,
+                              size: 24,
+                            ),
+                          );
+                        },
+                      )
+                    : imagePath.isNotEmpty
+                    ? Image.asset(
+                        imagePath,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 64,
+                            height: 64,
+                            color: AppColors.secondary50,
+                            child: const Icon(
+                              Icons.broken_image,
+                              color: AppColors.secondary200,
+                              size: 24,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        width: 64,
+                        height: 64,
+                        color: AppColors.secondary50,
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          color: AppColors.secondary200,
+                          size: 24,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(width: AppDimens.spaceMd),

@@ -28,16 +28,6 @@ class ProfileMenuOptions extends StatelessWidget {
         ),
         const SizedBox(height: AppDimens.spaceSm),
         ProfileMenuItem(
-          title: 'Help me',
-          subtitle: 'Availability, skills & zones',
-          iconData: Icons.person,
-          onTap: () => context.read<TechProfileViewModel>().handleMenuTap(
-            context,
-            'Help me',
-          ),
-        ),
-        const SizedBox(height: AppDimens.spaceSm),
-        ProfileMenuItem(
           title: 'Security',
           subtitle: 'Password & 2FA',
           iconData: Icons.lock_outline,

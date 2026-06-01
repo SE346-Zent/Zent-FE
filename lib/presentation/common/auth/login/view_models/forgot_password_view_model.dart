@@ -1,7 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/auth/forgot_password_usecase.dart';
 
-class ForgotPasswordViewModel extends ChangeNotifier {
+class ForgotPasswordViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ForgotPasswordUseCase forgotPasswordUseCase;
 
   ForgotPasswordViewModel({required this.forgotPasswordUseCase});

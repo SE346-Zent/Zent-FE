@@ -12,12 +12,13 @@ import 'viewmodels/detail_request_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 
 class DetailRequestScreen extends StatelessWidget {
-  const DetailRequestScreen({super.key});
+  final String partId;
+  const DetailRequestScreen({super.key, required this.partId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => di.sl<DetailRequestViewModel>(),
+      create: (_) => di.sl<DetailRequestViewModel>()..init(partId),
       child: const _DetailRequestScreenContent(),
     );
   }
@@ -26,7 +27,12 @@ class DetailRequestScreen extends StatelessWidget {
 class _DetailRequestScreenContent extends StatelessWidget {
   const _DetailRequestScreenContent();
 
-  void _showRejectDialog(BuildContext context) {
+  void _showRejectDialog(
+    BuildContext context,
+    DetailRequestViewModel viewModel,
+  ) {
+    final reasonController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
@@ -50,6 +56,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 TextField(
+                  controller: reasonController,
                   maxLines: 4,
                   decoration: InputDecoration(
                     filled: true,
@@ -80,8 +87,50 @@ class _DetailRequestScreenContent extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppDimens.boraSm),
                   ),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final reason = reasonController.text.trim();
+                      if (reason.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please provide a reason for rejection',
+                            ),
+                            backgroundColor: AppColors.warning500,
+                          ),
+                        );
+                        return;
+                      }
+                      if (reason.length < 10) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Reason for rejection must be at least 10 characters long',
+                            ),
+                            backgroundColor: AppColors.warning500,
+                          ),
+                        );
+                        return;
+                      }
                       Navigator.pop(ctx);
+                      final success = await viewModel.denyPart(reason);
+                      if (ctx.mounted) {
+                        if (success) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                              content: Text('Part request rejected'),
+                              backgroundColor: AppColors.success500,
+                            ),
+                          );
+                          Navigator.of(ctx).pop(true);
+                        } else {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to reject part request'),
+                              backgroundColor: AppColors.error500,
+                            ),
+                          );
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.error500,
@@ -117,48 +166,135 @@ class _DetailRequestScreenContent extends StatelessWidget {
           children: [
             const AccountHeader(
               title: 'Detail Request',
-              subtitle: '#WO-12345 • 12h30 AM',
+              subtitle: '',
               showDivider: true,
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(AppDimens.spaceSm),
-                      decoration: BoxDecoration(
-                        color: AppColors.tertiary50,
-                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                        border: Border.all(
-                          color: AppColors.tertiary500,
-                          width: 1.0,
+            if (viewModel.isLoadingDetail)
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.tertiary500,
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppDimens.spaceMd),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppDimens.spaceSm),
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiary50,
+                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                          border: Border.all(
+                            color: AppColors.tertiary500,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              color: AppColors.tertiary500,
+                              size: 32,
+                            ),
+                            const SizedBox(width: AppDimens.spaceMd),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Review part details for inventory update',
+                                    style: TextStyles.bodyLarge.copyWith(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Enter the details of the part that was not found in the inventory system.',
+                                    style: TextStyles.label.copyWith(
+                                      color: AppColors.secondary300,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      const SizedBox(height: AppDimens.spaceLg),
+                      // Request Status
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(
-                            Icons.info_outline,
-                            color: AppColors.tertiary500,
-                            size: 32,
+                          Text(
+                            'Request Status',
+                            style: TextStyles.title.copyWith(
+                              color: AppColors.primary500,
+                            ),
                           ),
-                          const SizedBox(width: AppDimens.spaceMd),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppDimens.spaceSm,
+                              vertical: 4.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  (viewModel.status.toLowerCase() == 'pending'
+                                          ? AppColors.warning500
+                                          : (viewModel.status.toLowerCase() ==
+                                                    'approved'
+                                                ? AppColors.success500
+                                                : AppColors.error500))
+                                      .withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(
+                                AppDimens.boraSm,
+                              ),
+                              border: Border.all(
+                                color:
+                                    viewModel.status.toLowerCase() == 'pending'
+                                    ? AppColors.warning500
+                                    : (viewModel.status.toLowerCase() ==
+                                              'approved'
+                                          ? AppColors.success500
+                                          : AppColors.error500),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Review part details for inventory update',
-                                  style: TextStyles.bodyLarge.copyWith(
-                                    color: Colors.black,
+                                Container(
+                                  width: 8.0,
+                                  height: 8.0,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        viewModel.status.toLowerCase() ==
+                                            'pending'
+                                        ? AppColors.warning500
+                                        : (viewModel.status.toLowerCase() ==
+                                                  'approved'
+                                              ? AppColors.success500
+                                              : AppColors.error500),
+                                    shape: BoxShape.circle,
                                   ),
                                 ),
+                                const SizedBox(width: AppDimens.spaceSm),
                                 Text(
-                                  'Enter the details of the part that was not found in the inventory system.',
+                                  viewModel.status,
                                   style: TextStyles.label.copyWith(
-                                    color: AppColors.secondary300,
+                                    color:
+                                        viewModel.status.toLowerCase() ==
+                                            'pending'
+                                        ? AppColors.warning500
+                                        : (viewModel.status.toLowerCase() ==
+                                                  'approved'
+                                              ? AppColors.success500
+                                              : AppColors.error500),
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
@@ -166,177 +302,285 @@ class _DetailRequestScreenContent extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    AdminTextField(
-                      label: 'Part Name',
-                      hint: '',
-                      controller: viewModel.partNameController,
-                      readOnly: true,
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    Text(
-                      'Part Category',
-                      style: TextStyles.title.copyWith(
-                        color: AppColors.primary500,
+                      const SizedBox(height: AppDimens.spaceMd),
+                      AdminTextField(
+                        label: 'Part Name',
+                        hint: '',
+                        controller: viewModel.partNameController,
+                        readOnly: true,
                       ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceXs),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimens.spaceSm,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary50,
-                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                        border: Border.all(
-                          color: AppColors.secondary100,
-                          width: 1.0,
+                      const SizedBox(height: AppDimens.spaceMd),
+                      Text(
+                        'Part Category',
+                        style: TextStyles.title.copyWith(
+                          color: AppColors.primary500,
                         ),
-                        boxShadow: [BoxShadowStyles.subtle],
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: viewModel.selectedCategory,
-                          isExpanded: true,
-                          icon: const SizedBox.shrink(),
-                          items: viewModel.categories.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TextStyles.bodyLarge.copyWith(
-                                  color: AppColors.secondary200,
+                      const SizedBox(height: AppDimens.spaceXs),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.spaceSm,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary50,
+                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                          border: Border.all(
+                            color: AppColors.secondary100,
+                            width: 1.0,
+                          ),
+                          boxShadow: [BoxShadowStyles.subtle],
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: viewModel.selectedCategory,
+                            isExpanded: true,
+                            icon: const SizedBox.shrink(),
+                            items: viewModel.categories.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyles.bodyLarge.copyWith(
+                                    color: AppColors.secondary500,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: viewModel.setCategory,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppDimens.spaceMd),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AdminTextField(
+                              label: 'MTM',
+                              hint: '',
+                              controller: viewModel.mtmController,
+                              readOnly: true,
+                            ),
+                          ),
+                          const SizedBox(width: AppDimens.spaceMd),
+                          Expanded(
+                            child: AdminTextField(
+                              label: 'Serial Number',
+                              hint: '',
+                              controller: viewModel.serialNumberController,
+                              readOnly: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppDimens.spaceMd),
+                      AdminTextField(
+                        label: 'Description / Notes',
+                        hint: '',
+                        controller: viewModel.descriptionController,
+                        maxLines: 4,
+                        readOnly: true,
+                      ),
+                      const SizedBox(height: AppDimens.spaceLg),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Part Photo',
+                            style: TextStyles.title.copyWith(
+                              color: AppColors.primary500,
+                            ),
+                          ),
+                          Text(
+                            'MAX: 5 PHOTOS',
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.tertiary500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppDimens.spaceSm),
+                      viewModel.photoUrls.isEmpty
+                          ? Container(
+                              alignment: Alignment.center,
+                              height: 80.0,
+                              decoration: BoxDecoration(
+                                color: AppColors.secondary50,
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.boraSm,
                                 ),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: null,
+                              child: Text(
+                                'No photos uploaded',
+                                style: TextStyles.bodyMedium.copyWith(
+                                  color: AppColors.secondary300,
+                                ),
+                              ),
+                            )
+                          : SizedBox(
+                              height: 80.0,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: viewModel.photoUrls.length,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(width: AppDimens.spaceSm),
+                                itemBuilder: (context, index) {
+                                  final url = viewModel.photoUrls[index];
+                                  final isNetworkImage =
+                                      url.startsWith('http') ||
+                                      url.startsWith('https');
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimens.boraSm,
+                                    ),
+                                    child: isNetworkImage
+                                        ? Image.network(
+                                            url,
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    width: 80,
+                                                    height: 80,
+                                                    color:
+                                                        AppColors.secondary50,
+                                                    child: const Icon(
+                                                      Icons.broken_image,
+                                                      color: AppColors
+                                                          .secondary200,
+                                                    ),
+                                                  );
+                                                },
+                                          )
+                                        : Image.asset(
+                                            url,
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    width: 80,
+                                                    height: 80,
+                                                    color:
+                                                        AppColors.secondary50,
+                                                    child: const Icon(
+                                                      Icons.broken_image,
+                                                      color: AppColors
+                                                          .secondary200,
+                                                    ),
+                                                  );
+                                                },
+                                          ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+            // Hide approve/reject buttons if part is already approved
+            if (!viewModel.isApproved && !viewModel.isLoadingDetail)
+              Container(
+                padding: const EdgeInsets.all(AppDimens.spaceMd),
+                color: AppColors.background500,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiary50,
+                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                          boxShadow: [BoxShadowStyles.subtle],
+                        ),
+                        child: TextButton(
+                          onPressed: viewModel.isProcessing
+                              ? null
+                              : () => _showRejectDialog(context, viewModel),
+                          child: viewModel.isProcessing
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Reject',
+                                  style: TextStyles.title.copyWith(
+                                    color: AppColors.tertiary500,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AdminTextField(
-                            label: 'MTM',
-                            hint: '',
-                            controller: viewModel.mtmController,
-                            readOnly: true,
-                          ),
+                    const SizedBox(width: AppDimens.spaceMd),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiary500,
+                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                          boxShadow: [BoxShadowStyles.glowing],
                         ),
-                        const SizedBox(width: AppDimens.spaceMd),
-                        Expanded(
-                          child: AdminTextField(
-                            label: 'Serial Number',
-                            hint: '',
-                            controller: viewModel.serialNumberController,
-                            readOnly: true,
-                          ),
+                        child: TextButton(
+                          onPressed: viewModel.isProcessing
+                              ? null
+                              : () async {
+                                  final success = await viewModel.acceptPart();
+                                  if (context.mounted) {
+                                    if (success) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Part request approved',
+                                          ),
+                                          backgroundColor: AppColors.success500,
+                                        ),
+                                      );
+                                      Navigator.of(context).pop(true);
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Failed to approve part request',
+                                          ),
+                                          backgroundColor: AppColors.error500,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                          child: viewModel.isProcessing
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Approve',
+                                  style: TextStyles.title.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    AdminTextField(
-                      label: 'Description / Notes',
-                      hint: '',
-                      controller: viewModel.descriptionController,
-                      maxLines: 4,
-                      readOnly: true,
-                    ),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Part Photo',
-                          style: TextStyles.title.copyWith(
-                            color: AppColors.primary500,
-                          ),
-                        ),
-                        Text(
-                          'MAX: 5 PHOTOS',
-                          style: TextStyles.label.copyWith(
-                            color: AppColors.tertiary500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppDimens.spaceSm),
-                    SizedBox(
-                      height: 80.0,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: viewModel.photoUrls.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(width: AppDimens.spaceSm),
-                        itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              AppDimens.boraSm,
-                            ),
-                            child: Image.asset(
-                              viewModel.photoUrls[index],
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(AppDimens.spaceMd),
-              color: AppColors.background500,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.tertiary50,
-                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                        boxShadow: [BoxShadowStyles.subtle],
-                      ),
-                      child: TextButton(
-                        onPressed: () => _showRejectDialog(context),
-                        child: Text(
-                          'Reject',
-                          style: TextStyles.title.copyWith(
-                            color: AppColors.tertiary500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.tertiary500,
-                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                        boxShadow: [BoxShadowStyles.glowing],
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Approve',
-                          style: TextStyles.title.copyWith(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

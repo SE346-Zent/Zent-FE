@@ -29,6 +29,7 @@ class WorkOrderModel extends WorkOrder {
     super.country,
     super.email,
     super.firstName,
+    super.symptomName,
     super.phoneNumber,
   });
 
@@ -60,6 +61,7 @@ class WorkOrderModel extends WorkOrder {
       country: entity.country,
       email: entity.email,
       firstName: entity.firstName,
+      symptomName: entity.symptomName,
       phoneNumber: entity.phoneNumber,
     );
   }

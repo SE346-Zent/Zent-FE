@@ -134,7 +134,7 @@ class NotificationNavigator {
       case UserRoles.admin:
       case UserRoles.superAdmin:
         context.pushNamed(
-          RouteNames.adminWorkOrderDetails,
+          RouteNames.adminAssignedWorkOrderDetails,
           pathParameters: {'workOrderId': workOrderId},
         );
         break;
@@ -354,7 +354,7 @@ class NotificationNavigator {
             case UserRoles.admin:
             case UserRoles.superAdmin:
               appRouter.pushNamed(
-                RouteNames.adminWorkOrderDetails,
+                RouteNames.adminAssignedWorkOrderDetails,
                 pathParameters: {'workOrderId': workOrderId},
               );
               break;

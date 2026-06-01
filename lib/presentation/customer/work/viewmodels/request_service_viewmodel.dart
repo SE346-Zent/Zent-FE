@@ -131,6 +131,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   final List<String> countries = ['Vietnam'];
+  final List<String> provinces = [];
   final List<String> wards = [];
   final Map<String, List<String>> _citiesByWard = {};
 
@@ -451,23 +452,19 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         throw BusinessException('Please provide a description of the problem.');
       }
 
-      String finalCity = city ?? '';
       String finalWard = ward ?? '';
 
       // Map full names to short codes for Backend
       if (finalWard.contains('Hồ Chí Minh')) {
         finalWard = 'HCM';
-        finalCity = 'HCM';
       } else if (finalWard.contains('Hà Nội')) {
         finalWard = 'HN';
-        finalCity = 'HN';
       }
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        ward: finalCity,
         country: country ?? 'Vietnam',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,

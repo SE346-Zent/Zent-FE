@@ -10,6 +10,7 @@ import '../account/widgets/customer_app_bar.dart';
 import 'widgets/customer_text_field.dart';
 import 'widgets/customer_dropdown_field.dart';
 import 'viewmodels/device_registration_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 
 class DeviceRegistrationScreen extends StatelessWidget {
   const DeviceRegistrationScreen({super.key});
@@ -347,22 +348,9 @@ class _DeviceRegistrationView extends StatelessWidget {
                   onPressed: () async {
                     final success = await viewModel.submitRegistration();
                     if (success && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Device registered successfully!'),
-                          backgroundColor: AppColors.success500,
-                        ),
-                      );
                       context.pop(true);
-                    } else if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Registration failed. Please try again.',
-                          ),
-                          backgroundColor: AppColors.error500,
-                        ),
-                      );
+                    } else if (context.mounted && viewModel.errorMessage != null) {
+                      ZentErrorPopup.show(context, viewModel.errorMessage!);
                     }
                   },
                   style: ElevatedButton.styleFrom(

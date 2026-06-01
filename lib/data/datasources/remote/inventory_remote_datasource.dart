@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../local/auth_local_datasource.dart';
+import '../../../domain/exceptions/business_exception.dart';
 
 abstract class InventoryRemoteDataSource {
   Future<Map<String, dynamic>> getScmProducts({
@@ -423,17 +424,20 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
     debugPrint('----------------------------------------');
 
     if (body.isEmpty) {
-      return Exception('Server Error ($statusCode)');
+      return Exception('Silent server error');
     }
 
     try {
       final errorMap = jsonDecode(body);
-      final message =
-          errorMap['message']?.toString() ??
-          'Something went wrong ($statusCode)';
-      return Exception(message);
+      final message = errorMap['message'];
+      
+      if (statusCode >= 400 && statusCode < 500 && message is String) {
+        return BusinessException(message);
+      }
+      
+      return Exception('Silent API error');
     } catch (_) {
-      return Exception('Server response error ($statusCode)');
+      return Exception('Silent parse error');
     }
   }
 }

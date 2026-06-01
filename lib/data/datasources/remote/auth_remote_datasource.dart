@@ -7,6 +7,7 @@ import '../../models/auth_response_model.dart' show AuthResponseModel;
 import '../../models/api_response.dart' show ApiResponse;
 import '../local/auth_local_datasource.dart';
 import '../../../di/injection_container.dart';
+import '../../../domain/exceptions/business_exception.dart';
 
 abstract class AuthRemoteDatasource {
   Future<AuthResponseModel> login(
@@ -521,26 +522,34 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     debugPrint('-----------------------------');
 
     if (body.isEmpty) {
-      throw Exception('Server Error ($statusCode)');
+      if (statusCode == 401) {
+        throw BusinessException('Invalid email or password');
+      }
+      throw Exception('Silent server error');
     }
 
     final contentType = response.headers['content-type'] ?? '';
     if (contentType.contains('application/json')) {
       try {
         final errorMap = jsonDecode(body);
-        throw Exception(
-          errorMap['message'] ?? 'Something went wrong ($statusCode)',
-        );
-      } catch (_) {
-        // Nếu không parse được JSON, trả về thông báo chung chung
-        throw Exception('Server response error ($statusCode)');
+        final message = errorMap['message'];
+        
+        // 4xx errors with a specific String message are business logic errors
+        if (statusCode >= 400 && statusCode < 500 && message is String) {
+          throw BusinessException(message);
+        }
+        
+        // Any other 4xx (like format array messages) or 5xx -> silent exception
+        throw Exception('Silent API error');
+      } catch (e) {
+        if (e is BusinessException) rethrow;
+        throw Exception('Silent parse error');
       }
     } else {
-      // Nếu là HTML hoặc text khác, không hiện lên UI mà chỉ báo lỗi chung
       if (statusCode == 401) {
-        throw Exception('Invalid email or password');
+        throw BusinessException('Invalid email or password');
       }
-      throw Exception('Server error ($statusCode)');
+      throw Exception('Silent server error');
     }
   }
 }

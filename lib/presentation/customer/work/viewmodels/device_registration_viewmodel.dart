@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:zent_fe/domain/entities/warranty_check_result.dart';
 import 'package:zent_fe/domain/usecases/inventory/zent_inventory_usecases.dart';
 import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 
 class DeviceRegistrationViewModel extends ChangeNotifier
     with SafeChangeNotifier {
@@ -32,6 +33,8 @@ class DeviceRegistrationViewModel extends ChangeNotifier
   bool isRegistering = false;
   String? warrantyMessage;
   WarrantyCheckResult? warrantyResult;
+
+  String? errorMessage; // To hold BusinessException message for UI
 
   // Checkbox state
   bool sendConfirmationEmail = false;
@@ -237,6 +240,10 @@ class DeviceRegistrationViewModel extends ChangeNotifier
       debugPrint('  - Email Sent: ${result.emailSent}');
       debugPrint('=============================================');
       return true;
+    } on BusinessException catch (e) {
+      if (_disposed) return false;
+      errorMessage = e.message;
+      return false;
     } catch (e) {
       debugPrint('=== [submitRegistration] ERROR EXCEPTION ===');
       debugPrint('Exception details: $e');

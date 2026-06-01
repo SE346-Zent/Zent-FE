@@ -10,6 +10,7 @@ import '../../models/create_work_order_request.dart';
 import '../../models/complete_work_order_request.dart';
 import '../../models/refuse_work_order_request.dart';
 import '../local/auth_local_datasource.dart';
+import '../../../domain/exceptions/business_exception.dart';
 
 abstract class WorkOrderRemoteDataSource {
   Future<List<WorkOrderModel>> getWorkOrders({
@@ -218,9 +219,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error completing work order: $e');
     }
   }
@@ -257,9 +259,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error refusing work order: $e');
     }
   }
@@ -277,9 +280,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error approving refusal: $e');
     }
   }
@@ -295,9 +299,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error denying refusal: $e');
     }
   }
@@ -356,9 +361,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error starting work order: $e');
     }
   }
@@ -409,18 +415,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           return;
         }
 
-        // Parse beautiful, human-readable error message from JSON instead of displaying raw JSON structure
-        String errorMessage = response.body;
-        try {
-          final decoded = json.decode(response.body);
-          if (decoded is Map<String, dynamic> && decoded['message'] != null) {
-            errorMessage = decoded['message'].toString();
-          }
-        } catch (_) {}
-
-        throw Exception('Status ${response.statusCode}: $errorMessage');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Failed to verify & upload image: $e');
     }
   }
@@ -436,7 +434,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
 
       final jsonMap = jsonDecode(response.body);
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
 
       if (jsonMap is Map<String, dynamic> && jsonMap.containsKey('data')) {
@@ -444,6 +442,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       }
       return jsonMap;
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error fetching work order history: $e');
     }
   }
@@ -460,9 +459,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error rating work order: $e');
     }
   }
@@ -474,23 +474,23 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     debugPrint('--- API Error $statusCode ---');
     debugPrint('Body: $body');
     debugPrint('-----------------------------');
-
     if (body.isEmpty) {
-      throw Exception('Server Error ($statusCode)');
+      throw Exception('Silent server error');
     }
 
-    final contentType = response.headers['content-type'] ?? '';
-    if (contentType.contains('application/json')) {
-      try {
-        final errorMap = jsonDecode(body);
-        throw Exception(
-          errorMap['message'] ?? 'Something went wrong ($statusCode)',
-        );
-      } catch (_) {
-        throw Exception('Server response error ($statusCode)');
+    try {
+      final errorMap = jsonDecode(body);
+      final message = errorMap['message'];
+
+      if (statusCode >= 400 && statusCode < 500 && message is String) {
+        throw BusinessException(message);
       }
-    } else {
-      throw Exception('Server error ($statusCode)');
+
+      throw Exception('Silent API error');
+    } on BusinessException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Silent parse error');
     }
   }
 }

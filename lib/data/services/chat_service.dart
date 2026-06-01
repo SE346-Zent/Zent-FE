@@ -446,6 +446,9 @@ class ChatService extends ChangeNotifier {
       'image_url': imageUrl,
       'reply_to': null,
     });
+
+    // Notify local chat list to refresh optimistically
+    _messageStreamController?.add({'type': 'MESSAGE_SENT', 'room_id': roomId});
   }
 
   void markAsRead(String messageId) {

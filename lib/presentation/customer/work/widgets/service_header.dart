@@ -122,7 +122,7 @@ class ServiceHeader extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: userName,
+                      text: "Zent",
                       style: TextStyles.headline.copyWith(
                         color: AppColors.tertiary500, // Highlight blue
                       ),

@@ -31,6 +31,12 @@ class ChatMessage {
     try {
       String cleanStr = dateStr.trim();
 
+      // Remove any spaces before + or - timezone offsets
+      cleanStr = cleanStr.replaceAll(
+        RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'),
+        r'$1',
+      );
+
       // Normalize timezone offset with seconds (e.g. '+00:00:00' -> '+00:00')
       final match = RegExp(r'([+-]\d{2}:\d{2}):\d{2}$').firstMatch(cleanStr);
       if (match != null) {

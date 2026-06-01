@@ -69,8 +69,9 @@ class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
     _currentStream = stream;
 
     _wsSubscription = stream.listen((event) {
-      if (event is Map<String, dynamic> && event['type'] == 'MESSAGE') {
-        // Refresh chat list silently on new messages
+      if (event is Map<String, dynamic> &&
+          (event['type'] == 'MESSAGE' || event['type'] == 'MESSAGE_SENT')) {
+        // Refresh chat list silently on new messages or locally sent messages
         fetchChats(showLoading: false);
       }
     });
@@ -92,8 +93,12 @@ class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
         if (room.latestMessageAt != null) {
           try {
             String dateStr = room.latestMessageAt!;
-            if (dateStr.endsWith(' +00:00:00')) {
-              dateStr = dateStr.replaceAll(' +00:00:00', 'Z');
+            dateStr = dateStr.replaceAll(
+              RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'),
+              r'$1',
+            );
+            if (dateStr.endsWith('+00:00:00')) {
+              dateStr = dateStr.replaceAll('+00:00:00', 'Z');
             }
             parsedDt = DateTime.parse(dateStr);
             formattedTime = DateFormat('HH:mm').format(parsedDt.toLocal());
@@ -138,13 +143,15 @@ class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
         }
         try {
           String aStr = a.latestMessageAt!;
-          if (aStr.endsWith(' +00:00:00')) {
-            aStr = aStr.replaceAll(' +00:00:00', 'Z');
+          aStr = aStr.replaceAll(RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'), r'$1');
+          if (aStr.endsWith('+00:00:00')) {
+            aStr = aStr.replaceAll('+00:00:00', 'Z');
           }
 
           String bStr = b.latestMessageAt!;
-          if (bStr.endsWith(' +00:00:00')) {
-            bStr = bStr.replaceAll(' +00:00:00', 'Z');
+          bStr = bStr.replaceAll(RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'), r'$1');
+          if (bStr.endsWith('+00:00:00')) {
+            bStr = bStr.replaceAll('+00:00:00', 'Z');
           }
 
           final aDt = DateTime.parse(aStr);

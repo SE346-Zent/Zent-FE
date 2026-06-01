@@ -111,11 +111,9 @@ class ChatService extends ChangeNotifier {
   bool get isConnecting => _isConnecting;
 
   String? _currentViewingRoomId;
+  String? get currentViewingRoomId => _currentViewingRoomId;
 
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "http://localhost:3000/api/v1",
-  );
+  static final String _baseURL = dotenv.get("BASE_URL");
 
   String get _cleanBaseURL {
     return _baseURL.endsWith('/')
@@ -124,7 +122,7 @@ class ChatService extends ChangeNotifier {
   }
 
   static final Duration _timeOut = Duration(
-    seconds: int.tryParse(dotenv.get("TIME_OUT", fallback: "30")) ?? 30,
+    seconds: int.tryParse(dotenv.get("TIME_OUT")) ?? 30,
   );
 
   ChatService({required this.client, required this.authLocalDataSource});
@@ -134,11 +132,7 @@ class ChatService extends ChangeNotifier {
       debugPrint("WS Image URL already absolute: $objectName");
       return objectName;
     }
-    final ociBaseUrl = dotenv.get(
-      "OCI_STORAGE_URL",
-      fallback:
-          "https://ax5xvczhukcm.objectstorage.ap-singapore-1.oci.customer-oci.com/p/Ya_v3u8oisCU7-ppjyii-jjJHJ6sOAzF3QpxYpCvMyEv2hKxWqB5y5aAuh-E0DZ8/n/ax5xvczhukcm/b/zent/o/media/images/work-orders/",
-    );
+    final ociBaseUrl = dotenv.get("OCI_STORAGE_URL");
     final resolvedUrl = '$ociBaseUrl$objectName';
     debugPrint(
       "WS Image URL resolved: objectName=$objectName -> resolvedUrl=$resolvedUrl",
@@ -452,6 +446,9 @@ class ChatService extends ChangeNotifier {
       'image_url': imageUrl,
       'reply_to': null,
     });
+
+    // Notify local chat list to refresh optimistically
+    _messageStreamController?.add({'type': 'MESSAGE_SENT', 'room_id': roomId});
   }
 
   void markAsRead(String messageId) {

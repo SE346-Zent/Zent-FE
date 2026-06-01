@@ -29,6 +29,7 @@ class WorkOrderModel extends WorkOrder {
     super.country,
     super.email,
     super.firstName,
+    super.phoneNumber,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -59,6 +60,7 @@ class WorkOrderModel extends WorkOrder {
       country: entity.country,
       email: entity.email,
       firstName: entity.firstName,
+      phoneNumber: entity.phoneNumber,
     );
   }
 
@@ -142,6 +144,10 @@ class WorkOrderModel extends WorkOrder {
       country: json['country'] as String?,
       email: json['email'] as String?,
       firstName: json['first_name'] as String? ?? json['firstName'] as String?,
+      phoneNumber:
+          json['phoneNumber'] as String? ??
+          json['phone_number'] as String? ??
+          json['phone'] as String?,
     );
   }
 
@@ -221,16 +227,18 @@ class WorkOrderModel extends WorkOrder {
         json['addressString'] as String? ?? json['address_string'] as String?;
     if (prebuilt != null && prebuilt.isNotEmpty) return prebuilt;
 
-    // Build from WorkOrderDetails fields: address, building, city, province, country
+    // Build from WorkOrderDetails fields: address, building, ward, city, province, country
     final parts = <String>[];
     final address = json['address'] as String?;
     final building = json['building'] as String?;
+    final ward = json['ward'] as String? ?? json['Ward'] as String?;
     final city = json['city'] as String?;
     final province = json['province'] as String?;
     final country = json['country'] as String?;
 
     if (building != null && building.isNotEmpty) parts.add(building);
     if (address != null && address.isNotEmpty) parts.add(address);
+    if (ward != null && ward.isNotEmpty) parts.add(ward);
     if (city != null && city.isNotEmpty) parts.add(city);
     if (province != null && province.isNotEmpty) parts.add(province);
     if (country != null && country.isNotEmpty) parts.add(country);
@@ -265,6 +273,7 @@ class WorkOrderModel extends WorkOrder {
       'country': country,
       'email': email,
       'firstName': firstName,
+      'phoneNumber': phoneNumber,
       'technician_name': technicianName,
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,

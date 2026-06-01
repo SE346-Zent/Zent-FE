@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/entities/login_history_entry.dart';
+import 'package:zent_fe/domain/usecases/auth/get_login_history_usecase.dart';
+import '../../../common/core/safe_change_notifier.dart';
 
-class LoginHistoryItem {
-  final String device;
-  final String location;
-  final String date;
+class TechSecurityViewModel extends ChangeNotifier with SafeChangeNotifier {
+  final GetLoginHistoryUseCase getLoginHistoryUseCase;
 
-  LoginHistoryItem(this.device, this.location, this.date);
-}
+  List<LoginHistoryEntry> _loginHistory = [];
+  List<LoginHistoryEntry> get loginHistory => _loginHistory;
 
-class TechSecurityViewModel extends ChangeNotifier {
-  final List<LoginHistoryItem> loginHistory = [
-    LoginHistoryItem('IPhone 14 ProMax', 'San Fransico, US', 'Oct 15'),
-    LoginHistoryItem('IPhone 15 ProMax', 'San Fransico, US', 'Oct 14'),
-    LoginHistoryItem('IPhone 16 ProMax', 'San Fransico, US', 'Oct 10'),
-  ];
+  bool _isLoadingHistory = false;
+  bool get isLoadingHistory => _isLoadingHistory;
+
+  TechSecurityViewModel({required this.getLoginHistoryUseCase}) {
+    fetchLoginHistory();
+  }
+
+  Future<void> fetchLoginHistory() async {
+    _isLoadingHistory = true;
+    notifyListeners();
+    try {
+      _loginHistory = await getLoginHistoryUseCase.execute();
+    } catch (e) {
+      debugPrint('Error fetching login history: $e');
+    } finally {
+      _isLoadingHistory = false;
+      notifyListeners();
+    }
+  }
 
   void saveChanges(BuildContext context) {
     debugPrint('Viewmodel: Saving Security changes...');

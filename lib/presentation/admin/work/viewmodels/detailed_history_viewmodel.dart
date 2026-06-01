@@ -1,8 +1,9 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/repositories/work_order_repository.dart';
 
-class DetailedHistoryViewModel extends ChangeNotifier {
+class DetailedHistoryViewModel extends ChangeNotifier with SafeChangeNotifier {
   final WorkOrderRepository repository;
   final String workOrderId;
 

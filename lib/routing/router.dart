@@ -84,7 +84,9 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
   try {
     final location = state.matchedLocation;
     final role = await _getRoleFromToken();
-    if (role == UserRoles.admin || role == UserRoles.technician) {
+    if (role == UserRoles.admin ||
+        role == UserRoles.superAdmin ||
+        role == UserRoles.technician) {
       try {
         final settings = await FirebaseMessaging.instance.requestPermission();
         if (settings.authorizationStatus != AuthorizationStatus.authorized) {
@@ -114,6 +116,7 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
 
     if (isPublic && !isAuthFlow) {
       return switch (role) {
+        UserRoles.superAdmin => Routes.adminDashboard,
         UserRoles.admin => Routes.adminDashboard,
         UserRoles.technician => Routes.techHome,
         UserRoles.customer => Routes.customerServices,
@@ -126,7 +129,9 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
     final isTechRoute = location.startsWith('/tech');
     final isCustomerRoute = location.startsWith('/customer');
 
-    if (isAdminRoute && role != UserRoles.admin) {
+    if (isAdminRoute &&
+        role != UserRoles.admin &&
+        role != UserRoles.superAdmin) {
       return switch (role) {
         UserRoles.technician => Routes.techHome,
         UserRoles.customer => Routes.customerServices,
@@ -134,7 +139,9 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
       };
     }
 
-    if (isTechRoute && role != UserRoles.technician) {
+    if (isTechRoute &&
+        role != UserRoles.technician &&
+        role != UserRoles.superAdmin) {
       return switch (role) {
         UserRoles.admin => Routes.adminDashboard,
         UserRoles.customer => Routes.customerServices,
@@ -142,7 +149,9 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
       };
     }
 
-    if (isCustomerRoute && role != UserRoles.customer) {
+    if (isCustomerRoute &&
+        role != UserRoles.customer &&
+        role != UserRoles.superAdmin) {
       return switch (role) {
         UserRoles.admin => Routes.adminDashboard,
         UserRoles.technician => Routes.techHome,
@@ -321,7 +330,10 @@ final GoRouter appRouter = GoRouter(
                       name: RouteNames.adminDetailRequest,
                       path: Routes.adminDetailRequest,
                       parentNavigatorKey: _rootNavigatorKey,
-                      builder: (context, state) => const DetailRequestScreen(),
+                      builder: (context, state) {
+                        final partId = state.pathParameters['partId'] ?? '';
+                        return DetailRequestScreen(partId: partId);
+                      },
                     ),
                   ],
                 ),
@@ -494,7 +506,16 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.techAddNewPart,
                   path: Routes.addNewPart,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const AddNewPartScreen(),
+                  builder: (context, state) {
+                    final extra = state.extra as Map<String, dynamic>? ?? {};
+                    final workOrderId = extra['workOrderId'] as String? ?? '';
+                    final workOrderNumber =
+                        extra['workOrderNumber'] as String? ?? '';
+                    return AddNewPartScreen(
+                      workOrderId: workOrderId,
+                      workOrderNumber: workOrderNumber,
+                    );
+                  },
                 ),
                 GoRoute(
                   name: RouteNames.techPartSearch,

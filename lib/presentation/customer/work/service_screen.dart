@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/presentation/customer/work/viewmodels/service_viewmodel.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
 import 'package:zent_fe/presentation/customer/work/widgets/service_action_card.dart';
@@ -29,8 +31,27 @@ class CustomerServiceScreen extends StatelessWidget {
   }
 }
 
-class _ServiceScreenContent extends StatelessWidget {
+class _ServiceScreenContent extends StatefulWidget {
   const _ServiceScreenContent();
+
+  @override
+  State<_ServiceScreenContent> createState() => _ServiceScreenContentState();
+}
+
+class _ServiceScreenContentState extends State<_ServiceScreenContent> {
+  bool _pendingProcessed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_pendingProcessed) {
+      _pendingProcessed = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final role = context.read<AuthViewModel>().role;
+        NotificationNavigator.processPendingNotification(context, role);
+      });
+    }
+  }
 
   void _onServiceCardTapped(BuildContext context, String? routeName) {
     if (routeName != null) {

@@ -10,22 +10,66 @@ import 'viewmodels/add_new_part_viewmodel.dart';
 import 'widgets/add_new_part_form.dart';
 
 class AddNewPartScreen extends StatelessWidget {
-  const AddNewPartScreen({super.key});
+  final String workOrderId;
+  final String workOrderNumber;
+
+  const AddNewPartScreen({
+    super.key,
+    required this.workOrderId,
+    required this.workOrderNumber,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<AddNewPartViewModel>(),
-      child: const _AddNewPartContent(),
+      child: _AddNewPartContent(
+        workOrderId: workOrderId,
+        workOrderNumber: workOrderNumber,
+      ),
     );
   }
 }
 
-class _AddNewPartContent extends StatelessWidget {
-  const _AddNewPartContent();
+class _AddNewPartContent extends StatefulWidget {
+  final String workOrderId;
+  final String workOrderNumber;
+
+  const _AddNewPartContent({
+    required this.workOrderId,
+    required this.workOrderNumber,
+  });
+
+  @override
+  State<_AddNewPartContent> createState() => _AddNewPartContentState();
+}
+
+class _AddNewPartContentState extends State<_AddNewPartContent> {
+  final TextEditingController _woNumberController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AddNewPartViewModel>().loadCategories();
+    });
+  }
+
+  @override
+  void dispose() {
+    _woNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final woId = widget.workOrderId;
+    final woNumber = widget.workOrderNumber;
+
+    if (_woNumberController.text.isEmpty) {
+      _woNumberController.text = woNumber;
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SafeArea(
@@ -38,11 +82,43 @@ class _AddNewPartContent extends StatelessWidget {
                 child: Column(
                   children: [
                     const AddNewPartForm(),
-                    PrimaryActionButton(
-                      label: "Submit Part Form",
-                      width: double.infinity,
-                      onPressed: () {
-                        debugPrint("action triggered: Submit Part Form");
+                    Consumer<AddNewPartViewModel>(
+                      builder: (context, viewModel, _) {
+                        final canSubmit = !viewModel.isSubmitting;
+                        return PrimaryActionButton(
+                          label: viewModel.isSubmitting
+                              ? "Submitting..."
+                              : "Submit Part Form",
+                          width: double.infinity,
+                          onPressed: canSubmit
+                              ? () async {
+                                  final success = await viewModel.submitPart(
+                                    workOrderId: woId,
+                                    workOrderNumber: _woNumberController.text
+                                        .trim(),
+                                  );
+                                  if (success && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Part added successfully!',
+                                        ),
+                                        backgroundColor: AppColors.success500,
+                                      ),
+                                    );
+                                    Navigator.of(context).pop(true);
+                                  } else if (context.mounted &&
+                                      viewModel.errorMessage != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(viewModel.errorMessage!),
+                                        backgroundColor: AppColors.error500,
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null,
+                        );
                       },
                     ),
                     const SizedBox(height: AppDimens.spaceLg),

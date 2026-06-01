@@ -16,6 +16,8 @@ import 'package:zent_fe/presentation/common/auth/login/widgets/auth_footer_link.
 import 'package:zent_fe/presentation/common/auth/login/widgets/social_login_section.dart';
 import 'package:zent_fe/presentation/common/auth/login/view_models/login_view_model.dart';
 
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
+
 // ViewModel
 import 'package:zent_fe/presentation/common/auth/register/view_models/register_view_model.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -38,8 +40,6 @@ class _RegisterScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<RegisterViewModel>();
-
-    // Automatically show error if it exists
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -162,6 +162,9 @@ class _RegisterScreenContent extends StatelessWidget {
                         'isRegistration': true,
                       },
                     );
+                  } else if (viewModel.errorMessage != null &&
+                      context.mounted) {
+                    ZentErrorPopup.show(context, viewModel.errorMessage!);
                   }
                 },
               ),

@@ -10,21 +10,26 @@ class UserManagementList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<UserManagementViewModel>();
-    final activeData = viewModel.activeData;
+    final activeUsers = viewModel.activeUsers;
+
+    if (viewModel.isLoading) {
+      return const Expanded(child: Center(child: CircularProgressIndicator()));
+    }
 
     return Expanded(
       child: ListView.separated(
         key: ValueKey<int>(viewModel.activeTabIndex),
         padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
-        itemCount: activeData.length,
+        itemCount: activeUsers.length,
         separatorBuilder: (context, index) =>
-            const SizedBox(height: AppDimens.spaceMd),
+            const SizedBox(height: AppDimens.spaceSm),
         itemBuilder: (context, index) {
-          final user = activeData[index];
+          final user = activeUsers[index];
           return UserListItem(
-            userName: user['userName'],
-            userRole: user['userRole'],
-            avatarUrl: user['avatarUrl'],
+            userId: user.id,
+            userName: user.name,
+            userRole: user.role.name,
+            phoneNumber: user.phoneNumber,
             onEditTap: () => viewModel.editUser(index),
           );
         },

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 // Core Dependency Injection
 import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/login_history_section.dart';
 
 // Core Theming
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
@@ -107,6 +108,13 @@ class _CustomerSecurityView extends StatelessWidget {
                           color: AppColors.secondary300,
                         ),
                       ),
+                    ),
+                    const SizedBox(height: AppDimens.spaceXl),
+
+                    // LOGIN HISTORY
+                    LoginHistorySection(
+                      history: viewModel.loginHistory,
+                      isLoading: viewModel.isLoadingHistory,
                     ),
                     const SizedBox(height: AppDimens.spaceXl),
 

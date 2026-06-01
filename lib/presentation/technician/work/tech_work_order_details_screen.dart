@@ -99,19 +99,24 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
   }
 
   Widget _buildPopupMenu(BuildContext context) {
+    final viewModel = context.read<TechWorkOrderDetailsViewModel>();
+    final cleanId = viewModel.workOrderId.replaceAll('#', '');
+    final woNum = viewModel.displayWorkOrderNum;
+
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_horiz, color: Colors.black),
-      color: AppColors.error50,
+      color: AppColors.background500,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimens.boraSm),
       ),
       offset: const Offset(0, 40),
       onSelected: (value) {
-        if (value == 'reject') {
-          final cleanId = context
-              .read<TechWorkOrderDetailsViewModel>()
-              .workOrderId
-              .replaceAll('#', '');
+        if (value == 'addPart') {
+          context.pushNamed(
+            RouteNames.techAddNewPart,
+            extra: {'workOrderId': cleanId, 'workOrderNumber': woNum},
+          );
+        } else if (value == 'reject') {
           context.pushNamed(
             RouteNames.techRejectWorkOrder,
             pathParameters: {'workOrderId': cleanId},
@@ -120,15 +125,59 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
       },
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
+          value: 'addPart',
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppDimens.boraSm),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                'Add New Part',
+                style: TextStyles.label.copyWith(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
           value: 'reject',
-          height: 20.0,
-          padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceSm),
-          child: Center(
-            child: Text(
-              'Reject Work Order',
-              style: TextStyles.label.copyWith(
-                color: AppColors.error500,
-                fontWeight: FontWeight.w600,
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.error50,
+              borderRadius: BorderRadius.circular(AppDimens.boraSm),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                'Reject Work Order',
+                style: TextStyles.label.copyWith(
+                  color: AppColors.error500,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),

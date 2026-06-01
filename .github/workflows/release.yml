@@ -35,8 +35,13 @@ jobs:
           channel: 'stable'
           cache: true
   
-      - name: Create .env from GitHub Secrets
-        run: echo "BASE_URL=${{ secrets.BASE_URL }}" > .env
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Setup Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
       - name: Install Dependencies
         run: flutter pub get

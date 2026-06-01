@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 
 class ServiceTypeData {
   final String id;
@@ -25,7 +27,7 @@ class ServiceTypeData {
   });
 }
 
-class RequestServiceViewModel extends ChangeNotifier {
+class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   final CreateWorkOrderUseCase createWorkOrderUseCase;
 
   static const List<String> symptomsList = [
@@ -87,6 +89,7 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   int get currentStep => _currentStep;
   bool get isLoading => _isLoading;
+  String? errorMessage;
 
   // Selected device
   String? selectedProductId;
@@ -149,9 +152,15 @@ class RequestServiceViewModel extends ChangeNotifier {
             .map((e) => e.toString())
             .toList();
 
-        provinces.add(provinceName);
-        _citiesByProvince[provinceName] = citiesList;
+        if (provinceName.contains('Hồ Chí Minh') ||
+            provinceName.contains('Hà Nội')) {
+          provinces.add(provinceName);
+          _citiesByProvince[provinceName] = citiesList;
+        }
       }
+
+      provinces.clear();
+      provinces.addAll(['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']);
 
       notifyListeners();
     } catch (e) {
@@ -402,8 +411,9 @@ class RequestServiceViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> submitTicket(BuildContext context) async {
+  Future<bool> submitTicket(BuildContext context) async {
     _isLoading = true;
+    errorMessage = null;
     notifyListeners();
 
     try {
@@ -441,7 +451,7 @@ class RequestServiceViewModel extends ChangeNotifier {
           : null;
 
       if (desc == null) {
-        throw Exception('Please provide a description of the problem.');
+        throw BusinessException('Please provide a description of the problem.');
       }
 
       String finalCity = city ?? '';
@@ -450,17 +460,15 @@ class RequestServiceViewModel extends ChangeNotifier {
       // Map full names to short codes for Backend
       if (finalProvince.contains('Hồ Chí Minh')) {
         finalProvince = 'HCM';
-        finalCity = 'HCM';
       } else if (finalProvince.contains('Hà Nội')) {
         finalProvince = 'HN';
-        finalCity = 'HN';
       }
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        city: finalCity,
+        ward: finalCity,
         country: country ?? 'Vietnam',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,
@@ -487,10 +495,13 @@ class RequestServiceViewModel extends ChangeNotifier {
 
       // Go to step 5 on success
       _currentStep = 5;
+      return true;
+    } on BusinessException catch (e) {
+      errorMessage = e.message;
+      return false;
     } catch (e) {
       debugPrint("Error submitting ticket: $e");
-      // Rethrow to let the UI handle or display error
-      rethrow;
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

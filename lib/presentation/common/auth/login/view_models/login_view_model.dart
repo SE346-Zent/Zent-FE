@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -6,7 +7,7 @@ import 'package:zent_fe/domain/usecases/auth/login_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/google_login_usecase.dart';
 import 'package:zent_fe/domain/entities/user.dart';
 
-class LoginViewModel extends ChangeNotifier {
+class LoginViewModel extends ChangeNotifier with SafeChangeNotifier {
   final LoginUseCase loginUseCase;
   final GoogleLoginUseCase googleLoginUseCase;
 

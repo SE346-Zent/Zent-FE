@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/chat_viewmodel.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart'
-    show AppAssets;
 
 class ChatListItem extends StatelessWidget {
   final ChatPreview chat;
@@ -29,25 +28,7 @@ class ChatListItem extends StatelessWidget {
         child: Row(
           children: [
             // Avatar
-            Container(
-              width: 44.0,
-              height: 44.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.tertiary500, width: 1.0),
-                image: chat.avatarUrl != null
-                    ? DecorationImage(
-                        image: NetworkImage(chat.avatarUrl!),
-                        fit: BoxFit.cover,
-                      )
-                    : const DecorationImage(
-                        image: AssetImage(
-                          AppAssets.onboarding1,
-                        ), // Fallback mock image
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            ),
+            UserAvatar(avatarUrl: chat.avatarUrl, name: chat.name, size: 44),
             const SizedBox(width: AppDimens.spaceMd),
             // Text Block
             Expanded(

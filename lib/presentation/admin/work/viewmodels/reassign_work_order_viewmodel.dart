@@ -1,6 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class ReassignWorkOrderViewModel extends ChangeNotifier {
+class ReassignWorkOrderViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   String _orderId = '';
   String get orderId => _orderId;
 

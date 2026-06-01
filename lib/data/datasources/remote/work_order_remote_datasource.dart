@@ -10,6 +10,7 @@ import '../../models/create_work_order_request.dart';
 import '../../models/complete_work_order_request.dart';
 import '../../models/refuse_work_order_request.dart';
 import '../local/auth_local_datasource.dart';
+import '../../../domain/exceptions/business_exception.dart';
 
 abstract class WorkOrderRemoteDataSource {
   Future<List<WorkOrderModel>> getWorkOrders({
@@ -18,6 +19,7 @@ abstract class WorkOrderRemoteDataSource {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   });
   Future<WorkOrderModel> getWorkOrderDetail(String id);
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
@@ -35,6 +37,7 @@ abstract class WorkOrderRemoteDataSource {
     String phase,
   );
   Future<Map<String, dynamic>> getWorkOrderHistory(String id);
+  Future<void> rateWorkOrder(String id, int rating, String? comment);
 }
 
 class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
@@ -42,10 +45,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
   final AuthLocalDataSource authLocalDataSource;
 
   // The BASE_URL should be something like http://.../api/v1
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "http://localhost:3000/api/v1",
-  );
+  static final String _baseURL = dotenv.get("BASE_URL");
 
   static final Duration _timeOut = Duration(
     seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
@@ -72,12 +72,13 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   }) async {
-    final queryParameters = {
-      'role': ?role,
-      'province': ?province,
-      'technician_id': ?technicianId,
-    };
+    final queryParameters = <String, String>{};
+    if (role != null) queryParameters['role'] = role;
+    if (province != null) queryParameters['province'] = province;
+    if (technicianId != null) queryParameters['technician_id'] = technicianId;
+    if (date != null) queryParameters['date'] = date;
 
     final url = Uri.parse(
       '$_baseURL/work_orders',
@@ -92,6 +93,8 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       if (response.statusCode != 200) {
         _handleErrorResponse(response);
       }
+
+      debugPrint('=== [API Response] GET /work_orders: ${response.body} ===');
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<List<dynamic>>.fromJson(
@@ -127,6 +130,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       if (response.statusCode != 200) {
         _handleErrorResponse(response);
       }
+
+      debugPrint(
+        '=== [API Response] GET /work_orders/$id: ${response.body} ===',
+      );
 
       final jsonMap = jsonDecode(response.body);
       final apiResponse = ApiResponse<WorkOrderModel>.fromJson(
@@ -212,9 +219,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error completing work order: $e');
     }
   }
@@ -251,9 +259,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error refusing work order: $e');
     }
   }
@@ -271,9 +280,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error approving refusal: $e');
     }
   }
@@ -289,9 +299,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error denying refusal: $e');
     }
   }
@@ -350,9 +361,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           .timeout(_timeOut);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error starting work order: $e');
     }
   }
@@ -403,18 +415,10 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
           return;
         }
 
-        // Parse beautiful, human-readable error message from JSON instead of displaying raw JSON structure
-        String errorMessage = response.body;
-        try {
-          final decoded = json.decode(response.body);
-          if (decoded is Map<String, dynamic> && decoded['message'] != null) {
-            errorMessage = decoded['message'].toString();
-          }
-        } catch (_) {}
-
-        throw Exception('Status ${response.statusCode}: $errorMessage');
+        _handleErrorResponse(response);
       }
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Failed to verify & upload image: $e');
     }
   }
@@ -430,7 +434,7 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
 
       final jsonMap = jsonDecode(response.body);
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Status ${response.statusCode}: ${response.body}');
+        _handleErrorResponse(response);
       }
 
       if (jsonMap is Map<String, dynamic> && jsonMap.containsKey('data')) {
@@ -438,7 +442,28 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
       }
       return jsonMap;
     } catch (e) {
+      if (e is Exception) rethrow;
       throw Exception('Error fetching work order history: $e');
+    }
+  }
+
+  @override
+  Future<void> rateWorkOrder(String id, int rating, String? comment) async {
+    final url = Uri.parse('$_baseURL/work_orders/$id/rate');
+    try {
+      final headers = await _getHeaders();
+      final body = jsonEncode({'rating': rating, 'comment': comment});
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error rating work order: $e');
     }
   }
 
@@ -449,23 +474,23 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     debugPrint('--- API Error $statusCode ---');
     debugPrint('Body: $body');
     debugPrint('-----------------------------');
-
     if (body.isEmpty) {
-      throw Exception('Server Error ($statusCode)');
+      throw Exception('Silent server error');
     }
 
-    final contentType = response.headers['content-type'] ?? '';
-    if (contentType.contains('application/json')) {
-      try {
-        final errorMap = jsonDecode(body);
-        throw Exception(
-          errorMap['message'] ?? 'Something went wrong ($statusCode)',
-        );
-      } catch (_) {
-        throw Exception('Server response error ($statusCode)');
+    try {
+      final errorMap = jsonDecode(body);
+      final message = errorMap['message'];
+
+      if (statusCode >= 400 && statusCode < 500 && message is String) {
+        throw BusinessException(message);
       }
-    } else {
-      throw Exception('Server error ($statusCode)');
+
+      throw Exception('Silent API error');
+    } on BusinessException {
+      rethrow;
+    } catch (_) {
+      throw Exception('Silent parse error');
     }
   }
 }

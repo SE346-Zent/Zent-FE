@@ -16,6 +16,7 @@ abstract class WorkOrderRepository {
     String? role,
     String? province,
     String? technicianId,
+    String? date,
   });
 
   Future<WorkOrder> getWorkOrderDetail({required String id});
@@ -29,6 +30,7 @@ abstract class WorkOrderRepository {
     String phase,
   );
   Future<Map<String, dynamic>> getWorkOrderHistory(String id);
+  Future<void> rateWorkOrder(String id, int rating, String? comment);
 
   // Drafts (Local)
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft);

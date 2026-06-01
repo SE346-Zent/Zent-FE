@@ -144,7 +144,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
               ),
               decoration: InputDecoration(
                 isDense: true,
-                hintText: 'Search work orders by work order number',
+                hintText: 'Search by WO#, customer, product, or issue',
                 hintStyle: TextStyles.bodyLarge.copyWith(
                   color: AppColors.secondary200,
                 ),
@@ -452,6 +452,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
   // Customer Rating Popup Screen
   // ──────────────────────────────────────────────────────────────────────────
   void _showRatingDialog(BuildContext context, WorkOrder wo) {
+    final vm = context.read<WorkOrdersHistoryViewModel>();
     int rating = 5;
     final commentController = TextEditingController();
 
@@ -595,16 +596,33 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                           vertical: 10,
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Rating submitted successfully! Thank you.',
-                            ),
-                            backgroundColor: AppColors.success500,
-                          ),
+                      onPressed: () async {
+                        final navigator = Navigator.of(context);
+                        final messenger = ScaffoldMessenger.of(context);
+                        navigator.pop(context);
+
+                        final success = await vm.rateWorkOrder(
+                          wo.id,
+                          rating,
+                          commentController.text.trim().isEmpty
+                              ? null
+                              : commentController.text.trim(),
                         );
+
+                        if (mounted) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Rating submitted successfully! Thank you.'
+                                    : 'Failed to submit rating. Please try again.',
+                              ),
+                              backgroundColor: success
+                                  ? AppColors.success500
+                                  : AppColors.error500,
+                            ),
+                          );
+                        }
                       },
                       child: Text(
                         'Submit',

@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../../../../domain/usecases/work_order/get_single_work_order_usecase.dart';
@@ -5,7 +6,8 @@ import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 import '../../../../data/models/refuse_work_order_request.dart';
 import '../../../../domain/entities/work_order.dart';
 
-class TechRejectWorkOrderViewModel extends ChangeNotifier {
+class TechRejectWorkOrderViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   final RefuseWorkOrderUseCase refuseWorkOrderUseCase;
   final GetSingleWorkOrderUseCase getSingleWorkOrderUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;

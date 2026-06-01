@@ -4,27 +4,32 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'package:zent_fe/presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import 'package:zent_fe/domain/entities/enums/account_status.dart';
 
 class UserListItem extends StatelessWidget {
+  final String userId;
   final String userName;
   final String userRole;
   final String? avatarUrl;
+  final String? phoneNumber;
   final VoidCallback onEditTap;
 
   const UserListItem({
     super.key,
+    required this.userId,
     required this.userName,
     required this.userRole,
     this.avatarUrl,
+    this.phoneNumber,
     required this.onEditTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Selector<UserManagementViewModel, AccountStatus>(
-      selector: (_, vm) => vm.getStatusFor(userName),
+      selector: (_, vm) => vm.getStatusForUser(userId),
       builder: (context, status, _) {
         return Container(
           width: double.infinity,
@@ -44,31 +49,7 @@ class UserListItem extends StatelessWidget {
                 height: 44.0,
                 child: Stack(
                   children: [
-                    Container(
-                      width: 44.0,
-                      height: 44.0,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface600,
-                        shape: BoxShape.circle,
-                        image: avatarUrl != null
-                            ? DecorationImage(
-                                image: NetworkImage(avatarUrl!),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                      alignment: Alignment.center,
-                      child: avatarUrl == null
-                          ? Text(
-                              userName.isNotEmpty
-                                  ? userName[0].toUpperCase()
-                                  : 'U',
-                              style: TextStyles.title.copyWith(
-                                color: AppColors.primary500,
-                              ),
-                            )
-                          : null,
-                    ),
+                    UserAvatar(avatarUrl: avatarUrl, name: userName, size: 44),
                     Positioned(
                       bottom: 0,
                       right: 0,

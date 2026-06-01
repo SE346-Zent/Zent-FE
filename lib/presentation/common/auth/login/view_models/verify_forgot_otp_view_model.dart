@@ -1,9 +1,10 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/auth/forgot_password_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/verify_forgot_otp_usecase.dart';
 
-class VerifyForgotOtpViewModel extends ChangeNotifier {
+class VerifyForgotOtpViewModel extends ChangeNotifier with SafeChangeNotifier {
   final VerifyForgotOtpUseCase verifyForgotOtpUseCase;
   final ForgotPasswordUseCase forgotPasswordUseCase;
 

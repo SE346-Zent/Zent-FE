@@ -27,6 +27,7 @@ class WorkOrder {
   final String? country;
   final String? email;
   final String? firstName;
+  final String? phoneNumber;
 
   WorkOrder({
     required this.id,
@@ -55,6 +56,7 @@ class WorkOrder {
     this.country,
     this.email,
     this.firstName,
+    this.phoneNumber,
   });
 
   String get address => addressString;

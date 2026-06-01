@@ -2,7 +2,7 @@ class CreateWorkOrderRequest {
   final String address;
   final String appointment;
   final String? building;
-  final String city;
+  final String ward;
   final String country;
   final String description;
   final String? email;
@@ -18,7 +18,7 @@ class CreateWorkOrderRequest {
     required this.address,
     required this.appointment,
     this.building,
-    required this.city,
+    required this.ward,
     required this.country,
     required this.description,
     this.email,
@@ -36,7 +36,7 @@ class CreateWorkOrderRequest {
       'address': address,
       'appointment': appointment,
       'building': building,
-      'city': city,
+      'ward': ward,
       'country': country,
       'description': description,
       'email': email,

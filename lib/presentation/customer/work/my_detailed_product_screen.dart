@@ -80,12 +80,59 @@ class _DetailedProductView extends StatelessWidget {
                         // Product Image
                         ClipRRect(
                           borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                          child: Image.asset(
-                            viewModel.imagePath,
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+                          child:
+                              viewModel.imagePath.startsWith('http') ||
+                                  viewModel.imagePath.startsWith('https')
+                              ? Image.network(
+                                  viewModel.imagePath,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    debugPrint(
+                                      '=== [DetailedProductImage] Network Image Error for ${viewModel.imagePath}: $error ===',
+                                    );
+                                    return Container(
+                                      height: 200,
+                                      width: double.infinity,
+                                      color: AppColors.secondary50,
+                                      child: const Icon(
+                                        Icons.broken_image,
+                                        color: AppColors.secondary200,
+                                        size: 48,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : viewModel.imagePath.isNotEmpty
+                              ? Image.asset(
+                                  viewModel.imagePath,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 200,
+                                      width: double.infinity,
+                                      color: AppColors.secondary50,
+                                      child: const Icon(
+                                        Icons.broken_image,
+                                        color: AppColors.secondary200,
+                                        size: 48,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  height: 200,
+                                  width: double.infinity,
+                                  color: AppColors.secondary50,
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    color: AppColors.secondary200,
+                                    size: 48,
+                                  ),
+                                ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(AppDimens.spaceLg),

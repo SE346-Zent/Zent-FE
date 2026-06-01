@@ -79,10 +79,7 @@ class InterceptedHttpClient extends http.BaseClient {
         return null;
       }
 
-      final String baseURL = dotenv.get(
-        "BASE_URL",
-        fallback: "http://localhost:3000/api/v1",
-      );
+      final String baseURL = dotenv.get("BASE_URL");
       final url = Uri.parse('$baseURL/auth/refresh-token');
 
       // Make direct request using _inner client to avoid recursive interception

@@ -41,8 +41,7 @@ jobs:
 
       - name: Setup Keystore
         run: |
-          mkdir -p ~/.android
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > ~/.android/debug.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
       - name: Install Dependencies
         run: flutter pub get

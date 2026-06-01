@@ -349,7 +349,8 @@ class _DeviceRegistrationView extends StatelessWidget {
                     final success = await viewModel.submitRegistration();
                     if (success && context.mounted) {
                       context.pop(true);
-                    } else if (context.mounted && viewModel.errorMessage != null) {
+                    } else if (context.mounted &&
+                        viewModel.errorMessage != null) {
                       ZentErrorPopup.show(context, viewModel.errorMessage!);
                     }
                   },

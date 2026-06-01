@@ -533,12 +533,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       try {
         final errorMap = jsonDecode(body);
         final message = errorMap['message'];
-        
+
         // 4xx errors with a specific String message are business logic errors
         if (statusCode >= 400 && statusCode < 500 && message is String) {
           throw BusinessException(message);
         }
-        
+
         // Any other 4xx (like format array messages) or 5xx -> silent exception
         throw Exception('Silent API error');
       } catch (e) {

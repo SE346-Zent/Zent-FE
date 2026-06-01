@@ -430,11 +430,11 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
     try {
       final errorMap = jsonDecode(body);
       final message = errorMap['message'];
-      
+
       if (statusCode >= 400 && statusCode < 500 && message is String) {
         return BusinessException(message);
       }
-      
+
       return Exception('Silent API error');
     } catch (_) {
       return Exception('Silent parse error');

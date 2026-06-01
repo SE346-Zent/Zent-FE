@@ -162,7 +162,8 @@ class _RegisterScreenContent extends StatelessWidget {
                         'isRegistration': true,
                       },
                     );
-                  } else if (viewModel.errorMessage != null && context.mounted) {
+                  } else if (viewModel.errorMessage != null &&
+                      context.mounted) {
                     ZentErrorPopup.show(context, viewModel.errorMessage!);
                   }
                 },

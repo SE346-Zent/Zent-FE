@@ -21,7 +21,6 @@ dependencies {
   // https://firebase.google.com/docs/android/setup#available-libraries
   implementation("com.google.firebase:firebase-messaging")
 
-  coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
 
 android {
@@ -33,7 +32,6 @@ android {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {

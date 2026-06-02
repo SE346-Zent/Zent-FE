@@ -13,141 +13,154 @@ class OperationalQueueJobCard extends StatelessWidget {
 
   const OperationalQueueJobCard({super.key, required this.job});
 
+  Future<void> _handleNavigation(
+    BuildContext context,
+    String actionType,
+  ) async {
+    final cleanId = job['id'].toString().replaceAll('#', '');
+    final statusEnum = job['statusEnum'].toString();
+
+    if (statusEnum == 'unassigned') {
+      await context.pushNamed(
+        RouteNames.adminAssignWorkOrder,
+        pathParameters: {'workOrderId': cleanId},
+      );
+    } else {
+      await context.pushNamed(
+        RouteNames.adminAssignedWorkOrderDetails,
+        pathParameters: {'workOrderId': cleanId},
+      );
+    }
+
+    if (context.mounted) {
+      context.read<OperationalQueueViewModel>().loadWorkOrders();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
+    final String statusEnum = job['statusEnum'].toString();
+    final bool isUnassigned = statusEnum == 'unassigned';
+
+    final String assigneeName = job['assignee'];
+
+    final Color dotColor =
+        (statusEnum == 'unassigned' || statusEnum == 'pending_acceptance')
+        ? AppColors.warning500
+        : (statusEnum == 'reject_in_review' || statusEnum == 'rejected')
+        ? AppColors.error500
+        : AppColors.primary500;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _handleNavigation(context, 'card_tap'),
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        boxShadow: [BoxShadowStyles.raised],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            Container(width: 6.0, color: AppColors.tertiary500),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      job['id'],
-                      style: TextStyles.middle.copyWith(
-                        color: AppColors.secondary500,
-                      ),
-                    ),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      job['title'],
-                      style: TextStyles.headline.copyWith(
-                        color: AppColors.primary500,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceSm),
-                    _buildIconTextRow(Icons.person_outline, job['assignee']),
-                    const SizedBox(height: 4.0),
-                    _buildIconTextRow(
-                      Icons.location_on_outlined,
-                      job['location'],
-                    ),
-                    const SizedBox(height: 4.0),
-                    _buildIconTextRow(
-                      Icons.calendar_today_outlined,
-                      job['time'],
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppDimens.boraMd),
+            boxShadow: [BoxShadowStyles.raised],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(width: 6.0, color: AppColors.primary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppDimens.spaceMd),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: () {
-                                    final s = job['statusEnum'].toString();
-                                    if (s == 'rejected') {
-                                      return AppColors.error500;
-                                    }
-                                    if (s == 'rejectInReview') {
-                                      return AppColors.error200;
-                                    }
-                                    if (s == 'inProg' || s == 'complete') {
-                                      return AppColors.tertiary500;
-                                    }
-                                    return AppColors.warning500; // pending
-                                  }(),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: AppDimens.spaceXs),
-                              Expanded(
-                                child: Text(
-                                  job['status'],
-                                  style: TextStyles.middle.copyWith(
-                                    color: AppColors.secondary500,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                        Text(
+                          job['id'],
+                          style: TextStyles.middle.copyWith(
+                            color: AppColors.secondary500,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: AppDimens.spaceSm),
-                        // Only show Assign button if it's PENDING (no tech yet)
-                        if (job['statusEnum'] == 'pending')
-                          GestureDetector(
-                            onTap: () async {
-                              final cleanId = job['id'].toString().replaceAll(
-                                '#',
-                                '',
-                              );
-                              await context.pushNamed(
-                                RouteNames.adminWorkOrderDetails,
-                                pathParameters: {'workOrderId': cleanId},
-                              );
-                              if (context.mounted) {
-                                context
-                                    .read<OperationalQueueViewModel>()
-                                    .loadWorkOrders();
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 30.0, // Increased width
-                                vertical: 5.0,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary500,
-                                borderRadius: BorderRadius.circular(
-                                  AppDimens.boraSm,
-                                ),
-                                boxShadow: [BoxShadowStyles.subtle],
-                              ),
-                              child: Text(
-                                'Assign',
-                                style: TextStyles.title.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
+                        const SizedBox(height: 2.0),
+                        Text(
+                          job['title'],
+                          style: TextStyles.headline.copyWith(
+                            color: AppColors.primary500,
+                            fontSize: 20,
                           ),
+                        ),
+                        const SizedBox(height: AppDimens.spaceSm),
+
+                        _buildIconTextRow(Icons.person_outline, assigneeName),
+                        const SizedBox(height: 4.0),
+                        _buildIconTextRow(
+                          Icons.location_on_outlined,
+                          job['location'],
+                        ),
+                        const SizedBox(height: 4.0),
+                        _buildIconTextRow(
+                          Icons.calendar_today_outlined,
+                          job['time'],
+                        ),
+
+                        const SizedBox(height: AppDimens.spaceMd),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: dotColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8.0),
+                                Text(
+                                  job['status'],
+                                  style: TextStyles.title.copyWith(
+                                    color: AppColors.primary500,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            if (statusEnum == 'unassigned' ||
+                                statusEnum == 'pending_acceptance')
+                              ElevatedButton(
+                                onPressed: () =>
+                                    _handleNavigation(context, 'button_tap'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary500,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimens.boraSm,
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 0,
+                                  ),
+                                  minimumSize: const Size(0, 36),
+                                ),
+                                child: Text(
+                                  isUnassigned ? 'Assign' : 'Detail',
+                                  style: TextStyles.middle.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -156,12 +169,14 @@ class OperationalQueueJobCard extends StatelessWidget {
   Widget _buildIconTextRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: AppColors.secondary400),
-        const SizedBox(width: 6.0),
+        Icon(icon, size: 16, color: AppColors.secondary400),
+        const SizedBox(width: 8.0),
         Expanded(
           child: Text(
             text,
-            style: TextStyles.label.copyWith(color: AppColors.secondary400),
+            style: TextStyles.bodyMedium.copyWith(
+              color: AppColors.secondary500,
+            ),
           ),
         ),
       ],

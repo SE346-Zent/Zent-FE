@@ -1,1 +1,1 @@
-enum WorkOrderStatus { pending, inProg, complete, rejectInReview, rejected }
+enum WorkOrderStatus { pending, assigned, complete, rejectInReview, rejected }

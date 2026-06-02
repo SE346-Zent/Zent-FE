@@ -48,7 +48,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     switch (workOrder!.status) {
       case WorkOrderStatus.pending:
         return "Pending";
-      case WorkOrderStatus.inProg:
+      case WorkOrderStatus.assigned:
         return "In Progress";
       case WorkOrderStatus.complete:
         return "Complete";

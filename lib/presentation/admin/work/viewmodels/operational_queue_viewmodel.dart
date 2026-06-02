@@ -16,14 +16,21 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
   int _activeTabIndex = 0;
   List<WorkOrder> _allWorkOrders = [];
   bool isLoading = false;
+  bool _isDisposed = false;
 
   int get activeTabIndex => _activeTabIndex;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
 
   void changeTab(int index) {
     if (_activeTabIndex != index) {
       _activeTabIndex = index;
       notifyListeners();
-      loadWorkOrders(); // Refresh data for the new tab
+      loadWorkOrders();
     }
   }
 
@@ -74,42 +81,75 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
       debugPrint("Error loading operational queue: $e");
       _allWorkOrders = [];
     } finally {
-      isLoading = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
   List<Map<String, dynamic>> get currentJobs {
     final List<Map<String, dynamic>> jobs = _allWorkOrders.map((wo) {
-      // Map enum name to more user-friendly display name
-      String statusDisplay = wo.status.name;
-      if (statusDisplay == 'inProg') {
+      String backendStatus = wo.status.name;
+      String uiStatusEnum = '';
+      String statusDisplay = '';
+      bool isAssigned = false;
+
+      if (backendStatus == 'pending') {
+        if (wo.technicianId.isEmpty) {
+          uiStatusEnum = 'unassigned';
+          statusDisplay = 'Pending assignment';
+          isAssigned = false;
+        } else {
+          uiStatusEnum = 'pending_acceptance';
+          statusDisplay = 'Pending assignment';
+          isAssigned = true;
+        }
+      } else if (backendStatus == 'Assigned' || backendStatus == 'assigned') {
+        uiStatusEnum = 'assigned';
+        statusDisplay = 'Assigned';
+        isAssigned = true;
+      } else if (backendStatus == 'inProg') {
+        uiStatusEnum = 'in_progress';
         statusDisplay = 'In Progress';
-      }
-      if (statusDisplay == 'complete') {
+        isAssigned = true;
+      } else if (backendStatus == 'complete') {
+        uiStatusEnum = 'completed';
         statusDisplay = 'Completed';
-      }
-      if (statusDisplay == 'rejectInReview') {
+        isAssigned = true;
+      } else if (backendStatus == 'rejectInReview') {
+        uiStatusEnum = 'reject_in_review';
         statusDisplay = 'Pending Rejection';
-      }
-      if (statusDisplay == 'pending') {
-        statusDisplay = 'Pending';
-      }
-      if (statusDisplay == 'rejected') {
+        isAssigned = true;
+      } else if (backendStatus == 'rejected') {
+        uiStatusEnum = 'rejected';
         statusDisplay = 'Rejected';
+        isAssigned = true;
+      } else {
+        uiStatusEnum = backendStatus;
+        statusDisplay = backendStatus;
+        isAssigned = wo.technicianId.isNotEmpty;
+      }
+
+      String assigneeText = 'Unassigned';
+      if (isAssigned) {
+        if (wo.technicianName != null && wo.technicianName!.isNotEmpty) {
+          assigneeText = wo.technicianName!;
+        } else {
+          assigneeText =
+              'Tech (ID: ${wo.technicianId.isNotEmpty ? wo.technicianId.substring(0, 4) : 'N/A'})';
+        }
       }
 
       return {
         'id': '#${wo.id}',
         'title': wo.title,
-        'assignee':
-            wo.technicianName ??
-            (wo.technicianId.isNotEmpty ? 'Assigned' : 'Unassigned'),
-        'isAssigned': wo.technicianId.isNotEmpty,
+        'assignee': assigneeText,
+        'isAssigned': isAssigned,
         'location': wo.addressString,
         'time': wo.createdAt.toIso8601String(),
         'status': statusDisplay,
-        'statusEnum': wo.status.name, // The raw enum name for filtering
+        'statusEnum': uiStatusEnum,
       };
     }).toList();
 
@@ -117,21 +157,26 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
       case 1: // Assigned
         return jobs
             .where(
-              (j) => j['isAssigned'] == true && j['statusEnum'] != 'complete',
+              (j) =>
+                  j['isAssigned'] == true &&
+                  j['statusEnum'] != 'completed' &&
+                  j['statusEnum'] != 'rejected',
             )
             .toList();
       case 2: // Unassigned
-        return jobs.where((j) => j['isAssigned'] == false).toList();
+        return jobs.where((j) => j['statusEnum'] == 'unassigned').toList();
       case 3: // Completed
         return jobs
             .where(
               (j) =>
-                  j['statusEnum'] == 'complete' ||
+                  j['statusEnum'] == 'completed' ||
                   j['statusEnum'] == 'rejected',
             )
             .toList();
       case 4: // Rejections
-        return jobs.where((j) => j['statusEnum'] == 'rejectInReview').toList();
+        return jobs
+            .where((j) => j['statusEnum'] == 'reject_in_review')
+            .toList();
       case 0: // All Jobs
       default:
         return jobs;

@@ -46,7 +46,7 @@ abstract final class Routes {
   static const adminDetailRequest = 'detail-request/:partId';
   static const adminRejectedWorkOrders = 'rejected-work-orders';
   static const adminRejectionDetail = 'rejection-detail/:id';
-  static const adminWorkOrderDetails = 'work-order-details/:workOrderId';
+  static const adminAssignWorkOrder = 'assign-work-order/:workOrderId';
   static const adminAssignedWorkOrderDetails =
       'assigned-work-order-details/:workOrderId';
   static const adminViewSchedule = 'view-schedule/:techId';

@@ -1,8 +1,9 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:zent_fe/di/injection_container.dart';
-import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
+import 'package:zent_fe/domain/repositories/work_order_repository.dart';
 import 'package:zent_fe/data/models/refuse_work_order_request.dart';
+import 'package:intl/intl.dart';
 
 class AssignedWorkOrderDetailViewModel extends ChangeNotifier
     with SafeChangeNotifier {
@@ -10,36 +11,70 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
 
   String get orderId => _orderId;
 
-  final String techAssignedTime = '45 minutes ago';
-  final String symptom = 'ABC XYZ';
-  final String description =
-      'ABC XYZasdfdsadffffffffffffffffffffffffasdfasdfasdfsaefe';
-  final String location = '123 Hoa Binh, Quan Tan Phu, HCM';
-  final String time = 'Oct 30, 2026 - 10h00 AM';
+  String techAssignedTime = '';
+  String symptom = '';
+  String description = '';
+  String location = '';
+  String time = '';
 
-  final Map<String, dynamic> technician = {
+  Map<String, dynamic> technician = {
     'id': 'TECH-9999',
-    'name': 'John Doe Doe',
-    'rating': 4.5,
+    'name': 'Unknown Tech',
+    'rating': 5.0,
   };
 
-  bool _isRejectInReview =
-      true; // Hardcoded for test, should be from WorkOrderModel.status
+  bool _isRejectInReview = false;
   bool get isRejectInReview => _isRejectInReview;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  void initData(String id) {
+  Future<void> initData(String id) async {
     _orderId = id.startsWith('#') ? id : '#$id';
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      final repo = sl<WorkOrderRepository>();
+      final cleanId = id.replaceAll('#', '');
+
+      final workOrder = await repo.getWorkOrderDetail(id: cleanId);
+
+      symptom = workOrder.symptomName ?? 'N/A';
+      description = workOrder.description;
+      location = workOrder.addressString;
+
+      time = DateFormat(
+        'MMM dd, yyyy - hh:mm a',
+      ).format(workOrder.createdAt.toLocal());
+      techAssignedTime = DateFormat(
+        'MMM dd, hh:mm a',
+      ).format(workOrder.updatedAt.toLocal());
+      final backendStatus = workOrder.status.name;
+      _isRejectInReview = backendStatus == 'rejectInReview';
+
+      technician = {
+        'id': workOrder.technicianId,
+        'name':
+            (workOrder.technicianName != null &&
+                workOrder.technicianName!.isNotEmpty)
+            ? workOrder.technicianName
+            : 'Tech (ID: ${workOrder.technicianId.substring(0, 4)})',
+        'rating': 5.0,
+      };
+    } catch (e) {
+      debugPrint("Lỗi lấy chi tiết đơn hàng: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<String?> approveRefusal() async {
     _isLoading = true;
     notifyListeners();
     try {
-      final repo = sl<WorkOrderRepositoryImpl>();
+      final repo = sl<WorkOrderRepository>();
       final cleanId = _orderId.replaceAll('#', '');
       await repo.approveRefusal(
         cleanId,
@@ -59,7 +94,7 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
     _isLoading = true;
     notifyListeners();
     try {
-      final repo = sl<WorkOrderRepositoryImpl>();
+      final repo = sl<WorkOrderRepository>();
       final cleanId = _orderId.replaceAll('#', '');
       await repo.denyRefusal(cleanId);
       _isRejectInReview = false;

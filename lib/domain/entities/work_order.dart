@@ -27,6 +27,7 @@ class WorkOrder {
   final String? country;
   final String? email;
   final String? firstName;
+  final String? symptomName;
   final String? phoneNumber;
 
   WorkOrder({
@@ -56,6 +57,7 @@ class WorkOrder {
     this.country,
     this.email,
     this.firstName,
+    this.symptomName,
     this.phoneNumber,
   });
 

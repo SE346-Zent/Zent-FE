@@ -389,12 +389,12 @@ final GoRouter appRouter = GoRouter(
               },
               routes: [
                 GoRoute(
-                  name: RouteNames.adminWorkOrderDetails,
-                  path: Routes.adminWorkOrderDetails,
+                  name: RouteNames.adminAssignWorkOrder,
+                  path: Routes.adminAssignWorkOrder,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) {
                     final id = state.pathParameters['workOrderId'] ?? '';
-                    return WorkOrderDetailScreen(workOrderId: id);
+                    return AssignWorkOrderScreen(workOrderId: id);
                   },
                 ),
                 GoRoute(

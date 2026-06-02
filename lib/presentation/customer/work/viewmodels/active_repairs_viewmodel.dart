@@ -28,7 +28,7 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
           .where(
             (o) =>
                 o.status == WorkOrderStatus.pending ||
-                o.status == WorkOrderStatus.inProg ||
+                o.status == WorkOrderStatus.assigned ||
                 o.status == WorkOrderStatus.rejectInReview,
           )
           .toList();
@@ -66,7 +66,7 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
     switch (status) {
       case WorkOrderStatus.pending:
         return 1;
-      case WorkOrderStatus.inProg:
+      case WorkOrderStatus.assigned:
       case WorkOrderStatus.rejectInReview:
         return 2;
       case WorkOrderStatus.complete:

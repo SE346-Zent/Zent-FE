@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 
 // Core Routing & Theming
@@ -131,11 +132,9 @@ class _LoginScreenContent extends StatelessWidget {
                                   }
                                 } else if (viewModel.errorMessage != null &&
                                     context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(viewModel.errorMessage!),
-                                      backgroundColor: Colors.red,
-                                    ),
+                                  ZentErrorPopup.show(
+                                    context,
+                                    viewModel.errorMessage!,
                                   );
                                 }
                               },

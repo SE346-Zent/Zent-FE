@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/rejection_detail_viewmodel.dart';
@@ -204,9 +205,7 @@ class _RejectionDetailContent extends StatelessWidget {
                                 final error = await viewModel.denyRejection();
                                 if (context.mounted) {
                                   if (error != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error)),
-                                    );
+                                    ZentErrorPopup.show(context, error);
                                   } else {
                                     context.pop();
                                   }
@@ -251,9 +250,7 @@ class _RejectionDetailContent extends StatelessWidget {
                                     .approveRejection();
                                 if (context.mounted) {
                                   if (error != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error)),
-                                    );
+                                    ZentErrorPopup.show(context, error);
                                   } else {
                                     context.pop();
                                   }

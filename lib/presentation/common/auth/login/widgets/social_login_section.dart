@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -56,12 +57,7 @@ class SocialLoginSection extends StatelessWidget {
                     }
                   } else if (viewModel.errorMessage != null &&
                       context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(viewModel.errorMessage!),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    ZentErrorPopup.show(context, viewModel.errorMessage!);
                   }
                 },
               ),

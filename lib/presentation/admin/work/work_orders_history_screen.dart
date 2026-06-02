@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
@@ -273,10 +274,14 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                 ),
 
                 // Bottom: 3 Info Rows (Name, Address, Last Updated)
-                Column(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Row 1: Name
-                    Row(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          // Row 1: Name
+                          Row(
                       children: [
                         const Icon(
                           Icons.person_outline,
@@ -342,6 +347,14 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                         ),
                       ],
                     ),
+                        ],
+                      ),
+                    ),
+                    if (isCustomer)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, bottom: 2.0),
+                        child: _buildStatusLabel(wo),
+                      ),
                   ],
                 ),
               ],
@@ -400,6 +413,8 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
   // Customer Triple-Dot Popup Menu
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildCustomerPopupMenu(BuildContext context, WorkOrder wo) {
+    final isComplete = wo.status == WorkOrderStatus.complete;
+    
     return PopupMenuButton<String>(
       constraints: const BoxConstraints(minWidth: 140.0, maxWidth: 140.0),
       padding: EdgeInsets.zero,
@@ -423,12 +438,16 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
             child: InkWell(
               onTap: () {
                 Navigator.pop(context);
+                if (!isComplete) {
+                  ZentErrorPopup.show(context, 'Work order must be completed before rating.');
+                  return;
+                }
                 _showRatingDialog(context, wo);
               },
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isComplete ? Colors.white : AppColors.secondary50,
                   borderRadius: BorderRadius.circular(AppDimens.boraXs),
                   border: Border.all(color: AppColors.secondary200, width: 1.0),
                 ),
@@ -436,7 +455,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                 child: Text(
                   "Rate",
                   style: TextStyles.label.copyWith(
-                    color: AppColors.primary500,
+                    color: isComplete ? AppColors.primary500 : AppColors.secondary300,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -598,7 +617,6 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                       ),
                       onPressed: () async {
                         final navigator = Navigator.of(context);
-                        final messenger = ScaffoldMessenger.of(context);
                         navigator.pop(context);
 
                         final success = await vm.rateWorkOrder(
@@ -609,18 +627,10 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                               : commentController.text.trim(),
                         );
 
-                        if (mounted) {
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? 'Rating submitted successfully! Thank you.'
-                                    : 'Failed to submit rating. Please try again.',
-                              ),
-                              backgroundColor: success
-                                  ? AppColors.success500
-                                  : AppColors.error500,
-                            ),
+                        if (!success && context.mounted) {
+                          ZentErrorPopup.show(
+                            context,
+                            'Failed to submit rating. Please try again.',
                           );
                         }
                       },

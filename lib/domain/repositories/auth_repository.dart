@@ -23,6 +23,12 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
+  Future<void> updateProfile({
+    required String fullName,
+    required String phone,
+    required String email,
+  });
+
   Future<void> refreshToken();
   Future<bool> restoreSession();
 

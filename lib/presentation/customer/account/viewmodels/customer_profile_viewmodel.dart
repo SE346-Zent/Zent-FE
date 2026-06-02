@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
 import 'package:zent_fe/routing/routes.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
 
 class CustomerProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -32,6 +33,7 @@ class CustomerProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<void> logout(BuildContext context) async {
     try {
+      DetailedChatViewModel.clearCache();
       await logoutUseCase.execute();
     } catch (e) {
       final errorStr = e.toString();

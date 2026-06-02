@@ -128,7 +128,7 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier
             wo.technicianId.replaceAll('-', '').toLowerCase() == cleanCurrentId,
       );
     } else if (role == UserRoles.customer) {
-      // History should get all statuses for customer as well, so status filtering is removed
+      // No client-side filtering for customer because the backend API already restricts returned WOs to the customer's own WOs
     } else if (role == UserRoles.admin) {
       var province = currentUser!.province.toUpperCase();
       if (province.isEmpty) {

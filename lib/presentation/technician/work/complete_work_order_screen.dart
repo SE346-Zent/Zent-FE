@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/complete_work_order_viewmodel.dart';
@@ -259,13 +260,9 @@ class _CompleteWorkOrderContent extends StatelessWidget {
     if (!viewModel.isReadOnly) {
       if (viewModel.currentStep == 0) {
         if (viewModel.prePhotos.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Vui lòng chụp ít nhất 1 ảnh trước tháo (Pre-disassembly)!',
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
+          ZentErrorPopup.show(
+            context,
+            'Vui lòng chụp ít nhất 1 ảnh trước tháo (Pre-disassembly)!',
           );
           return;
         }
@@ -273,13 +270,9 @@ class _CompleteWorkOrderContent extends StatelessWidget {
 
       if (viewModel.currentStep == 1) {
         if (viewModel.duringPhotos.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Vui lòng chụp ít nhất 1 ảnh đang tháo (Disassembled)!',
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
+          ZentErrorPopup.show(
+            context,
+            'Vui lòng chụp ít nhất 1 ảnh đang tháo (Disassembled)!',
           );
           return;
         }
@@ -287,13 +280,9 @@ class _CompleteWorkOrderContent extends StatelessWidget {
 
       if (viewModel.currentStep == 2) {
         if (viewModel.postPhotos.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Vui lòng chụp ít nhất 1 ảnh hoàn thiện (Post-assembly)!',
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
+          ZentErrorPopup.show(
+            context,
+            'Vui lòng chụp ít nhất 1 ảnh hoàn thiện (Post-assembly)!',
           );
           return;
         }

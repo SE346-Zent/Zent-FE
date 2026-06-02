@@ -31,18 +31,6 @@ class ChatMessage {
     try {
       String cleanStr = dateStr.trim();
 
-      // Remove any spaces before + or - timezone offsets
-      cleanStr = cleanStr.replaceAll(
-        RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'),
-        r'$1',
-      );
-
-      // Normalize timezone offset with seconds (e.g. '+00:00:00' -> '+00:00')
-      final match = RegExp(r'([+-]\d{2}:\d{2}):\d{2}$').firstMatch(cleanStr);
-      if (match != null) {
-        cleanStr = cleanStr.substring(0, match.start) + match.group(1)!;
-      }
-
       // Support Unix Epoch Timestamps (seconds or milliseconds)
       final numericVal = int.tryParse(cleanStr);
       if (numericVal != null) {
@@ -56,12 +44,66 @@ class ChatMessage {
       if (cleanStr.endsWith(' UTC')) {
         cleanStr = '${cleanStr.substring(0, cleanStr.length - 4)}Z';
       }
-      if (cleanStr.length > 10 && cleanStr[10] == ' ') {
-        cleanStr = '${cleanStr.substring(0, 10)}T${cleanStr.substring(11)}';
+
+      // Standardize timezone offset (+00:00:00 -> +00:00)
+      final offsetRegex = RegExp(r'\s+([+-]\d{2}):?(\d{2}):?(\d{2})?$');
+      final offsetMatch = offsetRegex.firstMatch(cleanStr);
+      String offsetPart = "";
+      if (offsetMatch != null) {
+        final hoursWithSign = offsetMatch.group(1)!; // e.g. "+00" or "-00"
+        final minutes = offsetMatch.group(2)!; // e.g. "00"
+        offsetPart = "$hoursWithSign:$minutes";
+        cleanStr = cleanStr.substring(0, offsetMatch.start).trim();
+      } else {
+        final offsetRegex2 = RegExp(r'\s+([+-]\d{2}):?(\d{2})?$');
+        final offsetMatch2 = offsetRegex2.firstMatch(cleanStr);
+        if (offsetMatch2 != null) {
+          final hoursWithSign = offsetMatch2.group(1)!;
+          final minutes = offsetMatch2.group(2) ?? "00";
+          offsetPart = "$hoursWithSign:$minutes";
+          cleanStr = cleanStr.substring(0, offsetMatch2.start).trim();
+        }
       }
+
+      // Convert space separator to 'T' and format single-digit hours (e.g. "4:48:36" -> "04:48:36")
+      if (cleanStr.contains(' ')) {
+        final parts = cleanStr.split(' ');
+        final datePart = parts[0];
+        String timePart = parts[1];
+        
+        final timeParts = timePart.split(':');
+        if (timeParts.isNotEmpty && timeParts[0].length == 1) {
+          timeParts[0] = "0${timeParts[0]}";
+        }
+        timePart = timeParts.join(':');
+        cleanStr = "${datePart}T$timePart";
+      } else if (cleanStr.contains('T')) {
+        final parts = cleanStr.split('T');
+        final datePart = parts[0];
+        String timePart = parts[1];
+        
+        final timeParts = timePart.split(':');
+        if (timeParts.isNotEmpty && timeParts[0].length == 1) {
+          timeParts[0] = "0${timeParts[0]}";
+        }
+        timePart = timeParts.join(':');
+        cleanStr = "${datePart}T$timePart";
+      }
+
+      if (offsetPart.isNotEmpty) {
+        cleanStr = "$cleanStr$offsetPart";
+      } else if (!cleanStr.endsWith('Z')) {
+        cleanStr = "${cleanStr}Z";
+      }
+
       return DateTime.parse(cleanStr);
-    } catch (_) {
-      return DateTime.tryParse(dateStr);
+    } catch (e) {
+      debugPrint("Detailed parseDateTime failed for '$dateStr': $e");
+      try {
+        return DateTime.tryParse(dateStr);
+      } catch (_) {
+        return null;
+      }
     }
   }
 }
@@ -76,6 +118,14 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   static final Map<String, bool> _hasMoreCache = {};
   static String? _cachedUserId;
   static String? _cachedMyName;
+
+  static void clearCache() {
+    _roomMessagesCache.clear();
+    _roomPartnerNamesCache.clear();
+    _hasMoreCache.clear();
+    _cachedUserId = null;
+    _cachedMyName = null;
+  }
 
   String? currentChatId;
   String chatPartnerName = "";
@@ -278,7 +328,7 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
           time: formattedTime,
           imageUrl: msg.imageUrl,
           isSeen: _isMe(msg.senderId) && msg.readBy.any((id) => !_isMe(id)),
-          dateTime: parsedDt ?? DateTime.fromMillisecondsSinceEpoch(0),
+          dateTime: parsedDt ?? DateTime.now(),
         );
       }).toList();
 

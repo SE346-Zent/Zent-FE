@@ -17,14 +17,24 @@ class CustomerMainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: navigationShell,
-      bottomNavigationBar: SafeArea(
-        bottom: true,
-        child: _CustomerBottomNavBar(
-          currentIndex: navigationShell.currentIndex,
-          onTap: _onNavTap,
+    final canPop = navigationShell.currentIndex == 0;
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (navigationShell.currentIndex != 0) {
+          _onNavTap(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        body: navigationShell,
+        bottomNavigationBar: SafeArea(
+          bottom: true,
+          child: _CustomerBottomNavBar(
+            currentIndex: navigationShell.currentIndex,
+            onTap: _onNavTap,
+          ),
         ),
       ),
     );

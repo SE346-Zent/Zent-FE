@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -25,6 +27,12 @@ abstract class AuthRemoteDatasource {
   Future<void> verifyOtp(String email, String otp);
   Future<void> resendOtp(String email);
   Future<void> logout(String accessToken, String refreshToken);
+  Future<void> updateProfile({
+    required String accessToken,
+    required String fullName,
+    required String phone,
+    required String email,
+  });
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
   Future<void> forgotPassword(String email);
   Future<List<Map<String, dynamic>>> getUsers({
@@ -248,6 +256,44 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Resend OTP error: $e');
+    }
+  }
+
+  @override
+  Future<void> updateProfile({
+    required String accessToken,
+    required String fullName,
+    required String phone,
+    required String email,
+  }) async {
+    final url = Uri.parse('$_baseURL/users/me');
+    try {
+      final response = await client
+          .put(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode({
+              'fullName': fullName,
+              'phone': phone,
+              'email': email,
+            }),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is TimeoutException || e is SocketException) {
+        throw BusinessException('Network error. Please check your connection.');
+      }
+      rethrow;
     }
   }
 

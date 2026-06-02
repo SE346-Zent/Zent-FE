@@ -1,6 +1,7 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 import '../../../../domain/usecases/auth/logout_usecase.dart';
 import '../../../../domain/entities/enums/user_roles.dart';
@@ -72,6 +73,7 @@ class ProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
+      DetailedChatViewModel.clearCache();
       await logoutUseCase.execute();
     } catch (e) {
       final errorStr = e.toString();

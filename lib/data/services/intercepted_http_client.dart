@@ -4,6 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/routing/router.dart';
+import 'package:zent_fe/routing/routes.dart';
 
 class InterceptedHttpClient extends http.BaseClient {
   final http.Client _inner;
@@ -40,8 +44,12 @@ class InterceptedHttpClient extends http.BaseClient {
           return await _inner.send(retriedRequest);
         } else {
           debugPrint(
-            "InterceptedHttpClient: Token refresh failed. Proceeding with original 401 response.",
+            "InterceptedHttpClient: Token refresh failed. Proceeding with original 401 response and logging out.",
           );
+          await _secureStorage.delete(key: 'ACCESS_TOKEN');
+          await _secureStorage.delete(key: 'REFRESH_TOKEN');
+          try { sl<AuthViewModel>().clearUser(); } catch (_) {}
+          try { appRouter.go(Routes.login); } catch (_) {}
         }
       } catch (e) {
         debugPrint(

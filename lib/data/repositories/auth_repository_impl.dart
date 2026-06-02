@@ -8,6 +8,7 @@ import '../models/user_model.dart';
 import '../models/login_history_entry_model.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -103,6 +104,39 @@ class AuthRepositoryImpl implements AuthRepository {
       debugPrint("Remote logout failed: $e");
     } finally {
       await authLocalDataSource.clearCredentials();
+    }
+  }
+
+  @override
+  Future<void> updateProfile({
+    required String fullName,
+    required String phone,
+    required String email,
+  }) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    
+    await authRemoteService.updateProfile(
+      accessToken: accessToken,
+      fullName: fullName,
+      phone: phone,
+      email: email,
+    );
+
+    // Update the locally cached user object
+    final currentUser = await authLocalDataSource.getUser();
+    if (currentUser != null) {
+      final updatedUser = UserModel(
+        id: currentUser.id,
+        email: email,
+        name: fullName,
+        phoneNumber: phone,
+        role: currentUser.role,
+        province: currentUser.province,
+      );
+      await authLocalDataSource.saveUser(updatedUser);
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
 import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
@@ -225,28 +226,11 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
       // 3. Refresh work order details
       await _loadDetails();
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Job started successfully!')),
-        );
-      }
     } catch (e) {
       if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Start Job Failed'),
-            content: Text(
-              'Geofencing / Verification Error:\n\n${e.toString().replaceAll('Exception: ', '')}\n\nYou must be within 2 km of the address to start this job.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+        ZentErrorPopup.show(
+          context,
+          'Start Job Failed: ${e.toString().replaceAll('Exception: ', '')}',
         );
       }
     } finally {

@@ -8,6 +8,7 @@ import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
 import 'sidebar_menu_item.dart';
 
 class AdminSidebar extends StatelessWidget {
@@ -24,6 +25,7 @@ class AdminSidebar extends StatelessWidget {
 
   Future<void> _onLogoutPressed(BuildContext context) async {
     try {
+      DetailedChatViewModel.clearCache();
       await sl<LogoutUseCase>().execute();
     } catch (e) {
       debugPrint("Error during logout: $e");

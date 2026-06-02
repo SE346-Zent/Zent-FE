@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/entities/enums/work_order_status.dart';
 import '../../../common/core/safe_change_notifier.dart';
 
 class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
 
-  ActiveRepairsViewModel({required this.getManyWorkOrdersUseCase});
+  ActiveRepairsViewModel({
+    required this.getManyWorkOrdersUseCase,
+    required this.getCurrentUserUseCase,
+  });
 
   bool isLoading = false;
   String? errorMessage;
@@ -23,8 +28,9 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
 
     try {
       final orders = await getManyWorkOrdersUseCase.execute(limit: 1000);
+      final customerOrders = orders;
 
-      final activeOrders = orders
+      final activeOrders = customerOrders
           .where(
             (o) =>
                 o.status == WorkOrderStatus.pending ||
@@ -34,22 +40,23 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
           .toList();
 
       if (activeOrders.isNotEmpty) {
-        activeOrders.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+        // Sort by createdAt descending to always get the newest active repair order!
+        activeOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         activeWorkOrder = activeOrders.first;
-        currentStatusStep = _mapStatusToStep(activeWorkOrder!.status);
+        currentStatusStep = _mapStatusToStep(activeWorkOrder!);
       } else {
         activeWorkOrder = null;
         currentStatusStep = 0;
       }
 
-      final completedOrders = orders
+      final completedOrders = customerOrders
           .where(
             (o) =>
                 o.status == WorkOrderStatus.complete ||
                 o.status == WorkOrderStatus.rejected,
           )
           .toList();
-      completedOrders.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      completedOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       recentCompleted = completedOrders;
 
@@ -62,15 +69,23 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
-  int _mapStatusToStep(WorkOrderStatus status) {
+  int _mapStatusToStep(WorkOrder order) {
+    final status = order.status;
+    final hasTech = order.technicianId.trim().isNotEmpty &&
+        order.technicianId.trim() != '0' &&
+        order.technicianId.trim() != 'null';
+
     switch (status) {
       case WorkOrderStatus.pending:
-        return 1;
-      case WorkOrderStatus.inProg:
+        // If a technician is assigned but hasn't started the job (pending), it is Tech Assigned (Step 2)
+        // Otherwise, it is Ticket Open (Step 1)
+        return hasTech ? 2 : 1;
       case WorkOrderStatus.rejectInReview:
-        return 2;
+        return 2; // Step 2 (Tech Assigned)
+      case WorkOrderStatus.inProg:
+        return 3; // Step 3 (In Progress)
       case WorkOrderStatus.complete:
-        return 3;
+        return 4; // Step 4 (Done)
       default:
         return 0;
     }

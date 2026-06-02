@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/routing/route_names.dart';
 import 'viewmodels/rejected_work_orders_viewmodel.dart';
@@ -79,9 +80,7 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
   ) {
     viewModel.approveRejection(wo).then((error) {
       if (error != null && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $error')));
+        ZentErrorPopup.show(context, 'Error: $error');
       }
     });
   }
@@ -93,9 +92,7 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
   ) {
     viewModel.denyRejection(id).then((error) {
       if (error != null && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $error')));
+        ZentErrorPopup.show(context, 'Error: $error');
       }
     });
   }

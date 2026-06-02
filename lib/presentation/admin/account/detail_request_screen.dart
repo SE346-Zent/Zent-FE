@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
@@ -90,24 +91,13 @@ class _DetailRequestScreenContent extends StatelessWidget {
                     onPressed: () async {
                       final reason = reasonController.text.trim();
                       if (reason.isEmpty) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Please provide a reason for rejection',
-                            ),
-                            backgroundColor: AppColors.warning500,
-                          ),
-                        );
+                        ZentErrorPopup.show(ctx, 'Please provide a reason for rejection');
                         return;
                       }
                       if (reason.length < 10) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Reason for rejection must be at least 10 characters long',
-                            ),
-                            backgroundColor: AppColors.warning500,
-                          ),
+                        ZentErrorPopup.show(
+                          ctx,
+                          'Reason for rejection must be at least 10 characters long',
                         );
                         return;
                       }
@@ -115,20 +105,9 @@ class _DetailRequestScreenContent extends StatelessWidget {
                       final success = await viewModel.denyPart(reason);
                       if (ctx.mounted) {
                         if (success) {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            const SnackBar(
-                              content: Text('Part request rejected'),
-                              backgroundColor: AppColors.success500,
-                            ),
-                          );
                           Navigator.of(ctx).pop(true);
                         } else {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            const SnackBar(
-                              content: Text('Failed to reject part request'),
-                              backgroundColor: AppColors.error500,
-                            ),
-                          );
+                          ZentErrorPopup.show(ctx, 'Failed to reject part request');
                         }
                       }
                     },
@@ -535,27 +514,11 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                   final success = await viewModel.acceptPart();
                                   if (context.mounted) {
                                     if (success) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Part request approved',
-                                          ),
-                                          backgroundColor: AppColors.success500,
-                                        ),
-                                      );
                                       Navigator.of(context).pop(true);
                                     } else {
-                                      ScaffoldMessenger.of(
+                                      ZentErrorPopup.show(
                                         context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Failed to approve part request',
-                                          ),
-                                          backgroundColor: AppColors.error500,
-                                        ),
+                                        'Failed to approve part request',
                                       );
                                     }
                                   }

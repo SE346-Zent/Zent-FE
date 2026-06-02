@@ -41,49 +41,59 @@ class _TechMainLayoutState extends State<TechMainLayout> {
         : widget.navigationShell.currentIndex;
     final userName = sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      resizeToAvoidBottomInset: false,
-      drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: TechSidebar(userName: userName, employeeId: 'TECH-1234'),
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: 110.0 + MediaQuery.paddingOf(context).bottom,
-            ),
-            child: widget.navigationShell,
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              color: AppColors.surface100,
+    final canPop = widget.navigationShell.currentIndex == 0;
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (widget.navigationShell.currentIndex != 0) {
+          _goBranch(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        resizeToAvoidBottomInset: false,
+        drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
+        drawer: TechSidebar(userName: userName, employeeId: 'TECH-1234'),
+        body: Stack(
+          children: [
+            Padding(
               padding: EdgeInsets.only(
-                bottom: MediaQuery.paddingOf(context).bottom,
+                bottom: 110.0 + MediaQuery.paddingOf(context).bottom,
               ),
-              child: _TechBottomNavBar(
-                currentIndex: displayIndex == -1
-                    ? widget.navigationShell.currentIndex
-                    : displayIndex,
-                onTap: _goBranch,
+              child: widget.navigationShell,
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                color: AppColors.surface100,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.paddingOf(context).bottom,
+                ),
+                child: _TechBottomNavBar(
+                  currentIndex: displayIndex == -1
+                      ? widget.navigationShell.currentIndex
+                      : displayIndex,
+                  onTap: _goBranch,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: MediaQuery.paddingOf(context).bottom + 70.0 - 30.0,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _AnimatedFAB(
-                onTap: () {
-                  debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
-                },
+            Positioned(
+              bottom: MediaQuery.paddingOf(context).bottom + 70.0 - 30.0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _AnimatedFAB(
+                  onTap: () {
+                    debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

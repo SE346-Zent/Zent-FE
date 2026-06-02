@@ -1,7 +1,8 @@
-import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
 import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
@@ -68,6 +69,14 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
       (workOrder?.workOrderNum != null && workOrder!.workOrderNum.isNotEmpty)
       ? workOrder!.workOrderNum
       : workOrderId;
+
+  String get symptom => workOrder?.title ?? '';
+  String get description => workOrder?.description ?? '';
+  String get appointmentFormatted {
+    final dt = workOrder?.appointment;
+    if (dt == null) return '';
+    return DateFormat("HH'h'mm, dd/MM/yyyy").format(dt);
+  }
 
   // Timer state
   final int _hours = 12;

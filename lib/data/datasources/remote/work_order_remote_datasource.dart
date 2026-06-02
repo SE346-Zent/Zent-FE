@@ -9,6 +9,7 @@ import '../../models/work_order_model.dart';
 import '../../models/create_work_order_request.dart';
 import '../../models/complete_work_order_request.dart';
 import '../../models/refuse_work_order_request.dart';
+import '../../models/edit_work_order_request.dart';
 import '../local/auth_local_datasource.dart';
 import '../../../domain/exceptions/business_exception.dart';
 
@@ -38,6 +39,10 @@ abstract class WorkOrderRemoteDataSource {
   );
   Future<Map<String, dynamic>> getWorkOrderHistory(String id);
   Future<void> rateWorkOrder(String id, int rating, String? comment);
+  Future<void> editWorkOrder(
+    String workOrderNumber,
+    EditWorkOrderRequest request,
+  );
 }
 
 class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
@@ -464,6 +469,42 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Error rating work order: $e');
+    }
+  }
+
+  @override
+  Future<void> editWorkOrder(
+    String workOrderNumber,
+    EditWorkOrderRequest request,
+  ) async {
+    final url = Uri.parse('$_baseURL/work_orders/$workOrderNumber/edit');
+    try {
+      final headers = await _getHeaders();
+
+      final Map<String, dynamic> bodyMap = request.toJson();
+      if (bodyMap['productId'] != null) {
+        bodyMap['product_id'] = bodyMap['productId'].toString().replaceAll(
+          '-',
+          '',
+        );
+        bodyMap.remove('productId');
+      }
+
+      final body = jsonEncode(bodyMap);
+      debugPrint(
+        '=== [API Request] POST /work_orders/$workOrderNumber/edit: $body ===',
+      );
+
+      final response = await client
+          .post(url, headers: headers, body: body)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error editing work order: $e');
     }
   }
 

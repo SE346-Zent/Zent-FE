@@ -33,23 +33,6 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
     _scrollController.addListener(_onScroll);
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels <= 100) {
-      _viewModel.loadMoreMessages();
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // According to guide: Send LEAVING when the app goes to background, and VIEWING on resume
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      _viewModel.chatService.stopViewing(widget.chatId);
-    } else if (state == AppLifecycleState.resumed) {
-      _viewModel.chatService.startViewing(widget.chatId);
-    }
-  }
-
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
@@ -59,118 +42,141 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
     super.dispose();
   }
 
+  bool _didInitialScroll = false;
+
+  void _onScroll() {
+    if (_scrollController.position.pixels <= 100) {
+      _viewModel.loadMoreMessages();
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _viewModel.chatService.stopViewing(widget.chatId);
+    } else if (state == AppLifecycleState.resumed) {
+      _viewModel.chatService.startViewing(widget.chatId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _viewModel,
-      child: _DetailedChatView(scrollController: _scrollController),
-    );
-  }
-}
+      child: Builder(
+        builder: (context) {
+          final viewModel = context.watch<DetailedChatViewModel>();
 
-class _DetailedChatView extends StatelessWidget {
-  final ScrollController scrollController;
-  const _DetailedChatView({required this.scrollController});
+          // Scroll to bottom once on first data load
+          if (!_didInitialScroll &&
+              !viewModel.isLoading &&
+              viewModel.messages.isNotEmpty) {
+            _didInitialScroll = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToBottom();
+            });
+          }
 
-  @override
-  Widget build(BuildContext context) {
-    final viewModel = context.watch<DetailedChatViewModel>();
+          return GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
+              backgroundColor: AppColors.surface100,
+              appBar: _buildCustomHeader(context, viewModel.chatPartnerName),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: viewModel.isLoading && viewModel.messages.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : ListView.separated(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.all(AppDimens.spaceMd),
+                              itemCount:
+                                  viewModel.messages.length +
+                                  (viewModel.isLoadMoreLoading ? 1 : 0),
+                              separatorBuilder: (context, index) {
+                                final isLoadMore = viewModel.isLoadMoreLoading;
+                                final msgIdx = isLoadMore ? index - 1 : index;
+                                final nextMsgIdx = msgIdx + 1;
+                                if (msgIdx < 0 ||
+                                    nextMsgIdx >= viewModel.messages.length) {
+                                  return const SizedBox(height: 3.0);
+                                }
+                                final currentMsg = viewModel.messages[msgIdx];
+                                final nextMsg = viewModel.messages[nextMsgIdx];
+                                final gap = currentMsg.isMe != nextMsg.isMe
+                                    ? 6.0
+                                    : 3.0;
+                                return SizedBox(height: gap);
+                              },
+                              itemBuilder: (context, index) {
+                                if (viewModel.isLoadMoreLoading && index == 0) {
+                                  return const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.secondary500,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                final msgIndex = viewModel.isLoadMoreLoading
+                                    ? index - 1
+                                    : index;
+                                final msg = viewModel.messages[msgIndex];
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        backgroundColor: AppColors.surface100,
-        appBar: _buildCustomHeader(context, viewModel.chatPartnerName),
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Vùng hiển thị tin nhắn hoặc loading
-              Expanded(
-                child: viewModel.isLoading && viewModel.messages.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.separated(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(AppDimens.spaceMd),
-                        itemCount:
-                            viewModel.messages.length +
-                            (viewModel.isLoadMoreLoading ? 1 : 0),
-                        separatorBuilder: (context, index) {
-                          final isLoadMore = viewModel.isLoadMoreLoading;
-                          final msgIdx = isLoadMore ? index - 1 : index;
-                          final nextMsgIdx = msgIdx + 1;
-                          if (msgIdx < 0 ||
-                              nextMsgIdx >= viewModel.messages.length) {
-                            return const SizedBox(height: 3.0);
-                          }
-                          final currentMsg = viewModel.messages[msgIdx];
-                          final nextMsg = viewModel.messages[nextMsgIdx];
-                          final gap = currentMsg.isMe != nextMsg.isMe
-                              ? 6.0
-                              : 3.0;
-                          return SizedBox(height: gap);
-                        },
-                        itemBuilder: (context, index) {
-                          if (viewModel.isLoadMoreLoading && index == 0) {
-                            return const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.secondary500,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                          final msgIndex = viewModel.isLoadMoreLoading
-                              ? index - 1
-                              : index;
-                          final msg = viewModel.messages[msgIndex];
+                                bool showSeparator = false;
+                                if (msgIndex == 0) {
+                                  showSeparator = true;
+                                } else {
+                                  final prevMsg =
+                                      viewModel.messages[msgIndex - 1];
+                                  final gap = msg.dateTime.difference(
+                                    prevMsg.dateTime,
+                                  );
+                                  if (gap.inMinutes.abs() >= 10) {
+                                    showSeparator = true;
+                                  }
+                                }
 
-                          // Messenger-style time separator calculation
-                          bool showSeparator = false;
-                          if (msgIndex == 0) {
-                            showSeparator = true;
-                          } else {
-                            final prevMsg = viewModel.messages[msgIndex - 1];
-                            final gap = msg.dateTime.difference(
-                              prevMsg.dateTime,
-                            );
-                            if (gap.inMinutes.abs() >= 10) {
-                              showSeparator = true;
-                            }
-                          }
-
-                          final bubble = _buildMessageBubble(
-                            context,
-                            viewModel,
-                            msg,
-                          );
-                          if (showSeparator) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildTimeSeparator(msg.dateTime),
-                                bubble,
-                              ],
-                            );
-                          }
-                          return bubble;
-                        },
-                      ),
+                                final bubble = _buildMessageBubble(
+                                  context,
+                                  viewModel,
+                                  msg,
+                                );
+                                if (showSeparator) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildTimeSeparator(msg.dateTime),
+                                      bubble,
+                                    ],
+                                  );
+                                }
+                                return bubble;
+                              },
+                            ),
+                    ),
+                    _buildBottomInputArea(context, viewModel),
+                    const SizedBox(height: AppDimens.spaceMd),
+                  ],
+                ),
               ),
-
-              // Thanh nhập tin nhắn
-              _buildBottomInputArea(context, viewModel),
-
-              // Nâng thanh chat lên cao một chút
-              const SizedBox(height: AppDimens.spaceMd),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -224,7 +230,7 @@ class _DetailedChatView extends StatelessWidget {
       backgroundColor: AppColors.tertiary400,
       elevation: 4.0,
       shadowColor: const Color(0xFF000000).withValues(alpha: 0.1),
-      shape: const Border(), // sharp/squared
+      shape: const Border(),
       leading: IconButton(
         icon: const Icon(
           Icons.arrow_back_ios_new,

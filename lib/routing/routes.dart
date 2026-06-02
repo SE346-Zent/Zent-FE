@@ -75,6 +75,9 @@ abstract final class Routes {
   static const activeRepairs = 'active-repairs';
   static const customerCancelWorkOrder = 'cancel-work-order/:workOrderId';
   static const customerWorkOrderHistory = 'work-order-history';
+  static const customerEditWorkOrder =
+      'edit-work-order/:workOrderId/:workOrderNumber';
+  static const customerWorkOrderDetails = 'work-order-details/:workOrderId';
 
   // // auth route builders
   // static String getAuthForgetPasswordRoute() => '$login/$forgetPassword';

@@ -172,19 +172,9 @@ void _setupForegroundMessaging() {
   });
 }
 
-/// Handle notification taps when app is opened from background/killed state.
-/// Saves notification data for deferred navigation after app is fully loaded.
+/// Handle notification taps when app is opened from background state only.
+/// Killed-state taps intentionally do NOT navigate — they only open the app.
 void _setupNotificationTapHandler() {
-  // App was opened by tapping a notification (killed state)
-  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-    if (message != null) {
-      developer.log(
-        'App opened from killed state via notification: ${message.data}',
-      );
-      NotificationNavigator.savePendingNotification(message.data);
-    }
-  });
-
   // App was in background, user tapped notification
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     developer.log(
@@ -192,6 +182,10 @@ void _setupNotificationTapHandler() {
     );
     NotificationNavigator.processNotificationDataDirectly(message.data);
   });
+
+  // Intentionally do NOT handle getInitialMessage (killed-state) here.
+  // Tapping a notification when the app is fully killed should only open
+  // the app to the home screen, not deep-link into a specific chat.
 }
 
 Future<void> fetchInstallationId() async {

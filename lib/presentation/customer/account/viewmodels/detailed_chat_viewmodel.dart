@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:zent_fe/data/services/chat_service.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 
@@ -607,6 +608,11 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<void> sendCameraImage() async {
     if (currentChatId == null) return;
+
+    final status = await Permission.camera.request();
+    if (!status.isGranted) {
+      return;
+    }
 
     final picker = ImagePicker();
     final image = await picker.pickImage(

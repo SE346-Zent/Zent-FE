@@ -82,6 +82,12 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
               const SizedBox(height: AppDimens.spaceLg),
               _buildJobSpecificationCard(viewModel),
               const SizedBox(height: AppDimens.spaceLg),
+              _buildAppointmentCard(viewModel),
+              const SizedBox(height: AppDimens.spaceLg),
+              _buildSymptomCard(viewModel),
+              const SizedBox(height: AppDimens.spaceLg),
+              _buildDescriptionCard(viewModel),
+              const SizedBox(height: AppDimens.spaceLg),
               _buildAssignedTechnicianCard(context, viewModel),
               if (viewModel.isRejectInReview) ...[
                 const SizedBox(height: AppDimens.spaceLg),
@@ -241,46 +247,6 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppDimens.spaceMd),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Symptom: ',
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextSpan(
-                  text: viewModel.symptom,
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Description: ',
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextSpan(
-                  text: viewModel.description,
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppDimens.spaceMd),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -333,6 +299,153 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppointmentCard(AssignedWorkOrderDetailViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_month_outlined,
+                color: AppColors.tertiary500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Appointment',
+                style: TextStyles.title.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Container(width: 6.0, color: AppColors.tertiary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.spaceMd),
+                    child: Text(
+                      viewModel.appointment,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSymptomCard(AssignedWorkOrderDetailViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.report_problem_outlined,
+                color: AppColors.tertiary500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Symptom',
+                style: TextStyles.title.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Container(width: 6.0, color: AppColors.tertiary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.spaceMd),
+                    child: Text(
+                      viewModel.symptom,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDescriptionCard(AssignedWorkOrderDetailViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.description_outlined,
+                color: AppColors.tertiary500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Description',
+                style: TextStyles.title.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Container(width: 6.0, color: AppColors.tertiary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.spaceMd),
+                    child: Text(
+                      viewModel.description,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -76,4 +76,7 @@ abstract final class RouteNames {
   static const String customerDetailedProductParts =
       'customerDetailedProductParts';
   static const String customerWorkOrderHistory = 'customerWorkOrderHistory';
+  static const String adminPersonalInfo = 'adminPersonalInfo';
+  static const String customerEditWorkOrder = 'customerEditWorkOrder';
+  static const String customerWorkOrderDetails = 'customerWorkOrderDetails';
 }

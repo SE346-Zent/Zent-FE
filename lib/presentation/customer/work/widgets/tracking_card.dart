@@ -9,6 +9,8 @@ import 'tracking_stepper.dart';
 import 'active_repairs_action_button.dart';
 
 import '../../../../domain/entities/work_order.dart';
+import '../viewmodels/active_repairs_viewmodel.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class TrackingCard extends StatelessWidget {
@@ -78,13 +80,13 @@ class TrackingCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: ActiveRepairsActionButton(
-                                title: 'Cancel',
+                                title: 'Details',
                                 bgColor: AppColors.surface600,
                                 textColor: AppColors.secondary500,
                                 shadow: BoxShadowStyles.subtle,
                                 onTap: () {
                                   context.pushNamed(
-                                    RouteNames.customerCancelWorkOrder,
+                                    RouteNames.customerWorkOrderDetails,
                                     pathParameters: {
                                       'workOrderId': workOrder.id,
                                     },
@@ -99,7 +101,23 @@ class TrackingCard extends StatelessWidget {
                                 bgColor: AppColors.tertiary500,
                                 textColor: Colors.white,
                                 shadow: BoxShadowStyles.glowing,
-                                onTap: () {},
+                                onTap: () async {
+                                  final result = await context.pushNamed(
+                                    RouteNames.customerEditWorkOrder,
+                                    pathParameters: {
+                                      'workOrderId': workOrder.id,
+                                      'workOrderNumber':
+                                          workOrder.workOrderNum.isNotEmpty
+                                          ? workOrder.workOrderNum
+                                          : workOrder.id,
+                                    },
+                                  );
+                                  if (result == true && context.mounted) {
+                                    context
+                                        .read<ActiveRepairsViewModel>()
+                                        .fetchWorkOrders();
+                                  }
+                                },
                               ),
                             ),
                           ],
@@ -123,6 +141,65 @@ class TrackingCard extends StatelessWidget {
                     bottomLeft: Radius.circular(AppDimens.boraMd),
                   ),
                 ),
+              ),
+            ),
+            Positioned(
+              right: AppDimens.spaceSm,
+              top: AppDimens.spaceSm,
+              child: PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.more_horiz,
+                  color: AppColors.secondary500,
+                  size: 24,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 190,
+                  maxWidth: 190,
+                  minHeight: 28,
+                  maxHeight: 28,
+                ),
+                offset: const Offset(0, 32),
+                color: const Color(0xFFFEF2F2),
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4.0),
+                ),
+                onSelected: (value) {
+                  if (value == 'cancel') {
+                    context
+                        .pushNamed(
+                          RouteNames.customerCancelWorkOrder,
+                          pathParameters: {'workOrderId': workOrder.id},
+                        )
+                        .then((result) {
+                          if (result == true && context.mounted) {
+                            context
+                                .read<ActiveRepairsViewModel>()
+                                .fetchWorkOrders();
+                          }
+                        });
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem<String>(
+                    value: 'cancel',
+                    height: 28,
+                    padding: EdgeInsets.zero,
+                    child: Container(
+                      width: double.infinity,
+                      height: 28,
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Cancel Work Order',
+                        style: TextStyles.label.copyWith(
+                          color: AppColors.error500,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

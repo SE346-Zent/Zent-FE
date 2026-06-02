@@ -9,6 +9,8 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/router.dart';
 import 'package:zent_fe/routing/routes.dart';
 
+import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
+
 class InterceptedHttpClient extends http.BaseClient {
   final http.Client _inner;
   final FlutterSecureStorage _secureStorage;
@@ -46,8 +48,13 @@ class InterceptedHttpClient extends http.BaseClient {
           debugPrint(
             "InterceptedHttpClient: Token refresh failed. Proceeding with original 401 response and logging out.",
           );
-          await _secureStorage.delete(key: 'ACCESS_TOKEN');
-          await _secureStorage.delete(key: 'REFRESH_TOKEN');
+          // Clear all local credentials including USER_DATA from SharedPreferences to fully sign out
+          try {
+            await sl<AuthLocalDataSource>().clearCredentials();
+          } catch (_) {
+            await _secureStorage.delete(key: 'ACCESS_TOKEN');
+            await _secureStorage.delete(key: 'REFRESH_TOKEN');
+          }
           try {
             sl<AuthViewModel>().clearUser();
           } catch (_) {}

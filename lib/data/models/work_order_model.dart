@@ -30,6 +30,8 @@ class WorkOrderModel extends WorkOrder {
     super.email,
     super.firstName,
     super.phoneNumber,
+    super.addressLine1,
+    super.symptomName,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -61,6 +63,8 @@ class WorkOrderModel extends WorkOrder {
       email: entity.email,
       firstName: entity.firstName,
       phoneNumber: entity.phoneNumber,
+      addressLine1: entity.addressLine1,
+      symptomName: entity.symptomName,
     );
   }
 
@@ -140,7 +144,7 @@ class WorkOrderModel extends WorkOrder {
           ? DateTime.tryParse(json['appointment'] as String)
           : null,
       building: json['building'] as String?,
-      city: json['city'] as String?,
+      city: json['ward'] as String? ?? json['city'] as String?,
       country: json['country'] as String?,
       email: json['email'] as String?,
       firstName: json['first_name'] as String? ?? json['firstName'] as String?,
@@ -148,6 +152,9 @@ class WorkOrderModel extends WorkOrder {
           json['phoneNumber'] as String? ??
           json['phone_number'] as String? ??
           json['phone'] as String?,
+      addressLine1: json['address'] as String?,
+      symptomName:
+          json['symptomName'] as String? ?? json['symptom_name'] as String?,
     );
   }
 
@@ -274,6 +281,8 @@ class WorkOrderModel extends WorkOrder {
       'email': email,
       'firstName': firstName,
       'phoneNumber': phoneNumber,
+      'addressLine1': addressLine1,
+      'symptomName': symptomName,
       'technician_name': technicianName,
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,

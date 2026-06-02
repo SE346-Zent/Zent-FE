@@ -6,6 +6,7 @@ import '../datasources/remote/work_order_remote_datasource.dart';
 import '../models/create_work_order_request.dart';
 import '../models/complete_work_order_request.dart';
 import '../models/refuse_work_order_request.dart';
+import '../models/edit_work_order_request.dart';
 import '../models/work_order_completion_draft_model.dart';
 
 class WorkOrderRepositoryImpl implements WorkOrderRepository {
@@ -111,6 +112,14 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   @override
   Future<void> rateWorkOrder(String id, int rating, String? comment) async {
     return await remoteDataSource.rateWorkOrder(id, rating, comment);
+  }
+
+  @override
+  Future<void> editWorkOrder(
+    String workOrderNumber,
+    EditWorkOrderRequest request,
+  ) async {
+    return await remoteDataSource.editWorkOrder(workOrderNumber, request);
   }
 
   @override

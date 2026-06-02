@@ -19,6 +19,7 @@ import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
+import '../presentation/admin/account/personal_info_screen.dart';
 import '../presentation/admin/work/admin_dashboard_screen.dart';
 import '../presentation/admin/work/operational_queue_screen.dart';
 import '../presentation/admin/work/work_order_detail_screen.dart';
@@ -42,6 +43,8 @@ import '../presentation/customer/account/detailed_chat_screen.dart';
 import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
 import '../presentation/customer/work/request_service_screen.dart';
+import '../presentation/customer/work/edit_work_order_screen.dart';
+import '../presentation/customer/work/customer_work_order_details_screen.dart';
 import '../presentation/customer/work/active_repairs_screen.dart';
 import '../presentation/customer/work/customer_cancel_work_order_screen.dart';
 import '../presentation/customer/work/device_registration_screen.dart';
@@ -475,6 +478,12 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const SecuritySettingsScreen(),
                 ),
                 GoRoute(
+                  name: RouteNames.adminPersonalInfo,
+                  path: Routes.personalInfo,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const AdminPersonalInfoScreen(),
+                ),
+                GoRoute(
                   name: RouteNames.adminSystemLog,
                   path: Routes.adminSystemLog,
                   parentNavigatorKey: _rootNavigatorKey,
@@ -713,6 +722,31 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final workOrderId = state.pathParameters['workOrderId']!;
                     return CustomerCancelWorkOrderScreen(
+                      workOrderId: workOrderId,
+                    );
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.customerEditWorkOrder,
+                  path: Routes.customerEditWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    final workOrderNumber =
+                        state.pathParameters['workOrderNumber']!;
+                    return EditWorkOrderScreen(
+                      workOrderId: workOrderId,
+                      workOrderNumber: workOrderNumber,
+                    );
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.customerWorkOrderDetails,
+                  path: Routes.customerWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return CustomerWorkOrderDetailsScreen(
                       workOrderId: workOrderId,
                     );
                   },

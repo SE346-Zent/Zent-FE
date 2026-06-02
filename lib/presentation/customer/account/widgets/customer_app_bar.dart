@@ -7,12 +7,14 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class CustomerAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final String? subtitle;
   final bool showBackButton;
   final bool showBottomDivider;
 
   const CustomerAppBar({
     super.key,
     required this.title,
+    this.subtitle,
     this.showBackButton = true,
     this.showBottomDivider = true,
   });
@@ -30,9 +32,24 @@ class CustomerAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () => context.pop(),
             )
           : null,
-      title: Text(
-        title,
-        style: TextStyles.title.copyWith(color: AppColors.primary500),
+      title: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: TextStyles.title.copyWith(color: AppColors.primary500),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 2.0),
+            Text(
+              subtitle!,
+              style: TextStyles.bodyMedium.copyWith(
+                color: AppColors.secondary500,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ],
       ),
       centerTitle: true,
 

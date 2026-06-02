@@ -7,7 +7,7 @@ import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
 import '../../../admin/account/widgets/admin_sidebar.dart';
 import '../../../../routing/route_names.dart';
-import '../../../../di/injection_container.dart';
+import 'package:provider/provider.dart';
 import '../../auth/auth_view_model.dart';
 
 class AdminMainLayout extends StatefulWidget {
@@ -34,7 +34,8 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
     final displayIndex = isQueueScreen
         ? -1
         : widget.navigationShell.currentIndex;
-    final userName = sl<AuthViewModel>().currentUser?.name ?? 'Admin';
+    final userName =
+        context.watch<AuthViewModel>().currentUser?.name ?? 'Admin';
     final canPop = widget.navigationShell.currentIndex == 0;
     return PopScope(
       canPop: canPop,

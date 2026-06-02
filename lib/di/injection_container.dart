@@ -28,6 +28,7 @@ import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../domain/usecases/work_order/create_work_order_usecase.dart';
+import '../domain/usecases/work_order/edit_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
 import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../domain/usecases/work_order/approve_refusal_usecase.dart';
@@ -65,6 +66,8 @@ import '../presentation/admin/account/viewmodels/inventory_assets_viewmodel.dart
 import '../presentation/admin/account/viewmodels/detail_request_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/choose_role_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/create_account_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/personal_info_viewmodel.dart'
+    as admin_personal_info;
 import '../presentation/admin/work/viewmodels/admin_dashboard_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_notifications_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_reports_viewmodel.dart';
@@ -91,6 +94,8 @@ import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart
 import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/active_repairs_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/customer_cancel_work_order_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/edit_work_order_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/customer_work_order_details_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/device_registration_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/parts_viewmodel.dart';
 import '../presentation/common/auth/register/view_models/register_view_model.dart';
@@ -135,6 +140,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
   sl.registerLazySingleton(() => CreateWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => EditWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetActiveRepairsUseCase(sl()));
   sl.registerLazySingleton(() => GetMyProductsUseCase(sl()));
   sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
@@ -186,7 +192,15 @@ Future<void> init() async {
     () => VerifyOtpViewModel(verifyOtpUseCase: sl(), resendOtpUseCase: sl()),
   );
   sl.registerFactory(() => UserManagementViewModel(getUsersUseCase: sl()));
-  sl.registerFactory(() => AdminDashboardViewModel());
+  sl.registerFactory(
+    () => AdminDashboardViewModel(getCurrentUserUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => admin_personal_info.AdminPersonalInfoViewModel(
+      getCurrentUserUseCase: sl(),
+      updateProfileUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => AdminNotificationsViewModel());
   sl.registerFactory(() => AdminReportsViewModel(getAnalyticsUseCase: sl()));
   sl.registerFactory(
@@ -263,6 +277,21 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
+  sl.registerFactoryParam<EditWorkOrderViewModel, List<String>, void>(
+    (params, _) => EditWorkOrderViewModel(
+      editWorkOrderUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
+      getMyProductsUseCase: sl(),
+      workOrderId: params[0],
+      workOrderNumber: params[1],
+    ),
+  );
+  sl.registerFactoryParam<CustomerWorkOrderDetailsViewModel, String, void>(
+    (workOrderId, _) => CustomerWorkOrderDetailsViewModel(
+      getSingleWorkOrderUseCase: sl(),
+      workOrderId: workOrderId,
+    ),
+  );
   sl.registerFactory(
     () => DetailedChatViewModel(chatService: sl(), getCurrentUserUseCase: sl()),
   );
@@ -315,7 +344,7 @@ Future<void> init() async {
   sl.registerFactory(() => TechPersonalInfoViewModel(sl(), sl()));
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(() => TechSecurityViewModel(getLoginHistoryUseCase: sl()));
-  sl.registerFactory(() => PartSearchViewModel(getPartsUseCase: sl()));
+  sl.registerFactory(() => PartSearchViewModel(getPartCatalogUseCase: sl()));
   sl.registerFactory(
     () => WorkOrdersHistoryViewModel(
       getManyWorkOrdersUseCase: sl(),

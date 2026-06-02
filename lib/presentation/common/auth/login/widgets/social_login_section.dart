@@ -35,7 +35,7 @@ class SocialLoginSection extends StatelessWidget {
         const SizedBox(height: AppDimens.spaceLg),
 
         // Google Button
-        viewModel.isLoading
+        viewModel.isGoogleLoading
             ? const Center(child: CircularProgressIndicator())
             : SocialLoginButton(
                 onPressed: () async {

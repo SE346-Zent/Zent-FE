@@ -64,6 +64,8 @@ class _AdminDashboardScreenContentState
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<AdminDashboardViewModel>();
+    final authViewModel = context.watch<AuthViewModel>();
+    final userName = authViewModel.currentUser?.name ?? 'Admin';
 
     return Material(
       color: AppColors.background500,
@@ -138,7 +140,7 @@ class _AdminDashboardScreenContentState
                         border: Border.all(color: Colors.white, width: 2.0),
                         boxShadow: [BoxShadowStyles.raised],
                       ),
-                      child: UserAvatar(name: viewModel.userName, size: 32),
+                      child: UserAvatar(name: userName, size: 32),
                     ),
                   ),
                 ],
@@ -160,7 +162,7 @@ class _AdminDashboardScreenContentState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Good morning, ${viewModel.userName}',
+                                'Good morning, $userName',
                                 style: TextStyles.label.copyWith(
                                   color: AppColors.secondary300,
                                 ),

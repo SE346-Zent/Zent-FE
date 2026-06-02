@@ -223,14 +223,19 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-          onTap: isCustomer
-              ? null
-              : () {
-                  context.pushNamed(
-                    RouteNames.adminDetailedHistory,
-                    pathParameters: {'workOrderId': wo.id},
-                  );
-                },
+          onTap: () {
+            if (isCustomer) {
+              context.pushNamed(
+                RouteNames.customerWorkOrderDetails,
+                pathParameters: {'workOrderId': wo.id},
+              );
+            } else {
+              context.pushNamed(
+                RouteNames.adminDetailedHistory,
+                pathParameters: {'workOrderId': wo.id},
+              );
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.only(
               top: 12.0,

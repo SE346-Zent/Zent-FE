@@ -1,6 +1,7 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
 import '../../../../domain/usecases/auth/logout_usecase.dart';
@@ -95,19 +96,16 @@ class ProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
     debugPrint("action triggered: Viewmodel logic navigated to $menuName");
     switch (menuName) {
       case 'User Management':
-        context.goNamed('adminUserManagement');
+        context.goNamed(RouteNames.adminUserManagement);
         break;
       case 'Security Settings':
-        context.goNamed('adminSecuritySettings');
+        context.goNamed(RouteNames.adminSecuritySettings);
+        break;
+      case 'Personal Info':
+        context.goNamed(RouteNames.adminPersonalInfo);
         break;
       case 'Add Part Request':
-        context.goNamed('adminPartRequests');
-        break;
-      case 'Available Roles':
-        context.goNamed('adminAvailableRoles');
-        break;
-      case 'Inventory Assets':
-        context.goNamed('adminInventoryAssets');
+        context.goNamed(RouteNames.adminPartRequests);
         break;
       default:
         break;

@@ -5,6 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
 import 'viewmodels/profile_viewmodel.dart';
@@ -27,7 +28,12 @@ class _ProfileScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<ProfileViewModel>();
+    final authViewModel = context.watch<AuthViewModel>();
+    final userName = authViewModel.currentUser?.name ?? 'Admin';
+    final role = authViewModel.currentUser?.role != null
+        ? (authViewModel.currentUser!.role.name[0].toUpperCase() +
+              authViewModel.currentUser!.role.name.substring(1))
+        : 'Administrator';
 
     return Scaffold(
       backgroundColor: AppColors.background500,
@@ -50,10 +56,16 @@ class _ProfileScreenContent extends StatelessWidget {
                   showLeading: false,
                 ),
                 const SizedBox(height: AppDimens.spaceLg),
-                Avatar(name: viewModel.userInfo.userName),
+                Avatar(name: userName),
                 const SizedBox(height: AppDimens.spaceMd),
                 // User Info
-                ProfileUserInfo(userInfo: viewModel.userInfo),
+                ProfileUserInfo(
+                  userInfo: UserProfileInfo(
+                    userName: userName,
+                    role: role,
+                    avatarUrl: '',
+                  ),
+                ),
                 const SizedBox(height: AppDimens.spaceXl),
                 // Menu Items
                 const Padding(

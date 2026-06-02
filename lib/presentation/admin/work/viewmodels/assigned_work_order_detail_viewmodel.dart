@@ -12,6 +12,7 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
 
   final String techAssignedTime = '45 minutes ago';
   final String symptom = 'ABC XYZ';
+  final String appointment = '10h00, 30/10/2026';
   final String description =
       'ABC XYZasdfdsadffffffffffffffffffffffffasdfasdfasdfsaefe';
   final String location = '123 Hoa Binh, Quan Tan Phu, HCM';

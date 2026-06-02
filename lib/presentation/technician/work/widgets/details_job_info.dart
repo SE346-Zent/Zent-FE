@@ -28,10 +28,12 @@ class DetailsJobInfo extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                viewModel.jobName,
-                style: TextStyles.headline.copyWith(
-                  color: AppColors.primary500,
+              Expanded(
+                child: Text(
+                  viewModel.jobName,
+                  style: TextStyles.headline.copyWith(
+                    color: AppColors.primary500,
+                  ),
                 ),
               ),
               Row(

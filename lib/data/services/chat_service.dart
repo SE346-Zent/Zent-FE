@@ -294,6 +294,8 @@ class ChatService extends ChangeNotifier {
 
   Timer? _reconnectTimer;
   bool _isIntentionalDisconnect = false;
+  int _reconnectAttempt = 0;
+  static const int _maxReconnectDelaySeconds = 30;
 
   Future<void> connect() async {
     if (_isConnected || _isConnecting) return;
@@ -314,6 +316,10 @@ class ChatService extends ChangeNotifier {
         _messageStreamController?.close();
         _messageStreamController = null;
       }
+
+      // Always try to refresh the token before connecting, so we don't
+      // use a stale/expired token that causes immediate disconnect loops.
+      await _refreshTokenBeforeConnect();
 
       final token = await authLocalDataSource.getAccessToken();
       if (token == null) return;
@@ -389,6 +395,7 @@ class ChatService extends ChangeNotifier {
       _isIntentionalDisconnect = true;
       _reconnectTimer?.cancel();
       _reconnectTimer = null;
+      _reconnectAttempt = 0;
     }
 
     _isConnected = false;
@@ -402,15 +409,76 @@ class ChatService extends ChangeNotifier {
 
     if (!intentional && !_isIntentionalDisconnect) {
       _reconnectTimer?.cancel();
+      // Exponential backoff: 2, 4, 8, 16, max 30 seconds
+      _reconnectAttempt++;
+      final delaySeconds = (_reconnectAttempt <= 1)
+          ? 2
+          : (1 << _reconnectAttempt).clamp(2, _maxReconnectDelaySeconds);
       debugPrint(
-        "WS: Unintentional disconnect detected. Scheduling reconnect in 4 seconds...",
+        "WS: Unintentional disconnect detected. Scheduling reconnect in $delaySeconds seconds (attempt #$_reconnectAttempt)...",
       );
-      _reconnectTimer = Timer(const Duration(seconds: 4), () {
+      _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
         if (!_isConnected && !_isIntentionalDisconnect) {
-          debugPrint("WS: Reconnecting now...");
+          debugPrint("WS: Reconnecting now (attempt #$_reconnectAttempt)...");
           connect();
         }
       });
+    }
+  }
+
+  /// Refresh the access token via REST API before attempting WebSocket connection.
+  /// This prevents using a stale/expired token that would cause the WS to
+  /// immediately disconnect again.
+  Future<void> _refreshTokenBeforeConnect() async {
+    try {
+      final refreshToken = await authLocalDataSource.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        debugPrint(
+          "WS: No refresh token available, skipping pre-connect refresh.",
+        );
+        return;
+      }
+
+      final baseURL = dotenv.get("BASE_URL");
+      final cleanBase = baseURL.endsWith('/')
+          ? baseURL.substring(0, baseURL.length - 1)
+          : baseURL;
+      final uri = Uri.parse('$cleanBase/auth/refresh-token');
+
+      final response = await client
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $refreshToken',
+            },
+            body: json.encode({'refresh_token': refreshToken}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final jsonMap = json.decode(response.body);
+        final data = jsonMap['data'];
+        if (data != null) {
+          final newAccessToken = data['accessToken']?.toString();
+          final newRefreshToken = data['refreshToken']?.toString();
+
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            debugPrint("WS: Token refreshed before connect successfully.");
+            await authLocalDataSource.saveCredentials(
+              newAccessToken,
+              newRefreshToken ?? refreshToken,
+            );
+            return;
+          }
+        }
+      }
+      debugPrint(
+        "WS: Pre-connect token refresh returned status ${response.statusCode}.",
+      );
+    } catch (e) {
+      debugPrint("WS: Pre-connect token refresh failed: $e");
     }
   }
 

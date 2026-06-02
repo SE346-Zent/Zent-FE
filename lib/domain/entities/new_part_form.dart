@@ -12,6 +12,8 @@ class NewPartForm {
   final String? modelCode;
   final String? denialReason;
   final List<String> photoUrls;
+  final String? reviewedBy;
+  final DateTime? reviewedAt;
 
   NewPartForm({
     required this.id,
@@ -27,6 +29,8 @@ class NewPartForm {
     this.modelCode,
     this.denialReason,
     required this.photoUrls,
+    this.reviewedBy,
+    this.reviewedAt,
   });
 }
 

@@ -117,7 +117,7 @@ class AuthRepositoryImpl implements AuthRepository {
     if (accessToken == null) {
       throw BusinessException('User is not authenticated');
     }
-    
+
     await authRemoteService.updateProfile(
       accessToken: accessToken,
       fullName: fullName,

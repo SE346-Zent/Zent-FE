@@ -48,8 +48,12 @@ class InterceptedHttpClient extends http.BaseClient {
           );
           await _secureStorage.delete(key: 'ACCESS_TOKEN');
           await _secureStorage.delete(key: 'REFRESH_TOKEN');
-          try { sl<AuthViewModel>().clearUser(); } catch (_) {}
-          try { appRouter.go(Routes.login); } catch (_) {}
+          try {
+            sl<AuthViewModel>().clearUser();
+          } catch (_) {}
+          try {
+            appRouter.go(Routes.login);
+          } catch (_) {}
         }
       } catch (e) {
         debugPrint(

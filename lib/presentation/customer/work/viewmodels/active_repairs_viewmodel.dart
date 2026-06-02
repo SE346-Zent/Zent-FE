@@ -71,7 +71,8 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   int _mapStatusToStep(WorkOrder order) {
     final status = order.status;
-    final hasTech = order.technicianId.trim().isNotEmpty &&
+    final hasTech =
+        order.technicianId.trim().isNotEmpty &&
         order.technicianId.trim() != '0' &&
         order.technicianId.trim() != 'null';
 

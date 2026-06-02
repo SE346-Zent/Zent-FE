@@ -153,7 +153,9 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
                 text: 'Save Changes',
                 icon: Icons.topic_outlined,
                 onPressed: () {
-                  context.read<TechPersonalInfoViewModel>().saveChanges(context);
+                  context.read<TechPersonalInfoViewModel>().saveChanges(
+                    context,
+                  );
                 },
               ),
             ],

@@ -354,7 +354,8 @@ class ChatService extends ChangeNotifier {
                 final decoded = json.decode(message as String);
                 if (decoded['type'] == 'TOKEN_EXPIRING') {
                   _handleTokenExpiring();
-                } else if (decoded['type'] == 'ERROR' && decoded['code'] == 4001) {
+                } else if (decoded['type'] == 'ERROR' &&
+                    decoded['code'] == 4001) {
                   // Token used for WS is expired/invalid, we must refresh it immediately!
                   _handleTokenExpiring();
                 }
@@ -481,7 +482,8 @@ class ChatService extends ChangeNotifier {
       debugPrint("WS handle token expiring failed: $e");
       final errorStr = e.toString().toLowerCase();
       // If it's a network error, we shouldn't log out. Only log out if it's an API/Auth error
-      if (!errorStr.contains('socketexception') && !errorStr.contains('timeoutexception')) {
+      if (!errorStr.contains('socketexception') &&
+          !errorStr.contains('timeoutexception')) {
         debugPrint("WS token refresh failed due to auth error. Logging out...");
         await sl<AuthRepository>().logout();
         sl<AuthViewModel>().clearUser();

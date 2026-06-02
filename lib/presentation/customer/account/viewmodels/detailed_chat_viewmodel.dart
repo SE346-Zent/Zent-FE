@@ -70,7 +70,7 @@ class ChatMessage {
         final parts = cleanStr.split(' ');
         final datePart = parts[0];
         String timePart = parts[1];
-        
+
         final timeParts = timePart.split(':');
         if (timeParts.isNotEmpty && timeParts[0].length == 1) {
           timeParts[0] = "0${timeParts[0]}";
@@ -81,7 +81,7 @@ class ChatMessage {
         final parts = cleanStr.split('T');
         final datePart = parts[0];
         String timePart = parts[1];
-        
+
         final timeParts = timePart.split(':');
         if (timeParts.isNotEmpty && timeParts[0].length == 1) {
           timeParts[0] = "0${timeParts[0]}";

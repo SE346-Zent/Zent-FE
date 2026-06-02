@@ -14,7 +14,10 @@ class TechPersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
   String phoneNumber = '';
   bool isLoading = false;
 
-  TechPersonalInfoViewModel(this.getCurrentUserUseCase, this.updateProfileUseCase) {
+  TechPersonalInfoViewModel(
+    this.getCurrentUserUseCase,
+    this.updateProfileUseCase,
+  ) {
     loadTechInfo();
   }
 
@@ -34,7 +37,10 @@ class TechPersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<void> saveChanges(BuildContext context) async {
     if (phoneNumber.length != 10 || !phoneNumber.startsWith('0')) {
-      ZentErrorPopup.show(context, "Phone number must be 10 digits and start with 0");
+      ZentErrorPopup.show(
+        context,
+        "Phone number must be 10 digits and start with 0",
+      );
       return;
     }
 
@@ -49,7 +55,10 @@ class TechPersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
       );
     } catch (e) {
       if (context.mounted) {
-        ZentErrorPopup.show(context, e.toString().replaceAll('Exception: ', ''));
+        ZentErrorPopup.show(
+          context,
+          e.toString().replaceAll('Exception: ', ''),
+        );
       }
     } finally {
       isLoading = false;

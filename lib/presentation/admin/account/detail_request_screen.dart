@@ -91,7 +91,10 @@ class _DetailRequestScreenContent extends StatelessWidget {
                     onPressed: () async {
                       final reason = reasonController.text.trim();
                       if (reason.isEmpty) {
-                        ZentErrorPopup.show(ctx, 'Please provide a reason for rejection');
+                        ZentErrorPopup.show(
+                          ctx,
+                          'Please provide a reason for rejection',
+                        );
                         return;
                       }
                       if (reason.length < 10) {
@@ -107,7 +110,10 @@ class _DetailRequestScreenContent extends StatelessWidget {
                         if (success) {
                           Navigator.of(ctx).pop(true);
                         } else {
-                          ZentErrorPopup.show(ctx, 'Failed to reject part request');
+                          ZentErrorPopup.show(
+                            ctx,
+                            'Failed to reject part request',
+                          );
                         }
                       }
                     },

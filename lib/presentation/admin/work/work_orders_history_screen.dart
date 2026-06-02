@@ -282,71 +282,71 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                         children: [
                           // Row 1: Name
                           Row(
-                      children: [
-                        const Icon(
-                          Icons.person_outline,
-                          size: 14.0,
-                          color: AppColors.secondary400,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Expanded(
-                          child: Text(
-                            isCustomer
-                                ? (wo.technicianName ?? 'Unassigned')
-                                : wo.customerName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
+                            children: [
+                              const Icon(
+                                Icons.person_outline,
+                                size: 14.0,
+                                color: AppColors.secondary400,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  isCustomer
+                                      ? (wo.technicianName ?? 'Unassigned')
+                                      : wo.customerName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2.0),
-                    // Row 2: Address
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on_outlined,
-                          size: 14.0,
-                          color: AppColors.secondary400,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Expanded(
-                          child: Text(
-                            wo.addressString,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
+                          const SizedBox(height: 2.0),
+                          // Row 2: Address
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                size: 14.0,
+                                color: AppColors.secondary400,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  wo.addressString,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2.0),
-                    // Row 3: Last Updated
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.access_time,
-                          size: 14.0,
-                          color: AppColors.secondary400,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Expanded(
-                          child: Text(
-                            DateFormat(
-                              'dd MMM yyyy, HH:mm',
-                            ).format(wo.updatedAt.toLocal()),
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
+                          const SizedBox(height: 2.0),
+                          // Row 3: Last Updated
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time,
+                                size: 14.0,
+                                color: AppColors.secondary400,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  DateFormat(
+                                    'dd MMM yyyy, HH:mm',
+                                  ).format(wo.updatedAt.toLocal()),
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                         ],
                       ),
                     ),
@@ -414,7 +414,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildCustomerPopupMenu(BuildContext context, WorkOrder wo) {
     final isComplete = wo.status == WorkOrderStatus.complete;
-    
+
     return PopupMenuButton<String>(
       constraints: const BoxConstraints(minWidth: 140.0, maxWidth: 140.0),
       padding: EdgeInsets.zero,
@@ -439,7 +439,10 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
               onTap: () {
                 Navigator.pop(context);
                 if (!isComplete) {
-                  ZentErrorPopup.show(context, 'Work order must be completed before rating.');
+                  ZentErrorPopup.show(
+                    context,
+                    'Work order must be completed before rating.',
+                  );
                   return;
                 }
                 _showRatingDialog(context, wo);
@@ -455,7 +458,9 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                 child: Text(
                   "Rate",
                   style: TextStyles.label.copyWith(
-                    color: isComplete ? AppColors.primary500 : AppColors.secondary300,
+                    color: isComplete
+                        ? AppColors.primary500
+                        : AppColors.secondary300,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

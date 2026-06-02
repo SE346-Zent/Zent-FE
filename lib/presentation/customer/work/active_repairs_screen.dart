@@ -21,8 +21,21 @@ class ActiveRepairsScreen extends StatelessWidget {
   }
 }
 
-class _ActiveRepairsView extends StatelessWidget {
+class _ActiveRepairsView extends StatefulWidget {
   const _ActiveRepairsView();
+
+  @override
+  State<_ActiveRepairsView> createState() => _ActiveRepairsViewState();
+}
+
+class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ActiveRepairsViewModel>().fetchWorkOrders();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,23 +48,13 @@ class _ActiveRepairsView extends StatelessWidget {
         showBackButton: true,
         showBottomDivider: true,
       ),
-      body: viewModel.isLoading && viewModel.activeWorkOrders.isEmpty
+      body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : viewModel.errorMessage != null && viewModel.activeWorkOrders.isEmpty
+          : viewModel.errorMessage != null
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Error: ${viewModel.errorMessage}',
-                    style: TextStyles.bodyLarge,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => viewModel.fetchWorkOrders(),
-                    child: const Text('Retry'),
-                  ),
-                ],
+              child: Text(
+                'Error: ${viewModel.errorMessage}',
+                style: const TextStyle(color: Colors.red),
               ),
             )
           : CustomScrollView(
@@ -84,20 +87,27 @@ class _ActiveRepairsView extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimens.spaceLg),
 
-                        // Tracking Card
-                        if (viewModel.currentTrackingOrder != null)
+                        if (viewModel.activeWorkOrder != null) ...[
                           TrackingCard(
-                            workOrder: viewModel.currentTrackingOrder!,
+                            workOrder: viewModel.activeWorkOrder!,
                             currentStatusStep: viewModel.currentStatusStep,
-                          )
-                        else
-                          const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(AppDimens.spaceXl),
-                              child: Text('No active work orders'),
+                          ),
+                          const SizedBox(height: AppDimens.spaceXl),
+                        ] else ...[
+                          Container(
+                            padding: const EdgeInsets.all(AppDimens.spaceLg),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                'You have no active repairs at the moment.',
+                              ),
                             ),
                           ),
-                        const SizedBox(height: AppDimens.spaceXl),
+                          const SizedBox(height: AppDimens.spaceXl),
+                        ],
                       ],
                     ),
                   ),
@@ -112,9 +122,11 @@ class _ActiveRepairsView extends StatelessWidget {
                       right: AppDimens.spaceMd,
                       bottom: AppDimens.spaceMd,
                     ),
-                    child: RecentCompletedList(
-                      recentCompleted: viewModel.completedWorkOrders,
-                    ),
+                    child: viewModel.recentCompleted.isEmpty
+                        ? const Center(child: Text(''))
+                        : RecentCompletedList(
+                            recentCompleted: viewModel.recentCompleted,
+                          ),
                   ),
                 ),
               ],

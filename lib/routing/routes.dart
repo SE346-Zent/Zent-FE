@@ -43,14 +43,16 @@ abstract final class Routes {
   static const adminCreateAccount = 'admin-create-account';
   static const adminPartRequests = 'admin-part-requests';
   static const adminInventoryAssets = 'admin-inventory-assets';
-  static const adminDetailRequest = 'detail-request';
+  static const adminDetailRequest = 'detail-request/:partId';
   static const adminRejectedWorkOrders = 'rejected-work-orders';
   static const adminRejectionDetail = 'rejection-detail/:id';
-  static const adminWorkOrderDetails = 'work-order-details/:workOrderId';
+  static const adminAssignWorkOrder = 'assign-work-order/:workOrderId';
   static const adminAssignedWorkOrderDetails =
       'assigned-work-order-details/:workOrderId';
   static const adminViewSchedule = 'view-schedule/:techId';
   static const adminReassignWorkOrder = 'reassign-work-order/:workOrderId';
+  static const adminWorkOrderHistory = 'work-order-history';
+  static const adminDetailedHistory = 'detailed-history/:workOrderId';
 
   static const techWorkOrderDetails = 'work-order-details/:workOrderId';
   static const techPauseWorkOrder = 'tech-pause-work-order/:workOrderId';
@@ -59,6 +61,7 @@ abstract final class Routes {
   static const addNewPart = 'add-new-part';
   static const inventorySearch = 'inventory-search';
   static const techSecuritySettings = 'tech-security-settings';
+  static const techWorkOrderHistory = 'work-order-history';
   static const customerSecuritySettings = 'customer-security-settings';
   static const customerNotifications = 'customer-notifications';
   static const notifications = 'notifications';
@@ -71,6 +74,7 @@ abstract final class Routes {
   static const requestService = 'request-service';
   static const activeRepairs = 'active-repairs';
   static const customerCancelWorkOrder = 'cancel-work-order/:workOrderId';
+  static const customerWorkOrderHistory = 'work-order-history';
 
   // // auth route builders
   // static String getAuthForgetPasswordRoute() => '$login/$forgetPassword';

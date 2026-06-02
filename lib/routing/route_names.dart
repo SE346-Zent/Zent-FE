@@ -17,7 +17,7 @@ abstract final class RouteNames {
   static const String adminNotifications = 'adminNotifications';
   static const String adminReports = 'adminReports';
   static const String adminOperationalQueue = 'adminOperationalQueue';
-  static const String adminWorkOrderDetails = 'adminWorkOrderDetails';
+  static const String adminAssignWorkOrder = 'adminAssignWorkOrder';
   static const String adminAssignedWorkOrderDetails =
       'adminAssignedWorkOrderDetails';
   static const String adminViewSchedule = 'adminViewSchedule';
@@ -25,6 +25,8 @@ abstract final class RouteNames {
   static const String adminRejectedWorkOrders = 'adminRejectedWorkOrders';
   static const String adminTeam = 'adminTeam';
   static const String adminMe = 'adminMe';
+  static const String adminWorkOrderHistory = 'adminWorkOrderHistory';
+  static const String adminDetailedHistory = 'adminDetailedHistory';
 
   // technician top level
   static const String techHome = 'techHome';
@@ -35,6 +37,7 @@ abstract final class RouteNames {
   static const String techCompleteWorkOrder = 'techCompleteWorkOrder';
   static const String techWorkOrderDetails = 'techWorkOrderDetails';
   static const String techPartSearch = 'techPartSearch';
+  static const String techDetailedChat = 'techDetailedChat';
   static const String appCamera = 'appCamera';
   static const String qrScanner = 'qrScanner';
 
@@ -58,6 +61,7 @@ abstract final class RouteNames {
   static const String techPauseWorkOrder = 'techPauseWorkOrder';
   static const String techRejectWorkOrder = 'techRejectWorkOrder';
   static const String techNotifications = 'techNotifications';
+  static const String techWorkOrderHistory = 'techWorkOrderHistory';
 
   static const String customerMyProducts = 'customerMyProducts';
   static const String customerRequestService = 'customerRequestService';
@@ -71,4 +75,5 @@ abstract final class RouteNames {
   static const String customerDeviceRegistration = 'customerDeviceRegistration';
   static const String customerDetailedProductParts =
       'customerDetailedProductParts';
+  static const String customerWorkOrderHistory = 'customerWorkOrderHistory';
 }

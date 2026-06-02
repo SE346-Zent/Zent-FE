@@ -5,7 +5,6 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
-import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
 import 'viewmodels/profile_viewmodel.dart';
@@ -61,20 +60,7 @@ class _ProfileScreenContent extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
                   child: ProfileMenuOptions(),
                 ),
-                const SizedBox(height: AppDimens.spaceXl),
-                // Sign Out Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimens.spaceMd,
-                  ),
-                  child: PrimaryActionButton(
-                    label: 'Sign Out',
-                    width: double.infinity,
-                    icon: Icons.logout,
-                    onPressed: () =>
-                        context.read<ProfileViewModel>().logout(context),
-                  ),
-                ),
+                // Sign Out button removed — logout only available via sidebar
               ],
             ),
           ),

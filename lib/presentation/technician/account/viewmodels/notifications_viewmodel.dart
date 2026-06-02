@@ -1,6 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class TechNotificationsViewModel extends ChangeNotifier {
+class TechNotificationsViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   bool newJobAssignments = true;
   bool urgentDispatches = false;
   bool equipmentMaintenance = true;

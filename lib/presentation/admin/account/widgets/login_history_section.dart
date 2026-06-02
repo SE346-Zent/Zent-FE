@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/entities/login_history_entry.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class LoginHistorySection extends StatelessWidget {
-  const LoginHistorySection({super.key});
+  final List<LoginHistoryEntry> history;
+  final bool isLoading;
+
+  const LoginHistorySection({
+    super.key,
+    required this.history,
+    required this.isLoading,
+  });
+
+  String _formatDate(DateTime dt) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final monthStr = months[dt.month - 1];
+    final dayStr = dt.day.toString();
+    final hourStr = dt.hour.toString().padLeft(2, '0');
+    final minuteStr = dt.minute.toString().padLeft(2, '0');
+    return '$monthStr $dayStr, $hourStr:$minuteStr';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final historyData = [
-      {
-        'device': 'IPhone 14 ProMax',
-        'location': 'San Fransico, US',
-        'date': 'Oct 15',
-      },
-      {
-        'device': 'IPhone 15 ProMax',
-        'location': 'San Fransico, US',
-        'date': 'Oct 14',
-      },
-      {
-        'device': 'IPhone 16 ProMax',
-        'location': 'San Fransico, US',
-        'date': 'Oct 13',
-      },
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,59 +59,79 @@ class LoginHistorySection extends StatelessWidget {
           ),
         ),
         Container(
-          height: 200,
+          constraints: const BoxConstraints(maxHeight: 220),
           padding: const EdgeInsets.all(AppDimens.spaceMd),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary100),
           ),
-          child: SingleChildScrollView(
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: historyData.length,
-              separatorBuilder: (context, index) => const Divider(
-                color: AppColors.secondary100,
-                height: AppDimens.spaceLg,
-              ),
-              itemBuilder: (context, index) {
-                final item = historyData[index];
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['device']!,
-                            style: TextStyles.bodyLarge.copyWith(
-                              color: AppColors.primary500,
-                            ),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            item['location']!,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
-                          ),
-                        ],
-                      ),
+          child: isLoading
+              ? const SizedBox(
+                  height: 100,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.tertiary500,
                     ),
-                    if (item['date']!.isNotEmpty)
-                      Text(
-                        item['date']!,
-                        style: TextStyles.label.copyWith(
-                          color: AppColors.secondary400,
+                  ),
+                )
+              : history.isEmpty
+              ? const SizedBox(
+                  height: 100,
+                  child: Center(
+                    child: Text(
+                      'No login history available',
+                      style: TextStyle(color: AppColors.secondary400),
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: history.length,
+                  separatorBuilder: (context, index) => const Divider(
+                    color: AppColors.secondary100,
+                    height: AppDimens.spaceLg,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = history[index];
+                    final locationStr =
+                        item.location != null && item.location!.isNotEmpty
+                        ? '${item.location} (${item.ipAddress})'
+                        : item.ipAddress;
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.deviceName,
+                                style: TextStyles.bodyLarge.copyWith(
+                                  color: AppColors.primary500,
+                                ),
+                              ),
+                              const SizedBox(height: 2.0),
+                              Text(
+                                locationStr,
+                                style: TextStyles.label.copyWith(
+                                  color: AppColors.secondary400,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ),
+                        Text(
+                          _formatDate(item.createdAt),
+                          style: TextStyles.label.copyWith(
+                            color: AppColors.secondary400,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
         ),
       ],
     );

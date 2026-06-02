@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import '../viewmodels/tech_work_order_details_viewmodel.dart';
 
 class DetailsChecklist extends StatelessWidget {
@@ -47,7 +48,11 @@ class DetailsChecklist extends StatelessWidget {
                   return Row(
                     children: [
                       GestureDetector(
-                        onTap: () => viewModel.toggleTask(index),
+                        onTap:
+                            viewModel.workOrder?.status ==
+                                WorkOrderStatus.complete
+                            ? null
+                            : () => viewModel.toggleTask(index),
                         child: Icon(
                           item.isCompleted
                               ? Icons.check_circle

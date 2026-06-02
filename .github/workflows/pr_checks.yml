@@ -27,8 +27,9 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Create dummy .env for analysis
-        run: touch .env
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Install Dependencies
         run: flutter pub get

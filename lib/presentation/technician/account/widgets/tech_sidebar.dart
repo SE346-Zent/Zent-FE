@@ -107,18 +107,7 @@ class TechSidebar extends StatelessWidget {
                         );
                       },
                     ),
-                    SidebarMenuItem(
-                      title: "Add New Part",
-                      icon: const Icon(
-                        Icons.add_circle_outline,
-                        color: AppColors.primary500,
-                      ),
-                      isActive: false,
-                      onTap: () {
-                        Navigator.pop(context);
-                        context.goNamed(RouteNames.techAddNewPart);
-                      },
-                    ),
+
                     SidebarMenuItem(
                       title: "Part Search",
                       icon: const Icon(
@@ -129,6 +118,18 @@ class TechSidebar extends StatelessWidget {
                       onTap: () {
                         Navigator.pop(context);
                         context.goNamed(RouteNames.techPartSearch);
+                      },
+                    ),
+                    SidebarMenuItem(
+                      title: "Work Order History",
+                      icon: const Icon(
+                        Icons.history,
+                        color: AppColors.primary500,
+                      ),
+                      isActive: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.goNamed(RouteNames.techWorkOrderHistory);
                       },
                     ),
                     const SizedBox(height: AppDimens.spaceSm),

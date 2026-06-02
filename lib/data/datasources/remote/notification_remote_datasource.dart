@@ -20,10 +20,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   final http.Client client;
   final AuthLocalDataSource authLocalDataSource;
 
-  static final String _baseURL = dotenv.get(
-    "BASE_URL",
-    fallback: "http://localhost:3000/api/v1",
-  );
+  static final String _baseURL = dotenv.get("BASE_URL");
 
   NotificationRemoteDataSourceImpl({
     required this.client,

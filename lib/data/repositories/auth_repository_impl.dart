@@ -1,9 +1,13 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/user.dart';
+import '../../domain/entities/login_history_entry.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
-import '../../routing/rbac_token_store.dart';
+import '../models/user_model.dart';
+import '../models/login_history_entry_model.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -15,20 +19,43 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<User> login({required String email, required String password}) async {
-    final response = await authRemoteService.login(email, password);
+  Future<User> login({
+    required String email,
+    required String password,
+    String? fcmToken,
+  }) async {
+    final response = await authRemoteService.login(
+      email,
+      password,
+      fcmToken: fcmToken,
+    );
 
-    // 1. Save to Memory Store
-    RbacTokenStore.setToken(response.accessToken);
-    RbacTokenStore.setRole(response.user.role);
-
-    // 2. Save to Secure Storage (Persistence)
+    // 1. Save to Secure Storage (Persistence)
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
     );
 
-    // 3. Save User Info
+    // 2. Save User Info
+    await authLocalDataSource.saveUser(response.user);
+
+    return response.user;
+  }
+
+  @override
+  Future<User> googleLogin({required String idToken, String? fcmToken}) async {
+    final response = await authRemoteService.googleLogin(
+      idToken,
+      fcmToken: fcmToken,
+    );
+
+    // 1. Save to Secure Storage (Persistence)
+    await authLocalDataSource.saveCredentials(
+      response.accessToken,
+      response.refreshToken,
+    );
+
+    // 2. Save User Info
     await authLocalDataSource.saveUser(response.user);
 
     return response.user;
@@ -76,7 +103,6 @@ class AuthRepositoryImpl implements AuthRepository {
       debugPrint("Remote logout failed: $e");
     } finally {
       await authLocalDataSource.clearCredentials();
-      RbacTokenStore.clearToken();
     }
   }
 
@@ -89,7 +115,6 @@ class AuthRepositoryImpl implements AuthRepository {
         email,
         refreshToken,
       );
-      RbacTokenStore.setToken(response.accessToken);
       await authLocalDataSource.saveCredentials(
         response.accessToken,
         response.refreshToken,
@@ -110,20 +135,24 @@ class AuthRepositoryImpl implements AuthRepository {
           refreshTokenStr,
         );
 
-        // Lưu thông tin mới
-        RbacTokenStore.setToken(response.accessToken);
-        RbacTokenStore.setRole(response.user.role);
         await authLocalDataSource.saveCredentials(
           response.accessToken,
           response.refreshToken,
         );
         await authLocalDataSource.saveUser(response.user);
+
+        try {
+          sl<AuthViewModel>().setLoggedInUser(response.user);
+        } catch (e) {
+          debugPrint("Could not set user in AuthViewModel: $e");
+        }
+
         return true;
       }
       return false;
     } catch (e) {
       debugPrint("Restore session failed: $e");
-      await logout(); // Xóa sạch nếu lỗi
+      await logout();
       return false;
     }
   }
@@ -144,6 +173,34 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<String> verifyForgotOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      return await authRemoteService.verifyForgotOtp(email, otp);
+    } catch (e, stacktrace) {
+      debugPrint("Stacktrace: $stacktrace");
+      rethrow;
+    }
+  }
+
+  @override
+  @override
+  Future<List<User>> getUsers({
+    int page = 1,
+    int pageSize = 50,
+    String? role,
+  }) async {
+    final usersJson = await authRemoteService.getUsers(
+      page: page,
+      pageSize: pageSize,
+      role: role,
+    );
+    return usersJson.map((json) => UserModel.fromJson(json)).toList();
+  }
+
+  @override
   Future<bool> resetPassword({
     required String email,
     required String token,
@@ -154,5 +211,17 @@ class AuthRepositoryImpl implements AuthRepository {
       token: token,
       newPassword: newPassword,
     );
+  }
+
+  @override
+  Future<List<LoginHistoryEntry>> getLoginHistory() async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    final historyJson = await authRemoteService.getLoginHistory(accessToken);
+    return historyJson
+        .map((json) => LoginHistoryEntryModel.fromJson(json))
+        .toList();
   }
 }

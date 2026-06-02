@@ -14,6 +14,9 @@ import 'package:zent_fe/presentation/common/auth/login/widgets/auth_text_field.d
 import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
 import 'package:zent_fe/presentation/common/auth/login/widgets/auth_footer_link.dart';
 import 'package:zent_fe/presentation/common/auth/login/widgets/social_login_section.dart';
+import 'package:zent_fe/presentation/common/auth/login/view_models/login_view_model.dart';
+
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 
 // ViewModel
 import 'package:zent_fe/presentation/common/auth/register/view_models/register_view_model.dart';
@@ -37,8 +40,6 @@ class _RegisterScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<RegisterViewModel>();
-
-    // Automatically show error if it exists
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -161,6 +162,9 @@ class _RegisterScreenContent extends StatelessWidget {
                         'isRegistration': true,
                       },
                     );
+                  } else if (viewModel.errorMessage != null &&
+                      context.mounted) {
+                    ZentErrorPopup.show(context, viewModel.errorMessage!);
                   }
                 },
               ),
@@ -168,7 +172,10 @@ class _RegisterScreenContent extends StatelessWidget {
         const SizedBox(height: AppDimens.spaceLg),
 
         // "Or continue with" + Google button (same as login)
-        const SocialLoginSection(),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<LoginViewModel>(),
+          child: const SocialLoginSection(),
+        ),
 
         const SizedBox(height: AppDimens.spaceLg),
 

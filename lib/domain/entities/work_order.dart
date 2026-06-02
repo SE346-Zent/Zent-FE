@@ -20,6 +20,15 @@ class WorkOrder {
   final String? technicianName;
   final String workOrderNum;
   final List<String> rejectionPhotos;
+  final String? productName;
+  final DateTime? appointment;
+  final String? building;
+  final String? city;
+  final String? country;
+  final String? email;
+  final String? firstName;
+  final String? symptomName;
+  final String? phoneNumber;
 
   WorkOrder({
     required this.id,
@@ -41,6 +50,15 @@ class WorkOrder {
     this.technicianName,
     required this.workOrderNum,
     this.rejectionPhotos = const [],
+    this.productName,
+    this.appointment,
+    this.building,
+    this.city,
+    this.country,
+    this.email,
+    this.firstName,
+    this.symptomName,
+    this.phoneNumber,
   });
 
   String get address => addressString;

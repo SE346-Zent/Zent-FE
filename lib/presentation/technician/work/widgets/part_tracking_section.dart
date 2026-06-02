@@ -144,28 +144,30 @@ class PartTrackingSection extends StatelessWidget {
           ),
           const SizedBox(height: AppDimens.spaceMd),
           ...parts.map((part) => _buildPartListItem(part, isUninstalled)),
-          const SizedBox(height: AppDimens.spaceLg),
-          Row(
-            children: [
-              Expanded(
-                child: _buildButton(
-                  label: "Scanner",
-                  icon: Icons.qr_code_scanner,
-                  onPressed: onScanPressed,
-                  isPrimary: true,
+          if (!viewModel.isReadOnly) ...[
+            const SizedBox(height: AppDimens.spaceLg),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildButton(
+                    label: "Scanner",
+                    icon: Icons.qr_code_scanner,
+                    onPressed: onScanPressed,
+                    isPrimary: true,
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppDimens.spaceMd),
-              Expanded(
-                child: _buildButton(
-                  label: "Manual",
-                  icon: Icons.add,
-                  onPressed: onManualPressed,
-                  isPrimary: false,
+                const SizedBox(width: AppDimens.spaceMd),
+                Expanded(
+                  child: _buildButton(
+                    label: "Manual",
+                    icon: Icons.add,
+                    onPressed: onManualPressed,
+                    isPrimary: false,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -174,10 +176,11 @@ class PartTrackingSection extends StatelessWidget {
   Widget _buildPartListItem(TechWorkOrderPart part, bool isUninstalled) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceSm),
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         left: AppDimens.spaceMd,
         top: AppDimens.spaceSm,
         bottom: AppDimens.spaceSm,
+        right: viewModel.isReadOnly ? AppDimens.spaceMd : 0,
       ),
       decoration: BoxDecoration(
         color: AppColors.tertiary50,
@@ -207,22 +210,23 @@ class PartTrackingSection extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: const Icon(
-              Icons.delete_outline,
-              color: AppColors.error500,
-              size: 29,
+          if (!viewModel.isReadOnly)
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(
+                Icons.delete_outline,
+                color: AppColors.error500,
+                size: 29,
+              ),
+              onPressed: () {
+                if (isUninstalled) {
+                  viewModel.removeUninstalledPart(part.id);
+                } else {
+                  viewModel.removeInstalledPart(part.id);
+                }
+              },
             ),
-            onPressed: () {
-              if (isUninstalled) {
-                viewModel.removeUninstalledPart(part.id);
-              } else {
-                viewModel.removeInstalledPart(part.id);
-              }
-            },
-          ),
           const SizedBox(width: AppDimens.spaceXs),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -9,6 +10,7 @@ import 'tracking_stepper.dart';
 import 'active_repairs_action_button.dart';
 
 import '../../../../domain/entities/work_order.dart';
+import '../viewmodels/active_repairs_viewmodel.dart';
 import 'package:intl/intl.dart';
 
 class TrackingCard extends StatelessWidget {
@@ -82,13 +84,21 @@ class TrackingCard extends StatelessWidget {
                                 bgColor: AppColors.surface600,
                                 textColor: AppColors.secondary500,
                                 shadow: BoxShadowStyles.subtle,
-                                onTap: () {
-                                  context.pushNamed(
+                                onTap: () async {
+                                  final result = await context.pushNamed(
                                     RouteNames.customerCancelWorkOrder,
                                     pathParameters: {
-                                      'workOrderId': workOrder.id,
+                                      'workOrderId': workOrder.id.replaceAll(
+                                        '#',
+                                        '',
+                                      ),
                                     },
                                   );
+                                  if (result == true && context.mounted) {
+                                    context
+                                        .read<ActiveRepairsViewModel>()
+                                        .fetchWorkOrders();
+                                  }
                                 },
                               ),
                             ),

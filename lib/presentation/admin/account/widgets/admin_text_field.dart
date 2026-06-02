@@ -60,7 +60,7 @@ class AdminTextField extends StatelessWidget {
             readOnly: readOnly,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
-              color: readOnly ? AppColors.secondary200 : AppColors.primary500,
+              color: readOnly ? AppColors.secondary500 : AppColors.primary500,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,

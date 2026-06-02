@@ -51,5 +51,9 @@
 		<string>This app requires access to the photo library to upload part photos.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>This app requires access to the camera to take part photos.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>This app requires access to your location to verify geofencing criteria for starting and completing work orders.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>This app requires access to your location to verify geofencing criteria for starting and completing work orders.</string>
 	</dict>
 </plist>

@@ -6,19 +6,21 @@ class GetManyWorkOrdersUseCase {
 
   GetManyWorkOrdersUseCase(this.repository);
 
-  Future<List<WorkOrder>> execute(
-    String userId, {
-    String? status,
+  Future<List<WorkOrder>> execute({
     int page = 1,
     int limit = 20,
     String? role,
+    String? province,
+    String? technicianId,
+    String? date,
   }) async {
-    return await repository.getManyWorkOrders(
-      userId: userId,
-      status: status,
+    return await repository.getWorkOrders(
       page: page,
       limit: limit,
       role: role,
+      province: province,
+      technicianId: technicianId,
+      date: date,
     );
   }
 }

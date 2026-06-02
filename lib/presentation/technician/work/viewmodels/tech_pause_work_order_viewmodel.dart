@@ -1,6 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 
-class TechPauseWorkOrderViewModel extends ChangeNotifier {
+class TechPauseWorkOrderViewModel extends ChangeNotifier
+    with SafeChangeNotifier {
   String _workOrderId = '';
   String get workOrderId => _workOrderId;
 

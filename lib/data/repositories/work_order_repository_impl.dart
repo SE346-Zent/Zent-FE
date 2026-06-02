@@ -49,30 +49,93 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
-  Future<WorkOrder> getSingleWorkOrder({required String id}) async {
-    return await remoteDataSource.getSingleWorkOrder(id);
+  Future<void> changeAppointment(String id, DateTime newDate) {
+    return remoteDataSource.changeAppointment(id, newDate);
   }
 
   @override
-  Future<List<WorkOrder>> getManyWorkOrders({
-    required String userId,
-    String? status,
+  Future<void> reassignWorkOrder(String id, String newTechnicianId) {
+    return remoteDataSource.reassignWorkOrder(id, newTechnicianId);
+  }
+
+  @override
+  Future<void> cancelWorkOrder(String id, String? reason) {
+    return remoteDataSource.cancelWorkOrder(id, reason);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getTechnicians() async {
+    return await remoteDataSource.getTechnicians();
+  }
+
+  @override
+  Future<void> assignWorkOrder(String id, String technicianId) async {
+    return await remoteDataSource.assignWorkOrder(id, technicianId);
+  }
+
+  @override
+  Future<WorkOrder> getWorkOrderDetail({required String id}) async {
+    return await remoteDataSource.getWorkOrderDetail(id);
+  }
+
+  @override
+  Future<List<WorkOrder>> getWorkOrders({
     int page = 1,
     int limit = 20,
     String? role,
+    String? province,
+    String? technicianId,
+    String? date,
   }) async {
-    return await remoteDataSource.getManyWorkOrders(
-      userId,
-      status: status,
+    return await remoteDataSource.getWorkOrders(
       page: page,
       limit: limit,
       role: role,
+      province: province,
+      technicianId: technicianId,
+      date: date,
     );
   }
 
   @override
   Future<List<WorkOrder>> getActiveRepairs({required String customerId}) async {
     return await remoteDataSource.getActiveRepairs(customerId);
+  }
+
+  @override
+  Future<void> startWorkOrder(
+    String id,
+    double latitude,
+    double longitude,
+  ) async {
+    return await remoteDataSource.startWorkOrder(id, latitude, longitude);
+  }
+
+  @override
+  Future<void> uploadClosingFormPhoto(
+    String id,
+    String filePath,
+    double latitude,
+    double longitude,
+    String phase,
+  ) async {
+    return await remoteDataSource.uploadClosingFormPhoto(
+      id,
+      filePath,
+      latitude,
+      longitude,
+      phase,
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> getWorkOrderHistory(String id) async {
+    return await remoteDataSource.getWorkOrderHistory(id);
+  }
+
+  @override
+  Future<void> rateWorkOrder(String id, int rating, String? comment) async {
+    return await remoteDataSource.rateWorkOrder(id, rating, comment);
   }
 
   @override

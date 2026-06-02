@@ -122,50 +122,70 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
               _buildSectionTitle(Icons.history, 'Login History'),
               _buildGroupWrapper(
                 padding: EdgeInsets.zero,
-                child: SizedBox(
-                  height: 220.0,
-                  child: Scrollbar(
-                    controller: _historyScrollController,
-                    thumbVisibility: true,
-                    radius: const Radius.circular(AppDimens.boraXs),
-                    child: ListView.separated(
-                      controller: _historyScrollController,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppDimens.spaceXs,
-                      ),
-                      itemCount: viewModel.loginHistory.length,
-                      separatorBuilder: (_, _) => const Divider(
-                        height: 1.0,
-                        color: AppColors.surface600,
-                      ),
-                      itemBuilder: (context, index) {
-                        final item = viewModel.loginHistory[index];
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: AppDimens.spaceMd,
-                          ),
-                          title: Text(
-                            item.device,
-                            style: TextStyles.bodyLarge.copyWith(
-                              color: AppColors.primary500,
+                child: Container(
+                  constraints: const BoxConstraints(maxHeight: 220),
+                  child: viewModel.isLoadingHistory
+                      ? const SizedBox(
+                          height: 100,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.tertiary500,
                             ),
                           ),
-                          subtitle: Text(
-                            item.location,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary300,
+                        )
+                      : viewModel.loginHistory.isEmpty
+                      ? const SizedBox(
+                          height: 100,
+                          child: Center(
+                            child: Text(
+                              'No login history available',
+                              style: TextStyle(color: AppColors.secondary400),
                             ),
                           ),
-                          trailing: Text(
-                            item.date,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary500,
+                        )
+                      : Scrollbar(
+                          controller: _historyScrollController,
+                          thumbVisibility: true,
+                          radius: const Radius.circular(AppDimens.boraXs),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            controller: _historyScrollController,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppDimens.spaceXs,
                             ),
+                            itemCount: viewModel.loginHistory.length,
+                            separatorBuilder: (_, _) => const Divider(
+                              height: 1.0,
+                              color: AppColors.surface600,
+                            ),
+                            itemBuilder: (context, index) {
+                              final item = viewModel.loginHistory[index];
+                              return ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: AppDimens.spaceMd,
+                                ),
+                                title: Text(
+                                  item.deviceName,
+                                  style: TextStyles.bodyLarge.copyWith(
+                                    color: AppColors.primary500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  item.location ?? 'Unknown',
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary300,
+                                  ),
+                                ),
+                                trailing: Text(
+                                  '${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}',
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary500,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                        ),
                 ),
               ),
               const SizedBox(height: AppDimens.spaceXl),

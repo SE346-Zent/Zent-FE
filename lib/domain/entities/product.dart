@@ -4,6 +4,7 @@ class Product {
   final String model;
   final String serialNumber;
   final DateTime? warrantyUntil;
+  final String? productImageUrl;
 
   Product({
     required this.id,
@@ -11,5 +12,6 @@ class Product {
     required this.model,
     required this.serialNumber,
     this.warrantyUntil,
+    this.productImageUrl,
   });
 }

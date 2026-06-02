@@ -53,12 +53,58 @@ class ProductItemCard extends StatelessWidget {
                 topLeft: Radius.circular(AppDimens.boraMd),
                 topRight: Radius.circular(AppDimens.boraMd),
               ),
-              child: Image.asset(
-                imagePath,
-                height: 140,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+              child:
+                  imagePath.startsWith('http') || imagePath.startsWith('https')
+                  ? Image.network(
+                      imagePath,
+                      height: 140,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint(
+                          '=== [ProductItemCard] Network Image Error for $imagePath: $error ===',
+                        );
+                        return Container(
+                          height: 140,
+                          width: double.infinity,
+                          color: AppColors.secondary50,
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: AppColors.secondary200,
+                            size: 40,
+                          ),
+                        );
+                      },
+                    )
+                  : imagePath.isNotEmpty
+                  ? Image.asset(
+                      imagePath,
+                      height: 140,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 140,
+                          width: double.infinity,
+                          color: AppColors.secondary50,
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: AppColors.secondary200,
+                            size: 40,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      height: 140,
+                      width: double.infinity,
+                      color: AppColors.secondary50,
+                      child: const Icon(
+                        Icons.image_not_supported,
+                        color: AppColors.secondary200,
+                        size: 40,
+                      ),
+                    ),
             ),
 
             // Details

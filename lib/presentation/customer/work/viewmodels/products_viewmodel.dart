@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/entities/product.dart';
 import 'package:zent_fe/domain/usecases/product/get_my_products_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
-import 'package:zent_fe/presentation/common/core/app_assets.dart';
+import '../../../common/core/safe_change_notifier.dart';
 
-class ProductsViewModel extends ChangeNotifier {
+class ProductsViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetMyProductsUseCase getMyProductsUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;
 
@@ -38,13 +38,7 @@ class ProductsViewModel extends ChangeNotifier {
 
   // Helper to get image for a product
   String getProductImage(Product product) {
-    if (product.name.toLowerCase().contains('laptop a')) {
-      return AppAssets.laptopA;
-    }
-    if (product.name.toLowerCase().contains('laptop b')) {
-      return AppAssets.laptopB;
-    }
-    return AppAssets.laptopA; // Default
+    return product.productImageUrl ?? '';
   }
 
   String getProductStatus(Product product) {

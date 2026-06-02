@@ -33,14 +33,18 @@ class _PartsScreenState extends State<PartsScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _viewModel,
-      child: _PartsView(searchBarKey: _searchBarKey),
+      child: _PartsView(
+        searchBarKey: _searchBarKey,
+        serialNumber: widget.serialNumber,
+      ),
     );
   }
 }
 
 class _PartsView extends StatelessWidget {
   final GlobalKey searchBarKey;
-  const _PartsView({required this.searchBarKey});
+  final String serialNumber;
+  const _PartsView({required this.searchBarKey, required this.serialNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +92,7 @@ class _PartsView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'IdeaPad 5 Pro 16ARH7 - Type 82SN',
+                            'Product Details',
                             style: TextStyles.headline.copyWith(
                               color: AppColors.primary500,
                             ),
@@ -98,13 +102,7 @@ class _PartsView extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'S/N: NA-12345678',
-                                style: TextStyles.bodyLarge.copyWith(
-                                  color: AppColors.secondary500,
-                                ),
-                              ),
-                              Text(
-                                'MTM: abc12345',
+                                'S/N: $serialNumber',
                                 style: TextStyles.bodyLarge.copyWith(
                                   color: AppColors.secondary500,
                                 ),
@@ -132,7 +130,7 @@ class _PartsView extends StatelessWidget {
                 child: TextField(
                   controller: viewModel.searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search users by name or ID',
+                    hintText: 'Search parts',
                     hintStyle: TextStyles.bodyLarge.copyWith(
                       color: AppColors.secondary300,
                     ),

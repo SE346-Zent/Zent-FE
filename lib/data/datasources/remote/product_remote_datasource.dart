@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+
 import '../../models/product_model.dart';
 import '../local/auth_local_datasource.dart';
 
@@ -10,52 +15,172 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final http.Client client;
   final AuthLocalDataSource authLocalDataSource;
 
+  static final String _scmBaseUrl = dotenv.get("SCM_BASE_URL");
+  static final String _zeusApiKey = dotenv.get("ZEUS_API_KEY");
+
+  static final Duration _timeOut = Duration(
+    seconds: int.tryParse(dotenv.get("TIME_OUT", fallback: "20")) ?? 20,
+  );
+
   ProductRemoteDataSourceImpl({
     required this.client,
     required this.authLocalDataSource,
   });
 
+  /// Headers for SCM (Zeus) calls — uses X-API-KEY + optional JWT
+  Future<Map<String, String>> _getScmHeaders() async {
+    final token = await authLocalDataSource.getAccessToken();
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-API-KEY': _zeusApiKey,
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
   @override
   Future<List<ProductModel>> getMyProducts(String userId) async {
-    // TEMPORARY: Hardcoded seeding as the /product/my_products endpoint is not in api-1.json
-    // Data matched from database screenshot provided by user
-    return [
-      ProductModel(
-        id: '155630d2-54c0-46ef-abff-dd797fcadea7',
-        name: 'Lenovo relationships',
-        model: '83LY00HQVN',
-        serialNumber: 'SN-RELATIONSHIPS-00006',
-      ),
-      ProductModel(
-        id: '5d530009-ff8d-4e48-abbe-57850174fb76',
-        name: 'Lenovo applications',
-        model: '82SN003JVN',
-        serialNumber: 'SN-APPLICATIONS-00005',
-      ),
-      ProductModel(
-        id: '8b002018-3651-4726-ad5d-cb6437c5aec5',
-        name: 'Lenovo paradigms',
-        model: '82SN003JVN',
-        serialNumber: 'SN-PARADIGMS-00000',
-      ),
-      ProductModel(
-        id: 'a6248c33-7436-4d3d-919d-9b9022737b79',
-        name: 'Lenovo infomediaries',
-        model: '82SN003JVN',
-        serialNumber: 'SN-INFOMEDIARIES-00008',
-      ),
-      ProductModel(
-        id: 'b37096c3-ecbe-4404-8806-62bdf95cb8fe',
-        name: 'Lenovo infomediaries',
-        model: '82SN003JVN',
-        serialNumber: 'SN-INFOMEDIARIES-00002',
-      ),
-      ProductModel(
-        id: 'fe9ff979-d1e3-406c-8564-0924fc0434bd',
-        name: 'Lenovo metrics',
-        model: '82SN003JVN',
-        serialNumber: 'SN-METRICS-00007',
-      ),
-    ];
+    final uri = Uri.parse(
+      '$_scmBaseUrl/inventory/products',
+    ).replace(queryParameters: {'limit': '1000'});
+
+    try {
+      final headers = await _getScmHeaders();
+      final response = await client
+          .get(uri, headers: headers)
+          .timeout(_timeOut);
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        debugPrint(
+          '--- Product API Error ${response.statusCode} ---\n${response.body}',
+        );
+        throw Exception('Failed to fetch products (${response.statusCode})');
+      }
+
+      final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
+      final rawData = jsonMap['data'];
+
+      List<dynamic> items;
+      if (rawData is List) {
+        items = rawData;
+      } else if (rawData is Map<String, dynamic>) {
+        items = rawData['items'] as List<dynamic>? ?? [];
+      } else {
+        items = [];
+      }
+
+      final List<ProductModel> filteredProducts = [];
+      for (final item in items) {
+        if (item is! Map<String, dynamic>) continue;
+
+        final customerId =
+            (item['CustomerID'] ?? item['customer_id'] ?? item['customerId'])
+                ?.toString() ??
+            '';
+        if (customerId.toLowerCase() == userId.toLowerCase()) {
+          debugPrint('SCM product raw item matches customer $userId: $item');
+
+          final id = (item['ID'] ?? item['id'] ?? item['Id'])?.toString() ?? '';
+          final name =
+              (item['ProductName'] ??
+                      item['product_name'] ??
+                      item['productName'] ??
+                      item['name'])
+                  ?.toString() ??
+              '';
+          final model =
+              (item['ProductModelCode'] ??
+                      item['product_model_code'] ??
+                      item['productModelCode'] ??
+                      item['model'])
+                  ?.toString() ??
+              '';
+          final serialNumber =
+              (item['SerialNumber'] ??
+                      item['serial_number'] ??
+                      item['serialNumber'])
+                  ?.toString() ??
+              '';
+          final nestedModel =
+              item['product_model'] ??
+              item['productModel'] ??
+              item['ProductModel'];
+          String? nestedImageUrl;
+          if (nestedModel is Map) {
+            nestedImageUrl =
+                (nestedModel['image_url'] ??
+                        nestedModel['imageUrl'] ??
+                        nestedModel['ImageURL'] ??
+                        nestedModel['product_image_url'] ??
+                        nestedModel['productImageUrl'])
+                    ?.toString();
+          }
+
+          final rawImageUrl =
+              (item['ProductImageUrl'] ??
+                      item['ProductImageURL'] ??
+                      item['product_image_url'] ??
+                      item['productImageUrl'] ??
+                      item['ImageURL'] ??
+                      item['imageUrl'] ??
+                      item['image_url'])
+                  ?.toString() ??
+              nestedImageUrl;
+
+          final productImageUrl = _sanitizeImageUrl(rawImageUrl);
+
+          debugPrint(
+            '=== [getMyProducts] Parsed productImageUrl for ${item['serial_number'] ?? item['serialNumber']}: $productImageUrl ===',
+          );
+
+          final warrantyStr =
+              (item['WarrantyUntil'] ??
+                      item['warranty_until'] ??
+                      item['warrantyUntil'] ??
+                      item['Warranty'] ??
+                      item['warranty'])
+                  ?.toString();
+          final warrantyUntil = warrantyStr != null
+              ? DateTime.tryParse(warrantyStr)
+              : null;
+
+          filteredProducts.add(
+            ProductModel(
+              id: id,
+              name: name,
+              model: model,
+              serialNumber: serialNumber,
+              warrantyUntil: warrantyUntil,
+              productImageUrl: productImageUrl,
+            ),
+          );
+        }
+      }
+      return filteredProducts;
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error fetching products: $e');
+    }
+  }
+
+  String? _sanitizeImageUrl(String? url) {
+    if (url == null || url.isEmpty) return url;
+    if (!url.contains('placehold.co')) return url;
+    try {
+      final uri = Uri.parse(url);
+      if (uri.path.endsWith('.png') ||
+          uri.path.endsWith('.jpg') ||
+          uri.path.endsWith('.jpeg') ||
+          uri.path.endsWith('.gif') ||
+          uri.path.endsWith('.webp') ||
+          uri.path.endsWith('.svg')) {
+        return url;
+      }
+      final newPath = '${uri.path}.png';
+      final newUri = uri.replace(path: newPath);
+      return newUri.toString();
+    } catch (_) {
+      return url;
+    }
   }
 }

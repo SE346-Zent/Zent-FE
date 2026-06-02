@@ -1,3 +1,4 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,7 +6,12 @@ import 'package:zent_fe/data/models/create_work_order_request.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/work_order/create_work_order_usecase.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 
 class ServiceTypeData {
   final String id;
@@ -21,8 +27,60 @@ class ServiceTypeData {
   });
 }
 
-class RequestServiceViewModel extends ChangeNotifier {
+class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   final CreateWorkOrderUseCase createWorkOrderUseCase;
+
+  static const List<String> symptomsList = [
+    "Active Noise Cancelling(ANC)",
+    "Backpack",
+    "Bluetooth",
+    "Case",
+    "Charger",
+    "External Hot Spot Issue",
+    "External Keyboard",
+    "External Mouse",
+    "External Storage(USB/SSD/etc)",
+    "Glasses",
+    "Headset",
+    "Kit(Mouse and Keyboard)",
+    "MousePad",
+    "Other",
+    "PC Port not working properly",
+    "Pen",
+    "Printer",
+    "Web Camera",
+    "Audio",
+    "Battery",
+    "Boot issue",
+    "Branding",
+    "Camera",
+    "Charging",
+    "Covers",
+    "Display",
+    "Dock",
+    "Drive (SSD / HDD)",
+    "External Display",
+    "Fan",
+    "Fingerprint",
+    "Keyboards",
+    "Network",
+    "No Post",
+    "No Power",
+    "Noise",
+    "Non Technical",
+    "Operating System (OS)",
+    "Performance",
+    "Physical Damage (CID)",
+    "Physical Damage (Not CID)",
+    "Pointing Devices",
+    "Power Button",
+    "Safety issue",
+    "Smart card reader",
+    "Smart Collab",
+    "Software",
+    "USB Port",
+    "Other",
+  ];
 
   RequestServiceViewModel(this.createWorkOrderUseCase);
 
@@ -31,6 +89,7 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   int get currentStep => _currentStep;
   bool get isLoading => _isLoading;
+  String? errorMessage;
 
   // Selected device
   String? selectedProductId;
@@ -50,7 +109,7 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   // Step 3 Data: Address Info
   String? country = 'Vietnam';
-  String? province;
+  String? ward;
   String? city;
   String? address;
   String? building;
@@ -73,10 +132,11 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   final List<String> countries = ['Vietnam'];
   final List<String> provinces = [];
-  final Map<String, List<String>> _citiesByProvince = {};
+  final List<String> wards = [];
+  final Map<String, List<String>> _citiesByWard = {};
 
   Future<void> loadLocationData() async {
-    if (provinces.isNotEmpty) return;
+    if (wards.isNotEmpty) return;
 
     try {
       final String response = await rootBundle.loadString(
@@ -84,42 +144,47 @@ class RequestServiceViewModel extends ChangeNotifier {
       );
       final List<dynamic> data = json.decode(response);
 
-      provinces.clear();
-      _citiesByProvince.clear();
+      wards.clear();
+      _citiesByWard.clear();
 
       for (var item in data) {
-        final provinceName = item['name'] as String;
+        final wardName = item['name'] as String;
         final citiesList = (item['cities'] as List)
             .map((e) => e.toString())
             .toList();
 
-        provinces.add(provinceName);
-        _citiesByProvince[provinceName] = citiesList;
+        wards.add(wardName);
+        _citiesByWard[wardName] = citiesList;
       }
+
+      provinces.clear();
+      provinces.addAll(['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']);
 
       notifyListeners();
     } catch (e) {
-      debugPrint("Lỗi tải file địa giới hành chính: $e");
+      debugPrint("Error loading location data: $e");
     }
   }
 
   List<String> get availableCities =>
-      province != null ? (_citiesByProvince[province!] ?? []) : [];
+      ward != null ? (_citiesByWard[ward!] ?? []) : [];
 
-  void updateProvince(String newProvince) {
-    if (province != newProvince) {
-      province = newProvince;
+  void updateWard(String newWard) {
+    if (ward != newWard) {
+      ward = newWard;
       city = null;
+      _saveDraft();
       notifyListeners();
     }
   }
 
   void updateCity(String newCity) {
     city = newCity;
+    _saveDraft();
     notifyListeners();
   }
 
-  // Selected service type (old - keeping for compatibility)
+  // Selected service type
   String? selectedServiceId;
 
   final List<ServiceTypeData> serviceTypes = [
@@ -151,13 +216,21 @@ class RequestServiceViewModel extends ChangeNotifier {
 
   void selectService(String serviceId) {
     selectedServiceId = serviceId;
+    _saveDraft();
     notifyListeners();
   }
 
-  void initContactInfo() {
+  Future<void> initContactInfo() async {
     loadLocationData();
-    // Auto-fill from logged-in user if not set
-    final user = sl<AuthViewModel>().currentUser;
+    var user = sl<AuthViewModel>().currentUser;
+
+    if (user == null) {
+      try {
+        final localDs = sl<AuthLocalDataSource>();
+        user = await localDs.getUser();
+      } catch (_) {}
+    }
+
     if (user != null) {
       if (firstName == null || firstName!.isEmpty) {
         final parts = user.name.split(' ');
@@ -174,7 +247,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     String? emailVal,
     String? phoneVal,
     String? countryVal,
-    String? provinceVal,
+    String? wardVal,
     String? cityVal,
     String? addressVal,
     String? buildingVal,
@@ -184,10 +257,11 @@ class RequestServiceViewModel extends ChangeNotifier {
     email = emailVal;
     phone = phoneVal;
     country = countryVal;
-    province = provinceVal;
+    ward = wardVal;
     city = cityVal;
     address = addressVal;
     building = buildingVal;
+    _saveDraft();
     notifyListeners();
   }
 
@@ -201,6 +275,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     ticketRef = ticketRefVal;
     description = descriptionVal;
     appointmentDate = appointmentDateVal;
+    _saveDraft();
     notifyListeners();
   }
 
@@ -310,9 +385,18 @@ class RequestServiceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void nextStep() {
+  Future<void> nextStep() async {
     if (currentStep < 5) {
+      if (_currentStep == 1 && selectedProductId != null) {
+        await _loadDraftForProduct(selectedProductId!);
+        if (_currentStep > 1) {
+          await _saveDraft();
+          notifyListeners();
+          return;
+        }
+      }
       _currentStep++;
+      await _saveDraft();
       notifyListeners();
     }
   }
@@ -320,12 +404,14 @@ class RequestServiceViewModel extends ChangeNotifier {
   void previousStep() {
     if (currentStep > 1) {
       _currentStep--;
+      _saveDraft();
       notifyListeners();
     }
   }
 
-  Future<void> submitTicket(BuildContext context) async {
+  Future<bool> submitTicket(BuildContext context) async {
     _isLoading = true;
+    errorMessage = null;
     notifyListeners();
 
     try {
@@ -335,33 +421,26 @@ class RequestServiceViewModel extends ChangeNotifier {
         try {
           final inputFormat = DateFormat("HH:mm, dd/MM/yyyy");
           final dateTime = inputFormat.parse(appointmentDate!);
-          // Format to ISO 8601: "yyyy-MM-ddTHH:mm:ssZ"
+          // Format to ISO 8601 with timezone offset (e.g. "+07:00" for Vietnam)
+          final offset = dateTime.timeZoneOffset;
+          final hours = offset.inHours.abs().toString().padLeft(2, '0');
+          final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(
+            2,
+            '0',
+          );
+          final sign = offset.isNegative ? '-' : '+';
           formattedAppointment =
-              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}Z";
+              "${DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime)}$sign$hours:$minutes";
         } catch (e) {
           debugPrint("Error parsing date: $e");
           formattedAppointment = appointmentDate!; // fallback
         }
       }
 
-      // Map symptom string to ID
-      int symptomId = 1; // Default
-      switch (symptom) {
-        case 'Screen Broken':
-          symptomId = 1;
-          break;
-        case 'Battery Issue':
-          symptomId = 2;
-          break;
-        case 'Software Glitch':
-          symptomId = 3;
-          break;
-        case 'Hardware Damage':
-          symptomId = 4;
-          break;
-        case 'Other':
-          symptomId = 5;
-          break;
+      // Map symptom string to ID (1-indexed based on symptomsList)
+      int symptomId = symptomsList.indexOf(symptom ?? '') + 1;
+      if (symptomId <= 0) {
+        symptomId = 14; // Default to 'Other' at index 13 (14th item)
       }
 
       // Validation: description is required by server
@@ -370,26 +449,22 @@ class RequestServiceViewModel extends ChangeNotifier {
           : null;
 
       if (desc == null) {
-        throw Exception('Please provide a description of the problem.');
+        throw BusinessException('Please provide a description of the problem.');
       }
 
-      String finalCity = city ?? '';
-      String finalProvince = province ?? '';
+      String finalWard = ward ?? '';
 
       // Map full names to short codes for Backend
-      if (finalProvince.contains('Hồ Chí Minh')) {
-        finalProvince = 'HCM';
-        finalCity = 'HCM';
-      } else if (finalProvince.contains('Hà Nội')) {
-        finalProvince = 'HN';
-        finalCity = 'HN';
+      if (finalWard.contains('Hồ Chí Minh')) {
+        finalWard = 'HCM';
+      } else if (finalWard.contains('Hà Nội')) {
+        finalWard = 'HN';
       }
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        city: finalCity,
         country: country ?? 'Vietnam',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,
@@ -400,25 +475,44 @@ class RequestServiceViewModel extends ChangeNotifier {
         referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
             ? ticketRef
             : null,
-        province: finalProvince,
+        ward: finalWard,
         workOrderSymptomId: symptomId,
       );
 
       await createWorkOrderUseCase.execute(request);
 
+      final sp = sl<SharedPreferences>();
+      if (selectedProductId != null) {
+        final key = await _getDraftKey(selectedProductId);
+        await sp.remove(key);
+      }
+      final activeProductKey = await _getDraftKey('active_product');
+      await sp.remove(activeProductKey);
+
       // Go to step 5 on success
       _currentStep = 5;
+      return true;
+    } on BusinessException catch (e) {
+      errorMessage = e.message;
+      return false;
     } catch (e) {
       debugPrint("Error submitting ticket: $e");
-      // Rethrow to let the UI handle or display error
-      rethrow;
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void reset() {
+  Future<void> reset() async {
+    final sp = sl<SharedPreferences>();
+    if (selectedProductId != null) {
+      final key = await _getDraftKey(selectedProductId);
+      await sp.remove(key);
+    }
+    final activeProductKey = await _getDraftKey('active_product');
+    await sp.remove(activeProductKey);
+
     _currentStep = 1;
     symptom = null;
     ticketRef = null;
@@ -430,7 +524,7 @@ class RequestServiceViewModel extends ChangeNotifier {
     email = null;
     phone = null;
     country = 'Vietnam';
-    province = null;
+    ward = null;
     city = null;
     address = null;
     building = null;
@@ -444,5 +538,98 @@ class RequestServiceViewModel extends ChangeNotifier {
     selectedServiceId = null;
 
     notifyListeners();
+  }
+
+  Future<String> _getDraftKey(String? productId) async {
+    String userPrefix = 'anonymous';
+    try {
+      final secureStorage = sl<FlutterSecureStorage>();
+      final token = await secureStorage.read(key: 'ACCESS_TOKEN');
+      if (token != null && token.isNotEmpty) {
+        final payload = JwtDecoder.decode(token);
+        final id = payload['id'] ?? payload['sub'] ?? payload['userId'];
+        if (id != null) {
+          userPrefix = id.toString();
+        }
+      }
+    } catch (_) {}
+    final productSuffix = productId ?? 'no_product';
+    return 'CREATE_WO_DRAFT_${userPrefix}_$productSuffix';
+  }
+
+  Future<void> _saveDraft() async {
+    if (selectedProductId == null) return;
+    try {
+      final sp = sl<SharedPreferences>();
+      final draftMap = {
+        'selectedProductId': selectedProductId,
+        'selectedSerialNumber': selectedSerialNumber,
+        'symptom': symptom,
+        'ticketRef': ticketRef,
+        'description': description,
+        'appointmentDate': appointmentDate,
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        'phone': phone,
+        'country': country,
+        'ward': ward,
+        'city': city,
+        'address': address,
+        'building': building,
+        'currentStep': _currentStep,
+        'selectedServiceId': selectedServiceId,
+      };
+      final key = await _getDraftKey(selectedProductId);
+      await sp.setString(key, json.encode(draftMap));
+
+      // Lưu thiết bị đang được soạn thảo gần nhất để khôi phục khi mở lại app
+      final activeProductKey = await _getDraftKey('active_product');
+      await sp.setString(activeProductKey, selectedProductId!);
+    } catch (e) {
+      debugPrint("Error saving Create WO Draft: $e");
+    }
+  }
+
+  Future<void> _loadDraftForProduct(String productId) async {
+    try {
+      final sp = sl<SharedPreferences>();
+      final key = await _getDraftKey(productId);
+      final jsonString = sp.getString(key);
+      if (jsonString != null) {
+        final draftMap = json.decode(jsonString) as Map<String, dynamic>;
+        selectedProductId = draftMap['selectedProductId'] as String?;
+        selectedSerialNumber = draftMap['selectedSerialNumber'] as String?;
+        symptom = draftMap['symptom'] as String?;
+        ticketRef = draftMap['ticketRef'] as String?;
+        description = draftMap['description'] as String?;
+        appointmentDate = draftMap['appointmentDate'] as String?;
+        firstName = draftMap['firstName'] as String?;
+        lastName = draftMap['lastName'] as String?;
+        email = draftMap['email'] as String?;
+        phone = draftMap['phone'] as String?;
+        country = draftMap['country'] as String? ?? 'Vietnam';
+        ward = draftMap['ward'] as String?;
+        city = draftMap['city'] as String?;
+        address = draftMap['address'] as String?;
+        building = draftMap['building'] as String?;
+        _currentStep = draftMap['currentStep'] as int? ?? 1;
+        selectedServiceId = draftMap['selectedServiceId'] as String?;
+
+        if (ward != null) {
+          loadLocationData();
+        }
+      } else {
+        // Reset các trường thông tin lỗi nếu sản phẩm được chọn chưa có bản nháp nào
+        symptom = null;
+        ticketRef = null;
+        description = null;
+        appointmentDate = null;
+        _currentStep = 1;
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error loading product-specific draft: $e");
+    }
   }
 }

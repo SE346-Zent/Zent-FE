@@ -25,12 +25,14 @@ class _RequestServiceContactScreenState
   final TextEditingController addressCtrl = TextEditingController();
   final TextEditingController buildingCtrl = TextEditingController();
 
+  int _lastStep = -1;
+
   bool get isNextEnabled {
     final vm = context.read<RequestServiceViewModel>();
     return firstNameCtrl.text.isNotEmpty &&
         lastNameCtrl.text.isNotEmpty &&
         vm.country != null &&
-        vm.province != null &&
+        vm.ward != null &&
         vm.city != null &&
         addressCtrl.text.isNotEmpty;
   }
@@ -39,7 +41,6 @@ class _RequestServiceContactScreenState
   void initState() {
     super.initState();
     final vm = context.read<RequestServiceViewModel>();
-    vm.initContactInfo();
 
     firstNameCtrl.text = vm.firstName ?? '';
     lastNameCtrl.text = vm.lastName ?? '';
@@ -52,6 +53,26 @@ class _RequestServiceContactScreenState
     lastNameCtrl.addListener(_onTextChanged);
     emailCtrl.addListener(_onTextChanged);
     addressCtrl.addListener(_onTextChanged);
+
+    _initAsync(vm);
+  }
+
+  Future<void> _initAsync(RequestServiceViewModel vm) async {
+    await vm.initContactInfo();
+    if (mounted) {
+      if (firstNameCtrl.text.isEmpty && (vm.firstName ?? '').isNotEmpty) {
+        firstNameCtrl.text = vm.firstName!;
+      }
+      if (lastNameCtrl.text.isEmpty && (vm.lastName ?? '').isNotEmpty) {
+        lastNameCtrl.text = vm.lastName!;
+      }
+      if (emailCtrl.text.isEmpty && (vm.email ?? '').isNotEmpty) {
+        emailCtrl.text = vm.email!;
+      }
+      if (phoneCtrl.text.isEmpty && (vm.phone ?? '').isNotEmpty) {
+        phoneCtrl.text = vm.phone!;
+      }
+    }
   }
 
   void _onTextChanged() => setState(() {});
@@ -74,7 +95,7 @@ class _RequestServiceContactScreenState
       emailVal: emailCtrl.text,
       phoneVal: phoneCtrl.text,
       countryVal: viewModel.country,
-      provinceVal: viewModel.province,
+      wardVal: viewModel.ward,
       cityVal: viewModel.city,
       addressVal: addressCtrl.text,
       buildingVal: buildingCtrl.text,
@@ -85,6 +106,17 @@ class _RequestServiceContactScreenState
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<RequestServiceViewModel>();
+
+    // Sync from draft when this step becomes active
+    if (viewModel.currentStep == 3 && _lastStep != 3) {
+      _lastStep = 3;
+      firstNameCtrl.text = viewModel.firstName ?? '';
+      lastNameCtrl.text = viewModel.lastName ?? '';
+      emailCtrl.text = viewModel.email ?? '';
+      phoneCtrl.text = viewModel.phone ?? '';
+      addressCtrl.text = viewModel.address ?? '';
+      buildingCtrl.text = viewModel.building ?? '';
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -180,7 +212,7 @@ class _RequestServiceContactScreenState
               if (v != null) {
                 viewModel.saveContactInfo(
                   countryVal: v,
-                  provinceVal: viewModel.province,
+                  wardVal: viewModel.ward,
                   cityVal: viewModel.city,
                 );
               }
@@ -190,14 +222,14 @@ class _RequestServiceContactScreenState
           const SizedBox(height: AppDimens.spaceMd),
 
           CustomerDropdownField<String>(
-            label: 'Province',
-            value: viewModel.province,
-            items: viewModel.provinces
+            label: 'Ward',
+            value: viewModel.ward,
+            items: viewModel.wards
                 .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                 .toList(),
             onChanged: (v) {
               if (v != null) {
-                viewModel.updateProvince(v);
+                viewModel.updateWard(v);
               }
             },
             isRequired: true,
@@ -205,7 +237,7 @@ class _RequestServiceContactScreenState
           const SizedBox(height: AppDimens.spaceMd),
 
           CustomerDropdownField<String>(
-            label: 'City',
+            label: 'Ward',
             value: viewModel.city,
             items: viewModel.availableCities
                 .map((c) => DropdownMenuItem(value: c, child: Text(c)))

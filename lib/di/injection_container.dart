@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../routing/rbac_token_store.dart';
 import '../data/datasources/local/auth_local_datasource.dart';
 import '../data/datasources/remote/auth_remote_datasource.dart';
 import '../data/datasources/remote/work_order_remote_datasource.dart';
@@ -13,6 +12,7 @@ import '../data/repositories/work_order_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../domain/repositories/work_order_repository.dart';
 import '../domain/usecases/auth/login_usecase.dart';
+import '../domain/usecases/auth/google_login_usecase.dart';
 import '../domain/usecases/auth/logout_usecase.dart';
 import '../domain/usecases/auth/first_time_usecase.dart';
 import '../domain/usecases/auth/reset_password_usecase.dart';
@@ -20,6 +20,10 @@ import '../domain/usecases/auth/get_current_user_usecase.dart';
 import '../domain/usecases/auth/register_usecase.dart';
 import '../domain/usecases/auth/verify_otp_usecase.dart';
 import '../domain/usecases/auth/resend_otp_usecase.dart';
+import '../domain/usecases/auth/forgot_password_usecase.dart';
+import '../domain/usecases/auth/verify_forgot_otp_usecase.dart';
+import '../domain/usecases/work_order/reassign_work_order_usecase.dart';
+import '../domain/usecases/auth/get_login_history_usecase.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
@@ -28,6 +32,12 @@ import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
 import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../domain/usecases/work_order/approve_refusal_usecase.dart';
 import '../domain/usecases/work_order/deny_refusal_usecase.dart';
+import '../domain/usecases/work_order/change_appointment_usecase.dart';
+import '../domain/usecases/work_order/cancel_work_order_usecase.dart';
+import '../domain/usecases/work_order/assign_work_order_usecase.dart';
+import '../domain/usecases/work_order/get_technicians_usecase.dart';
+import '../domain/usecases/work_order/rate_work_order_usecase.dart';
+import '../domain/usecases/user/get_users_usecase.dart';
 import '../domain/usecases/product/get_my_products_usecase.dart';
 import '../domain/repositories/product_repository.dart';
 import '../data/repositories/product_repository_impl.dart';
@@ -37,11 +47,19 @@ import '../data/repositories/notification_repository_impl.dart';
 import '../data/datasources/remote/notification_remote_datasource.dart';
 import '../domain/usecases/notification/get_notifications_usecase.dart';
 import '../domain/usecases/notification/get_unread_count_usecase.dart';
+
+// Inventory
+import '../data/datasources/remote/inventory_remote_datasource.dart';
+import '../data/repositories/inventory_repository_impl.dart';
+import '../domain/repositories/inventory_repository.dart';
+import '../domain/usecases/inventory/get_inventory_usecases.dart';
+import '../domain/usecases/inventory/zent_inventory_usecases.dart';
 import '../presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import '../presentation/common/intro/viewmodels/splash_viewmodel.dart';
 import '../presentation/common/auth/login/view_models/login_view_model.dart';
 import '../presentation/common/auth/login/view_models/forgot_password_view_model.dart';
 import '../presentation/common/auth/login/view_models/reset_password_view_model.dart';
+import '../presentation/common/auth/login/view_models/verify_forgot_otp_view_model.dart';
 import '../presentation/common/auth/register/view_models/verify_otp_view_model.dart';
 import '../presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/profile_viewmodel.dart';
@@ -51,16 +69,19 @@ import '../presentation/admin/account/viewmodels/inventory_assets_viewmodel.dart
 import '../presentation/admin/account/viewmodels/detail_request_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/choose_role_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/create_account_viewmodel.dart';
-import '../presentation/admin/dashboard/viewmodels/admin_dashboard_viewmodel.dart';
-import '../presentation/admin/dashboard/viewmodels/admin_notifications_viewmodel.dart';
-import '../presentation/admin/reports/viewmodels/admin_reports_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/operational_queue_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/work_order_detail_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/assigned_work_order_detail_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/view_schedule_viewmodel.dart';
-import '../presentation/admin/queue/viewmodels/reassign_work_order_viewmodel.dart';
-import '../presentation/admin/rejections/viewmodels/rejected_work_orders_viewmodel.dart';
-import '../presentation/admin/rejections/viewmodels/rejection_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/admin_dashboard_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/admin_notifications_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/admin_reports_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/operational_queue_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/assign_work_order_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/assigned_work_order_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/view_schedule_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/change_appointment_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/reassign_work_order_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/rejected_work_orders_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/rejection_detail_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/work_orders_history_viewmodel.dart';
+import '../presentation/admin/work/viewmodels/detailed_history_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/customer_profile_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/personal_info_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/service_viewmodel.dart';
@@ -68,6 +89,8 @@ import '../presentation/customer/account/viewmodels/chat_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/security_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/notifications_viewmodel.dart';
 import '../presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
+import 'package:zent_fe/data/services/chat_service.dart';
+import 'package:zent_fe/data/services/intercepted_http_client.dart';
 import '../presentation/customer/work/viewmodels/products_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
@@ -99,6 +122,7 @@ Future<void> init() async {
 
   // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => GoogleLoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
@@ -106,6 +130,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
   sl.registerLazySingleton(() => ResendOtpUseCase(sl()));
+  sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyForgotOtpUseCase(sl()));
+  sl.registerLazySingleton(() => GetLoginHistoryUseCase(sl()));
 
   // Work Order Use Cases
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
@@ -117,35 +144,80 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => ApproveRefusalUseCase(sl()));
   sl.registerLazySingleton(() => DenyRefusalUseCase(sl()));
+  sl.registerLazySingleton(() => ChangeAppointmentUseCase(repository: sl()));
+  sl.registerLazySingleton(() => ReassignWorkOrderUseCase(repository: sl()));
+  sl.registerLazySingleton(() => CancelWorkOrderUseCase(repository: sl()));
+  sl.registerLazySingleton(() => GetTechniciansUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AssignWorkOrderUseCase(repository: sl()));
+  sl.registerLazySingleton(() => RateWorkOrderUseCase(sl()));
+
+  // User Use Cases
+  sl.registerLazySingleton(() => GetUsersUseCase(sl()));
 
   // Notification Use Cases
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => GetUnreadCountUseCase(sl()));
 
+  // Inventory Use Cases — SCM
+  sl.registerLazySingleton(() => GetScmProductsUseCase(sl()));
+  sl.registerLazySingleton(() => GetPartsUseCase(sl()));
+  sl.registerLazySingleton(() => GetPartCatalogUseCase(sl()));
+  sl.registerLazySingleton(() => GetPartByIdUseCase(sl()));
+  sl.registerLazySingleton(() => GetPartRequestsUseCase(sl()));
+  sl.registerLazySingleton(() => GetNewPartFormByIdUseCase(sl()));
+  sl.registerLazySingleton(() => GetScmLutsUseCase(sl()));
+
+  // Inventory Use Cases — Zent
+  sl.registerLazySingleton(() => GetProductDetailUseCase(sl()));
+  sl.registerLazySingleton(() => CheckWarrantyUseCase(sl()));
+  sl.registerLazySingleton(() => RegisterProductUseCase(sl()));
+  sl.registerLazySingleton(() => AcceptPartUseCase(sl()));
+  sl.registerLazySingleton(() => DenyPartUseCase(sl()));
+  sl.registerLazySingleton(() => AddPartsToWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetAnalyticsUseCase(sl()));
+
   // ViewModels
   sl.registerLazySingleton(() => AuthViewModel());
   sl.registerFactory(() => SplashViewModel(sl(), sl()));
-  sl.registerFactory(() => LoginViewModel(sl()));
+  sl.registerFactory(() => LoginViewModel(sl(), sl()));
   sl.registerFactory(() => RegisterViewModel(registerUseCase: sl()));
-  sl.registerFactory(() => ForgotPasswordViewModel());
+  sl.registerFactory(
+    () => ForgotPasswordViewModel(forgotPasswordUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => VerifyForgotOtpViewModel(
+      verifyForgotOtpUseCase: sl(),
+      forgotPasswordUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => ResetPasswordViewModel(resetPasswordUseCase: sl()));
   sl.registerFactory(
     () => VerifyOtpViewModel(verifyOtpUseCase: sl(), resendOtpUseCase: sl()),
   );
-  sl.registerFactory(() => UserManagementViewModel());
+  sl.registerFactory(() => UserManagementViewModel(getUsersUseCase: sl()));
   sl.registerFactory(() => AdminDashboardViewModel());
   sl.registerFactory(() => AdminNotificationsViewModel());
-  sl.registerFactory(() => AdminReportsViewModel());
+  sl.registerFactory(() => AdminReportsViewModel(getAnalyticsUseCase: sl()));
   sl.registerFactory(
     () => OperationalQueueViewModel(
       getManyWorkOrdersUseCase: sl(),
       getCurrentUserUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => WorkOrderDetailViewModel());
+  sl.registerFactory(
+    () => AssignWorkOrderViewModel(
+      getTechniciansUseCase: sl(),
+      assignWorkOrderUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
   sl.registerFactory(() => ViewScheduleViewModel());
-  sl.registerFactory(() => ReassignWorkOrderViewModel());
+  sl.registerFactory(
+    () => ReassignWorkOrderViewModel(reassignWorkOrderUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => ChangeAppointmentViewModel(changeAppointmentUseCase: sl()),
+  );
   sl.registerFactory(
     () => RejectedWorkOrdersViewModel(
       getManyWorkOrdersUseCase: sl(),
@@ -163,15 +235,31 @@ Future<void> init() async {
   sl.registerFactory(() => ChooseRoleViewModel());
   sl.registerFactory(() => CreateAccountViewModel());
   sl.registerFactory(() => ProfileViewModel(sl(), sl()));
-  sl.registerFactory(() => SecuritySettingsViewModel());
-  sl.registerFactory(() => PartRequestsViewModel());
-  sl.registerFactory(() => InventoryAssetsViewModel());
-  sl.registerFactory(() => DetailRequestViewModel());
+  sl.registerFactory(
+    () => SecuritySettingsViewModel(getLoginHistoryUseCase: sl()),
+  );
+  sl.registerFactory(() => PartRequestsViewModel(getPartRequestsUseCase: sl()));
+  sl.registerFactory(
+    () => InventoryAssetsViewModel(
+      getScmProductsUseCase: sl(),
+      getPartCatalogUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => DetailRequestViewModel(
+      acceptPartUseCase: sl(),
+      denyPartUseCase: sl(),
+      getNewPartFormByIdUseCase: sl(),
+      getScmLutsUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => CustomerProfileViewModel(sl(), sl()));
   sl.registerFactory(() => PersonalInfoViewModel(sl()));
-  sl.registerFactory(() => ServiceViewModel());
-  sl.registerFactory(() => ChatViewModel());
-  sl.registerFactory(() => CustomerSecurityViewModel());
+  sl.registerFactory(() => ServiceViewModel(getCurrentUserUseCase: sl()));
+  sl.registerFactory(() => ChatViewModel(chatService: sl()));
+  sl.registerFactory(
+    () => CustomerSecurityViewModel(getLoginHistoryUseCase: sl()),
+  );
   sl.registerFactory(() => CustomerNotificationsViewModel());
   sl.registerFactory(
     () => ProductsViewModel(
@@ -183,23 +271,35 @@ Future<void> init() async {
     () => DetailedProductViewModel(
       getMyProductsUseCase: sl(),
       getCurrentUserUseCase: sl(),
+      getProductDetailUseCase: sl(),
     ),
   );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(
-    () => ActiveRepairsViewModel(
+    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => CustomerCancelWorkOrderViewModel(cancelWorkOrderUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => DetailedChatViewModel(chatService: sl(), getCurrentUserUseCase: sl()),
+  );
+  sl.registerFactory(
+    () => DeviceRegistrationViewModel(
+      checkWarrantyUseCase: sl(),
+      registerProductUseCase: sl(),
+      getScmProductsUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(() => PartsViewModel(getPartCatalogUseCase: sl()));
+  sl.registerFactory(() => NotificationsViewModel());
+
+  sl.registerFactory(
+    () => TechnicianHomeViewModel(
       getManyWorkOrdersUseCase: sl(),
       getCurrentUserUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => CustomerCancelWorkOrderViewModel());
-  sl.registerFactory(() => DetailedChatViewModel());
-  sl.registerFactory(() => DeviceRegistrationViewModel());
-  sl.registerFactory(() => PartsViewModel());
-  sl.registerFactory(() => NotificationsViewModel());
-
-  // Tech ViewModels
-  sl.registerFactory(() => TechnicianHomeViewModel());
   sl.registerFactory(
     () => TechWorkOrderViewModel(
       getManyWorkOrdersUseCase: sl(),
@@ -207,11 +307,21 @@ Future<void> init() async {
     ),
   );
   sl.registerFactoryParam<TechWorkOrderDetailsViewModel, String, void>(
-    (workOrderId, _) => TechWorkOrderDetailsViewModel(workOrderId: workOrderId),
+    (workOrderId, _) => TechWorkOrderDetailsViewModel(
+      workOrderId: workOrderId,
+      getSingleWorkOrderUseCase: sl(),
+      sharedPreferences: sl(),
+    ),
   );
   sl.registerFactory(() => TechPauseWorkOrderViewModel());
   sl.registerFactory(() => TechRejectWorkOrderViewModel(sl(), sl(), sl()));
-  sl.registerFactory(() => AddNewPartViewModel());
+  sl.registerFactory(
+    () => AddNewPartViewModel(
+      addPartsToWorkOrderUseCase: sl(),
+      getScmLutsUseCase: sl(),
+      chatService: sl(),
+    ),
+  );
   sl.registerFactoryParam<CompleteWorkOrderViewModel, String, void>(
     (workOrderId, _) => CompleteWorkOrderViewModel(
       workOrderId: workOrderId,
@@ -222,8 +332,19 @@ Future<void> init() async {
   sl.registerFactory(() => TechProfileViewModel(sl(), sl()));
   sl.registerFactory(() => TechPersonalInfoViewModel(sl()));
   sl.registerFactory(() => TechNotificationsViewModel());
-  sl.registerFactory(() => TechSecurityViewModel());
-  sl.registerFactory(() => PartSearchViewModel());
+  sl.registerFactory(() => TechSecurityViewModel(getLoginHistoryUseCase: sl()));
+  sl.registerFactory(() => PartSearchViewModel(getPartsUseCase: sl()));
+  sl.registerFactory(
+    () => WorkOrdersHistoryViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+      rateWorkOrderUseCase: sl(),
+    ),
+  );
+  sl.registerFactoryParam<DetailedHistoryViewModel, String, void>(
+    (workOrderId, _) =>
+        DetailedHistoryViewModel(repository: sl(), workOrderId: workOrderId),
+  );
 
   // Repository
   sl.registerLazySingleton<AuthRepository>(
@@ -240,6 +361,9 @@ Future<void> init() async {
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<InventoryRepository>(
+    () => InventoryRepositoryImpl(remoteDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDatasource>(
@@ -249,7 +373,10 @@ Future<void> init() async {
     () => AuthLocalDataSourceImpl(secureStorage: sl(), sharedPreferences: sl()),
   );
   sl.registerLazySingleton<WorkOrderLocalDataSource>(
-    () => WorkOrderLocalDataSourceImpl(sharedPreferences: sl()),
+    () => WorkOrderLocalDataSourceImpl(
+      sharedPreferences: sl(),
+      secureStorage: sl(),
+    ),
   );
   sl.registerLazySingleton<WorkOrderRemoteDataSource>(
     () =>
@@ -264,17 +391,20 @@ Future<void> init() async {
       authLocalDataSource: sl(),
     ),
   );
+  sl.registerLazySingleton<InventoryRemoteDataSource>(
+    () =>
+        InventoryRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => ChatService(client: sl(), authLocalDataSource: sl()),
+  );
 
   // --- External ---
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => const FlutterSecureStorage());
-  sl.registerLazySingleton(() => http.Client());
-
-  // --- Load Initial Token ---
-  final authLocalDataSource = sl<AuthLocalDataSource>();
-  final token = await authLocalDataSource.getAccessToken();
-  if (token != null) {
-    RbacTokenStore.setToken(token);
-  }
+  sl.registerLazySingleton<http.Client>(
+    () => InterceptedHttpClient(http.Client(), sl()),
+  );
 }

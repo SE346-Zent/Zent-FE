@@ -6,7 +6,15 @@ class LoginUseCase {
 
   LoginUseCase(this.repository);
 
-  Future<User> execute(String email, String password) async {
-    return await repository.login(email: email, password: password);
+  Future<User> execute(
+    String email,
+    String password, {
+    String? fcmToken,
+  }) async {
+    return await repository.login(
+      email: email,
+      password: password,
+      fcmToken: fcmToken,
+    );
   }
 }

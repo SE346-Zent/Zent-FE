@@ -1,9 +1,10 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 
-class TechWorkOrderViewModel extends ChangeNotifier {
+class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;
 
@@ -44,10 +45,7 @@ class TechWorkOrderViewModel extends ChangeNotifier {
     try {
       final user = await getCurrentUserUseCase.execute();
       if (user != null) {
-        final results = await getManyWorkOrdersUseCase.execute(
-          user.id,
-          role: 'technician',
-        );
+        final results = await getManyWorkOrdersUseCase.execute(limit: 100);
         // The server already filters work orders by the technician's token identity.
         _allOrders = results;
       }

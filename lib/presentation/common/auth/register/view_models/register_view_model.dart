@@ -1,7 +1,9 @@
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/auth/register_usecase.dart';
 
-class RegisterViewModel extends ChangeNotifier {
+class RegisterViewModel extends ChangeNotifier with SafeChangeNotifier {
   final RegisterUseCase registerUseCase;
 
   RegisterViewModel({required this.registerUseCase});
@@ -44,8 +46,11 @@ class RegisterViewModel extends ChangeNotifier {
       );
 
       return true;
+    } on BusinessException catch (e) {
+      _errorMessage = e.message;
+      return false;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      // Ignore format errors and server errors for UI
       return false;
     } finally {
       _isLoading = false;

@@ -99,7 +99,7 @@ class WorkOrderCard extends StatelessWidget {
 
           // 2. Title
           Text(
-            '${order.id.substring(0, 8)}... | ${order.title}',
+            '${order.workOrderNum.isNotEmpty ? order.workOrderNum : order.id.substring(0, 8)} | ${order.title}',
             style: TextStyles.title.copyWith(color: AppColors.primary500),
           ),
           const SizedBox(height: AppDimens.spaceSm),

@@ -1,4 +1,7 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/domain/entities/part_catalog_entry.dart';
+import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
 
 class PartModel {
   final String title;
@@ -14,38 +17,51 @@ class PartModel {
   });
 }
 
-class PartsViewModel extends ChangeNotifier {
-  List<PartModel> allParts = [
-    PartModel(
-      title: 'Black Tape 1',
-      partNo: '5F10S13964',
-      commodity: 'Reusable items',
-      status: 'Available',
-    ),
-    PartModel(
-      title: 'Black Tape 2',
-      partNo: '5F10S13964',
-      commodity: 'Reusable items',
-      status: 'Unavailable',
-    ),
-    PartModel(
-      title: 'White Tape',
-      partNo: '5F10S13965',
-      commodity: 'Consumables',
-      status: 'Available',
-    ),
-  ];
+class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
+  final GetPartCatalogUseCase getPartCatalogUseCase;
 
+  PartsViewModel({required this.getPartCatalogUseCase});
+
+  List<PartModel> allParts = [];
   List<PartModel> filteredParts = [];
+  bool isLoading = false;
+
   final TextEditingController searchController = TextEditingController();
 
   String sortAlphabet = 'None';
   String filterStatus = 'None';
 
-  void init() {
-    filteredParts = List.from(allParts);
+  Future<void> init() async {
     searchController.addListener(_onSearchChanged);
+    await fetchParts();
+  }
+
+  Future<void> fetchParts() async {
+    isLoading = true;
     notifyListeners();
+
+    try {
+      final (parts, _) = await getPartCatalogUseCase.execute(
+        page: 1,
+        limit: 50,
+      );
+      allParts = parts.map(_mapCatalogToModel).toList();
+      _filterParts();
+    } catch (e) {
+      debugPrint('Error fetching parts: $e');
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  PartModel _mapCatalogToModel(PartCatalogEntry entry) {
+    return PartModel(
+      title: entry.partNumber,
+      partNo: entry.mfgNumber ?? entry.id,
+      commodity: entry.description ?? 'General',
+      status: entry.partMfgStatus ?? 'Unknown',
+    );
   }
 
   void setSortAlphabet(String val) {

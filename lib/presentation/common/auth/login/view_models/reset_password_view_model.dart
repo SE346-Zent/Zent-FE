@@ -1,7 +1,8 @@
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/auth/reset_password_usecase.dart';
 
-class ResetPasswordViewModel extends ChangeNotifier {
+class ResetPasswordViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ResetPasswordUseCase resetPasswordUseCase;
 
   ResetPasswordViewModel({required this.resetPasswordUseCase});
@@ -39,29 +40,30 @@ class ResetPasswordViewModel extends ChangeNotifier {
 
   // Technical Notes
   bool get hasMinLength => _newPassword.length >= 8;
-  bool get hasUpperCase => RegExp(r'[A-Z]').hasMatch(_newPassword);
   bool get hasNumber => RegExp(r'[0-9]').hasMatch(_newPassword);
   bool get hasSpecialChar => RegExp(r'[!@#\$&*~]').hasMatch(_newPassword);
+
+  bool get isPasswordValid =>
+      hasMinLength && hasNumber && hasSpecialChar && doPasswordsMatch;
 
   int get passwordStrength {
     if (_newPassword.isEmpty) return 0;
 
     int strength = 0;
     if (hasMinLength) strength++;
-    if (hasUpperCase) strength++;
     if (hasNumber) strength++;
     if (hasSpecialChar) strength++;
 
     if (strength == 0) return 1;
     if (strength == 1) return 2;
-    if (strength == 2 || strength == 3) return 3;
-    if (strength == 4) return 4;
+    if (strength == 2) return 3;
+    if (strength == 3) return 4;
 
     return 0;
   }
 
   Future<bool> submitNewPassword() async {
-    if (!doPasswordsMatch || _email == null || _token == null) return false;
+    if (!isPasswordValid || _email == null || _token == null) return false;
 
     _isLoading = true;
     _errorMessage = null;
@@ -78,7 +80,7 @@ class ResetPasswordViewModel extends ChangeNotifier {
       notifyListeners();
       return success;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       _isLoading = false;
       notifyListeners();
       return false;

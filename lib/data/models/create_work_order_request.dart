@@ -2,7 +2,6 @@ class CreateWorkOrderRequest {
   final String address;
   final String appointment;
   final String? building;
-  final String city;
   final String country;
   final String description;
   final String? email;
@@ -11,14 +10,14 @@ class CreateWorkOrderRequest {
   final String? phoneNumber;
   final String productId;
   final String? referenceTicketId;
-  final String province;
+  final String ward;
   final int workOrderSymptomId;
 
   CreateWorkOrderRequest({
     required this.address,
     required this.appointment,
     this.building,
-    required this.city,
+    required this.ward,
     required this.country,
     required this.description,
     this.email,
@@ -27,7 +26,6 @@ class CreateWorkOrderRequest {
     this.phoneNumber,
     required this.productId,
     this.referenceTicketId,
-    required this.province,
     required this.workOrderSymptomId,
   });
 
@@ -36,7 +34,7 @@ class CreateWorkOrderRequest {
       'address': address,
       'appointment': appointment,
       'building': building,
-      'city': city,
+      'ward': ward,
       'country': country,
       'description': description,
       'email': email,
@@ -45,7 +43,6 @@ class CreateWorkOrderRequest {
       'phone_number': phoneNumber,
       'product_id': productId,
       'reference_ticket_id': referenceTicketId,
-      'province': province,
       'work_order_symptom_id': workOrderSymptomId,
     };
   }

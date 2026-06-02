@@ -41,130 +41,138 @@ class _MyProductsView extends StatelessWidget {
         showBottomDivider: true,
       ),
       body: SafeArea(
-        child: viewModel.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    Text(
-                      'Registered Products',
-                      style: TextStyles.display.copyWith(
-                        color: Colors.black,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Centralized asset management',
-                      style: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.secondary500,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceLg),
-
-                    // Register Button
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                        boxShadow: [BoxShadowStyles.glowing],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.pushNamed(
-                            RouteNames.customerDeviceRegistration,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.tertiary500,
-                          padding: const EdgeInsets.all(AppDimens.spaceMd),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppDimens.boraMd,
-                            ),
-                          ),
-                          elevation: 0,
+        child: RefreshIndicator(
+          onRefresh: () => viewModel.fetchProducts(),
+          color: AppColors.tertiary500,
+          child: viewModel.isLoading && viewModel.products.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(AppDimens.spaceMd),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Text(
+                        'Registered Products',
+                        style: TextStyles.display.copyWith(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Register a new Device',
-                                    style: TextStyles.title.copyWith(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Add a new device to your service profile',
-                                    style: TextStyles.label.copyWith(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Centralized asset management',
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimens.spaceLg),
+
+                      // Register Button
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                          boxShadow: [BoxShadowStyles.glowing],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final result = await context.pushNamed(
+                              RouteNames.customerDeviceRegistration,
+                            );
+                            if (result == true && context.mounted) {
+                              viewModel.fetchProducts();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.tertiary500,
+                            padding: const EdgeInsets.all(AppDimens.spaceMd),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                AppDimens.boraMd,
                               ),
                             ),
-                            const SizedBox(width: AppDimens.spaceMd),
-                            Container(
-                              width: 28,
-                              height: 28,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2.0,
+                            elevation: 0,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Register a new Device',
+                                      style: TextStyles.title.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Add a new device to your service profile',
+                                      style: TextStyles.label.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 24,
+                              const SizedBox(width: AppDimens.spaceMd),
+                              Container(
+                                width: 28,
+                                height: 28,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceXl),
+                      const SizedBox(height: AppDimens.spaceXl),
 
-                    // Product List
-                    if (viewModel.products.isEmpty)
-                      const Center(child: Text('No products found'))
-                    else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: viewModel.products.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: AppDimens.spaceLg),
-                        itemBuilder: (context, index) {
-                          final product = viewModel.products[index];
-                          final warrantyDate = product.warrantyUntil != null
-                              ? DateFormat(
-                                  'MMM dd, yyyy',
-                                ).format(product.warrantyUntil!)
-                              : 'No Warranty';
+                      // Product List
+                      if (viewModel.products.isEmpty)
+                        const Center(child: Text('No products found'))
+                      else
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: viewModel.products.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppDimens.spaceLg),
+                          itemBuilder: (context, index) {
+                            final product = viewModel.products[index];
+                            final warrantyDate = product.warrantyUntil != null
+                                ? DateFormat(
+                                    'MMM dd, yyyy',
+                                  ).format(product.warrantyUntil!)
+                                : 'No Warranty';
 
-                          return ProductItemCard(
-                            name: product.name,
-                            serialNumber: product.serialNumber,
-                            warrantyDate: warrantyDate,
-                            status: viewModel.getProductStatus(product),
-                            imagePath: viewModel.getProductImage(product),
-                          );
-                        },
-                      ),
-                    const SizedBox(height: AppDimens.spaceLg),
-                  ],
+                            return ProductItemCard(
+                              name: product.name,
+                              serialNumber: product.serialNumber,
+                              warrantyDate: warrantyDate,
+                              status: viewModel.getProductStatus(product),
+                              imagePath: viewModel.getProductImage(product),
+                            );
+                          },
+                        ),
+                      const SizedBox(height: AppDimens.spaceLg),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

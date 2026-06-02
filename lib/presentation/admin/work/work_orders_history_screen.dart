@@ -387,8 +387,8 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
           color = AppColors.tertiary500;
         }
         break;
-      case WorkOrderStatus.inProg:
-        label = "InProg";
+      case WorkOrderStatus.assigned:
+        label = "Assigned";
         color = AppColors.tertiary500;
         break;
       case WorkOrderStatus.complete:

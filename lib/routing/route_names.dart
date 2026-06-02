@@ -17,7 +17,7 @@ abstract final class RouteNames {
   static const String adminNotifications = 'adminNotifications';
   static const String adminReports = 'adminReports';
   static const String adminOperationalQueue = 'adminOperationalQueue';
-  static const String adminWorkOrderDetails = 'adminWorkOrderDetails';
+  static const String adminAssignWorkOrder = 'adminAssignWorkOrder';
   static const String adminAssignedWorkOrderDetails =
       'adminAssignedWorkOrderDetails';
   static const String adminViewSchedule = 'adminViewSchedule';

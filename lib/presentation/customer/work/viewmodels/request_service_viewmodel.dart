@@ -109,7 +109,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   // Step 3 Data: Address Info
   String? country = 'Vietnam';
-  String? province;
+  String? ward;
   String? city;
   String? address;
   String? building;
@@ -132,10 +132,11 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   final List<String> countries = ['Vietnam'];
   final List<String> provinces = [];
-  final Map<String, List<String>> _citiesByProvince = {};
+  final List<String> wards = [];
+  final Map<String, List<String>> _citiesByWard = {};
 
   Future<void> loadLocationData() async {
-    if (provinces.isNotEmpty) return;
+    if (wards.isNotEmpty) return;
 
     try {
       final String response = await rootBundle.loadString(
@@ -143,20 +144,17 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       );
       final List<dynamic> data = json.decode(response);
 
-      provinces.clear();
-      _citiesByProvince.clear();
+      wards.clear();
+      _citiesByWard.clear();
 
       for (var item in data) {
-        final provinceName = item['name'] as String;
+        final wardName = item['name'] as String;
         final citiesList = (item['cities'] as List)
             .map((e) => e.toString())
             .toList();
 
-        if (provinceName.contains('Hồ Chí Minh') ||
-            provinceName.contains('Hà Nội')) {
-          provinces.add(provinceName);
-          _citiesByProvince[provinceName] = citiesList;
-        }
+        wards.add(wardName);
+        _citiesByWard[wardName] = citiesList;
       }
 
       provinces.clear();
@@ -164,16 +162,16 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      debugPrint("Lỗi tải file địa giới hành chính: $e");
+      debugPrint("Error loading location data: $e");
     }
   }
 
   List<String> get availableCities =>
-      province != null ? (_citiesByProvince[province!] ?? []) : [];
+      ward != null ? (_citiesByWard[ward!] ?? []) : [];
 
-  void updateProvince(String newProvince) {
-    if (province != newProvince) {
-      province = newProvince;
+  void updateWard(String newWard) {
+    if (ward != newWard) {
+      ward = newWard;
       city = null;
       _saveDraft();
       notifyListeners();
@@ -186,7 +184,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
   }
 
-  // Selected service type (old - keeping for compatibility)
+  // Selected service type
   String? selectedServiceId;
 
   final List<ServiceTypeData> serviceTypes = [
@@ -249,7 +247,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     String? emailVal,
     String? phoneVal,
     String? countryVal,
-    String? provinceVal,
+    String? wardVal,
     String? cityVal,
     String? addressVal,
     String? buildingVal,
@@ -259,7 +257,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     email = emailVal;
     phone = phoneVal;
     country = countryVal;
-    province = provinceVal;
+    ward = wardVal;
     city = cityVal;
     address = addressVal;
     building = buildingVal;
@@ -454,21 +452,19 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         throw BusinessException('Please provide a description of the problem.');
       }
 
-      String finalCity = city ?? '';
-      String finalProvince = province ?? '';
+      String finalWard = ward ?? '';
 
       // Map full names to short codes for Backend
-      if (finalProvince.contains('Hồ Chí Minh')) {
-        finalProvince = 'HCM';
-      } else if (finalProvince.contains('Hà Nội')) {
-        finalProvince = 'HN';
+      if (finalWard.contains('Hồ Chí Minh')) {
+        finalWard = 'HCM';
+      } else if (finalWard.contains('Hà Nội')) {
+        finalWard = 'HN';
       }
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
         building: building,
-        ward: finalCity,
         country: country ?? 'Vietnam',
         description: desc,
         email: (email != null && email!.trim().isNotEmpty) ? email : null,
@@ -479,7 +475,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
             ? ticketRef
             : null,
-        province: finalProvince,
+        ward: finalWard,
         workOrderSymptomId: symptomId,
       );
 
@@ -528,7 +524,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     email = null;
     phone = null;
     country = 'Vietnam';
-    province = null;
+    ward = null;
     city = null;
     address = null;
     building = null;
@@ -577,7 +573,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         'email': email,
         'phone': phone,
         'country': country,
-        'province': province,
+        'ward': ward,
         'city': city,
         'address': address,
         'building': building,
@@ -613,14 +609,14 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         email = draftMap['email'] as String?;
         phone = draftMap['phone'] as String?;
         country = draftMap['country'] as String? ?? 'Vietnam';
-        province = draftMap['province'] as String?;
+        ward = draftMap['ward'] as String?;
         city = draftMap['city'] as String?;
         address = draftMap['address'] as String?;
         building = draftMap['building'] as String?;
         _currentStep = draftMap['currentStep'] as int? ?? 1;
         selectedServiceId = draftMap['selectedServiceId'] as String?;
 
-        if (province != null) {
+        if (ward != null) {
           loadLocationData();
         }
       } else {

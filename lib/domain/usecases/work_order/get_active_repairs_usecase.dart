@@ -15,7 +15,7 @@ class GetActiveRepairsUseCase {
     // Filter for active statuses: pending, inProg, rejectInReview
     return activeOrders.where((order) {
       return order.status == WorkOrderStatus.pending ||
-          order.status == WorkOrderStatus.inProg ||
+          order.status == WorkOrderStatus.assigned ||
           order.status == WorkOrderStatus.rejectInReview;
     }).toList();
   }

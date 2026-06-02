@@ -34,7 +34,7 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
           .where(
             (o) =>
                 o.status == WorkOrderStatus.pending ||
-                o.status == WorkOrderStatus.inProg ||
+                o.status == WorkOrderStatus.assigned ||
                 o.status == WorkOrderStatus.rejectInReview,
           )
           .toList();
@@ -71,23 +71,16 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   int _mapStatusToStep(WorkOrder order) {
     final status = order.status;
-    final hasTech =
-        order.technicianId.trim().isNotEmpty &&
-        order.technicianId.trim() != '0' &&
-        order.technicianId.trim() != 'null';
 
     switch (status) {
       case WorkOrderStatus.pending:
-        // If a technician is assigned but hasn't started the job (pending), it is Tech Assigned (Step 2)
-        // Otherwise, it is Ticket Open (Step 1)
-        return hasTech ? 2 : 1;
+        return 1;
+      case WorkOrderStatus.assigned:
       case WorkOrderStatus.rejectInReview:
         return 2; // Step 2 (Tech Assigned)
-      case WorkOrderStatus.inProg:
-        return 3; // Step 3 (In Progress)
       case WorkOrderStatus.complete:
         return 4; // Step 4 (Done)
-      default:
+      case WorkOrderStatus.rejected:
         return 0;
     }
   }

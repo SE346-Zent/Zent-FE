@@ -50,6 +50,31 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
+  Future<void> changeAppointment(String id, DateTime newDate) {
+    return remoteDataSource.changeAppointment(id, newDate);
+  }
+
+  @override
+  Future<void> reassignWorkOrder(String id, String newTechnicianId) {
+    return remoteDataSource.reassignWorkOrder(id, newTechnicianId);
+  }
+
+  @override
+  Future<void> cancelWorkOrder(String id, String? reason) {
+    return remoteDataSource.cancelWorkOrder(id, reason);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getTechnicians() async {
+    return await remoteDataSource.getTechnicians();
+  }
+
+  @override
+  Future<void> assignWorkOrder(String id, String technicianId) async {
+    return await remoteDataSource.assignWorkOrder(id, technicianId);
+  }
+
+  @override
   Future<WorkOrder> getWorkOrderDetail({required String id}) async {
     return await remoteDataSource.getWorkOrderDetail(id);
   }

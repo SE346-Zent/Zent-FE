@@ -29,9 +29,9 @@ class WorkOrderModel extends WorkOrder {
     super.country,
     super.email,
     super.firstName,
+    super.symptomName,
     super.phoneNumber,
     super.addressLine1,
-    super.symptomName,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -62,9 +62,9 @@ class WorkOrderModel extends WorkOrder {
       country: entity.country,
       email: entity.email,
       firstName: entity.firstName,
+      symptomName: entity.symptomName,
       phoneNumber: entity.phoneNumber,
       addressLine1: entity.addressLine1,
-      symptomName: entity.symptomName,
     );
   }
 
@@ -78,6 +78,8 @@ class WorkOrderModel extends WorkOrder {
           json['workOrderNum'] as String? ??
           '',
       addressString: _buildAddress(json),
+      symptomName:
+          json['symptomName'] as String? ?? json['symptom_name'] as String?,
       status: _parseStatus(
         json['work_order_status_id'] ??
             json['status_id'] ??
@@ -153,8 +155,6 @@ class WorkOrderModel extends WorkOrder {
           json['phone_number'] as String? ??
           json['phone'] as String?,
       addressLine1: json['address'] as String?,
-      symptomName:
-          json['symptomName'] as String? ?? json['symptom_name'] as String?,
     );
   }
 
@@ -176,14 +176,12 @@ class WorkOrderModel extends WorkOrder {
         case 1:
           return WorkOrderStatus.pending;
         case 2:
-          return WorkOrderStatus.inProg; // Map Assigned to inProg for UI
+          return WorkOrderStatus.assigned;
         case 3:
-          return WorkOrderStatus.inProg;
-        case 4:
           return WorkOrderStatus.complete;
-        case 5:
+        case 4:
           return WorkOrderStatus.rejectInReview;
-        case 6:
+        case 5:
           return WorkOrderStatus.rejected;
         default:
           return WorkOrderStatus.pending;
@@ -196,7 +194,7 @@ class WorkOrderModel extends WorkOrder {
         return WorkOrderStatus.pending;
       }
       if (s == 'inprogress' || s == 'assigned' || s == 'inprog') {
-        return WorkOrderStatus.inProg;
+        return WorkOrderStatus.assigned;
       }
       if (s == 'complete' || s == 'completed' || s == 'closed') {
         return WorkOrderStatus.complete;
@@ -212,7 +210,7 @@ class WorkOrderModel extends WorkOrder {
         return WorkOrderStatus.pending;
       }
       if (s.contains('prog') || s.contains('assigned')) {
-        return WorkOrderStatus.inProg;
+        return WorkOrderStatus.assigned;
       }
       if (s.contains('complete') || s.contains('closed')) {
         return WorkOrderStatus.complete;

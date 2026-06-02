@@ -199,8 +199,10 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier
         filtered = filtered.where(
           (wo) => wo.status == WorkOrderStatus.rejectInReview,
         );
-      } else if (selectedTab == "InProg") {
-        filtered = filtered.where((wo) => wo.status == WorkOrderStatus.inProg);
+      } else if (selectedTab == "Assigned") {
+        filtered = filtered.where(
+          (wo) => wo.status == WorkOrderStatus.assigned,
+        );
       }
     }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -8,9 +9,8 @@ import 'package:zent_fe/routing/route_names.dart';
 import 'tracking_stepper.dart';
 import 'active_repairs_action_button.dart';
 
-import '../../../../domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/work_order.dart';
 import '../viewmodels/active_repairs_viewmodel.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class TrackingCard extends StatelessWidget {
@@ -88,7 +88,10 @@ class TrackingCard extends StatelessWidget {
                                   context.pushNamed(
                                     RouteNames.customerWorkOrderDetails,
                                     pathParameters: {
-                                      'workOrderId': workOrder.id,
+                                      'workOrderId': workOrder.id.replaceAll(
+                                        '#',
+                                        '',
+                                      ),
                                     },
                                   );
                                 },
@@ -170,7 +173,9 @@ class TrackingCard extends StatelessWidget {
                     context
                         .pushNamed(
                           RouteNames.customerCancelWorkOrder,
-                          pathParameters: {'workOrderId': workOrder.id},
+                          pathParameters: {
+                            'workOrderId': workOrder.id.replaceAll('#', ''),
+                          },
                         )
                         .then((result) {
                           if (result == true && context.mounted) {

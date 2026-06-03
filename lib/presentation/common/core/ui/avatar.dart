@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/text_styles.dart';
 import '../../../common/core/themes/boxshadow.dart';
@@ -49,7 +50,7 @@ class Avatar extends StatelessWidget {
             shape: BoxShape.circle,
             image: imageUrl != null && imageUrl!.isNotEmpty
                 ? DecorationImage(
-                    image: NetworkImage(imageUrl!),
+                    image: CachedNetworkImageProvider(imageUrl!),
                     fit: BoxFit.cover,
                   )
                 : null,

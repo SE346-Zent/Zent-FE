@@ -68,7 +68,7 @@ class EditWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
       }
 
       final userProducts = await getMyProductsUseCase.execute(user.id);
-      products = userProducts;
+      products = List<Product>.from(userProducts);
 
       // 3. Fetch Work Order Details
       final cleanId = workOrderId.replaceAll('#', '');

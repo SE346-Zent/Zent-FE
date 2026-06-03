@@ -25,14 +25,7 @@ class AdminDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<AdminDashboardViewModel>(),
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
-          ),
-        ],
-        child: const _AdminDashboardScreenContent(),
-      ),
+      child: const _AdminDashboardScreenContent(),
     );
   }
 }

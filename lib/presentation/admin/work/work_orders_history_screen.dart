@@ -229,6 +229,11 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                 RouteNames.customerWorkOrderDetails,
                 pathParameters: {'workOrderId': wo.id},
               );
+            } else if (vm.currentUser?.role == UserRoles.technician) {
+              context.pushNamed(
+                RouteNames.techDetailedHistory,
+                pathParameters: {'workOrderId': wo.id},
+              );
             } else {
               context.pushNamed(
                 RouteNames.adminDetailedHistory,

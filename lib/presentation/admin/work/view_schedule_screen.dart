@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/view_schedule_viewmodel.dart';
@@ -91,26 +92,12 @@ class _ViewScheduleScreenContent extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
+          AppNetworkImage(
+            url: viewModel.technician['avatar']?.toString(),
+            width: 56,
+            height: 56,
+            fit: BoxFit.cover,
             borderRadius: BorderRadius.circular(8.0),
-            child: Image.network(
-              viewModel.technician['avatar'],
-              width: 56,
-              height: 56,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 56,
-                  height: 56,
-                  color: AppColors.secondary200,
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                );
-              },
-            ),
           ),
           const SizedBox(width: 12.0),
           Expanded(

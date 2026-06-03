@@ -8,7 +8,6 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 import 'package:zent_fe/di/injection_container.dart' as di;
-import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -24,14 +23,7 @@ class TechnicianHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<TechnicianHomeViewModel>()..fetchTodaySchedule(),
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
-          ),
-        ],
-        child: const _TechnicianHomeContent(),
-      ),
+      child: const _TechnicianHomeContent(),
     );
   }
 }

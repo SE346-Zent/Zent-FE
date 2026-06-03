@@ -6,8 +6,10 @@ import 'package:http/http.dart' as http;
 
 import '../../models/product_model.dart';
 import '../local/auth_local_datasource.dart';
+import '../../../domain/exceptions/business_exception.dart';
 
 abstract class ProductRemoteDataSource {
+  /// Returns the authenticated customer's registered products from Zent BE.
   Future<List<ProductModel>> getMyProducts(String userId);
 }
 
@@ -15,11 +17,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final http.Client client;
   final AuthLocalDataSource authLocalDataSource;
 
-  static final String _scmBaseUrl = dotenv.get("SCM_BASE_URL");
-  static final String _zeusApiKey = dotenv.get("ZEUS_API_KEY");
+  static final String _baseURL = dotenv.get("BASE_URL");
 
   static final Duration _timeOut = Duration(
-    seconds: int.tryParse(dotenv.get("TIME_OUT", fallback: "20")) ?? 20,
+    seconds: int.tryParse(dotenv.get("TIMEOUT_SECONDS", fallback: "20")) ?? 20,
   );
 
   ProductRemoteDataSourceImpl({
@@ -27,34 +28,30 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     required this.authLocalDataSource,
   });
 
-  /// Headers for SCM (Zeus) calls — uses X-API-KEY + optional JWT
-  Future<Map<String, String>> _getScmHeaders() async {
+  Future<Map<String, String>> _getHeaders() async {
     final token = await authLocalDataSource.getAccessToken();
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'X-API-KEY': _zeusApiKey,
       if (token != null) 'Authorization': 'Bearer $token',
     };
   }
 
   @override
   Future<List<ProductModel>> getMyProducts(String userId) async {
-    final uri = Uri.parse(
-      '$_scmBaseUrl/inventory/products',
-    ).replace(queryParameters: {'limit': '1000'});
+    // Zent BE endpoint — uses JWT auth, no SCM API key needed.
+    final uri = Uri.parse('$_baseURL/inventory/products/mine');
 
     try {
-      final headers = await _getScmHeaders();
-      final response = await client
-          .get(uri, headers: headers)
-          .timeout(_timeOut);
+      final headers = await _getHeaders();
+      final response = await client.get(uri, headers: headers).timeout(_timeOut);
+
+      debugPrint(
+        '=== [ProductAPI] GET /inventory/products/mine ${response.statusCode}: ${response.body} ===',
+      );
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        debugPrint(
-          '--- Product API Error ${response.statusCode} ---\n${response.body}',
-        );
-        throw Exception('Failed to fetch products (${response.statusCode})');
+        _handleError(response);
       }
 
       final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
@@ -63,124 +60,37 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       List<dynamic> items;
       if (rawData is List) {
         items = rawData;
-      } else if (rawData is Map<String, dynamic>) {
-        items = rawData['items'] as List<dynamic>? ?? [];
       } else {
         items = [];
       }
 
-      final List<ProductModel> filteredProducts = [];
-      for (final item in items) {
-        if (item is! Map<String, dynamic>) continue;
-
-        final customerId =
-            (item['CustomerID'] ?? item['customer_id'] ?? item['customerId'])
-                ?.toString() ??
-            '';
-        if (customerId.toLowerCase() == userId.toLowerCase()) {
-          debugPrint('SCM product raw item matches customer $userId: $item');
-
-          final id = (item['ID'] ?? item['id'] ?? item['Id'])?.toString() ?? '';
-          final name =
-              (item['ProductName'] ??
-                      item['product_name'] ??
-                      item['productName'] ??
-                      item['name'])
-                  ?.toString() ??
-              '';
-          final model =
-              (item['ProductModelCode'] ??
-                      item['product_model_code'] ??
-                      item['productModelCode'] ??
-                      item['model'])
-                  ?.toString() ??
-              '';
-          final serialNumber =
-              (item['SerialNumber'] ??
-                      item['serial_number'] ??
-                      item['serialNumber'])
-                  ?.toString() ??
-              '';
-          final nestedModel =
-              item['product_model'] ??
-              item['productModel'] ??
-              item['ProductModel'];
-          String? nestedImageUrl;
-          if (nestedModel is Map) {
-            nestedImageUrl =
-                (nestedModel['image_url'] ??
-                        nestedModel['imageUrl'] ??
-                        nestedModel['ImageURL'] ??
-                        nestedModel['product_image_url'] ??
-                        nestedModel['productImageUrl'])
-                    ?.toString();
-          }
-
-          final rawImageUrl =
-              (item['ProductImageUrl'] ??
-                      item['ProductImageURL'] ??
-                      item['product_image_url'] ??
-                      item['productImageUrl'] ??
-                      item['ImageURL'] ??
-                      item['imageUrl'] ??
-                      item['image_url'])
-                  ?.toString() ??
-              nestedImageUrl;
-
-          final productImageUrl = _sanitizeImageUrl(rawImageUrl);
-
-          debugPrint(
-            '=== [getMyProducts] Parsed productImageUrl for ${item['serial_number'] ?? item['serialNumber']}: $productImageUrl ===',
-          );
-
-          final warrantyStr =
-              (item['WarrantyUntil'] ??
-                      item['warranty_until'] ??
-                      item['warrantyUntil'] ??
-                      item['Warranty'] ??
-                      item['warranty'])
-                  ?.toString();
-          final warrantyUntil = warrantyStr != null
-              ? DateTime.tryParse(warrantyStr)
-              : null;
-
-          filteredProducts.add(
-            ProductModel(
-              id: id,
-              name: name,
-              model: model,
-              serialNumber: serialNumber,
-              warrantyUntil: warrantyUntil,
-              productImageUrl: productImageUrl,
-            ),
-          );
-        }
-      }
-      return filteredProducts;
+      return items
+          .whereType<Map<String, dynamic>>()
+          .map((item) => ProductModel.fromZentJson(item))
+          .toList();
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Error fetching products: $e');
     }
   }
 
-  String? _sanitizeImageUrl(String? url) {
-    if (url == null || url.isEmpty) return url;
-    if (!url.contains('placehold.co')) return url;
-    try {
-      final uri = Uri.parse(url);
-      if (uri.path.endsWith('.png') ||
-          uri.path.endsWith('.jpg') ||
-          uri.path.endsWith('.jpeg') ||
-          uri.path.endsWith('.gif') ||
-          uri.path.endsWith('.webp') ||
-          uri.path.endsWith('.svg')) {
-        return url;
+  void _handleError(http.Response response) {
+    final statusCode = response.statusCode;
+    final body = response.body;
+
+    debugPrint('--- Product API Error $statusCode ---\n$body');
+
+    if (body.isNotEmpty) {
+      try {
+        final errorMap = jsonDecode(body);
+        final message = errorMap['message'];
+        if (statusCode >= 400 && statusCode < 500 && message is String) {
+          throw BusinessException(message);
+        }
+      } catch (e) {
+        if (e is BusinessException) rethrow;
       }
-      final newPath = '${uri.path}.png';
-      final newUri = uri.replace(path: newPath);
-      return newUri.toString();
-    } catch (_) {
-      return url;
     }
+    throw Exception('Failed to fetch products ($statusCode)');
   }
 }

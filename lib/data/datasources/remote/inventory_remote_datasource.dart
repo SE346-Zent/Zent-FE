@@ -73,6 +73,10 @@ abstract class InventoryRemoteDataSource {
   Future<Map<String, dynamic>> getPartRequestById(String id);
 
   Future<Map<String, dynamic>> getScmLuts();
+
+  Future<Map<String, dynamic>> getScmAssets();
+
+  Future<List<int>> exportInventoryAssets({String? query});
 }
 
 class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
@@ -113,6 +117,28 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
       'Accept': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
     };
+  }
+
+  @override
+  Future<List<int>> exportInventoryAssets({String? query}) async {
+    final uri = Uri.parse('$_scmBaseUrl/inventory/assets/export').replace(
+      queryParameters: {
+        if (query != null && query.isNotEmpty) 'q': query,
+      },
+    );
+    final headers = await _getScmHeaders();
+    final response = await client.get(uri, headers: headers).timeout(_timeOut);
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else {
+      throw _parseError(response);
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getScmAssets() async {
+    final uri = Uri.parse('$_scmBaseUrl/inventory/assets');
+    return _getScm(uri);
   }
 
   // ──────────────────────────────────────────────────────

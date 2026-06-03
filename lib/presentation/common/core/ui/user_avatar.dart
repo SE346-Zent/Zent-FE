@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'avatar_utils.dart';
 
@@ -46,9 +47,8 @@ class UserAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         image: _hasImage
             ? DecorationImage(
-                image: NetworkImage(avatarUrl!),
+                image: CachedNetworkImageProvider(avatarUrl!),
                 fit: BoxFit.cover,
-                onError: (e, s) {}, // silently fall back on network error
               )
             : null,
       ),

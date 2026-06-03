@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
+import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'viewmodels/detailed_chat_viewmodel.dart';
 
@@ -327,56 +329,46 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                      child: Image.network(
-                        viewModel.chatService.getAttachmentUrl(
-                          message.imageUrl!,
+                      child: GestureDetector(
+                        onTap: () => ImageViewerDialog.show(
+                          context,
+                          viewModel.chatService.getAttachmentUrl(message.imageUrl!),
                         ),
-                        fit: BoxFit.cover,
-                        loadingBuilder:
-                            (
-                              BuildContext context,
-                              Widget child,
-                              ImageChunkEvent? loadingProgress,
-                            ) {
-                              if (loadingProgress == null) {
-                                return child;
-                              }
-                              return Container(
-                                width: 150,
-                                height: 150,
-                                color: AppColors.secondary50,
-                                alignment: Alignment.center,
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes!
-                                        : null,
-                                    valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                          AppColors.secondary400,
-                                        ),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: CachedNetworkImage(
+                            imageUrl: viewModel.chatService.getAttachmentUrl(
+                              message.imageUrl!,
+                            ),
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              width: 150,
+                              height: 150,
+                              color: AppColors.secondary50,
+                              alignment: Alignment.center,
+                              child: const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.secondary400,
                                   ),
                                 ),
-                              );
-                            },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          padding: const EdgeInsets.all(8),
-                          color: Colors.red.shade100,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.error_outline, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text("Failed to load image"),
-                            ],
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              padding: const EdgeInsets.all(8),
+                              color: Colors.red.shade100,
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.error_outline, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text("Failed to load image"),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),

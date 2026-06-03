@@ -11,9 +11,14 @@ class ForgotPasswordViewModel extends ChangeNotifier with SafeChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
+  /// true  = send OTP to recovery email
+  /// false = send OTP to primary email  (default)
+  bool _useRecoveryEmail = false;
+
   String get email => _email;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get useRecoveryEmail => _useRecoveryEmail;
 
   bool get isEmailValid {
     if (_email.isEmpty) return false;
@@ -27,6 +32,13 @@ class ForgotPasswordViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
   }
 
+  void setUseRecoveryEmail(bool value) {
+    if (_useRecoveryEmail == value) return;
+    _useRecoveryEmail = value;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   Future<bool> requestOTP() async {
     if (!isEmailValid) return false;
 
@@ -35,13 +47,16 @@ class ForgotPasswordViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      await forgotPasswordUseCase.call(_email);
+      await forgotPasswordUseCase.call(
+        _email,
+        useRecoveryEmail: _useRecoveryEmail,
+      );
 
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = "Failed to send OTP. Please try again.";
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       _isLoading = false;
       notifyListeners();
       return false;

@@ -36,7 +36,7 @@ abstract class AuthRepository {
 
   Future<void> setFirstTimeDone();
 
-  Future<void> forgotPassword(String email);
+  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false});
 
   Future<List<User>> getUsers({int page = 1, int pageSize = 50, String? role});
 
@@ -49,4 +49,18 @@ abstract class AuthRepository {
   });
 
   Future<List<LoginHistoryEntry>> getLoginHistory();
+
+  Future<void> setRecoveryEmail({
+    required String recoveryEmail,
+    required String password,
+  });
+
+  Future<void> verifyRecoveryEmail({required String otpCode});
+
+  Future<Map<String, dynamic>> getTechnicianMetrics();
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }

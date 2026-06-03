@@ -5,6 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 
 class ProductItemCard extends StatelessWidget {
   final String name;
@@ -48,63 +49,28 @@ class ProductItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
-            ClipRRect(
+            AppNetworkImage(
+              url: imagePath.startsWith('http') ? imagePath : null,
+              width: double.infinity,
+              height: 140,
+              fit: BoxFit.cover,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppDimens.boraMd),
                 topRight: Radius.circular(AppDimens.boraMd),
               ),
-              child:
-                  imagePath.startsWith('http') || imagePath.startsWith('https')
-                  ? Image.network(
-                      imagePath,
-                      height: 140,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        debugPrint(
-                          '=== [ProductItemCard] Network Image Error for $imagePath: $error ===',
-                        );
-                        return Container(
-                          height: 140,
-                          width: double.infinity,
-                          color: AppColors.secondary50,
-                          child: const Icon(
-                            Icons.broken_image,
-                            color: AppColors.secondary200,
-                            size: 40,
-                          ),
-                        );
-                      },
-                    )
-                  : imagePath.isNotEmpty
+              errorWidget: imagePath.isNotEmpty && !imagePath.startsWith('http')
                   ? Image.asset(
                       imagePath,
                       height: 140,
                       width: double.infinity,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 140,
-                          width: double.infinity,
-                          color: AppColors.secondary50,
-                          child: const Icon(
-                            Icons.broken_image,
-                            color: AppColors.secondary200,
-                            size: 40,
-                          ),
-                        );
-                      },
-                    )
-                  : Container(
-                      height: 140,
-                      width: double.infinity,
-                      color: AppColors.secondary50,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        color: AppColors.secondary200,
-                        size: 40,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 140,
+                        color: AppColors.secondary50,
+                        child: const Icon(Icons.broken_image, color: AppColors.secondary200, size: 40),
                       ),
-                    ),
+                    )
+                  : null,
             ),
 
             // Details

@@ -8,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'dashed_border_container.dart';
 import '../viewmodels/complete_work_order_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
 
 class EvidencePhotosSection extends StatelessWidget {
   final CompleteWorkOrderViewModel viewModel;
@@ -139,7 +140,7 @@ class EvidencePhotosSection extends StatelessWidget {
                     ),
                   );
                 }
-                return _buildPhotoItem(photos[index], index, phase);
+                return _buildPhotoItem(context, photos[index], index, phase);
               },
             ),
           ),
@@ -147,17 +148,23 @@ class EvidencePhotosSection extends StatelessWidget {
     );
   }
 
-  Widget _buildPhotoItem(String path, int index, String phase) {
+  Widget _buildPhotoItem(BuildContext context, String path, int index, String phase) {
     return Stack(
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            image: DecorationImage(
-              image: FileImage(File(path)),
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () => ImageViewerDialog.show(context, path),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: FileImage(File(path)),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
         ),

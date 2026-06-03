@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import 'package:zent_fe/routing/route_names.dart';
 
 import '../../../../domain/entities/work_order.dart';
 import 'package:intl/intl.dart';
 
 class RecentCompletedList extends StatelessWidget {
   final List<WorkOrder> recentCompleted;
+  final ValueChanged<WorkOrder> onSelected;
 
-  const RecentCompletedList({super.key, required this.recentCompleted});
+  const RecentCompletedList({
+    super.key,
+    required this.recentCompleted,
+    required this.onSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,7 @@ class RecentCompletedList extends StatelessWidget {
               horizontal: AppDimens.spaceMd,
               vertical: AppDimens.spaceSm,
             ),
-            child: Text('Recent Completed', style: TextStyles.middle),
+            child: Text('Other Active WO', style: TextStyles.middle),
           ),
           const Divider(height: 1, color: AppColors.secondary50),
 
@@ -39,19 +42,14 @@ class RecentCompletedList extends StatelessWidget {
           if (recentCompleted.isEmpty)
             const Padding(
               padding: EdgeInsets.all(AppDimens.spaceMd),
-              child: Center(child: Text('No completed work orders')),
+              child: Center(child: Text('No other active work orders')),
             )
           else
             Column(
               children: [
                 for (int i = 0; i < recentCompleted.length; i++) ...[
                   InkWell(
-                    onTap: () {
-                      context.pushNamed(
-                        RouteNames.customerWorkOrderDetails,
-                        pathParameters: {'workOrderId': recentCompleted[i].id},
-                      );
-                    },
+                    onTap: () => onSelected(recentCompleted[i]),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppDimens.spaceMd,

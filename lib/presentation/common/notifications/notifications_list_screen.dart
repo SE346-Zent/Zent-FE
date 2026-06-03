@@ -7,7 +7,6 @@ import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import 'package:zent_fe/routing/route_names.dart';
 
 import 'package:provider/provider.dart';
-import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/domain/entities/notification_item.dart';
 
 import 'viewmodels/notifications_viewmodel.dart';
@@ -19,11 +18,7 @@ class NotificationsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          di.sl<NotificationsViewModel>()..fetchNotifications(refresh: true),
-      child: const _NotificationsListScreenContent(),
-    );
+    return const _NotificationsListScreenContent();
   }
 }
 
@@ -43,6 +38,9 @@ class _NotificationsListScreenContentState
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NotificationsViewModel>().fetchNotifications(refresh: true);
+    });
   }
 
   @override

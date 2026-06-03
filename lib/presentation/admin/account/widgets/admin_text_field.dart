@@ -15,6 +15,8 @@ class AdminTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool readOnly;
   final TextStyle? labelStyle;
+  final TextInputType? keyboardType;
+  final bool obscureText;
 
   const AdminTextField({
     super.key,
@@ -26,6 +28,8 @@ class AdminTextField extends StatelessWidget {
     this.controller,
     this.readOnly = false,
     this.labelStyle,
+    this.keyboardType,
+    this.obscureText = false,
   });
 
   @override
@@ -56,8 +60,10 @@ class AdminTextField extends StatelessWidget {
           ),
           child: TextField(
             controller: controller,
-            maxLines: maxLines,
+            maxLines: obscureText ? 1 : maxLines,
             readOnly: readOnly,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
               color: readOnly ? AppColors.secondary500 : AppColors.primary500,

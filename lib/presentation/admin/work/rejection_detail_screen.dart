@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/rejection_detail_viewmodel.dart';
 
@@ -156,21 +157,12 @@ class _RejectionDetailContent extends StatelessWidget {
                       spacing: AppDimens.spaceMd,
                       runSpacing: AppDimens.spaceMd,
                       children: wo.rejectionPhotos.map((url) {
-                        return ClipRRect(
+                        return AppNetworkImage(
+                          url: url,
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
                           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                          child: Image.network(
-                            url,
-                            width: 90,
-                            height: 90,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  width: 90,
-                                  height: 90,
-                                  color: AppColors.secondary100,
-                                  child: const Icon(Icons.image_not_supported),
-                                ),
-                          ),
                         );
                       }).toList(),
                     ),

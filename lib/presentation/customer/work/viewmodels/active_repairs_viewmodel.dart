@@ -58,17 +58,18 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
         }
       }
 
-      final completedOrders = customerOrders
+      final otherActiveOrders = customerOrders
           .where(
             (o) =>
-                (o.status == WorkOrderStatus.complete ||
-                o.status == WorkOrderStatus.rejected) &&
+                (o.status == WorkOrderStatus.pending ||
+                o.status == WorkOrderStatus.assigned ||
+                o.status == WorkOrderStatus.rejectInReview) &&
                 o.id != activeWorkOrder?.id,
           )
           .toList();
-      completedOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      otherActiveOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      recentCompleted = completedOrders;
+      recentCompleted = otherActiveOrders;
 
       isLoading = false;
       notifyListeners();
@@ -77,6 +78,26 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void selectActiveWorkOrder(WorkOrder selected) {
+    if (activeWorkOrder == null) {
+      activeWorkOrder = selected;
+      currentStatusStep = _mapStatusToStep(selected);
+      recentCompleted.removeWhere((o) => o.id == selected.id);
+    } else {
+      final previousActive = activeWorkOrder!;
+      activeWorkOrder = selected;
+      currentStatusStep = _mapStatusToStep(selected);
+      
+      recentCompleted.removeWhere((o) => o.id == selected.id);
+      if (!recentCompleted.any((o) => o.id == previousActive.id)) {
+        recentCompleted.add(previousActive);
+      }
+      
+      recentCompleted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    notifyListeners();
   }
 
   int _mapStatusToStep(WorkOrder order) {

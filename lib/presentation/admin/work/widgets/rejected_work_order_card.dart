@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -77,7 +78,7 @@ class RejectedWorkOrderCard extends StatelessWidget {
                               children: [
                                 const CircleAvatar(
                                   radius: 10,
-                                  backgroundImage: NetworkImage(
+                                  backgroundImage: CachedNetworkImageProvider(
                                     'https://i.pravatar.cc/150?img=11',
                                   ),
                                 ),
@@ -114,7 +115,7 @@ class RejectedWorkOrderCard extends StatelessWidget {
                               children: [
                                 const CircleAvatar(
                                   radius: 10,
-                                  backgroundImage: NetworkImage(
+                                  backgroundImage: CachedNetworkImageProvider(
                                     'https://i.pravatar.cc/150?img=5',
                                   ),
                                 ),

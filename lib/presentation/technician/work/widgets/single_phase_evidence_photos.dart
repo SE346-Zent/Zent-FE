@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/technician/work/widgets/dashed_border_container.dart';
+import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
 
 /// A reusable, single-phase evidence photo section.
 ///
@@ -195,23 +196,29 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
               ),
             );
           }
-          return _buildPhotoItem(photos[index], index);
+          return _buildPhotoItem(context, photos[index], index);
         },
       ),
     );
   }
 
-  Widget _buildPhotoItem(String path, int index) {
+  Widget _buildPhotoItem(BuildContext context, String path, int index) {
     return Stack(
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppDimens.boraSm),
-            image: DecorationImage(
-              image: FileImage(File(path)),
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () => ImageViewerDialog.show(context, path),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                image: DecorationImage(
+                  image: FileImage(File(path)),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import '../account/widgets/customer_app_bar.dart';
 import 'viewmodels/parts_viewmodel.dart';
 
@@ -76,37 +77,27 @@ class _PartsView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(AppDimens.boraMd),
-                            topRight: Radius.circular(AppDimens.boraMd),
+                         AppNetworkImage(
+                            url: viewModel.product?.productImageUrl != null &&
+                                    (viewModel.product!.productImageUrl!.startsWith('http') ||
+                                        viewModel.product!.productImageUrl!.startsWith('https'))
+                                ? viewModel.product!.productImageUrl!
+                                : null,
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(AppDimens.boraMd),
+                              topRight: Radius.circular(AppDimens.boraMd),
+                            ),
+                            enableViewer: true,
+                            errorWidget: Image.asset(
+                              AppAssets.laptopA,
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          child: viewModel.product?.productImageUrl != null &&
-                                  (viewModel.product!.productImageUrl!.startsWith('http') ||
-                                      viewModel.product!.productImageUrl!.startsWith('https'))
-                              ? Image.network(
-                                  viewModel.product!.productImageUrl!,
-                                  height: 180,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(
-                                    height: 180,
-                                    width: double.infinity,
-                                    color: AppColors.secondary50,
-                                    child: const Icon(
-                                      Icons.broken_image,
-                                      color: AppColors.secondary200,
-                                      size: 48,
-                                    ),
-                                  ),
-                                )
-                              : Image.asset(
-                                  AppAssets.laptopA,
-                                  height: 180,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(AppDimens.spaceMd),
                           child: Column(
@@ -239,29 +230,14 @@ class _PartsView extends StatelessWidget {
                             ),
                           ),
                           child: part.imageUrl != null && part.imageUrl!.isNotEmpty
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    AppDimens.boraSm,
-                                  ),
-                                  child: part.imageUrl!.startsWith('http')
-                                      ? Image.network(
-                                          part.imageUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => const Icon(
-                                            Icons.dns_outlined,
-                                            color: AppColors.secondary500,
-                                            size: 28,
-                                          ),
-                                        )
-                                      : Image.asset(
-                                          part.imageUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => const Icon(
-                                            Icons.dns_outlined,
-                                            color: AppColors.secondary500,
-                                            size: 28,
-                                          ),
-                                        ),
+                              ? AppNetworkImage(
+                                  url: part.imageUrl!.startsWith('http') ? part.imageUrl! : null,
+                                  fit: BoxFit.cover,
+                                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                                  enableViewer: true,
+                                  errorWidget: !part.imageUrl!.startsWith('http')
+                                      ? Image.asset(part.imageUrl!, fit: BoxFit.cover)
+                                      : null,
                                 )
                               : const Icon(
                                   Icons.dns_outlined,

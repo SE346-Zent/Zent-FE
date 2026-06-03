@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -39,7 +40,7 @@ class PartSearchItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppDimens.boraSm),
                     image: DecorationImage(
-                      image: NetworkImage(part.imageUrl),
+                      image: CachedNetworkImageProvider(part.imageUrl),
                       fit: BoxFit.cover,
                     ),
                   ),

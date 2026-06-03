@@ -17,6 +17,8 @@ class VerifyForgotOtpViewModel extends ChangeNotifier with SafeChangeNotifier {
   int _countdownSeconds = 30;
   Timer? _resendTimer;
 
+  bool _useRecoveryEmail = false;
+
   VerifyForgotOtpViewModel({
     required this.verifyForgotOtpUseCase,
     required this.forgotPasswordUseCase,
@@ -29,9 +31,11 @@ class VerifyForgotOtpViewModel extends ChangeNotifier with SafeChangeNotifier {
   String? get resetToken => _resetToken;
   int get countdownSeconds => _countdownSeconds;
   bool get canResendOTP => _countdownSeconds == 0;
+  bool get useRecoveryEmail => _useRecoveryEmail;
 
-  void init({required String email}) {
+  void init({required String email, bool useRecoveryEmail = false}) {
     _email = email;
+    _useRecoveryEmail = useRecoveryEmail;
     startResendTimer();
   }
 
@@ -83,7 +87,7 @@ class VerifyForgotOtpViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      await forgotPasswordUseCase.call(_email);
+      await forgotPasswordUseCase.call(_email, useRecoveryEmail: _useRecoveryEmail);
       startResendTimer();
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');

@@ -62,6 +62,7 @@ abstract final class Routes {
   static const inventorySearch = 'inventory-search';
   static const techSecuritySettings = 'tech-security-settings';
   static const techWorkOrderHistory = 'work-order-history';
+  static const techDetailedHistory = 'detailed-history/:workOrderId';
   static const customerSecuritySettings = 'customer-security-settings';
   static const customerNotifications = 'customer-notifications';
   static const customerNotificationsList = 'notifications-list';

@@ -129,7 +129,7 @@ class DetailsJobInfo extends StatelessWidget {
                 child: _buildActionButton(
                   label: "Contact",
                   icon: Icons.phone_outlined,
-                  onPressed: viewModel.onContactPressed,
+                  onPressed: () => viewModel.onContactPressed(context),
                 ),
               ),
             ],

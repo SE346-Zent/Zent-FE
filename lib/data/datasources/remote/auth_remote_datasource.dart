@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../models/auth_response_model.dart' show AuthResponseModel;
 import '../../models/api_response.dart' show ApiResponse;
@@ -34,7 +36,7 @@ abstract class AuthRemoteDatasource {
     required String email,
   });
   Future<AuthResponseModel> refreshToken(String email, String refreshToken);
-  Future<void> forgotPassword(String email);
+  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false});
   Future<List<Map<String, dynamic>>> getUsers({
     int page = 1,
     int pageSize = 50,
@@ -47,6 +49,21 @@ abstract class AuthRemoteDatasource {
     required String newPassword,
   });
   Future<List<Map<String, dynamic>>> getLoginHistory(String accessToken);
+  Future<void> setRecoveryEmail({
+    required String accessToken,
+    required String recoveryEmail,
+    required String password,
+  });
+  Future<void> verifyRecoveryEmail({
+    required String accessToken,
+    required String otpCode,
+  });
+  Future<Map<String, dynamic>> getTechnicianMetrics(String accessToken);
+  Future<void> changePassword({
+    required String accessToken,
+    required String currentPassword,
+    required String newPassword,
+  });
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -57,6 +74,49 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   );
 
   AuthRemoteDatasourceImpl(this.client);
+
+  Future<String> _getDeviceName() async {
+    try {
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        return '${androidInfo.manufacturer} ${androidInfo.model}';
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.name;
+      } else if (Platform.isMacOS) {
+        final macInfo = await deviceInfo.macOsInfo;
+        return macInfo.computerName;
+      } else if (Platform.isWindows) {
+        final windowsInfo = await deviceInfo.windowsInfo;
+        return windowsInfo.computerName;
+      } else if (Platform.isLinux) {
+        final linuxInfo = await deviceInfo.linuxInfo;
+        return linuxInfo.name;
+      }
+    } catch (e) {
+      debugPrint("Error getting device name: $e");
+    }
+    return 'Unknown Device';
+  }
+
+  Future<String?> _getLocationString() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+        final position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.low,
+            timeLimit: Duration(seconds: 4),
+          ),
+        );
+        return "${position.latitude}, ${position.longitude}";
+      }
+    } catch (e) {
+      debugPrint("Error getting location: $e");
+    }
+    return null;
+  }
 
   @override
   Future<AuthResponseModel> login(
@@ -69,7 +129,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       final Map<String, dynamic> bodyMap = {
         'email': email,
         'password': password,
+        'device_name': await _getDeviceName(),
       };
+      final loc = await _getLocationString();
+      if (loc != null) {
+        bodyMap['location'] = loc;
+      }
       if (fcmToken != null) {
         bodyMap['fcm_token'] = fcmToken;
       }
@@ -112,7 +177,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }) async {
     final url = Uri.parse('$_baseURL/auth/google-login');
     try {
-      final Map<String, dynamic> bodyMap = {'idToken': idToken};
+      final Map<String, dynamic> bodyMap = {
+        'idToken': idToken,
+        'deviceName': await _getDeviceName(),
+      };
+      final loc = await _getLocationString();
+      if (loc != null) {
+        bodyMap['location'] = loc;
+      }
       if (fcmToken != null) {
         bodyMap['fcmToken'] = fcmToken;
       }
@@ -372,9 +444,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void> forgotPassword(String email) async {
+  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false}) async {
     final url = Uri.parse('$_baseURL/auth/forgot-password');
     try {
+      final Map<String, dynamic> body = {'email': email};
+      if (useRecoveryEmail) body['use_recovery_email'] = true;
+
       final response = await client
           .post(
             url,
@@ -382,7 +457,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
             },
-            body: jsonEncode({'email': email}),
+            body: jsonEncode(body),
           )
           .timeout(_timeOut);
 
@@ -418,8 +493,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
           .timeout(_timeOut);
 
       if (response.statusCode != 200) {
-        final errorMap = jsonDecode(response.body);
-        throw Exception(errorMap['message'] ?? 'Verify OTP Failed');
+        _handleErrorResponse(response);
       }
 
       final jsonMap = jsonDecode(response.body);
@@ -558,6 +632,125 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     }
   }
 
+  @override
+  Future<void> setRecoveryEmail({
+    required String accessToken,
+    required String recoveryEmail,
+    required String password,
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/recovery-email');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode({
+              'recoveryEmail': recoveryEmail,
+              'password': password,
+            }),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Set recovery email error: $e');
+    }
+  }
+
+  @override
+  Future<void> verifyRecoveryEmail({
+    required String accessToken,
+    required String otpCode,
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/verify-recovery-email');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode({'otpCode': otpCode}),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Verify recovery email error: $e');
+    }
+  }
+
+  @override
+  Future<void> changePassword({
+    required String accessToken,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/change-password');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode({
+              'oldPassword': currentPassword,
+              'newPassword': newPassword,
+            }),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Change password error: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getTechnicianMetrics(String accessToken) async {
+    final url = Uri.parse('$_baseURL/work_orders/technician/metrics');
+    try {
+      final response = await client
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      return (jsonMap['data'] as Map<String, dynamic>?) ?? {};
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Fetch technician metrics error: $e');
+    }
+  }
+
   void _handleErrorResponse(http.Response response) {
     final statusCode = response.statusCode;
     final body = response.body;
@@ -574,28 +767,21 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       throw Exception('Silent server error');
     }
 
-    final contentType = response.headers['content-type'] ?? '';
-    if (contentType.contains('application/json')) {
-      try {
-        final errorMap = jsonDecode(body);
+    try {
+      final errorMap = jsonDecode(body);
+      if (errorMap is Map<String, dynamic>) {
         final message = errorMap['message'];
-
-        // 4xx errors with a specific String message are business logic errors
         if (statusCode >= 400 && statusCode < 500 && message is String) {
           throw BusinessException(message);
         }
-
-        // Any other 4xx (like format array messages) or 5xx -> silent exception
-        throw Exception('Silent API error');
-      } catch (e) {
-        if (e is BusinessException) rethrow;
-        throw Exception('Silent parse error');
       }
-    } else {
-      if (statusCode == 401) {
-        throw BusinessException('Invalid email or password');
-      }
-      throw Exception('Silent server error');
+    } catch (e) {
+      if (e is BusinessException) rethrow;
     }
+
+    if (statusCode == 401) {
+      throw BusinessException('Invalid email or password');
+    }
+    throw Exception('Silent server error');
   }
 }

@@ -7,6 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import '../account/widgets/customer_app_bar.dart';
 import 'viewmodels/detailed_product_viewmodel.dart';
 
@@ -78,61 +79,25 @@ class _DetailedProductView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Product Image
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                          child:
-                              viewModel.imagePath.startsWith('http') ||
+                        AppNetworkImage(
+                          url: viewModel.imagePath.startsWith('http') ||
                                   viewModel.imagePath.startsWith('https')
-                              ? Image.network(
-                                  viewModel.imagePath,
-                                  height: 200,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    debugPrint(
-                                      '=== [DetailedProductImage] Network Image Error for ${viewModel.imagePath}: $error ===',
-                                    );
-                                    return Container(
-                                      height: 200,
-                                      width: double.infinity,
-                                      color: AppColors.secondary50,
-                                      child: const Icon(
-                                        Icons.broken_image,
-                                        color: AppColors.secondary200,
-                                        size: 48,
-                                      ),
-                                    );
-                                  },
-                                )
-                              : viewModel.imagePath.isNotEmpty
+                              ? viewModel.imagePath
+                              : null,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                          enableViewer: true,
+                          errorWidget: viewModel.imagePath.isNotEmpty &&
+                                  !viewModel.imagePath.startsWith('http')
                               ? Image.asset(
                                   viewModel.imagePath,
                                   height: 200,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      height: 200,
-                                      width: double.infinity,
-                                      color: AppColors.secondary50,
-                                      child: const Icon(
-                                        Icons.broken_image,
-                                        color: AppColors.secondary200,
-                                        size: 48,
-                                      ),
-                                    );
-                                  },
                                 )
-                              : Container(
-                                  height: 200,
-                                  width: double.infinity,
-                                  color: AppColors.secondary50,
-                                  child: const Icon(
-                                    Icons.image_not_supported,
-                                    color: AppColors.secondary200,
-                                    size: 48,
-                                  ),
-                                ),
+                              : null,
                         ),
                         Padding(
                           padding: const EdgeInsets.all(AppDimens.spaceLg),

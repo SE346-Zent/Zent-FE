@@ -4,7 +4,6 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'widgets/change_password_section.dart';
 import 'widgets/save_changes_button.dart';
-import 'widgets/two_factor_section.dart';
 import 'widgets/recovery_email_section.dart';
 import 'widgets/login_history_section.dart';
 import 'package:provider/provider.dart';
@@ -48,11 +47,6 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const ChangePasswordSection(),
-                      const SizedBox(height: AppDimens.spaceXl),
-                      TwoFactorSection(
-                        securityData: viewModel.settingsData,
-                        onToggle: (value) => viewModel.toggleTwoFactor(value),
-                      ),
                       const SizedBox(height: AppDimens.spaceXl),
                       const RecoveryEmailSection(),
                       const SizedBox(height: AppDimens.spaceXl),

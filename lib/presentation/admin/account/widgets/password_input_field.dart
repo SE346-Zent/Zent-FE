@@ -5,8 +5,13 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class PasswordInputField extends StatefulWidget {
   final String label;
+  final TextEditingController? controller;
 
-  const PasswordInputField({super.key, required this.label});
+  const PasswordInputField({
+    super.key,
+    required this.label,
+    this.controller,
+  });
 
   @override
   State<PasswordInputField> createState() => _PasswordInputFieldState();
@@ -45,6 +50,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
             children: [
               Expanded(
                 child: TextField(
+                  controller: widget.controller,
                   obscureText: _obscureText,
                   decoration: InputDecoration(
                     hintText: '........',

@@ -127,6 +127,7 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                         ? const SizedBox()
                         : RecentCompletedList(
                             recentCompleted: viewModel.recentCompleted,
+                            onSelected: viewModel.selectActiveWorkOrder,
                           ),
                   ),
                 ),

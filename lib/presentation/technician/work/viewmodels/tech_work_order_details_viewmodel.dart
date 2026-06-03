@@ -10,7 +10,7 @@ import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase
 import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:zent_fe/main.dart' show rootScaffoldMessengerKey;
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 
 class TaskChecklistItem {
   final String title;
@@ -187,26 +187,27 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     }
   }
 
-  Future<void> onContactPressed() async {
-    final phone = workOrder?.phoneNumber;
-    if (phone == null || phone.isEmpty) {
-      debugPrint("No phone number available for contact");
-      rootScaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(
-          content: Text('No phone number available for this customer.'),
-        ),
-      );
-      return;
-    }
-
-    final url = Uri.parse("tel:${phone.replaceAll(' ', '')}");
+  Future<void> onContactPressed(BuildContext context) async {
     try {
-      await launchUrl(url);
+      final phone = workOrder?.phoneNumber;
+      if (phone == null || phone.isEmpty) {
+        throw BusinessException('No phone number available for this customer.');
+      }
+
+      final url = Uri.parse("tel:${phone.replaceAll(' ', '')}");
+      try {
+        await launchUrl(url);
+      } catch (e) {
+        throw BusinessException('Could not open phone dialer: $e');
+      }
+    } on BusinessException catch (e) {
+      if (context.mounted) {
+        ZentErrorPopup.show(context, e.message);
+      }
     } catch (e) {
-      debugPrint("Error launching phone dialer: $e");
-      rootScaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(content: Text('Could not open phone dialer: $e')),
-      );
+      if (context.mounted) {
+        ZentErrorPopup.show(context, e.toString().replaceAll('Exception: ', ''));
+      }
     }
   }
 

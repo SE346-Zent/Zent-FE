@@ -163,22 +163,44 @@ class AuthRepositoryImpl implements AuthRepository {
       final refreshTokenStr = await authLocalDataSource.getRefreshToken();
 
       if (user != null && refreshTokenStr != null) {
-        // Luôn thử refresh token để lấy access token mới khi khởi động
-        final response = await authRemoteService.refreshToken(
-          user.email,
-          refreshTokenStr,
-        );
-
-        await authLocalDataSource.saveCredentials(
-          response.accessToken,
-          response.refreshToken,
-        );
-        await authLocalDataSource.saveUser(response.user);
-
         try {
-          sl<AuthViewModel>().setLoggedInUser(response.user);
-        } catch (e) {
-          debugPrint("Could not set user in AuthViewModel: $e");
+          // Luôn thử refresh token để lấy access token mới khi khởi động
+          final response = await authRemoteService.refreshToken(
+            user.email,
+            refreshTokenStr,
+          );
+
+          await authLocalDataSource.saveCredentials(
+            response.accessToken,
+            response.refreshToken,
+          );
+          await authLocalDataSource.saveUser(response.user);
+
+          try {
+            sl<AuthViewModel>().setLoggedInUser(response.user);
+          } catch (e) {
+            debugPrint("Could not set user in AuthViewModel: $e");
+          }
+        } catch (refreshError) {
+          debugPrint("Restore session: Refresh token attempt failed: $refreshError");
+          final errStr = refreshError.toString().toLowerCase();
+
+          // Only force a logout if it is a definitive authentication failure (e.g. invalid credentials, 400, 401).
+          // If it is a connection/transient error, keep the current session intact so they remain logged in offline.
+          if (errStr.contains('unauthorized') ||
+              errStr.contains('invalid') ||
+              errStr.contains('401') ||
+              errStr.contains('400')) {
+            await logout();
+            return false;
+          }
+
+          // Otherwise, set the cached user in AuthViewModel so they can continue offline
+          try {
+            sl<AuthViewModel>().setLoggedInUser(user);
+          } catch (e) {
+            debugPrint("Could not set cached user in AuthViewModel: $e");
+          }
         }
 
         return true;
@@ -202,8 +224,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> forgotPassword(String email) async {
-    await authRemoteService.forgotPassword(email);
+  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false}) async {
+    await authRemoteService.forgotPassword(email, useRecoveryEmail: useRecoveryEmail);
   }
 
   @override
@@ -257,5 +279,58 @@ class AuthRepositoryImpl implements AuthRepository {
     return historyJson
         .map((json) => LoginHistoryEntryModel.fromJson(json))
         .toList();
+  }
+
+  @override
+  Future<void> setRecoveryEmail({
+    required String recoveryEmail,
+    required String password,
+  }) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.setRecoveryEmail(
+      accessToken: accessToken,
+      recoveryEmail: recoveryEmail,
+      password: password,
+    );
+  }
+
+  @override
+  Future<void> verifyRecoveryEmail({required String otpCode}) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.verifyRecoveryEmail(
+      accessToken: accessToken,
+      otpCode: otpCode,
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> getTechnicianMetrics() async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    return await authRemoteService.getTechnicianMetrics(accessToken);
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.changePassword(
+      accessToken: accessToken,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
   }
 }

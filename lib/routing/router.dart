@@ -59,6 +59,7 @@ import '../presentation/common/notifications/notifications_list_screen.dart';
 import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
+import '../presentation/technician/work/tech_detailed_history_screen.dart';
 import '../presentation/technician/work/tech_pause_work_order_screen.dart';
 import '../presentation/technician/work/tech_reject_work_order_screen.dart';
 import '../presentation/technician/home/technician_home_screen.dart';
@@ -230,12 +231,17 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             final extra = state.extra;
             String email = '';
+            bool useRecoveryEmail = false;
             if (extra is String) {
               email = extra;
             } else if (extra is Map<String, dynamic>) {
               email = extra['email'] as String? ?? '';
+              useRecoveryEmail = extra['useRecoveryEmail'] as bool? ?? false;
             }
-            return VerifyForgotOtpScreen(email: email);
+            return VerifyForgotOtpScreen(
+              email: email,
+              useRecoveryEmail: useRecoveryEmail,
+            );
           },
         ),
         GoRoute(
@@ -538,6 +544,17 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.techWorkOrderHistory,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const WorkOrdersHistoryScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.techDetailedHistory,
+                      path: Routes.techDetailedHistory,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['workOrderId'] ?? '';
+                        return TechDetailedHistoryScreen(workOrderId: id);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -62,6 +62,7 @@ abstract final class RouteNames {
   static const String techRejectWorkOrder = 'techRejectWorkOrder';
   static const String techNotifications = 'techNotifications';
   static const String techWorkOrderHistory = 'techWorkOrderHistory';
+  static const String techDetailedHistory = 'techDetailedHistory';
 
   static const String customerMyProducts = 'customerMyProducts';
   static const String customerRequestService = 'customerRequestService';

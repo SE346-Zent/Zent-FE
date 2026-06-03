@@ -3,6 +3,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 
 class SmallProductItemCard extends StatelessWidget {
   final String name;
@@ -48,29 +49,16 @@ class SmallProductItemCard extends StatelessWidget {
           children: [
             // Image
             Expanded(
-              child: ClipRRect(
+              child: AppNetworkImage(
+                url: imagePath.startsWith('http') ? imagePath : null,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(AppDimens.boraSm - 1),
                   topRight: Radius.circular(AppDimens.boraSm - 1),
                 ),
-                child:
-                    imagePath.startsWith('http') ||
-                        imagePath.startsWith('https')
-                    ? Image.network(
-                        imagePath,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: AppColors.secondary50,
-                          child: const Icon(
-                            Icons.broken_image,
-                            size: 16,
-                            color: AppColors.secondary200,
-                          ),
-                        ),
-                      )
-                    : imagePath.isNotEmpty
+                errorWidget: imagePath.isNotEmpty && !imagePath.startsWith('http')
                     ? Image.asset(
                         imagePath,
                         width: double.infinity,
@@ -78,21 +66,10 @@ class SmallProductItemCard extends StatelessWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: AppColors.secondary50,
-                          child: const Icon(
-                            Icons.broken_image,
-                            size: 16,
-                            color: AppColors.secondary200,
-                          ),
+                          child: const Icon(Icons.broken_image, size: 16, color: AppColors.secondary200),
                         ),
                       )
-                    : Container(
-                        color: AppColors.secondary50,
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          size: 16,
-                          color: AppColors.secondary200,
-                        ),
-                      ),
+                    : null,
               ),
             ),
             // Details

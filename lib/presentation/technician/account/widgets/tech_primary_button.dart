@@ -5,7 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class TechPrimaryButton extends StatefulWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData? icon;
   final bool isLoading;
 
@@ -51,16 +51,16 @@ class _TechPrimaryButtonState extends State<TechPrimaryButton> {
     );
 
     return GestureDetector(
-      onTapDown: widget.isLoading
+      onTapDown: (widget.isLoading || widget.onPressed == null)
           ? null
           : (_) => setState(() => _isPressed = true),
-      onTapUp: widget.isLoading
+      onTapUp: (widget.isLoading || widget.onPressed == null)
           ? null
           : (_) {
               setState(() => _isPressed = false);
               Future.delayed(
                 const Duration(milliseconds: 100),
-                widget.onPressed,
+                widget.onPressed!,
               );
             },
       onTapCancel: () => setState(() => _isPressed = false),

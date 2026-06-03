@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'widgets/admin_text_field.dart';
@@ -602,56 +603,17 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                 itemCount: viewModel.photoUrls.length,
                                 separatorBuilder: (_, _) =>
                                     const SizedBox(width: AppDimens.spaceSm),
-                                itemBuilder: (context, index) {
+                                 itemBuilder: (context, index) {
                                   final url = viewModel.photoUrls[index];
-                                  final isNetworkImage =
-                                      url.startsWith('http') ||
-                                      url.startsWith('https');
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimens.boraSm,
-                                    ),
-                                    child: isNetworkImage
-                                        ? Image.network(
-                                            url,
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    width: 80,
-                                                    height: 80,
-                                                    color:
-                                                        AppColors.secondary50,
-                                                    child: const Icon(
-                                                      Icons.broken_image,
-                                                      color: AppColors
-                                                          .secondary200,
-                                                    ),
-                                                  );
-                                                },
-                                          )
-                                        : Image.asset(
-                                            url,
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    width: 80,
-                                                    height: 80,
-                                                    color:
-                                                        AppColors.secondary50,
-                                                    child: const Icon(
-                                                      Icons.broken_image,
-                                                      color: AppColors
-                                                          .secondary200,
-                                                    ),
-                                                  );
-                                                },
-                                          ),
+                                  return AppNetworkImage(
+                                    url: url.startsWith('http') ? url : null,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                                    errorWidget: !url.startsWith('http') && url.isNotEmpty
+                                        ? Image.asset(url, width: 80, height: 80, fit: BoxFit.cover)
+                                        : null,
                                   );
                                 },
                               ),

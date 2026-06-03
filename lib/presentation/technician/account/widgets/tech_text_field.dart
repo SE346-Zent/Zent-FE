@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
-class TechTextField extends StatelessWidget {
+class TechTextField extends StatefulWidget {
   final String label;
   final String hint;
   final IconData? prefixIcon;
@@ -15,6 +15,8 @@ class TechTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool readOnly;
   final TextStyle? labelStyle;
+  final TextInputType? keyboardType;
+  final bool obscureText;
 
   const TechTextField({
     super.key,
@@ -26,7 +28,22 @@ class TechTextField extends StatelessWidget {
     this.controller,
     this.readOnly = false,
     this.labelStyle,
+    this.keyboardType,
+    this.obscureText = false,
   });
+
+  @override
+  State<TechTextField> createState() => _TechTextFieldState();
+}
+
+class _TechTextFieldState extends State<TechTextField> {
+  late bool _obscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscured = widget.obscureText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,27 +56,29 @@ class TechTextField extends StatelessWidget {
             left: AppDimens.spaceXs,
           ),
           child: Text(
-            label,
+            widget.label,
             style:
-                labelStyle ??
+                widget.labelStyle ??
                 TextStyles.title.copyWith(color: AppColors.primary500),
           ),
         ),
 
         Container(
           decoration: BoxDecoration(
-            color: readOnly ? AppColors.secondary50 : AppColors.surface100,
+            color: widget.readOnly ? AppColors.secondary50 : AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary100, width: 1.0),
             boxShadow: [BoxShadowStyles.subtle],
           ),
           child: TextField(
-            controller: controller,
-            maxLines: maxLines,
-            readOnly: readOnly,
+            controller: widget.controller,
+            maxLines: _obscured ? 1 : widget.maxLines,
+            readOnly: widget.readOnly,
+            obscureText: _obscured,
+            keyboardType: widget.keyboardType,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
-              color: readOnly ? AppColors.secondary200 : AppColors.primary500,
+              color: widget.readOnly ? AppColors.secondary200 : AppColors.primary500,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -67,16 +86,30 @@ class TechTextField extends StatelessWidget {
                 horizontal: AppDimens.spaceSm,
                 vertical: 12.0,
               ),
-              hintText: hint,
+              hintText: widget.hint,
               hintStyle: TextStyles.bodyLarge.copyWith(
                 color: AppColors.secondary200,
               ),
-              prefixIcon: prefixIcon != null
-                  ? Icon(prefixIcon, color: AppColors.secondary100)
+              prefixIcon: widget.prefixIcon != null
+                  ? Icon(widget.prefixIcon, color: AppColors.secondary100)
                   : null,
-              suffixIcon: suffixIcon != null
-                  ? Icon(suffixIcon, color: AppColors.secondary100)
-                  : null,
+              suffixIcon: widget.obscureText
+                  ? GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _obscured = !_obscured;
+                        });
+                      },
+                      child: Icon(
+                        _obscured
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppColors.secondary200,
+                      ),
+                    )
+                  : (widget.suffixIcon != null
+                      ? Icon(widget.suffixIcon, color: AppColors.secondary100)
+                      : null),
             ),
           ),
         ),

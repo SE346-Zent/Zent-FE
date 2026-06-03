@@ -46,7 +46,7 @@ class InterceptedHttpClient extends http.BaseClient {
           return await _inner.send(retriedRequest);
         } else {
           debugPrint(
-            "InterceptedHttpClient: Token refresh failed. Proceeding with original 401 response and logging out.",
+            "InterceptedHttpClient: Token refresh failed with auth error. Proceeding with original 401 response and logging out.",
           );
           // Clear all local credentials including USER_DATA from SharedPreferences to fully sign out
           try {
@@ -64,8 +64,9 @@ class InterceptedHttpClient extends http.BaseClient {
         }
       } catch (e) {
         debugPrint(
-          "InterceptedHttpClient: Error during token refresh interception: $e",
+          "InterceptedHttpClient: Error during token refresh interception (likely transient): $e",
         );
+        // Do NOT log out here. Return the original 401 response so the UI/calling client knows it failed.
       }
     }
 
@@ -143,10 +144,20 @@ class InterceptedHttpClient extends http.BaseClient {
       debugPrint(
         "InterceptedHttpClient: Token refresh request returned status ${response.statusCode}: ${response.body}",
       );
+
+      // If status is 400 or 401, it means the token itself is invalid or expired or revoked (auth error) -> return null to logout
+      if (response.statusCode == 400 || response.statusCode == 401) {
+        return null;
+      }
+
+      // Otherwise (e.g. 500, 503, 504, 404, etc.), it's a server/transient error -> throw to prevent logout
+      throw Exception('Server returned status ${response.statusCode} during token refresh');
     } catch (e) {
-      debugPrint("InterceptedHttpClient: Exception in _refreshTokenCall: $e");
+      if (e is FormatException || e is TypeError) {
+        throw Exception('Data parsing error during token refresh: $e');
+      }
+      rethrow;
     }
-    return null;
   }
 
   http.BaseRequest _copyRequest(

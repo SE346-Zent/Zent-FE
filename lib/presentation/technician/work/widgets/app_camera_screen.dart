@@ -16,7 +16,7 @@ class AppCameraScreen extends StatefulWidget {
 class _AppCameraScreenState extends State<AppCameraScreen> {
   String? _capturedFilePath;
   bool _isPressed = false;
-  bool _hasPermission = false;
+  bool _hasError = false;
   bool _permissionChecked = false;
 
   @override
@@ -26,15 +26,22 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
   }
 
   Future<void> _checkCameraPermission() async {
-    var status = await Permission.camera.status;
+    final status = await Permission.camera.status;
     if (!status.isGranted) {
-      status = await Permission.camera.request();
-    }
-    if (mounted) {
-      setState(() {
-        _hasPermission = status.isGranted;
-        _permissionChecked = true;
-      });
+      final requestStatus = await Permission.camera.request();
+      if (mounted) {
+        setState(() {
+          _hasError = !requestStatus.isGranted;
+          _permissionChecked = true;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _hasError = false;
+          _permissionChecked = true;
+        });
+      }
     }
   }
 
@@ -49,7 +56,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
       );
     }
 
-    if (!_hasPermission) {
+    if (_hasError) {
       return Scaffold(
         backgroundColor: Colors.black,
         body: Center(
@@ -59,15 +66,10 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
               const Icon(Icons.camera_alt_outlined, color: Colors.white54, size: 64),
               const SizedBox(height: 16),
               const Text(
-                'Camera permission is required',
+                'Camera is unavailable',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => openAppSettings(),
-                child: const Text('Open Settings'),
-              ),
-              const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.pop(),
                 child: const Text('Go Back', style: TextStyle(color: Colors.white70)),

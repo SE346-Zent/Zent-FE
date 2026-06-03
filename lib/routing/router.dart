@@ -39,6 +39,7 @@ import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
 import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
+import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
 import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
@@ -802,6 +803,13 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   name: RouteNames.customerNotifications,
                   path: Routes.customerNotifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      const CustomerNotificationsScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.customerNotificationsList,
+                  path: Routes.customerNotificationsList,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const NotificationsListScreen(),
                 ),

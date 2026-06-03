@@ -70,6 +70,7 @@ abstract final class RouteNames {
   static const String customerPersonalInfo = 'customerPersonalInfo';
   static const String customerSecuritySettings = 'customerSecuritySettings';
   static const String customerNotifications = 'customerNotifications';
+  static const String customerNotificationsList = 'customerNotificationsList';
   static const String customerDetailedProduct = 'customerDetailedProduct';
   static const String customerDetailedChat = 'customerDetailedChat';
   static const String customerDeviceRegistration = 'customerDeviceRegistration';

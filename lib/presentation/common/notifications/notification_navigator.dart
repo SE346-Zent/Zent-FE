@@ -166,7 +166,7 @@ class NotificationNavigator {
   static void _navigateToNotifications(BuildContext context, UserRoles role) {
     switch (role) {
       case UserRoles.customer:
-        context.pushNamed(RouteNames.customerNotifications);
+        context.pushNamed(RouteNames.customerNotificationsList);
         break;
       case UserRoles.technician:
         context.pushNamed(RouteNames.techNotifications);
@@ -364,7 +364,7 @@ class NotificationNavigator {
         } else {
           switch (role) {
             case UserRoles.customer:
-              appRouter.pushNamed(RouteNames.customerNotifications);
+              appRouter.pushNamed(RouteNames.customerNotificationsList);
               break;
             case UserRoles.technician:
               appRouter.pushNamed(RouteNames.techNotifications);

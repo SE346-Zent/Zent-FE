@@ -47,7 +47,7 @@ class ServiceHeader extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               context.pushNamed(
-                                RouteNames.customerNotifications,
+                                RouteNames.customerNotificationsList,
                               );
                             },
                             child: const Icon(

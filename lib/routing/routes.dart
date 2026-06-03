@@ -64,6 +64,7 @@ abstract final class Routes {
   static const techWorkOrderHistory = 'work-order-history';
   static const customerSecuritySettings = 'customer-security-settings';
   static const customerNotifications = 'customer-notifications';
+  static const customerNotificationsList = 'notifications-list';
   static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
   static const appCamera = '/app-camera';

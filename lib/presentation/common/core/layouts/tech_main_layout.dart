@@ -40,20 +40,39 @@ class _TechMainLayoutState extends State<TechMainLayout> {
         limit: 50,
       );
 
-      // Filter only assigned (in-progress) WOs and sort by appointment (soonest first)
+      // Filter only assigned (in-progress) WOs
       final activeOrders =
           orders.where((o) => o.status == WorkOrderStatus.assigned).toList();
 
-      activeOrders.sort((a, b) {
-        final ta = a.appointment ?? a.createdAt;
-        final tb = b.appointment ?? b.createdAt;
-        return ta.compareTo(tb);
-      });
-
       if (activeOrders.isNotEmpty && context.mounted) {
+        final now = DateTime.now();
+
+        // Prioritize upcoming work orders
+        final upcomingOrders = activeOrders.where((o) {
+          final appt = o.appointment;
+          return appt != null && appt.isAfter(now);
+        }).toList();
+
+        String targetId;
+        if (upcomingOrders.isNotEmpty) {
+          // Sort upcoming by appointment time (soonest upcoming first)
+          upcomingOrders.sort((a, b) => a.appointment!.compareTo(b.appointment!));
+          targetId = upcomingOrders.first.id;
+        } else {
+          // Fallback: sort all active orders by absolute time difference to now
+          activeOrders.sort((a, b) {
+            final ta = a.appointment ?? a.createdAt;
+            final tb = b.appointment ?? b.createdAt;
+            final diffA = (ta.difference(now)).abs();
+            final diffB = (tb.difference(now)).abs();
+            return diffA.compareTo(diffB);
+          });
+          targetId = activeOrders.first.id;
+        }
+
         context.pushNamed(
           RouteNames.techWorkOrderDetails,
-          pathParameters: {'workOrderId': activeOrders.first.id},
+          pathParameters: {'workOrderId': targetId},
         );
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

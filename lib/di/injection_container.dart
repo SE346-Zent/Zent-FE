@@ -276,7 +276,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => CustomerSecurityViewModel(getLoginHistoryUseCase: sl()),
   );
-  sl.registerFactory(() => CustomerNotificationsViewModel());
+  sl.registerFactory(() => CustomerNotificationsViewModel(notificationRepository: sl()));
   sl.registerFactory(
     () => ProductsViewModel(
       getMyProductsUseCase: sl(),

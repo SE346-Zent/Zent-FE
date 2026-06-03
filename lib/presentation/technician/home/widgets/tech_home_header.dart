@@ -153,7 +153,7 @@ class TechHomeHeader extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      debugPrint("action triggered: View All");
+                      context.goNamed(RouteNames.techWorkOrder);
                     },
                     child: Text(
                       "View All",

@@ -1,4 +1,5 @@
 import '../entities/notification_item.dart';
+import '../../data/models/notification_preference_model.dart';
 
 abstract class NotificationRepository {
   Future<List<NotificationItem>> getNotifications({
@@ -8,4 +9,8 @@ abstract class NotificationRepository {
   });
 
   Future<int> getUnreadCount();
+
+  Future<List<NotificationPreferenceModel>> getNotificationPreferences();
+
+  Future<void> updateNotificationPreference(int categoryId, bool osEnabled);
 }

@@ -288,6 +288,7 @@ Future<void> init() async {
       getMyProductsUseCase: sl(),
       getCurrentUserUseCase: sl(),
       getProductDetailUseCase: sl(),
+      getManyWorkOrdersUseCase: sl(),
     ),
   );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
@@ -325,7 +326,14 @@ Future<void> init() async {
       getScmProductsUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => PartsViewModel(getPartCatalogUseCase: sl()));
+  sl.registerFactory(
+    () => PartsViewModel(
+      getPartsUseCase: sl(),
+      getMyProductsUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+      getPartCatalogUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => NotificationsViewModel());
 
   sl.registerFactory(

@@ -26,7 +26,7 @@ class _PartsScreenState extends State<PartsScreen> {
   void initState() {
     super.initState();
     _viewModel = sl<PartsViewModel>();
-    _viewModel.init();
+    _viewModel.init(widget.serialNumber);
   }
 
   @override
@@ -59,63 +59,100 @@ class _PartsView extends StatelessWidget {
           showBackButton: true,
           showBottomDivider: true,
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- 1. PRODUCT CARD ---
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                  boxShadow: [BoxShadowStyles.raised],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(AppDimens.boraMd),
-                        topRight: Radius.circular(AppDimens.boraMd),
-                      ),
-                      child: Image.asset(
-                        AppAssets.laptopA,
-                        height: 180,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+      body: viewModel.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(AppDimens.spaceMd),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- 1. PRODUCT CARD ---
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                      boxShadow: [BoxShadowStyles.raised],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(AppDimens.spaceMd),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Product Details',
-                            style: TextStyles.headline.copyWith(
-                              color: AppColors.primary500,
-                            ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(AppDimens.boraMd),
+                            topRight: Radius.circular(AppDimens.boraMd),
                           ),
-                          const SizedBox(height: AppDimens.spaceMd),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          child: viewModel.product?.productImageUrl != null &&
+                                  (viewModel.product!.productImageUrl!.startsWith('http') ||
+                                      viewModel.product!.productImageUrl!.startsWith('https'))
+                              ? Image.network(
+                                  viewModel.product!.productImageUrl!,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    height: 180,
+                                    width: double.infinity,
+                                    color: AppColors.secondary50,
+                                    child: const Icon(
+                                      Icons.broken_image,
+                                      color: AppColors.secondary200,
+                                      size: 48,
+                                    ),
+                                  ),
+                                )
+                              : Image.asset(
+                                  AppAssets.laptopA,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(AppDimens.spaceMd),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'S/N: $serialNumber',
-                                style: TextStyles.bodyLarge.copyWith(
-                                  color: AppColors.secondary500,
+                                viewModel.product?.name ?? 'Product Details',
+                                style: TextStyles.headline.copyWith(
+                                  color: AppColors.primary500,
                                 ),
+                              ),
+                              const SizedBox(height: AppDimens.spaceMd),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'S/N: $serialNumber',
+                                      style: TextStyles.bodyLarge.copyWith(
+                                        color: AppColors.secondary500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppDimens.spaceSm),
+                                  Expanded(
+                                    child: Text(
+                                      'MTM: ${viewModel.product?.model ?? 'NA'}',
+                                      textAlign: TextAlign.right,
+                                      style: TextStyles.bodyLarge.copyWith(
+                                        color: AppColors.secondary500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppDimens.spaceXl),
+                  ),
+                  const SizedBox(height: AppDimens.spaceXl),
 
               // --- 2. LIST PARTS HEADER & SEARCH ---
               Text('List Parts', style: TextStyles.headline),
@@ -136,7 +173,7 @@ class _PartsView extends StatelessWidget {
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 14,
+                      vertical: 8,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
@@ -201,11 +238,36 @@ class _PartsView extends StatelessWidget {
                               AppDimens.boraSm,
                             ),
                           ),
-                          child: const Icon(
-                            Icons.dns_outlined,
-                            color: AppColors.secondary500,
-                            size: 28,
-                          ),
+                          child: part.imageUrl != null && part.imageUrl!.isNotEmpty
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimens.boraSm,
+                                  ),
+                                  child: part.imageUrl!.startsWith('http')
+                                      ? Image.network(
+                                          part.imageUrl!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => const Icon(
+                                            Icons.dns_outlined,
+                                            color: AppColors.secondary500,
+                                            size: 28,
+                                          ),
+                                        )
+                                      : Image.asset(
+                                          part.imageUrl!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => const Icon(
+                                            Icons.dns_outlined,
+                                            color: AppColors.secondary500,
+                                            size: 28,
+                                          ),
+                                        ),
+                                )
+                              : const Icon(
+                                  Icons.dns_outlined,
+                                  color: AppColors.secondary500,
+                                  size: 28,
+                                ),
                         ),
                         const SizedBox(width: AppDimens.spaceMd),
 

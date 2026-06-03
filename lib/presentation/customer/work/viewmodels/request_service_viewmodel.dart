@@ -109,8 +109,13 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   // Step 3 Data: Address Info
   String? country = 'Vietnam';
+  String? province;
   String? ward;
-  String? city;
+  String? city; // We map 'city' to the API field, but in UI we label it Province/City. The backend requires 'province' or 'ward' (as HN/HCM). Wait, the deserialization error: "missing field `province`". Let's check: Backend needs `province` but our request class did not define a `province` parameter, it had `ward`! No, wait, look at the deserialization error: "Failed to deserialize the JSON body into the target type: missing field `province` at line 1 column 329". This means the request body sent to the backend MUST contain a field named `province`!
+  // Let's check CreateWorkOrderRequest toJson() or property definition. It has 'ward' but not 'province'! Ah! CreateWorkOrderRequest had:
+  // final String country;
+  // final String ward;
+  // Let's check the error: missing field `province`. Yes, the endpoint must have changed to require `province`. Let's define `province` in the request!
   String? address;
   String? building;
 
@@ -132,11 +137,10 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   final List<String> countries = ['Vietnam'];
   final List<String> provinces = [];
-  final List<String> wards = [];
-  final Map<String, List<String>> _citiesByWard = {};
+  final Map<String, List<String>> _wardsByProvince = {};
 
   Future<void> loadLocationData() async {
-    if (wards.isNotEmpty) return;
+    if (provinces.isNotEmpty) return;
 
     try {
       final String response = await rootBundle.loadString(
@@ -144,21 +148,20 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       );
       final List<dynamic> data = json.decode(response);
 
-      wards.clear();
-      _citiesByWard.clear();
+      provinces.clear();
+      _wardsByProvince.clear();
 
       for (var item in data) {
-        final wardName = item['name'] as String;
-        final citiesList = (item['cities'] as List)
-            .map((e) => e.toString())
-            .toList();
-
-        wards.add(wardName);
-        _citiesByWard[wardName] = citiesList;
+        final provName = item['name'] as String;
+        // Limit to only 'Thành phố Hồ Chí Minh' and 'Thành phố Hà Nội'
+        if (provName == 'Thành phố Hồ Chí Minh' || provName == 'Thành phố Hà Nội') {
+          provinces.add(provName);
+          final wardsList = (item['cities'] as List)
+              .map((e) => e.toString())
+              .toList();
+          _wardsByProvince[provName] = wardsList;
+        }
       }
-
-      provinces.clear();
-      provinces.addAll(['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']);
 
       notifyListeners();
     } catch (e) {
@@ -166,20 +169,20 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
-  List<String> get availableCities =>
-      ward != null ? (_citiesByWard[ward!] ?? []) : [];
+  List<String> get availableWards =>
+      province != null ? (_wardsByProvince[province!] ?? []) : [];
 
-  void updateWard(String newWard) {
-    if (ward != newWard) {
-      ward = newWard;
-      city = null;
+  void updateProvince(String newProv) {
+    if (province != newProv) {
+      province = newProv;
+      ward = null;
       _saveDraft();
       notifyListeners();
     }
   }
 
-  void updateCity(String newCity) {
-    city = newCity;
+  void updateWard(String newWard) {
+    ward = newWard;
     _saveDraft();
     notifyListeners();
   }
@@ -247,8 +250,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     String? emailVal,
     String? phoneVal,
     String? countryVal,
+    String? provinceVal,
     String? wardVal,
-    String? cityVal,
     String? addressVal,
     String? buildingVal,
   }) {
@@ -257,8 +260,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     email = emailVal;
     phone = phoneVal;
     country = countryVal;
+    province = provinceVal;
     ward = wardVal;
-    city = cityVal;
     address = addressVal;
     building = buildingVal;
     _saveDraft();
@@ -452,13 +455,11 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         throw BusinessException('Please provide a description of the problem.');
       }
 
-      String finalWard = ward ?? '';
-
-      // Map full names to short codes for Backend
-      if (finalWard.contains('Hồ Chí Minh')) {
-        finalWard = 'HCM';
-      } else if (finalWard.contains('Hà Nội')) {
-        finalWard = 'HN';
+      String finalProv = province ?? '';
+      if (finalProv.contains('Hồ Chí Minh')) {
+        finalProv = 'HCM';
+      } else if (finalProv.contains('Hà Nội')) {
+        finalProv = 'HN';
       }
 
       final request = CreateWorkOrderRequest(
@@ -475,7 +476,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
             ? ticketRef
             : null,
-        ward: finalWard,
+        ward: ward ?? '',
+        province: finalProv,
         workOrderSymptomId: symptomId,
       );
 
@@ -524,6 +526,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     email = null;
     phone = null;
     country = 'Vietnam';
+    province = null;
     ward = null;
     city = null;
     address = null;
@@ -573,6 +576,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         'email': email,
         'phone': phone,
         'country': country,
+        'province': province,
         'ward': ward,
         'city': city,
         'address': address,
@@ -609,6 +613,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         email = draftMap['email'] as String?;
         phone = draftMap['phone'] as String?;
         country = draftMap['country'] as String? ?? 'Vietnam';
+        province = draftMap['province'] as String?;
         ward = draftMap['ward'] as String?;
         city = draftMap['city'] as String?;
         address = draftMap['address'] as String?;
@@ -616,7 +621,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         _currentStep = draftMap['currentStep'] as int? ?? 1;
         selectedServiceId = draftMap['selectedServiceId'] as String?;
 
-        if (ward != null) {
+        if (province != null) {
           loadLocationData();
         }
       } else {

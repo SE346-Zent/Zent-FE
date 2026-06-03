@@ -708,7 +708,10 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.customerActiveRepairs,
                   path: Routes.activeRepairs,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const ActiveRepairsScreen(),
+                  builder: (context, state) {
+                    final workOrderId = state.uri.queryParameters['workOrderId'];
+                    return ActiveRepairsScreen(workOrderId: workOrderId);
+                  },
                 ),
                 GoRoute(
                   name: RouteNames.customerWorkOrderHistory,

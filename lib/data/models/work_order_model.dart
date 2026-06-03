@@ -142,6 +142,9 @@ class WorkOrderModel extends WorkOrder {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+      productName:
+          json['productName'] as String? ??
+          json['product_name'] as String?,
       appointment: json['appointment'] != null
           ? DateTime.tryParse(json['appointment'] as String)
           : null,

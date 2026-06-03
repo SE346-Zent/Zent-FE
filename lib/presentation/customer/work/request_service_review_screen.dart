@@ -108,8 +108,8 @@ class _RequestServiceReviewScreenState
         emailVal: emailCtrl.text,
         phoneVal: phoneCtrl.text,
         countryVal: vm.country,
+        provinceVal: vm.province,
         wardVal: vm.ward,
-        cityVal: vm.city,
         addressVal: vm.address,
         buildingVal: vm.building,
       );
@@ -126,8 +126,8 @@ class _RequestServiceReviewScreenState
         emailVal: vm.email,
         phoneVal: vm.phone,
         countryVal: vm.country,
+        provinceVal: vm.province,
         wardVal: vm.ward,
-        cityVal: vm.city,
         addressVal: addressCtrl.text,
         buildingVal: buildingCtrl.text,
       );
@@ -380,14 +380,15 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'Ward',
-                  value: viewModel.ward,
-                  items: viewModel.wards
-                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  label: 'Province/City',
+                  value: viewModel.province,
+                  items: viewModel.provinces
+                      .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateWard(v);
+                      viewModel.updateProvince(v);
+                      setState(() {});
                     }
                   },
                   isRequired: true,
@@ -396,13 +397,14 @@ class _RequestServiceReviewScreenState
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
                   label: 'Ward',
-                  value: viewModel.city,
-                  items: viewModel.availableCities
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  value: viewModel.ward,
+                  items: viewModel.availableWards
+                      .map((w) => DropdownMenuItem(value: w, child: Text(w)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateCity(v);
+                      viewModel.updateWard(v);
+                      setState(() {});
                     }
                   },
                   isRequired: true,

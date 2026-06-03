@@ -11,6 +11,7 @@ class InventoryPartModel extends InventoryPart {
     super.installationDate,
     super.removalDate,
     super.scrappedDate,
+    super.imageUrl,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -43,6 +44,7 @@ class InventoryPartModel extends InventoryPart {
         json['ScrappedDate'] as String?,
         fallback: json['scrapped_date'] as String?,
       ),
+      imageUrl: json['image_url'] as String? ?? json['ImageUrl'] as String?,
       createdAt: DateTime.parse(
         (json['CreatedAt'] as String?) ?? (json['created_at'] as String),
       ),

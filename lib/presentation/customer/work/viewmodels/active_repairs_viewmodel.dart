@@ -21,7 +21,7 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
   WorkOrder? activeWorkOrder;
   List<WorkOrder> recentCompleted = [];
 
-  Future<void> fetchWorkOrders() async {
+  Future<void> fetchWorkOrders({String? workOrderId}) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
@@ -39,21 +39,31 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
           )
           .toList();
 
-      if (activeOrders.isNotEmpty) {
-        // Sort by createdAt descending to always get the newest active repair order!
-        activeOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        activeWorkOrder = activeOrders.first;
-        currentStatusStep = _mapStatusToStep(activeWorkOrder!);
+      if (workOrderId != null && workOrderId.isNotEmpty) {
+        // If a specific workOrderId was requested, find it from the entire list first
+        try {
+          activeWorkOrder = customerOrders.firstWhere((o) => o.id == workOrderId);
+          currentStatusStep = _mapStatusToStep(activeWorkOrder!);
+        } catch (_) {
+          activeWorkOrder = null;
+        }
       } else {
-        activeWorkOrder = null;
-        currentStatusStep = 0;
+        if (activeOrders.isNotEmpty) {
+          activeOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          activeWorkOrder = activeOrders.first;
+          currentStatusStep = _mapStatusToStep(activeWorkOrder!);
+        } else {
+          activeWorkOrder = null;
+          currentStatusStep = 0;
+        }
       }
 
       final completedOrders = customerOrders
           .where(
             (o) =>
-                o.status == WorkOrderStatus.complete ||
-                o.status == WorkOrderStatus.rejected,
+                (o.status == WorkOrderStatus.complete ||
+                o.status == WorkOrderStatus.rejected) &&
+                o.id != activeWorkOrder?.id,
           )
           .toList();
       completedOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));

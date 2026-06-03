@@ -32,24 +32,39 @@ class CustomerAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () => context.pop(),
             )
           : null,
-      title: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: TextStyles.title.copyWith(color: AppColors.primary500),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: 2.0),
-            Text(
-              subtitle!,
-              style: TextStyles.bodyMedium.copyWith(
-                color: AppColors.secondary500,
-                fontWeight: FontWeight.normal,
+      title: Builder(
+        builder: (context) {
+          final words = title.split(' ');
+          String displayTitle = title;
+          if (words.length > 3) {
+            // Split title roughly in half at the word boundaries to prevent long product names from squeezing to one side
+            final splitIndex = (words.length / 2).floor();
+            displayTitle = '${words.sublist(0, splitIndex).join(' ')}\n${words.sublist(splitIndex).join(' ')}';
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                displayTitle,
+                textAlign: TextAlign.center,
+                style: TextStyles.title.copyWith(
+                  color: AppColors.primary500,
+                  height: 1.2,
+                ),
               ),
-            ),
-          ],
-        ],
+              if (subtitle != null) ...[
+                const SizedBox(height: 2.0),
+                Text(
+                  subtitle!,
+                  style: TextStyles.bodyMedium.copyWith(
+                    color: AppColors.secondary500,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ],
+          );
+        }
       ),
       centerTitle: true,
 

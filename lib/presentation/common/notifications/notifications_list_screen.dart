@@ -254,7 +254,10 @@ class _NotificationsListScreenContentState
                         pathParameters: {'workOrderId': workOrderId},
                       );
                     } else if (role == UserRoles.customer) {
-                      context.pushNamed(RouteNames.customerActiveRepairs);
+                      context.pushNamed(
+                        RouteNames.customerActiveRepairs,
+                        queryParameters: {'workOrderId': workOrderId},
+                      );
                     }
                   }
                 }

@@ -123,7 +123,10 @@ class NotificationNavigator {
     switch (role) {
       case UserRoles.customer:
         // Navigate to active repairs
-        context.pushNamed(RouteNames.customerActiveRepairs);
+        context.pushNamed(
+          RouteNames.customerActiveRepairs,
+          queryParameters: {'workOrderId': workOrderId},
+        );
         break;
       case UserRoles.technician:
         context.pushNamed(
@@ -343,7 +346,10 @@ class NotificationNavigator {
         } else if (workOrderId.isNotEmpty) {
           switch (role) {
             case UserRoles.customer:
-              appRouter.pushNamed(RouteNames.customerActiveRepairs);
+              appRouter.pushNamed(
+                RouteNames.customerActiveRepairs,
+                queryParameters: {'workOrderId': workOrderId},
+              );
               break;
             case UserRoles.technician:
               appRouter.pushNamed(

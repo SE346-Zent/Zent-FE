@@ -10,19 +10,21 @@ import 'widgets/tracking_card.dart';
 import 'widgets/recent_completed_list.dart';
 
 class ActiveRepairsScreen extends StatelessWidget {
-  const ActiveRepairsScreen({super.key});
+  final String? workOrderId;
+  const ActiveRepairsScreen({super.key, this.workOrderId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<ActiveRepairsViewModel>()..fetchWorkOrders(),
-      child: const _ActiveRepairsView(),
+      create: (_) => sl<ActiveRepairsViewModel>()..fetchWorkOrders(workOrderId: workOrderId),
+      child: _ActiveRepairsView(workOrderId: workOrderId),
     );
   }
 }
 
 class _ActiveRepairsView extends StatefulWidget {
-  const _ActiveRepairsView();
+  final String? workOrderId;
+  const _ActiveRepairsView({this.workOrderId});
 
   @override
   State<_ActiveRepairsView> createState() => _ActiveRepairsViewState();
@@ -33,7 +35,7 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ActiveRepairsViewModel>().fetchWorkOrders();
+      context.read<ActiveRepairsViewModel>().fetchWorkOrders(workOrderId: widget.workOrderId);
     });
   }
 
@@ -114,8 +116,7 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                 ),
 
                 // Recent Completed List
-                SliverFillRemaining(
-                  hasScrollBody: false,
+                SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(
                       left: AppDimens.spaceMd,
@@ -123,7 +124,7 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                       bottom: AppDimens.spaceMd,
                     ),
                     child: viewModel.recentCompleted.isEmpty
-                        ? const Center(child: Text(''))
+                        ? const SizedBox()
                         : RecentCompletedList(
                             recentCompleted: viewModel.recentCompleted,
                           ),

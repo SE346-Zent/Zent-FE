@@ -8,6 +8,7 @@ class InventoryPart {
   final DateTime? installationDate;
   final DateTime? removalDate;
   final DateTime? scrappedDate;
+  final String? imageUrl;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -21,6 +22,7 @@ class InventoryPart {
     this.installationDate,
     this.removalDate,
     this.scrappedDate,
+    this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
   });

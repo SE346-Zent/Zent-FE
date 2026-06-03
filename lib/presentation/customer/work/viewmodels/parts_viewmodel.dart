@@ -1,27 +1,40 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/entities/part_catalog_entry.dart';
 import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
+import 'package:zent_fe/domain/usecases/product/get_my_products_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/domain/entities/product.dart';
 
 class PartModel {
   final String title;
   final String partNo;
   final String commodity;
   final String status;
+  final String? imageUrl;
 
   PartModel({
     required this.title,
     required this.partNo,
     required this.commodity,
     required this.status,
+    this.imageUrl,
   });
 }
 
 class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
+  final GetPartsUseCase getPartsUseCase;
+  final GetMyProductsUseCase getMyProductsUseCase;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
   final GetPartCatalogUseCase getPartCatalogUseCase;
 
-  PartsViewModel({required this.getPartCatalogUseCase});
+  PartsViewModel({
+    required this.getPartsUseCase,
+    required this.getMyProductsUseCase,
+    required this.getCurrentUserUseCase,
+    required this.getPartCatalogUseCase,
+  });
 
+  Product? product;
   List<PartModel> allParts = [];
   List<PartModel> filteredParts = [];
   bool isLoading = false;
@@ -31,37 +44,63 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
   String sortAlphabet = 'None';
   String filterStatus = 'None';
 
-  Future<void> init() async {
+  Future<void> init(String serialNumber) async {
     searchController.addListener(_onSearchChanged);
-    await fetchParts();
+    await fetchParts(serialNumber);
   }
 
-  Future<void> fetchParts() async {
+  Future<void> fetchParts(String serialNumber) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      final (parts, _) = await getPartCatalogUseCase.execute(
-        page: 1,
-        limit: 50,
-      );
-      allParts = parts.map(_mapCatalogToModel).toList();
+      final user = await getCurrentUserUseCase.execute();
+      if (user != null) {
+        final products = await getMyProductsUseCase.execute(user.id);
+        String? productId;
+        try {
+          product = products.firstWhere((p) => p.serialNumber == serialNumber);
+          productId = product?.id;
+        } catch (_) {
+          product = null;
+        }
+
+        if (productId != null) {
+          // Fetch all part catalog entries to map descriptions/names in-memory
+          final (catalogList, _) = await getPartCatalogUseCase.execute(
+            page: 1,
+            limit: 1000,
+          );
+          final catalogMap = {for (var entry in catalogList) entry.id: entry};
+
+          // Fetch parts for this specific product ID
+          final (parts, _) = await getPartsUseCase.execute(
+            productId: productId,
+            page: 1,
+            limit: 1000,
+          );
+          
+          allParts = parts.map((part) {
+            final catalog = catalogMap[part.partCatalogId];
+            return PartModel(
+              title: catalog?.partNumber ?? part.serialNumber,
+              partNo: catalog?.mfgNumber ?? part.id,
+              commodity: catalog?.description ?? 'General',
+              status: part.partConditionId == 1 ? 'Available' : 'Unavailable',
+              imageUrl: part.imageUrl,
+            );
+          }).toList();
+        } else {
+          allParts = [];
+        }
+      }
       _filterParts();
     } catch (e) {
-      debugPrint('Error fetching parts: $e');
+      debugPrint('Error fetching parts for $serialNumber: $e');
     } finally {
       isLoading = false;
       notifyListeners();
     }
-  }
-
-  PartModel _mapCatalogToModel(PartCatalogEntry entry) {
-    return PartModel(
-      title: entry.partNumber,
-      partNo: entry.mfgNumber ?? entry.id,
-      commodity: entry.description ?? 'General',
-      status: entry.partMfgStatus ?? 'Unknown',
-    );
   }
 
   void setSortAlphabet(String val) {

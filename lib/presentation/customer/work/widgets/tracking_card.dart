@@ -149,27 +149,47 @@ class TrackingCard extends StatelessWidget {
             Positioned(
               right: AppDimens.spaceSm,
               top: AppDimens.spaceSm,
-              child: PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.more_horiz,
-                  color: AppColors.secondary500,
-                  size: 24,
-                ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 190,
-                  maxWidth: 190,
-                  minHeight: 28,
-                  maxHeight: 28,
-                ),
-                offset: const Offset(0, 32),
-                color: const Color(0xFFFEF2F2),
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                onSelected: (value) {
-                  if (value == 'cancel') {
+              child: GestureDetector(
+                onTapDown: (TapDownDetails details) async {
+                  final tapPos = details.globalPosition;
+                  final size = MediaQuery.of(context).size;
+
+                  final selected = await showMenu<String>(
+                    context: context,
+                    color: const Color(0xFFFEF2F2),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 155,
+                      maxWidth: 160,
+                    ),
+                    position: RelativeRect.fromLTRB(
+                      tapPos.dx - 155,               // menu right edge aligns with tap
+                      tapPos.dy + 12,                // just below the icon
+                      size.width - tapPos.dx,        // distance from right screen edge
+                      size.height - tapPos.dy - 12,  // distance from bottom
+                    ),
+                    items: [
+                      PopupMenuItem<String>(
+                        value: 'cancel',
+                        padding: EdgeInsets.zero,
+                        height: 28,
+                        child: Center(
+                          child: Text(
+                            'Cancel Work Order',
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.error500,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+
+                  if (selected == 'cancel' && context.mounted) {
                     context
                         .pushNamed(
                           RouteNames.customerCancelWorkOrder,
@@ -186,25 +206,14 @@ class TrackingCard extends StatelessWidget {
                         });
                   }
                 },
-                itemBuilder: (BuildContext context) => [
-                  PopupMenuItem<String>(
-                    value: 'cancel',
-                    height: 28,
-                    padding: EdgeInsets.zero,
-                    child: Container(
-                      width: double.infinity,
-                      height: 28,
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Cancel Work Order',
-                        style: TextStyles.label.copyWith(
-                          color: AppColors.error500,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                child: const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.more_horiz,
+                    color: AppColors.secondary500,
+                    size: 24,
                   ),
-                ],
+                ),
               ),
             ),
           ],

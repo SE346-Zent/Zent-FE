@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -22,7 +24,9 @@ class AdminDashboardQuickActions extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(8.0),
-                onTap: () {},
+                onTap: () {
+                  context.pushNamed(RouteNames.adminUserManagement);
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Row(
@@ -60,7 +64,9 @@ class AdminDashboardQuickActions extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(8.0),
-                onTap: () {},
+                onTap: () {
+                  context.pushNamed(RouteNames.adminOperationalQueue);
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Row(

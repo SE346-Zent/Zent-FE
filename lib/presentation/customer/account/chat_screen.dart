@@ -19,11 +19,49 @@ class CustomerChatScreen extends StatelessWidget {
   }
 }
 
-class _ChatScreenContent extends StatelessWidget {
+class _ChatScreenContent extends StatefulWidget {
   const _ChatScreenContent();
 
+  @override
+  State<_ChatScreenContent> createState() => _ChatScreenContentState();
+}
+
+class _ChatScreenContentState extends State<_ChatScreenContent>
+    with WidgetsBindingObserver {
   void _onSearchPressed() {
     debugPrint("action triggered: tap search button");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Refresh chat list when returning to the app
+      context.read<ChatViewModel>().fetchChats(showLoading: false);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Silently refresh chat list whenever this screen becomes active
+    // (e.g., popping back from detailed chat)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ChatViewModel>().fetchChats(showLoading: false);
+      }
+    });
   }
 
   @override

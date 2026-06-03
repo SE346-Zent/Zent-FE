@@ -93,7 +93,18 @@ class TechHomeHeader extends StatelessWidget {
                   const SizedBox(width: AppDimens.spaceSm),
                   GestureDetector(
                     onTap: onProfileTapped,
-                    child: UserAvatar(name: userName, size: 30),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2.0,
+                        ),
+                      ),
+                      child: UserAvatar(name: userName, size: 30),
+                    ),
                   ),
                 ],
               ),

@@ -2,6 +2,7 @@ import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
 class AppCameraScreen extends StatefulWidget {
@@ -15,9 +16,68 @@ class AppCameraScreen extends StatefulWidget {
 class _AppCameraScreenState extends State<AppCameraScreen> {
   String? _capturedFilePath;
   bool _isPressed = false;
+  bool _hasPermission = false;
+  bool _permissionChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCameraPermission();
+  }
+
+  Future<void> _checkCameraPermission() async {
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      status = await Permission.camera.request();
+    }
+    if (mounted) {
+      setState(() {
+        _hasPermission = status.isGranted;
+        _permissionChecked = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_permissionChecked) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
+    if (!_hasPermission) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.camera_alt_outlined, color: Colors.white54, size: 64),
+              const SizedBox(height: 16),
+              const Text(
+                'Camera permission is required',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => openAppSettings(),
+                child: const Text('Open Settings'),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => context.pop(),
+                child: const Text('Go Back', style: TextStyle(color: Colors.white70)),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(

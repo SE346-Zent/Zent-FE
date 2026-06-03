@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/di/injection_container.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 
 // Core Theming
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
 import '../../../technician/account/widgets/tech_sidebar.dart';
-import '../../../../di/injection_container.dart';
 import '../../auth/auth_view_model.dart';
 
 class TechMainLayout extends StatefulWidget {
@@ -24,6 +28,44 @@ class _TechMainLayoutState extends State<TechMainLayout> {
       index,
       initialLocation: index == widget.navigationShell.currentIndex,
     );
+  }
+
+  Future<void> _navigateToActiveWO(BuildContext context) async {
+    try {
+      final user = await sl<GetCurrentUserUseCase>().execute();
+      if (user == null) return;
+
+      final orders = await sl<GetManyWorkOrdersUseCase>().execute(
+        technicianId: user.id,
+        limit: 50,
+      );
+
+      // Filter only assigned (in-progress) WOs and sort by appointment (soonest first)
+      final activeOrders =
+          orders.where((o) => o.status == WorkOrderStatus.assigned).toList();
+
+      activeOrders.sort((a, b) {
+        final ta = a.appointment ?? a.createdAt;
+        final tb = b.appointment ?? b.createdAt;
+        return ta.compareTo(tb);
+      });
+
+      if (activeOrders.isNotEmpty && context.mounted) {
+        context.pushNamed(
+          RouteNames.techWorkOrderDetails,
+          pathParameters: {'workOrderId': activeOrders.first.id},
+        );
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No active work order assigned to you.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('_navigateToActiveWO error: $e');
+    }
   }
 
   @override
@@ -86,9 +128,7 @@ class _TechMainLayoutState extends State<TechMainLayout> {
               right: 0,
               child: Center(
                 child: _AnimatedFAB(
-                  onTap: () {
-                    debugPrint('🔧 Đã bấm nút cờ lê sửa chữa!');
-                  },
+                  onTap: () => _navigateToActiveWO(context),
                 ),
               ),
             ),

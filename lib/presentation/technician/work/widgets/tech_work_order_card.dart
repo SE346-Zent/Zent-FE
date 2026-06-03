@@ -121,12 +121,14 @@ class WorkOrderCard extends StatelessWidget {
               text: 'View Details',
               textColor: AppColors.tertiary500,
               bgColor: AppColors.tertiary50,
-              onPressed: () {
-                context.pushNamed(
-                  RouteNames.techWorkOrderDetails,
-                  pathParameters: {'workOrderId': order.id},
-                );
-              },
+              onPressed: order.id.isNotEmpty
+                  ? () {
+                      context.pushNamed(
+                        RouteNames.techWorkOrderDetails,
+                        pathParameters: {'workOrderId': order.id},
+                      );
+                    }
+                  : null,
             )
           else
             Row(
@@ -136,19 +138,26 @@ class WorkOrderCard extends StatelessWidget {
                     text: isPending ? 'Start Job' : 'Complete',
                     textColor: AppColors.surface100,
                     bgColor: AppColors.tertiary500,
-                    onPressed: () {
-                      context.pushNamed(
-                        RouteNames.techWorkOrderDetails,
-                        pathParameters: {'workOrderId': order.id},
-                      );
-                    },
+                    onPressed: order.id.isNotEmpty
+                        ? () {
+                            context.pushNamed(
+                              RouteNames.techWorkOrderDetails,
+                              pathParameters: {'workOrderId': order.id},
+                            );
+                          }
+                        : null,
                   ),
                 ),
                 const SizedBox(width: 12.0),
                 GestureDetector(
-                  onTap: () {
-                    // Quick Action: maybe navigation or status change
-                  },
+                  onTap: order.id.isNotEmpty
+                      ? () {
+                          context.pushNamed(
+                            RouteNames.techWorkOrderDetails,
+                            pathParameters: {'workOrderId': order.id},
+                          );
+                        }
+                      : null,
                   child: Container(
                     height: 44.0,
                     width: 44.0,
@@ -192,7 +201,7 @@ class WorkOrderCard extends StatelessWidget {
     required String text,
     required Color textColor,
     required Color bgColor,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return InkWell(
       onTap: onPressed,

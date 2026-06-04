@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -56,57 +56,71 @@ class _ChooseRoleScreenContent extends StatelessWidget {
                         color: AppColors.secondary500,
                       ),
                     ),
-                    const SizedBox(height: 48),
-                    _buildRoleCard(
-                      title: 'Technicians',
-                      description:
-                          'Access your daily job assignments, and manage your field operations efficiently',
-                      icon: Icons.build_outlined,
-                      isSelected: viewModel.selectedRole == 'Technicians',
-                      onTap: () => viewModel.selectRole('Technicians'),
-                    ),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    _buildRoleCard(
-                      title: 'Admins',
-                      description:
-                          'Oversee all active operations, manage technician schedules to ensure maximum productivity.',
-                      icon: Icons.settings_outlined,
-                      isSelected: viewModel.selectedRole == 'Admins',
-                      onTap: () => viewModel.selectRole('Admins'),
-                    ),
-                    const Spacer(),
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: AppColors.tertiary500,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [BoxShadowStyles.glowing],
+                    if (viewModel.isLoading)
+                      const Expanded(
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary500,
+                          ),
+                        ),
+                      )
+                    else ...[
+                      const SizedBox(height: 48),
+                      _buildRoleCard(
+                        title: 'Technicians',
+                        description:
+                            'Access your daily job assignments, and manage your field operations efficiently',
+                        icon: Icons.build_outlined,
+                        isSelected: viewModel.selectedRole == 'Technicians',
+                        onTap: () => viewModel.selectRole('Technicians'),
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: ThrottledInkWell(
+                      if (viewModel.canCreateAdmin) ...[
+                        const SizedBox(height: AppDimens.spaceLg),
+                        _buildRoleCard(
+                          title: 'Admins',
+                          description:
+                              'Oversee all active operations, manage technician schedules to ensure maximum productivity.',
+                          icon: Icons.settings_outlined,
+                          isSelected: viewModel.selectedRole == 'Admins',
+                          onTap: () => viewModel.selectRole('Admins'),
+                        ),
+                      ],
+                      const Spacer(),
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiary500,
                           borderRadius: BorderRadius.circular(8),
-                          onTap: () {
-                            context.pushNamed(
-                              RouteNames.adminCreateAccount,
-                              extra: {'role': viewModel.selectedRole},
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            child: Center(
-                              child: Text(
-                                'Continue',
-                                style: TextStyles.title.copyWith(
-                                  color: Colors.white,
+                          boxShadow: [BoxShadowStyles.glowing],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ThrottledInkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () {
+                              context.pushNamed(
+                                RouteNames.adminCreateAccount,
+                                extra: {'role': viewModel.selectedRole},
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Continue',
+                                  style: TextStyles.title.copyWith(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

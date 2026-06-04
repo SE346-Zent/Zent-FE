@@ -963,7 +963,9 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!;
       } else {
-        throw Exception(apiResponse.message ?? 'Failed to get user profile by ID');
+        throw Exception(
+          apiResponse.message ?? 'Failed to get user profile by ID',
+        );
       }
     } catch (e) {
       if (e is Exception) rethrow;

@@ -52,12 +52,13 @@ class UserModel extends User {
         json['avatar_url'] as String? ??
         json['avatar'] as String?;
 
-    final ratingCounts = (json['ratingCounts'] as Map<dynamic, dynamic>?)?.map(
-      (key, value) {
-        final val = int.tryParse(value?.toString() ?? '') ?? 0;
-        return MapEntry(key.toString(), val);
-      },
-    );
+    final ratingCounts = (json['ratingCounts'] as Map<dynamic, dynamic>?)?.map((
+      key,
+      value,
+    ) {
+      final val = int.tryParse(value?.toString() ?? '') ?? 0;
+      return MapEntry(key.toString(), val);
+    });
 
     final dynamic statusRaw =
         json['accountStatus'] ??
@@ -105,7 +106,10 @@ class UserModel extends User {
     }
 
     if (roleStr != null && roleStr is String) {
-      final normalized = roleStr.replaceAll('_', '').replaceAll(' ', '').toUpperCase();
+      final normalized = roleStr
+          .replaceAll('_', '')
+          .replaceAll(' ', '')
+          .toUpperCase();
       return UserRoles.values.firstWhere(
         (e) => e.name.toUpperCase() == normalized,
         orElse: () => UserRoles.customer,

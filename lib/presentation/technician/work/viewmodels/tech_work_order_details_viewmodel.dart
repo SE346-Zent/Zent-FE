@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -94,13 +95,51 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
   }
 
   // Timer state
-  final int _hours = 12;
-  final int _minutes = 22;
-  final int _seconds = 11;
+  Timer? _timer;
+  Duration _elapsedDuration = Duration.zero;
 
-  int get hours => _hours;
-  int get minutes => _minutes;
-  int get seconds => _seconds;
+  int get hours => _elapsedDuration.inHours;
+  int get minutes => _elapsedDuration.inMinutes.remainder(60);
+  int get seconds => _elapsedDuration.inSeconds.remainder(60);
+
+  void _startTimer() {
+    _timer?.cancel();
+    _updateElapsedDuration();
+
+    // Only run periodic timer if the job is currently "In Progress" (statusId == 3)
+    final isTimerActive = workOrder?.statusId == 3;
+    if (isTimerActive && workOrder?.startAt != null) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        _updateElapsedDuration();
+      });
+    }
+  }
+
+  void _updateElapsedDuration() {
+    final start = workOrder?.startAt;
+    if (start == null) {
+      _elapsedDuration = Duration.zero;
+      notifyListeners();
+      return;
+    }
+
+    final isCompleted =
+        workOrder?.status == WorkOrderStatus.complete ||
+        workOrder?.statusId == 4;
+
+    if (isCompleted) {
+      final end = workOrder?.closedAt ?? workOrder?.updatedAt ?? DateTime.now();
+      _elapsedDuration = end.isAfter(start)
+          ? end.difference(start)
+          : Duration.zero;
+    } else {
+      final now = DateTime.now();
+      _elapsedDuration = now.isAfter(start)
+          ? now.difference(start)
+          : Duration.zero;
+    }
+    notifyListeners();
+  }
 
   // Checklist state
   final List<TaskChecklistItem> _checklist = [
@@ -172,6 +211,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
       final cleanId = workOrderId.replaceAll('#', '');
       workOrder = await getSingleWorkOrderUseCase.execute(cleanId);
       await _loadChecklistFromLocal();
+      _startTimer();
     } catch (e) {
       debugPrint("Error loading work order: $e");
     } finally {
@@ -261,7 +301,9 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
       // 3. Refresh work order details
       debugPrint("Refreshing work order details...");
       await _loadDetails();
-      debugPrint("Work order details refreshed successfully. Current status: $status");
+      debugPrint(
+        "Work order details refreshed successfully. Current status: $status",
+      );
     } on BusinessException catch (e) {
       debugPrint("BusinessException caught: ${e.message}");
       if (context.mounted) {
@@ -311,5 +353,11 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     } catch (e) {
       throw Exception('Failed to retrieve GPS location: ${e.toString()}');
     }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }

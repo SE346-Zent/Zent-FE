@@ -156,12 +156,19 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
                               final item = viewModel.todaySchedule[index];
                               return ScheduleItemCard(
                                 item: item,
-                                onTap: () {
+                                onTap: () async {
                                   if (item.id.isNotEmpty) {
-                                    context.pushNamed(
+                                    await context.pushNamed(
                                       RouteNames.techWorkOrderDetails,
                                       pathParameters: {'workOrderId': item.id},
                                     );
+                                    if (context.mounted) {
+                                      try {
+                                        context
+                                            .read<TechnicianHomeViewModel>()
+                                            .fetchTodaySchedule(silent: true);
+                                      } catch (_) {}
+                                    }
                                   } else {
                                     debugPrint(
                                       "action triggered: tap on mock item ${item.title}",

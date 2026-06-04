@@ -44,9 +44,11 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
     }).toList();
   }
 
-  Future<void> initData() async {
-    isLoading = true;
-    notifyListeners();
+  Future<void> refreshData({bool silent = false}) async {
+    if (!silent) {
+      isLoading = true;
+      notifyListeners();
+    }
 
     try {
       final user = await getCurrentUserUseCase.execute();
@@ -60,16 +62,22 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
     } catch (e) {
       debugPrint("Error fetching tech work orders: $e");
     } finally {
-      isLoading = false;
+      if (!silent) {
+        isLoading = false;
+      }
       notifyListeners();
     }
+  }
+
+  Future<void> initData() async {
+    await refreshData(silent: false);
   }
 
   void setFilter(int index) {
     if (selectedFilterIndex != index) {
       selectedFilterIndex = index;
       notifyListeners();
-      initData(); // Trigger API refresh
+      refreshData(silent: false); // Trigger API refresh with loading indicator
     }
   }
 }

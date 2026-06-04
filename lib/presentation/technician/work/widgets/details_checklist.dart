@@ -38,7 +38,9 @@ class _DetailsChecklistState extends State<DetailsChecklist> {
                 children: [
                   Text(
                     "Task Checklist",
-                    style: TextStyles.middle.copyWith(color: AppColors.primary500),
+                    style: TextStyles.middle.copyWith(
+                      color: AppColors.primary500,
+                    ),
                   ),
                   if (!_isExpanded) ...[
                     const SizedBox(width: 8),
@@ -53,7 +55,9 @@ class _DetailsChecklistState extends State<DetailsChecklist> {
                 ],
               ),
               Icon(
-                _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                _isExpanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
                 color: AppColors.primary500,
               ),
             ],
@@ -127,7 +131,9 @@ class _DetailsChecklistState extends State<DetailsChecklist> {
               ],
             ),
           ),
-          crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: _isExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 300),
         ),
       ],

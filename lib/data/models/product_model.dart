@@ -60,9 +60,17 @@ class ProductModel extends Product {
     return ProductModel(
       id: json['productId']?.toString() ?? '',
       name: json['productName']?.toString() ?? '',
-      model: (json['model'] ?? json['modelCode'] ?? json['modelName'] ?? json['productModel'] ?? '').toString(),
+      model:
+          (json['productModelCode'] ??
+                  json['model'] ??
+                  json['modelCode'] ??
+                  json['modelName'] ??
+                  json['productModel'] ??
+                  '')
+              .toString(),
       serialNumber: json['serialNumber']?.toString() ?? '',
-      productImageUrl: (json['productImageUrl'] ?? json['imageUrl'])?.toString(),
+      productImageUrl: (json['productImageUrl'] ?? json['imageUrl'])
+          ?.toString(),
       warranty: warranty,
       warrantyUntil: parsedWarrantyUntil,
     );
@@ -72,7 +80,14 @@ class ProductModel extends Product {
     return ProductModel(
       id: json['id'] as String,
       name: json['name'] as String,
-      model: (json['model'] ?? json['modelCode'] ?? json['modelName'] ?? json['productModel'] ?? '') as String,
+      model:
+          (json['productModelCode'] ??
+                  json['model'] ??
+                  json['modelCode'] ??
+                  json['modelName'] ??
+                  json['productModel'] ??
+                  '')
+              as String,
       serialNumber: json['serialNumber'] as String,
       warrantyUntil: json['warrantyUntil'] != null
           ? DateTime.parse(json['warrantyUntil'] as String)

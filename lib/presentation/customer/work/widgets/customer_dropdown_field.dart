@@ -37,9 +37,7 @@ class CustomerDropdownField<T> extends StatelessWidget {
               ? [
                   TextSpan(
                     text: '*',
-                    style: TextStyles.title.copyWith(
-                      color: AppColors.error500,
-                    ),
+                    style: TextStyles.title.copyWith(color: AppColors.error500),
                   ),
                 ]
               : null,
@@ -133,10 +131,12 @@ class _SearchableDropdownField<T> extends StatefulWidget {
   });
 
   @override
-  State<_SearchableDropdownField<T>> createState() => _SearchableDropdownFieldState<T>();
+  State<_SearchableDropdownField<T>> createState() =>
+      _SearchableDropdownFieldState<T>();
 }
 
-class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>> {
+class _SearchableDropdownFieldState<T>
+    extends State<_SearchableDropdownField<T>> {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -188,9 +188,9 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
   String _getDisplayValue(T? val) {
     if (val == null) return '';
     final matchedItem = widget.items.cast<DropdownMenuItem<T>?>().firstWhere(
-          (item) => item?.value == val,
-          orElse: () => null,
-        );
+      (item) => item?.value == val,
+      orElse: () => null,
+    );
     if (matchedItem != null && matchedItem.child is Text) {
       return (matchedItem.child as Text).data ?? '';
     }
@@ -217,7 +217,7 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
       RegExp(r'[đ]'),
       RegExp(r'[Đ]'),
       RegExp(r'[ỳýỵỷỹ]'),
-      RegExp(r'[ỲÝỴỶỸ]')
+      RegExp(r'[ỲÝỴỶỸ]'),
     ];
 
     var result = str;
@@ -258,7 +258,8 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
   }
 
   OverlayEntry _createOverlayEntry() {
-    final renderBox = _fieldKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox =
+        _fieldKey.currentContext?.findRenderObject() as RenderBox?;
     final size = renderBox?.size ?? Size.zero;
 
     return OverlayEntry(
@@ -310,11 +311,17 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
                                   horizontal: AppDimens.spaceSm,
                                   vertical: 12,
                                 ),
-                                color: isSelected ? AppColors.secondary50 : null,
+                                color: isSelected
+                                    ? AppColors.secondary50
+                                    : null,
                                 child: DefaultTextStyle(
                                   style: TextStyles.bodyLarge.copyWith(
-                                    color: isSelected ? AppColors.tertiary500 : AppColors.primary500,
-                                    fontWeight: isSelected ? FontWeight.bold : null,
+                                    color: isSelected
+                                        ? AppColors.tertiary500
+                                        : AppColors.primary500,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : null,
                                   ),
                                   child: item.child,
                                 ),
@@ -342,9 +349,7 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
               ? [
                   TextSpan(
                     text: '*',
-                    style: TextStyles.title.copyWith(
-                      color: AppColors.error500,
-                    ),
+                    style: TextStyles.title.copyWith(color: AppColors.error500),
                   ),
                 ]
               : null,
@@ -370,7 +375,9 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
           Container(
             height: 48,
             decoration: BoxDecoration(
-              color: widget.readOnly ? AppColors.secondary50 : AppColors.surface100,
+              color: widget.readOnly
+                  ? AppColors.secondary50
+                  : AppColors.surface100,
               borderRadius: BorderRadius.circular(AppDimens.boraMd),
               border: Border.all(color: AppColors.secondary100, width: 1.0),
               boxShadow: [BoxShadowStyles.subtle],
@@ -380,9 +387,7 @@ class _SearchableDropdownFieldState<T> extends State<_SearchableDropdownField<T>
               controller: _searchController,
               readOnly: widget.readOnly,
               onChanged: _filterItems,
-              style: TextStyles.bodyLarge.copyWith(
-                color: AppColors.primary500,
-              ),
+              style: TextStyles.bodyLarge.copyWith(color: AppColors.primary500),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(

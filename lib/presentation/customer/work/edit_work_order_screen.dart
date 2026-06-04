@@ -188,7 +188,6 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-
                           // 2. Change Address Section
                           _buildSectionHeader(
                             title: "Change Address",

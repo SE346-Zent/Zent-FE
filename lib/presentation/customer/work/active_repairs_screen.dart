@@ -18,7 +18,9 @@ class ActiveRepairsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<ActiveRepairsViewModel>()..fetchWorkOrders(workOrderId: workOrderId),
+      create: (_) =>
+          sl<ActiveRepairsViewModel>()
+            ..fetchWorkOrders(workOrderId: workOrderId),
       child: _ActiveRepairsView(workOrderId: workOrderId),
     );
   }
@@ -37,7 +39,9 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ActiveRepairsViewModel>().fetchWorkOrders(workOrderId: widget.workOrderId);
+      context.read<ActiveRepairsViewModel>().fetchWorkOrders(
+        workOrderId: widget.workOrderId,
+      );
     });
   }
 
@@ -95,7 +99,9 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                           for (final order in viewModel.activeWorkOrders) ...[
                             TrackingCard(
                               workOrder: order,
-                              currentStatusStep: viewModel.mapStatusToStep(order),
+                              currentStatusStep: viewModel.mapStatusToStep(
+                                order,
+                              ),
                             ),
                             const SizedBox(height: AppDimens.spaceLg),
                           ],
@@ -133,16 +139,21 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                         : RecentCompletedList(
                             recentCompleted: viewModel.recentCompleted,
                             onSelected: (order) {
-                              context.pushNamed(
-                                RouteNames.customerWorkOrderDetails,
-                                pathParameters: {
-                                  'workOrderId': order.id.replaceAll('#', ''),
-                                },
-                              ).then((_) {
-                                if (context.mounted) {
-                                  viewModel.fetchWorkOrders();
-                                }
-                              });
+                              context
+                                  .pushNamed(
+                                    RouteNames.customerWorkOrderDetails,
+                                    pathParameters: {
+                                      'workOrderId': order.id.replaceAll(
+                                        '#',
+                                        '',
+                                      ),
+                                    },
+                                  )
+                                  .then((_) {
+                                    if (context.mounted) {
+                                      viewModel.fetchWorkOrders();
+                                    }
+                                  });
                             },
                           ),
                   ),

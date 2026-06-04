@@ -91,8 +91,8 @@ class _CustomerNotificationsView extends StatelessWidget {
                       title: 'Appointment reminders',
                       subtitle: 'Follows the active work orders',
                       value: viewModel.appointmentReminders,
-                      onChanged: (val) => viewModel.toggleSetting(
-                          'appointmentReminders', val),
+                      onChanged: (val) =>
+                          viewModel.toggleSetting('appointmentReminders', val),
                     ),
                     _buildSwitchRow(
                       title: 'Invoice',

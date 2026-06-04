@@ -148,7 +148,12 @@ class EvidencePhotosSection extends StatelessWidget {
     );
   }
 
-  Widget _buildPhotoItem(BuildContext context, String path, int index, String phase) {
+  Widget _buildPhotoItem(
+    BuildContext context,
+    String path,
+    int index,
+    String phase,
+  ) {
     return Stack(
       children: [
         GestureDetector(

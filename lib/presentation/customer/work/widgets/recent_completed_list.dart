@@ -62,7 +62,9 @@ class RecentCompletedList extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                recentCompleted[i].title.isNotEmpty ? recentCompleted[i].title : 'No Title',
+                                recentCompleted[i].title.isNotEmpty
+                                    ? recentCompleted[i].title
+                                    : 'No Title',
                                 style: TextStyles.bodyLarge.copyWith(
                                   color: AppColors.secondary500,
                                 ),

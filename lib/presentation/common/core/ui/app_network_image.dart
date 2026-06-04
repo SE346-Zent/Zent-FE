@@ -60,10 +60,8 @@ class AppNetworkImage extends StatelessWidget {
     }
     return CachedNetworkImage(
       imageUrl: resolvedUrl,
-      imageBuilder: (context, imageProvider) => CircleAvatar(
-        radius: radius,
-        backgroundImage: imageProvider,
-      ),
+      imageBuilder: (context, imageProvider) =>
+          CircleAvatar(radius: radius, backgroundImage: imageProvider),
       placeholder: (context, _) => CircleAvatar(
         radius: radius,
         backgroundColor: AppColors.secondary100,
@@ -103,7 +101,8 @@ class AppNetworkImage extends StatelessWidget {
       return errorWidget ?? _buildError();
     }
 
-    final isNetwork = resolvedUrl.startsWith('http://') || resolvedUrl.startsWith('https://');
+    final isNetwork =
+        resolvedUrl.startsWith('http://') || resolvedUrl.startsWith('https://');
 
     if (!isNetwork) {
       Widget localImage = Image.asset(
@@ -111,7 +110,8 @@ class AppNetworkImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => errorWidget ?? _buildError(),
+        errorBuilder: (context, error, stackTrace) =>
+            errorWidget ?? _buildError(),
       );
       if (borderRadius != null) {
         localImage = ClipRRect(borderRadius: borderRadius!, child: localImage);
@@ -139,7 +139,8 @@ class AppNetworkImage extends StatelessWidget {
               ),
             );
       },
-      errorBuilder: (context, error, stackTrace) => errorWidget ?? _buildError(),
+      errorBuilder: (context, error, stackTrace) =>
+          errorWidget ?? _buildError(),
     );
 
     Widget resultImage = netImage;
@@ -168,9 +169,10 @@ class AppNetworkImage extends StatelessWidget {
       child: Icon(
         Icons.image_not_supported_outlined,
         color: AppColors.secondary300,
-        size: (width != null && height != null) ? (width! * 0.4).clamp(16, 48) : 24,
+        size: (width != null && height != null)
+            ? (width! * 0.4).clamp(16, 48)
+            : 24,
       ),
     );
   }
 }
-

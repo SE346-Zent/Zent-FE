@@ -46,7 +46,9 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
       if (workOrderId != null && workOrderId.isNotEmpty) {
         // If a specific workOrderId was requested, find it from the entire list first
         try {
-          activeWorkOrder = customerOrders.firstWhere((o) => o.id == workOrderId);
+          activeWorkOrder = customerOrders.firstWhere(
+            (o) => o.id == workOrderId,
+          );
           currentStatusStep = _mapStatusToStep(activeWorkOrder!);
         } catch (_) {
           activeWorkOrder = null;
@@ -86,12 +88,12 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
       final previousActive = activeWorkOrder!;
       activeWorkOrder = selected;
       currentStatusStep = _mapStatusToStep(selected);
-      
+
       recentCompleted.removeWhere((o) => o.id == selected.id);
       if (!recentCompleted.any((o) => o.id == previousActive.id)) {
         recentCompleted.add(previousActive);
       }
-      
+
       recentCompleted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
     notifyListeners();

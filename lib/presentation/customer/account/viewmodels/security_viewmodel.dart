@@ -98,7 +98,9 @@ class CustomerSecurityViewModel extends ChangeNotifier with SafeChangeNotifier {
       _recoveryStep = RecoveryEmailStep.done;
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Recovery email verified successfully!')),
+          const SnackBar(
+            content: Text('Recovery email verified successfully!'),
+          ),
         );
       }
     } on BusinessException catch (e) {

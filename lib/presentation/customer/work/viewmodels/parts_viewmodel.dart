@@ -11,6 +11,7 @@ class PartModel {
   final String commodity;
   final String status;
   final String? imageUrl;
+  final String modelCode;
 
   PartModel({
     required this.title,
@@ -18,6 +19,7 @@ class PartModel {
     required this.commodity,
     required this.status,
     this.imageUrl,
+    required this.modelCode,
   });
 }
 
@@ -46,12 +48,12 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
   String sortAlphabet = 'None';
   String filterStatus = 'None';
 
-  Future<void> init(String serialNumber) async {
+  Future<void> init(String serialNumber, {String modelCode = ''}) async {
     searchController.addListener(_onSearchChanged);
-    await fetchParts(serialNumber);
+    await fetchParts(serialNumber, modelCode: modelCode);
   }
 
-  Future<void> fetchParts(String serialNumber) async {
+  Future<void> fetchParts(String serialNumber, {String modelCode = ''}) async {
     isLoading = true;
     notifyListeners();
 
@@ -69,7 +71,9 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
 
         // Resolve SCM product ID by querying SCM database using the serial number first
         try {
-          final (scmProducts, _) = await getScmProductsUseCase.execute(query: serialNumber);
+          final (scmProducts, _) = await getScmProductsUseCase.execute(
+            query: serialNumber,
+          );
           final scmMatch = scmProducts.firstWhere(
             (p) => p.serialNumber == serialNumber,
           );
@@ -92,17 +96,29 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
             page: 1,
             limit: 1000,
           );
-          
+
           allParts = parts.map((part) {
             final catalog = catalogMap[part.partCatalogId];
             return PartModel(
-              title: catalog?.partNumber ?? part.serialNumber,
-              partNo: catalog?.mfgNumber ?? part.id,
-              commodity: catalog?.description ?? 'General',
-              status: part.partConditionId == 1 ? 'Available' : 'Unavailable',
+              title: catalog?.description ?? part.partTypeName ?? 'Part',
+              partNo: catalog?.partNumber ?? part.serialNumber,
+              commodity: part.partTypeName ?? 'General',
+              status:
+                  part.partConditionName ??
+                  (part.partConditionId == 1 ? 'Available' : 'Unavailable'),
               imageUrl: part.imageUrl,
+              modelCode: modelCode.isNotEmpty
+                  ? modelCode
+                  : (product?.model ?? 'NA'),
             );
           }).toList();
+          debugPrint('=== [DEBUG PARTS] Fetch Parts Successful ===');
+          for (var p in allParts) {
+            debugPrint(
+              'Part -> title: ${p.title}, partNo: ${p.partNo}, commodity: ${p.commodity}, status: ${p.status}',
+            );
+          }
+          debugPrint('============================================');
         } else {
           allParts = [];
         }

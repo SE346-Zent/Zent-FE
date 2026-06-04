@@ -91,8 +91,8 @@ class WorkOrderCard extends StatelessWidget {
                     order.statusId == 2
                         ? 'ASSIGNED'
                         : order.statusId == 3
-                            ? 'IN PROGRESS'
-                            : order.status.name.toUpperCase(),
+                        ? 'IN PROGRESS'
+                        : order.status.name.toUpperCase(),
                     style: TextStyles.label.copyWith(color: statusColor),
                   ),
                 ],

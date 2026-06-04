@@ -59,7 +59,8 @@ class _ProfileScreenContent extends StatelessWidget {
                 Avatar(
                   name: userName,
                   imageUrl: authViewModel.currentUser?.avatarUrl,
-                  onTap: () => context.read<ProfileViewModel>().updateAvatar(context),
+                  onTap: () =>
+                      context.read<ProfileViewModel>().updateAvatar(context),
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 // User Info

@@ -115,16 +115,23 @@ class _LoginScreenContent extends StatelessWidget {
                                   if (user.role == UserRoles.admin ||
                                       user.role == UserRoles.superAdmin ||
                                       user.role == UserRoles.technician) {
-                                    final permission = await Geolocator.checkPermission();
-                                    if (permission == LocationPermission.denied) {
+                                    final permission =
+                                        await Geolocator.checkPermission();
+                                    if (permission ==
+                                        LocationPermission.denied) {
                                       await Geolocator.requestPermission();
                                     }
-                                    final currentPermission = await Geolocator.checkPermission();
-                                    if (currentPermission == LocationPermission.denied ||
-                                        currentPermission == LocationPermission.deniedForever) {
+                                    final currentPermission =
+                                        await Geolocator.checkPermission();
+                                    if (currentPermission ==
+                                            LocationPermission.denied ||
+                                        currentPermission ==
+                                            LocationPermission.deniedForever) {
                                       await di.sl<LogoutUseCase>().execute();
                                       if (context.mounted) {
-                                        context.read<AuthViewModel>().clearUser();
+                                        context
+                                            .read<AuthViewModel>()
+                                            .clearUser();
                                         ZentErrorPopup.show(
                                           context,
                                           'Location permission is required for Admin and Technician roles.',

@@ -30,10 +30,12 @@ class TechPersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
         email = user.email;
         phoneNumber = user.phoneNumber;
         avatarUrl = user.avatarUrl;
-        
+
         final rawId = user.employeeId ?? user.id;
-        employeeId = rawId.length > 10 ? rawId.substring(0, 10).toUpperCase() : rawId.toUpperCase();
-        
+        employeeId = rawId.length > 10
+            ? rawId.substring(0, 10).toUpperCase()
+            : rawId.toUpperCase();
+
         notifyListeners();
       }
     } catch (e) {

@@ -345,7 +345,9 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
                       child: GestureDetector(
                         onTap: () => ImageViewerDialog.show(
                           context,
-                          viewModel.chatService.getAttachmentUrl(message.imageUrl!),
+                          viewModel.chatService.getAttachmentUrl(
+                            message.imageUrl!,
+                          ),
                         ),
                         child: MouseRegion(
                           cursor: SystemMouseCursors.click,

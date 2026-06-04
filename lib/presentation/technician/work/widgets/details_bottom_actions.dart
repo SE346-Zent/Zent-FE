@@ -18,8 +18,7 @@ class DetailsBottomActions extends StatelessWidget {
     final order = viewModel.workOrder;
     final status = order?.status;
     final statusId = order?.statusId;
-    final isPending = status == WorkOrderStatus.pending ||
-        (status == WorkOrderStatus.assigned && statusId == 2);
+    final isPending = statusId == 1 || statusId == 2;
     final isCompletedOrRejected =
         status == WorkOrderStatus.complete ||
         status == WorkOrderStatus.rejected ||

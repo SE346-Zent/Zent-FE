@@ -8,8 +8,6 @@ import 'widgets/customer_text_field.dart';
 import 'widgets/customer_dropdown_field.dart';
 import 'viewmodels/request_service_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
-import 'package:zent_fe/presentation/customer/work/viewmodels/products_viewmodel.dart';
-import 'package:zent_fe/domain/entities/product.dart';
 
 class RequestServiceReviewScreen extends StatefulWidget {
   const RequestServiceReviewScreen({super.key});
@@ -187,30 +185,14 @@ class _RequestServiceReviewScreenState
           // Product Card
           Builder(
             builder: (context) {
-              final productsVm = context.watch<ProductsViewModel>();
-              final selectedSn = viewModel.selectedSerialNumber;
-              final matchedProduct = selectedSn != null
-                  ? productsVm.products.cast<Product?>().firstWhere(
-                      (p) => p != null && p.serialNumber.trim().toLowerCase() == selectedSn.trim().toLowerCase(),
-                      orElse: () => null,
-                    )
-                  : null;
+              final String productName =
+                  viewModel.selectedProductName ?? 'Unknown Device';
+              final String productSn = viewModel.selectedSerialNumber ?? 'N/A';
+              final String productModel =
+                  viewModel.selectedProductModel ?? 'N/A';
 
-              final String productName = matchedProduct?.name ?? 'Unknown Device';
-              final String productSn = selectedSn ?? 'N/A';
-              final String productModel = matchedProduct?.model ?? 'N/A';
-              final String status = matchedProduct != null ? productsVm.getProductStatus(matchedProduct) : 'No Warranty';
-
-              Color statusTextColor = AppColors.secondary500;
-              String displayStatus = status;
-              if (status == 'Active') {
-                statusTextColor = AppColors.success500;
-                displayStatus = 'In warranty';
-              } else if (status == 'Expired') {
-                statusTextColor = AppColors.error500;
-              } else if (status == 'Expiring') {
-                statusTextColor = AppColors.warning500;
-              }
+              const Color statusTextColor = AppColors.success500;
+              const String displayStatus = 'In warranty';
 
               return Container(
                 decoration: BoxDecoration(
@@ -252,7 +234,8 @@ class _RequestServiceReviewScreenState
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'S/N',
@@ -272,7 +255,8 @@ class _RequestServiceReviewScreenState
                                   ),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Model (MTM)',
@@ -282,7 +266,9 @@ class _RequestServiceReviewScreenState
                                           ),
                                         ),
                                         Text(
-                                          productModel.isNotEmpty ? productModel : 'N/A',
+                                          productModel.isNotEmpty
+                                              ? productModel
+                                              : 'N/A',
                                           style: TextStyles.bodyMedium.copyWith(
                                             color: AppColors.primary500,
                                           ),
@@ -297,7 +283,8 @@ class _RequestServiceReviewScreenState
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Warranty Status',

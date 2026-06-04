@@ -137,7 +137,10 @@ class CustomerNotificationsViewModel extends ChangeNotifier
       await prefs.setBool('pref_direct_message_enabled', directMessage);
 
       if (context.mounted) {
-        ZentSuccessPopup.show(context, 'Notification settings saved successfully!');
+        ZentSuccessPopup.show(
+          context,
+          'Notification settings saved successfully!',
+        );
       }
     } catch (e) {
       debugPrint('Error saving notification preferences: $e');

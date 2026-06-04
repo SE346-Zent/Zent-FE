@@ -121,8 +121,9 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       if (apiResponse.isSuccessful && apiResponse.data != null) {
         return apiResponse.data!
             .map(
-              (e) =>
-                  NotificationPreferenceModel.fromJson(e as Map<String, dynamic>),
+              (e) => NotificationPreferenceModel.fromJson(
+                e as Map<String, dynamic>,
+              ),
             )
             .toList();
       } else {
@@ -134,7 +135,10 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   }
 
   @override
-  Future<void> updateNotificationPreference(int categoryId, bool osEnabled) async {
+  Future<void> updateNotificationPreference(
+    int categoryId,
+    bool osEnabled,
+  ) async {
     final uri = Uri.parse('$_baseURL/notifications/preferences');
     final headers = await _getHeaders();
     final body = json.encode({

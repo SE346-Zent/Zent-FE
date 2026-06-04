@@ -73,7 +73,8 @@ class WorkOrderModel extends WorkOrder {
   }
 
   factory WorkOrderModel.fromJson(Map<String, dynamic> json) {
-    final rawStatusVal = json['work_order_status_id'] ??
+    final rawStatusVal =
+        json['work_order_status_id'] ??
         json['status_id'] ??
         json['statusId'] ??
         json['status'];
@@ -83,14 +84,21 @@ class WorkOrderModel extends WorkOrder {
     } else if (rawStatusVal is String) {
       parsedStatusId = int.tryParse(rawStatusVal);
       if (parsedStatusId == null) {
-        final s = rawStatusVal.toLowerCase().replaceAll('_', '').replaceAll(' ', '');
+        final s = rawStatusVal
+            .toLowerCase()
+            .replaceAll('_', '')
+            .replaceAll(' ', '');
         if (s == 'pending' || s.contains('pending')) {
           parsedStatusId = 1;
         } else if (s == 'assigned' || s.contains('assigned')) {
           parsedStatusId = 2;
         } else if (s == 'inprogress' || s == 'inprog' || s.contains('prog')) {
           parsedStatusId = 3;
-        } else if (s == 'complete' || s == 'completed' || s == 'closed' || s.contains('complete') || s.contains('closed')) {
+        } else if (s == 'complete' ||
+            s == 'completed' ||
+            s == 'closed' ||
+            s.contains('complete') ||
+            s.contains('closed')) {
           parsedStatusId = 4;
         } else if (s == 'rejectinreview' || s.contains('rejectinreview')) {
           parsedStatusId = 5;
@@ -170,8 +178,7 @@ class WorkOrderModel extends WorkOrder {
               .toList() ??
           const [],
       productName:
-          json['productName'] as String? ??
-          json['product_name'] as String?,
+          json['productName'] as String? ?? json['product_name'] as String?,
       appointment: json['appointment'] != null
           ? DateTime.tryParse(json['appointment'] as String)
           : null,
@@ -185,7 +192,8 @@ class WorkOrderModel extends WorkOrder {
           json['phone_number'] as String? ??
           json['phone'] as String?,
       addressLine1: json['address'] as String?,
-      customerAvatarUrl: json['customerAvatarUrl'] as String? ??
+      customerAvatarUrl:
+          json['customerAvatarUrl'] as String? ??
           json['customer_avatar_url'] as String? ??
           json['customerAvatarName'] as String? ??
           json['customer_avatar_name'] as String? ??
@@ -199,11 +207,21 @@ class WorkOrderModel extends WorkOrder {
           json['opposite_image'] as String? ??
           json['oppositeImageUrl'] as String? ??
           json['opposite_image_url'] as String? ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatarUrl']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatar_url']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatarImageName']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatarName']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatar']?.toString() : null),
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarUrl']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatar_url']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarImageName']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarName']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatar']?.toString()
+              : null),
     );
   }
 
@@ -227,9 +245,10 @@ class WorkOrderModel extends WorkOrder {
         case 2:
           return WorkOrderStatus.assigned;
         case 3:
-          return WorkOrderStatus.assigned; // In progress -> assigned frontend state
+          return WorkOrderStatus
+              .assigned; // In progress -> assigned frontend state
         case 4:
-          return WorkOrderStatus.complete;  // Closed -> complete frontend state
+          return WorkOrderStatus.complete; // Closed -> complete frontend state
         case 5:
           return WorkOrderStatus.rejectInReview;
         case 6:

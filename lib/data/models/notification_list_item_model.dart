@@ -42,11 +42,19 @@ class NotificationListItemModel extends NotificationItem {
       isRead: json['isRead'] as bool? ?? false,
       createdAt: parseDateTime(json['createdAt'] as String),
       data: json['data'] as Map<String, dynamic>?,
-      senderAvatarName: json['senderAvatarName'] as String? ??
-          (json['data'] is Map ? (json['data'] as Map)['senderAvatarName']?.toString() : null) ??
-          (json['data'] is Map ? (json['data'] as Map)['avatarUrl']?.toString() : null),
-      senderName: json['senderName'] as String? ??
-          (json['data'] is Map ? (json['data'] as Map)['senderName']?.toString() : null),
+      senderAvatarName:
+          json['senderAvatarName'] as String? ??
+          (json['data'] is Map
+              ? (json['data'] as Map)['senderAvatarName']?.toString()
+              : null) ??
+          (json['data'] is Map
+              ? (json['data'] as Map)['avatarUrl']?.toString()
+              : null),
+      senderName:
+          json['senderName'] as String? ??
+          (json['data'] is Map
+              ? (json['data'] as Map)['senderName']?.toString()
+              : null),
     );
   }
 }

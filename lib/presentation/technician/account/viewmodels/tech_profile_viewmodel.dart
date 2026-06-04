@@ -88,7 +88,8 @@ class TechProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
           if (decoded != null) {
             final jpegBytes = img.encodeJpg(decoded, quality: 85);
             final tempDir = await getTemporaryDirectory();
-            final newPath = '${tempDir.path}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+            final newPath =
+                '${tempDir.path}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
             await File(newPath).writeAsBytes(jpegBytes);
             uploadPath = newPath;
           }

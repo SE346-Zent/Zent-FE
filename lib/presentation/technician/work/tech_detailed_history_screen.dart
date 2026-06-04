@@ -15,7 +15,8 @@ class TechDetailedHistoryScreen extends StatefulWidget {
   const TechDetailedHistoryScreen({super.key, required this.workOrderId});
 
   @override
-  State<TechDetailedHistoryScreen> createState() => _TechDetailedHistoryScreenState();
+  State<TechDetailedHistoryScreen> createState() =>
+      _TechDetailedHistoryScreenState();
 }
 
 class _TechDetailedHistoryScreenState extends State<TechDetailedHistoryScreen> {

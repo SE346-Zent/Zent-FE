@@ -92,7 +92,7 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
     if (role == UserRoles.admin ||
         role == UserRoles.superAdmin ||
         role == UserRoles.technician) {
-    // FirebaseMessaging permission request removed to prevent blocking redirects.
+      // FirebaseMessaging permission request removed to prevent blocking redirects.
     }
     final isPublic = _publicPrefixes.any(
       (p) => location == p || location.startsWith('$p/'),
@@ -695,8 +695,11 @@ final GoRouter appRouter = GoRouter(
                       builder: (context, state) {
                         final serialNumber =
                             state.pathParameters['serialNumber']!;
+                        final productId =
+                            state.uri.queryParameters['productId'] ?? '';
                         return MyDetailedProductScreen(
                           serialNumber: serialNumber,
+                          productId: productId,
                         );
                       },
                       routes: [
@@ -707,7 +710,12 @@ final GoRouter appRouter = GoRouter(
                           builder: (context, state) {
                             final serialNumber =
                                 state.pathParameters['serialNumber']!;
-                            return PartsScreen(serialNumber: serialNumber);
+                            final modelCode =
+                                state.uri.queryParameters['modelCode'] ?? '';
+                            return PartsScreen(
+                              serialNumber: serialNumber,
+                              modelCode: modelCode,
+                            );
                           },
                         ),
                       ],
@@ -725,7 +733,8 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.activeRepairs,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) {
-                    final workOrderId = state.uri.queryParameters['workOrderId'];
+                    final workOrderId =
+                        state.uri.queryParameters['workOrderId'];
                     return ActiveRepairsScreen(workOrderId: workOrderId);
                   },
                 ),

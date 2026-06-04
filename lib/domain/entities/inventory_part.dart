@@ -4,6 +4,8 @@ class InventoryPart {
   final String serialNumber;
   final String? productId;
   final int? partConditionId;
+  final String? partConditionName;
+  final String? partTypeName;
   final DateTime? manufacturedDate;
   final DateTime? installationDate;
   final DateTime? removalDate;
@@ -18,6 +20,8 @@ class InventoryPart {
     required this.serialNumber,
     this.productId,
     this.partConditionId,
+    this.partConditionName,
+    this.partTypeName,
     this.manufacturedDate,
     this.installationDate,
     this.removalDate,

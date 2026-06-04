@@ -50,7 +50,8 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
 
   void _onPasswordFieldsChanged() {
     final viewModel = context.read<CustomerSecurityViewModel>();
-    if (viewModel.changePasswordSuccess || viewModel.changePasswordError != null) {
+    if (viewModel.changePasswordSuccess ||
+        viewModel.changePasswordError != null) {
       viewModel.resetChangePasswordState();
     }
   }
@@ -82,119 +83,136 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
           showBackButton: true,
           showBottomDivider: true,
         ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // CHANGE PASSWORD
-              _buildSectionTitle(Icons.lock_outline, 'Change Password'),
-              _buildGroupWrapper(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CustomerTextField(
-                      controller: _currentPasswordCtrl,
-                      label: 'Current Password',
-                      hint: '••••••••',
-                      suffixIcon: Icons.visibility_off_outlined,
-                      obscureText: true,
-                      labelStyle: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.primary500,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimens.spaceMd),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // CHANGE PASSWORD
+                _buildSectionTitle(Icons.lock_outline, 'Change Password'),
+                _buildGroupWrapper(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      CustomerTextField(
+                        controller: _currentPasswordCtrl,
+                        label: 'Current Password',
+                        hint: '••••••••',
+                        suffixIcon: Icons.visibility_off_outlined,
+                        obscureText: true,
+                        labelStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.primary500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    CustomerTextField(
-                      controller: _newPasswordCtrl,
-                      label: 'New Password',
-                      hint: '••••••••',
-                      suffixIcon: Icons.visibility_off_outlined,
-                      obscureText: true,
-                      labelStyle: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.primary500,
+                      const SizedBox(height: AppDimens.spaceMd),
+                      CustomerTextField(
+                        controller: _newPasswordCtrl,
+                        label: 'New Password',
+                        hint: '••••••••',
+                        suffixIcon: Icons.visibility_off_outlined,
+                        obscureText: true,
+                        labelStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.primary500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    CustomerTextField(
-                      controller: _confirmPasswordCtrl,
-                      label: 'Confirm New Password',
-                      hint: '••••••••',
-                      suffixIcon: Icons.visibility_off_outlined,
-                      obscureText: true,
-                      labelStyle: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.primary500,
+                      const SizedBox(height: AppDimens.spaceMd),
+                      CustomerTextField(
+                        controller: _confirmPasswordCtrl,
+                        label: 'Confirm New Password',
+                        hint: '••••••••',
+                        suffixIcon: Icons.visibility_off_outlined,
+                        obscureText: true,
+                        labelStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.primary500,
+                        ),
                       ),
-                    ),
-                    if (viewModel.changePasswordError != null) ...[
-                      const SizedBox(height: AppDimens.spaceSm),
-                      Text(
-                        viewModel.changePasswordError!,
-                        style: TextStyles.label.copyWith(color: Colors.red),
-                      ),
-                    ] else if (viewModel.changePasswordSuccess) ...[
-                      const SizedBox(height: AppDimens.spaceSm),
-                      Text(
-                        'Password changed successfully!',
-                        style: TextStyles.label.copyWith(color: AppColors.tertiary500),
+                      if (viewModel.changePasswordError != null) ...[
+                        const SizedBox(height: AppDimens.spaceSm),
+                        Text(
+                          viewModel.changePasswordError!,
+                          style: TextStyles.label.copyWith(color: Colors.red),
+                        ),
+                      ] else if (viewModel.changePasswordSuccess) ...[
+                        const SizedBox(height: AppDimens.spaceSm),
+                        Text(
+                          'Password changed successfully!',
+                          style: TextStyles.label.copyWith(
+                            color: AppColors.tertiary500,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AppDimens.spaceMd),
+                      CustomerPrimaryButton(
+                        text: viewModel.isChangePasswordLoading
+                            ? 'Changing…'
+                            : 'Change Password',
+                        isLoading: viewModel.isChangePasswordLoading,
+                        onPressed: viewModel.isChangePasswordLoading
+                            ? null
+                            : () {
+                                final current = _currentPasswordCtrl.text;
+                                final newPass = _newPasswordCtrl.text;
+                                final confirm = _confirmPasswordCtrl.text;
+
+                                if (current.isEmpty ||
+                                    newPass.isEmpty ||
+                                    confirm.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please fill all password fields',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (newPass != confirm) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'New passwords do not match',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                viewModel
+                                    .changePassword(
+                                      currentPassword: current,
+                                      newPassword: newPass,
+                                    )
+                                    .then((_) {
+                                      if (viewModel.changePasswordSuccess) {
+                                        _currentPasswordCtrl.clear();
+                                        _newPasswordCtrl.clear();
+                                        _confirmPasswordCtrl.clear();
+                                      }
+                                    });
+                              },
                       ),
                     ],
-                    const SizedBox(height: AppDimens.spaceMd),
-                    CustomerPrimaryButton(
-                      text: viewModel.isChangePasswordLoading ? 'Changing…' : 'Change Password',
-                      isLoading: viewModel.isChangePasswordLoading,
-                      onPressed: viewModel.isChangePasswordLoading
-                          ? null
-                          : () {
-                              final current = _currentPasswordCtrl.text;
-                              final newPass = _newPasswordCtrl.text;
-                              final confirm = _confirmPasswordCtrl.text;
-                              
-                              if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Please fill all password fields')),
-                                );
-                                return;
-                              }
-                              if (newPass != confirm) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('New passwords do not match')),
-                                );
-                                return;
-                              }
-                              viewModel.changePassword(
-                                currentPassword: current,
-                                newPassword: newPass,
-                              ).then((_) {
-                                if (viewModel.changePasswordSuccess) {
-                                  _currentPasswordCtrl.clear();
-                                  _newPasswordCtrl.clear();
-                                  _confirmPasswordCtrl.clear();
-                                }
-                              });
-                            },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppDimens.spaceXl),
+                const SizedBox(height: AppDimens.spaceXl),
 
-              // RECOVERY EMAIL
-              _buildSectionTitle(Icons.mail_outline, 'Recovery Email'),
-              _buildRecoveryEmailSection(context, viewModel),
-              const SizedBox(height: AppDimens.spaceXl),
+                // RECOVERY EMAIL
+                _buildSectionTitle(Icons.mail_outline, 'Recovery Email'),
+                _buildRecoveryEmailSection(context, viewModel),
+                const SizedBox(height: AppDimens.spaceXl),
 
-              // LOGIN HISTORY
-              LoginHistorySection(
-                history: viewModel.loginHistory,
-                isLoading: viewModel.isLoadingHistory,
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-            ],
+                // LOGIN HISTORY
+                LoginHistorySection(
+                  history: viewModel.loginHistory,
+                  isLoading: viewModel.isLoadingHistory,
+                ),
+                const SizedBox(height: AppDimens.spaceLg),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   Widget _buildRecoveryEmailSection(
@@ -209,7 +227,9 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
             const SizedBox(width: AppDimens.spaceSm),
             Text(
               'Recovery email verified!',
-              style: TextStyles.bodyLarge.copyWith(color: AppColors.tertiary500),
+              style: TextStyles.bodyLarge.copyWith(
+                color: AppColors.tertiary500,
+              ),
             ),
             const Spacer(),
             TextButton(
@@ -261,14 +281,16 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
                 const SizedBox(width: AppDimens.spaceMd),
                 Expanded(
                   child: CustomerPrimaryButton(
-                    text: viewModel.isRecoveryLoading ? 'Verifying…' : 'Verify OTP',
+                    text: viewModel.isRecoveryLoading
+                        ? 'Verifying…'
+                        : 'Verify OTP',
                     isLoading: viewModel.isRecoveryLoading,
                     onPressed: viewModel.isRecoveryLoading
                         ? null
                         : () => viewModel.verifyRecoveryOtp(
-                              context: context,
-                              otpCode: _otpCtrl.text.trim(),
-                            ),
+                            context: context,
+                            otpCode: _otpCtrl.text.trim(),
+                          ),
                   ),
                 ),
               ],
@@ -312,15 +334,17 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
           ],
           const SizedBox(height: AppDimens.spaceMd),
           CustomerPrimaryButton(
-            text: viewModel.isRecoveryLoading ? 'Sending OTP…' : 'Set Recovery Email',
+            text: viewModel.isRecoveryLoading
+                ? 'Sending OTP…'
+                : 'Set Recovery Email',
             isLoading: viewModel.isRecoveryLoading,
             onPressed: viewModel.isRecoveryLoading
                 ? null
                 : () => viewModel.requestRecoveryEmailOtp(
-                      context: context,
-                      recoveryEmail: _recoveryEmailCtrl.text.trim(),
-                      password: _recoveryPasswordCtrl.text,
-                    ),
+                    context: context,
+                    recoveryEmail: _recoveryEmailCtrl.text.trim(),
+                    password: _recoveryPasswordCtrl.text,
+                  ),
           ),
         ],
       ),

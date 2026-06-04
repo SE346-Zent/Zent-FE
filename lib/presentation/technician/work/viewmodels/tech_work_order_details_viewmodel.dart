@@ -213,7 +213,10 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
       }
     } catch (e) {
       if (context.mounted) {
-        ZentErrorPopup.show(context, e.toString().replaceAll('Exception: ', ''));
+        ZentErrorPopup.show(
+          context,
+          e.toString().replaceAll('Exception: ', ''),
+        );
       }
     }
   }
@@ -243,6 +246,10 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
       // 3. Refresh work order details
       await _loadDetails();
+    } on BusinessException catch (e) {
+      if (context.mounted) {
+        ZentErrorPopup.show(context, e.message);
+      }
     } catch (e) {
       if (context.mounted) {
         ZentErrorPopup.show(
@@ -271,7 +278,9 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     }
 
     if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied. Please enable them in settings.');
+      throw Exception(
+        'Location permissions are permanently denied. Please enable them in settings.',
+      );
     }
 
     try {

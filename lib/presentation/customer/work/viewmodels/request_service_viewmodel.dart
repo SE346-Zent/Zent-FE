@@ -87,6 +87,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   RequestServiceViewModel(this.createWorkOrderUseCase);
 
   int _currentStep = 1;
+  String? _selectedProductWarrantyStatus;
   bool _isLoading = false;
 
   int get currentStep => _currentStep;
@@ -96,6 +97,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   // Selected device
   String? selectedProductId;
   String? selectedSerialNumber;
+  String? selectedProductName;
+  String? selectedProductModel;
 
   // Selected information for Step 2
   String? symptom;
@@ -113,7 +116,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   String? country = 'Vietnam';
   String? province;
   String? ward;
-  String? city; // We map 'city' to the API field, but in UI we label it Province/City. The backend requires 'province' or 'ward' (as HN/HCM). Wait, the deserialization error: "missing field `province`". Let's check: Backend needs `province` but our request class did not define a `province` parameter, it had `ward`! No, wait, look at the deserialization error: "Failed to deserialize the JSON body into the target type: missing field `province` at line 1 column 329". This means the request body sent to the backend MUST contain a field named `province`!
+  String?
+  city; // We map 'city' to the API field, but in UI we label it Province/City. The backend requires 'province' or 'ward' (as HN/HCM). Wait, the deserialization error: "missing field `province`". Let's check: Backend needs `province` but our request class did not define a `province` parameter, it had `ward`! No, wait, look at the deserialization error: "Failed to deserialize the JSON body into the target type: missing field `province` at line 1 column 329". This means the request body sent to the backend MUST contain a field named `province`!
   // Let's check CreateWorkOrderRequest toJson() or property definition. It has 'ward' but not 'province'! Ah! CreateWorkOrderRequest had:
   // final String country;
   // final String ward;
@@ -156,7 +160,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       for (var item in data) {
         final provName = item['name'] as String;
         // Limit to only 'Thành phố Hồ Chí Minh' and 'Thành phố Hà Nội'
-        if (provName == 'Thành phố Hồ Chí Minh' || provName == 'Thành phố Hà Nội') {
+        if (provName == 'Thành phố Hồ Chí Minh' ||
+            provName == 'Thành phố Hà Nội') {
           provinces.add(provName);
           final wardsList = (item['cities'] as List)
               .map((e) => e.toString())
@@ -213,9 +218,19 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     ),
   ];
 
-  void selectDevice(String id, String sn) {
+  void selectDevice(
+    String id,
+    String sn, {
+    String? warrantyStatus,
+    String? name,
+    String? model,
+  }) {
     selectedProductId = id;
     selectedSerialNumber = sn;
+    _selectedProductWarrantyStatus = warrantyStatus;
+    selectedProductName = name;
+    selectedProductModel = model;
+    errorMessage = null; // Clear previous error when new device selected
     notifyListeners();
   }
 
@@ -393,6 +408,16 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   Future<void> nextStep() async {
     if (currentStep < 5) {
       if (_currentStep == 1 && selectedProductId != null) {
+        // Block proceeding if product has no warranty or is expired
+        if (_selectedProductWarrantyStatus == 'No Warranty' ||
+            _selectedProductWarrantyStatus == 'Expired') {
+          throw BusinessException(
+            _selectedProductWarrantyStatus == 'No Warranty'
+                ? 'This product has no warranty coverage. Please register a product with valid warranty to request service.'
+                : 'This product\'s warranty has expired. Please renew the warranty or register a different product to request service.',
+          );
+        }
+
         await _loadDraftForProduct(selectedProductId!);
         if (_currentStep > 1) {
           await _saveDraft();
@@ -400,6 +425,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
           return;
         }
       }
+      errorMessage = null;
       _currentStep++;
       await _saveDraft();
       notifyListeners();
@@ -464,7 +490,9 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         finalProv = 'HN';
       }
 
-      final resolvedReferenceTicketId = await _resolveReferenceTicketId(ticketRef);
+      final resolvedReferenceTicketId = await _resolveReferenceTicketId(
+        ticketRef,
+      );
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
@@ -525,7 +553,9 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       final getManyUseCase = sl<GetManyWorkOrdersUseCase>();
       final orders = await getManyUseCase.execute(limit: 1000);
       final match = orders.cast<WorkOrder?>().firstWhere(
-        (o) => o != null && o.workOrderNum.trim().toLowerCase() == trimmed.toLowerCase(),
+        (o) =>
+            o != null &&
+            o.workOrderNum.trim().toLowerCase() == trimmed.toLowerCase(),
         orElse: () => null,
       );
       if (match != null) {
@@ -572,7 +602,12 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
     selectedProductId = null;
     selectedSerialNumber = null;
+    selectedProductName = null;
+    selectedProductModel = null;
     selectedServiceId = null;
+
+    _selectedProductWarrantyStatus = null;
+    errorMessage = null;
 
     notifyListeners();
   }
@@ -601,6 +636,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       final draftMap = {
         'selectedProductId': selectedProductId,
         'selectedSerialNumber': selectedSerialNumber,
+        'selectedProductName': selectedProductName,
+        'selectedProductModel': selectedProductModel,
         'symptom': symptom,
         'ticketRef': ticketRef,
         'description': description,
@@ -638,6 +675,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         final draftMap = json.decode(jsonString) as Map<String, dynamic>;
         selectedProductId = draftMap['selectedProductId'] as String?;
         selectedSerialNumber = draftMap['selectedSerialNumber'] as String?;
+        selectedProductName = draftMap['selectedProductName'] as String?;
+        selectedProductModel = draftMap['selectedProductModel'] as String?;
         symptom = draftMap['symptom'] as String?;
         ticketRef = draftMap['ticketRef'] as String?;
         description = draftMap['description'] as String?;

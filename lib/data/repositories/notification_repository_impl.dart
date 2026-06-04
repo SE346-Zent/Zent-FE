@@ -32,7 +32,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
-  Future<void> updateNotificationPreference(int categoryId, bool osEnabled) async {
+  Future<void> updateNotificationPreference(
+    int categoryId,
+    bool osEnabled,
+  ) async {
     await remoteDataSource.updateNotificationPreference(categoryId, osEnabled);
   }
 }

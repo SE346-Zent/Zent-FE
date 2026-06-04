@@ -603,16 +603,25 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                 itemCount: viewModel.photoUrls.length,
                                 separatorBuilder: (_, _) =>
                                     const SizedBox(width: AppDimens.spaceSm),
-                                 itemBuilder: (context, index) {
+                                itemBuilder: (context, index) {
                                   final url = viewModel.photoUrls[index];
                                   return AppNetworkImage(
                                     url: url.startsWith('http') ? url : null,
                                     width: 80,
                                     height: 80,
                                     fit: BoxFit.cover,
-                                    borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                                    errorWidget: !url.startsWith('http') && url.isNotEmpty
-                                        ? Image.asset(url, width: 80, height: 80, fit: BoxFit.cover)
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimens.boraSm,
+                                    ),
+                                    errorWidget:
+                                        !url.startsWith('http') &&
+                                            url.isNotEmpty
+                                        ? Image.asset(
+                                            url,
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                          )
                                         : null,
                                   );
                                 },

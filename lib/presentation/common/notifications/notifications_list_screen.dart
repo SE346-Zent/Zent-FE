@@ -72,7 +72,10 @@ class _NotificationsListScreenContentState
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => context.pop(),
+                onPressed: () {
+                  context.read<NotificationsViewModel>().fetchUnreadCount();
+                  context.pop();
+                },
               ),
               title: Text(
                 'Notifications',

@@ -43,18 +43,23 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   try {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     await dotenv.load(fileName: ".env");
     await di.init();
-    
+
     // Request location permission asynchronously on startup
-    Geolocator.checkPermission().then((permission) {
-      if (permission == LocationPermission.denied) {
-        Geolocator.requestPermission();
-      }
-    }).catchError((e) {
-      developer.log("Error requesting location permission on startup: $e");
-    });
+    Geolocator.checkPermission()
+        .then((permission) {
+          if (permission == LocationPermission.denied) {
+            Geolocator.requestPermission();
+          }
+        })
+        .catchError((e) {
+          developer.log("Error requesting location permission on startup: $e");
+        });
   } catch (e) {
     developer.log("Local initialization failed: $e");
   }
@@ -165,7 +170,9 @@ void _setupForegroundMessaging() {
       // Use jsonEncode so we can properly parse it in onDidReceiveNotificationResponse
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
-        notification.title?.isNotEmpty == true ? notification.title : 'Unknown Product',
+        notification.title?.isNotEmpty == true
+            ? notification.title
+            : 'Unknown Product',
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(

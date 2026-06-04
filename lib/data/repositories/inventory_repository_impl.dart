@@ -351,7 +351,8 @@ class InventoryRepositoryImpl implements InventoryRepository {
     } else if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
     } else {
-      directory = await getDownloadsDirectory() ?? await getTemporaryDirectory();
+      directory =
+          await getDownloadsDirectory() ?? await getTemporaryDirectory();
     }
     final path = directory?.path ?? (await getTemporaryDirectory()).path;
     final timestamp = DateTime.now().millisecondsSinceEpoch;

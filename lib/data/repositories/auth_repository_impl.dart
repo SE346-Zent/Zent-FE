@@ -198,7 +198,9 @@ class AuthRepositoryImpl implements AuthRepository {
           try {
             latestUser = await getMe();
           } catch (e) {
-            debugPrint("Failed to fetch fresh user profile on restoreSession: $e");
+            debugPrint(
+              "Failed to fetch fresh user profile on restoreSession: $e",
+            );
             latestUser = response.user;
           }
 
@@ -210,7 +212,9 @@ class AuthRepositoryImpl implements AuthRepository {
             debugPrint("Could not set user in AuthViewModel: $e");
           }
         } catch (refreshError) {
-          debugPrint("Restore session: Refresh token attempt failed: $refreshError");
+          debugPrint(
+            "Restore session: Refresh token attempt failed: $refreshError",
+          );
           final errStr = refreshError.toString().toLowerCase();
 
           // Only force a logout if it is a definitive authentication failure (e.g. invalid credentials, 400, 401).
@@ -252,8 +256,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false}) async {
-    await authRemoteService.forgotPassword(email, useRecoveryEmail: useRecoveryEmail);
+  Future<void> forgotPassword(
+    String email, {
+    bool useRecoveryEmail = false,
+  }) async {
+    await authRemoteService.forgotPassword(
+      email,
+      useRecoveryEmail: useRecoveryEmail,
+    );
   }
 
   @override

@@ -10,6 +10,7 @@ import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 class ProductItemCard extends StatelessWidget {
   final String name;
   final String serialNumber;
+  final String productId;
   final String model;
   final String warrantyDate;
   final String status;
@@ -19,6 +20,7 @@ class ProductItemCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.serialNumber,
+    required this.productId,
     required this.model,
     required this.warrantyDate,
     required this.status,
@@ -38,6 +40,7 @@ class ProductItemCard extends StatelessWidget {
         context.goNamed(
           RouteNames.customerDetailedProduct,
           pathParameters: {'serialNumber': serialNumber},
+          queryParameters: {'productId': productId},
         );
       },
       child: Container(

@@ -13,7 +13,8 @@ class ImageViewerDialog extends StatefulWidget {
       barrierColor: Colors.black.withValues(alpha: 0.9),
       barrierDismissible: true,
       barrierLabel: 'Close Image',
-      pageBuilder: (context, anim1, anim2) => ImageViewerDialog(imagePath: imagePath),
+      pageBuilder: (context, anim1, anim2) =>
+          ImageViewerDialog(imagePath: imagePath),
       transitionDuration: const Duration(milliseconds: 200),
       transitionBuilder: (context, anim1, anim2, child) {
         return FadeTransition(
@@ -32,7 +33,8 @@ class ImageViewerDialog extends StatefulWidget {
 }
 
 class _ImageViewerDialogState extends State<ImageViewerDialog> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   TapDownDetails? _doubleTapDetails;
 
   void _handleDoubleTap() {
@@ -54,7 +56,9 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isNetwork = widget.imagePath.startsWith('http://') || widget.imagePath.startsWith('https://');
+    final isNetwork =
+        widget.imagePath.startsWith('http://') ||
+        widget.imagePath.startsWith('https://');
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -70,9 +74,7 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
             },
             onDoubleTapDown: (details) => _doubleTapDetails = details,
             onDoubleTap: _handleDoubleTap,
-            child: Container(
-              color: Colors.transparent,
-            ),
+            child: Container(color: Colors.transparent),
           ),
           // Zoomable Interactive Viewer
           Center(
@@ -90,16 +92,26 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
                         placeholder: (context, _) => const Center(
                           child: CircularProgressIndicator(color: Colors.white),
                         ),
-                        errorWidget: (context, urlString, error) => const Center(
-                          child: Icon(Icons.broken_image, color: Colors.white, size: 48),
-                        ),
+                        errorWidget: (context, urlString, error) =>
+                            const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                color: Colors.white,
+                                size: 48,
+                              ),
+                            ),
                       )
                     : Image.file(
                         File(widget.imagePath),
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Icon(Icons.broken_image, color: Colors.white, size: 48),
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                color: Colors.white,
+                                size: 48,
+                              ),
+                            ),
                       ),
               ),
             ),

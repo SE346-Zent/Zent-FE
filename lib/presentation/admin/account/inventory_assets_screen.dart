@@ -64,39 +64,44 @@ class _InventoryAssetsScreenContent extends StatelessWidget {
                             onSelected: (value) {
                               viewModel.updateTypeFilter(value);
                             },
-                            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                              const PopupMenuItem<String>(
-                                value: 'ALL',
-                                child: Text('All Types'),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'PRODUCT',
-                                child: Text('Products only'),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'PART',
-                                child: Text('Parts only'),
-                              ),
-                            ],
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<String>>[
+                                  const PopupMenuItem<String>(
+                                    value: 'ALL',
+                                    child: Text('All Types'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'PRODUCT',
+                                    child: Text('Products only'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'PART',
+                                    child: Text('Parts only'),
+                                  ),
+                                ],
                             child: _buildActionButton(
                               Icons.filter_list,
                               'Type: ${viewModel.typeFilter}',
                             ),
                           ),
                           const SizedBox(width: AppDimens.spaceMd),
-                           GestureDetector(
+                          GestureDetector(
                             onTap: viewModel.isExporting
                                 ? null
                                 : () async {
-                                    final filePath = await viewModel.exportAssets();
+                                    final filePath = await viewModel
+                                        .exportAssets();
                                     if (filePath != null) {
                                       // Extract the directory part of the saved path
-                                      final lastSeparator = filePath.lastIndexOf('/');
+                                      final lastSeparator = filePath
+                                          .lastIndexOf('/');
                                       final dirPath = lastSeparator != -1
                                           ? filePath.substring(0, lastSeparator)
                                           : filePath;
                                       // Open the folder in the system file manager
-                                      await FileManagerService.openFolder(dirPath);
+                                      await FileManagerService.openFolder(
+                                        dirPath,
+                                      );
                                     } else {
                                       if (context.mounted) {
                                         ZentErrorPopup.show(
@@ -107,7 +112,9 @@ class _InventoryAssetsScreenContent extends StatelessWidget {
                                     }
                                   },
                             child: _buildActionButton(
-                              viewModel.isExporting ? Icons.hourglass_empty : Icons.ios_share,
+                              viewModel.isExporting
+                                  ? Icons.hourglass_empty
+                                  : Icons.ios_share,
                               viewModel.isExporting ? 'Exporting…' : 'Export',
                             ),
                           ),

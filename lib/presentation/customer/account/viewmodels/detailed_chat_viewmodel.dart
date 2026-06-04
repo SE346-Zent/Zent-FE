@@ -110,6 +110,7 @@ class ChatMessage {
     }
   }
 }
+
 class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ChatService chatService;
   final GetCurrentUserUseCase getCurrentUserUseCase;

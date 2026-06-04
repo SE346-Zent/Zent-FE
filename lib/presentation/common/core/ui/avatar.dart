@@ -50,52 +50,53 @@ class Avatar extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Stack(
-      children: [
-        Container(
-          width: 100.0,
-          height: 100.0,
-          decoration: BoxDecoration(
-            color: !hasImage ? _backgroundColor : AppColors.surface100,
-            shape: BoxShape.circle,
-            image: hasImage
-                ? DecorationImage(
-                    image: CachedNetworkImageProvider(resolvedUrl),
-                    fit: BoxFit.cover,
+        children: [
+          Container(
+            width: 100.0,
+            height: 100.0,
+            decoration: BoxDecoration(
+              color: !hasImage ? _backgroundColor : AppColors.surface100,
+              shape: BoxShape.circle,
+              image: hasImage
+                  ? DecorationImage(
+                      image: CachedNetworkImageProvider(resolvedUrl),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+              border: Border.all(color: AppColors.surface100, width: 3.0),
+              boxShadow: [BoxShadowStyles.raised],
+            ),
+            alignment: Alignment.center,
+            child: !hasImage
+                ? Text(
+                    _initials,
+                    style: TextStyles.display.copyWith(
+                      color: AppColors.surface100,
+                    ),
                   )
                 : null,
-            border: Border.all(color: AppColors.surface100, width: 3.0),
-            boxShadow: [BoxShadowStyles.raised],
           ),
-          alignment: Alignment.center,
-          child: !hasImage
-              ? Text(
-                  _initials,
-                  style: TextStyles.display.copyWith(
-                    color: AppColors.surface100,
-                  ),
-                )
-              : null,
-        ),
-        if (showEditIcon)
-          Positioned(
-            bottom: 4.0,
-            right: 4.0,
-            child: Container(
-              width: 20.0,
-              height: 20.0,
-              decoration: BoxDecoration(
-                color: AppColors.tertiary500,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.surface100, width: 2.0),
-              ),
-              child: const Icon(
-                Icons.edit_outlined,
-                size: 10.0,
-                color: AppColors.surface100,
+          if (showEditIcon)
+            Positioned(
+              bottom: 4.0,
+              right: 4.0,
+              child: Container(
+                width: 20.0,
+                height: 20.0,
+                decoration: BoxDecoration(
+                  color: AppColors.tertiary500,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.surface100, width: 2.0),
+                ),
+                child: const Icon(
+                  Icons.edit_outlined,
+                  size: 10.0,
+                  color: AppColors.surface100,
+                ),
               ),
             ),
-          ),
-      ],
-    ),);
+        ],
+      ),
+    );
   }
 }

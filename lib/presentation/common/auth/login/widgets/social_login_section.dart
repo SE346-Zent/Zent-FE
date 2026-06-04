@@ -51,9 +51,11 @@ class SocialLoginSection extends StatelessWidget {
                       if (permission == LocationPermission.denied) {
                         await Geolocator.requestPermission();
                       }
-                      final currentPermission = await Geolocator.checkPermission();
+                      final currentPermission =
+                          await Geolocator.checkPermission();
                       if (currentPermission == LocationPermission.denied ||
-                          currentPermission == LocationPermission.deniedForever) {
+                          currentPermission ==
+                              LocationPermission.deniedForever) {
                         await sl<LogoutUseCase>().execute();
                         if (context.mounted) {
                           context.read<AuthViewModel>().clearUser();

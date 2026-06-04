@@ -62,7 +62,8 @@ class _NotificationTileState extends State<NotificationTile> {
             Padding(
               padding: EdgeInsets.only(top: _isExpanded ? 4.0 : 0),
               child: UserAvatar(
-                avatarUrl: widget.notification.senderAvatarName ??
+                avatarUrl:
+                    widget.notification.senderAvatarName ??
                     widget.notification.data?['avatarUrl'] as String?,
                 name:
                     widget.notification.senderName ??

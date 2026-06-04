@@ -98,7 +98,7 @@ class _SuccessToastWidgetState extends State<_SuccessToastWidget>
                     color: Colors.black.withAlpha(20),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
               child: Row(

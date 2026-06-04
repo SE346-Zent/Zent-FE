@@ -34,7 +34,9 @@ class AdminPersonalInfoViewModel extends ChangeNotifier
         phoneNumber = user.phoneNumber;
         avatarUrl = user.avatarUrl;
         final rawId = user.employeeId ?? user.id;
-        adminId = rawId.length > 10 ? rawId.substring(0, 10).toUpperCase() : rawId.toUpperCase();
+        adminId = rawId.length > 10
+            ? rawId.substring(0, 10).toUpperCase()
+            : rawId.toUpperCase();
         notifyListeners();
       }
     } catch (e) {

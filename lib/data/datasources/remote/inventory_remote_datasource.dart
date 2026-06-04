@@ -122,9 +122,7 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
   @override
   Future<List<int>> exportInventoryAssets({String? query}) async {
     final uri = Uri.parse('$_scmBaseUrl/inventory/assets/export').replace(
-      queryParameters: {
-        if (query != null && query.isNotEmpty) 'q': query,
-      },
+      queryParameters: {if (query != null && query.isNotEmpty) 'q': query},
     );
     final headers = await _getScmHeaders();
     final response = await client.get(uri, headers: headers).timeout(_timeOut);

@@ -74,12 +74,8 @@ abstract class AuthRemoteDatasource {
     required String userId,
     required int statusId,
   });
-  Future<void> closeAccount({
-    required String accessToken,
-  });
-  Future<Map<String, dynamic>> getMe({
-    required String accessToken,
-  });
+  Future<void> closeAccount({required String accessToken});
+  Future<Map<String, dynamic>> getMe({required String accessToken});
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -119,7 +115,8 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   Future<String?> _getLocationString() async {
     try {
       final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
         final position = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.low,
@@ -129,11 +126,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
         final lat = position.latitude;
         final lon = position.longitude;
         try {
-          final url = Uri.parse('https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lon');
-          final response = await client.get(
-            url,
-            headers: {'User-Agent': 'Zent-FE-App'},
-          ).timeout(const Duration(seconds: 4));
+          final url = Uri.parse(
+            'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lon',
+          );
+          final response = await client
+              .get(url, headers: {'User-Agent': 'Zent-FE-App'})
+              .timeout(const Duration(seconds: 4));
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
             final displayName = data['display_name'] as String?;
@@ -478,7 +476,10 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false}) async {
+  Future<void> forgotPassword(
+    String email, {
+    bool useRecoveryEmail = false,
+  }) async {
     final url = Uri.parse('$_baseURL/auth/forgot-password');
     try {
       final Map<String, dynamic> body = {'email': email};
@@ -854,9 +855,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
               'Accept': 'application/json',
               'Authorization': 'Bearer $accessToken',
             },
-            body: jsonEncode({
-              'accountStatusId': statusId,
-            }),
+            body: jsonEncode({'accountStatusId': statusId}),
           )
           .timeout(_timeOut);
 
@@ -870,9 +869,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<void> closeAccount({
-    required String accessToken,
-  }) async {
+  Future<void> closeAccount({required String accessToken}) async {
     final url = Uri.parse('$_baseURL/users/me/close');
     try {
       final response = await client
@@ -896,9 +893,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<Map<String, dynamic>> getMe({
-    required String accessToken,
-  }) async {
+  Future<Map<String, dynamic>> getMe({required String accessToken}) async {
     final url = Uri.parse('$_baseURL/users/me');
     try {
       final response = await client

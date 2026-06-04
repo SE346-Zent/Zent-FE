@@ -80,7 +80,9 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
               child: Center(
                 child: _AnimatedFAB(
                   onTap: () {
-                    context.pushNamed(RouteNames.adminOperationalQueue);
+                    if (!isQueueScreen) {
+                      context.pushNamed(RouteNames.adminOperationalQueue);
+                    }
                   },
                 ),
               ),

@@ -248,6 +248,7 @@ class _RequestServiceContactScreenState
               }
             },
             isRequired: true,
+            isSearchable: true,
           ),
           const SizedBox(height: AppDimens.spaceMd),
 

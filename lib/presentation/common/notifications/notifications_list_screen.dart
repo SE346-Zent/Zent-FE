@@ -72,7 +72,10 @@ class _NotificationsListScreenContentState
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => context.pop(),
+                onPressed: () {
+                  context.read<NotificationsViewModel>().fetchUnreadCount();
+                  context.pop();
+                },
               ),
               title: Text(
                 'Notifications',
@@ -234,7 +237,7 @@ class _NotificationsListScreenContentState
                     final category = item.categoryName.toLowerCase();
                     final role = context.read<AuthViewModel>().role;
 
-                    if (role == UserRoles.admin) {
+                    if (role == UserRoles.admin || role == UserRoles.superAdmin) {
                       if (category.contains('reject')) {
                         context.pushNamed(
                           RouteNames.adminRejectionDetail,

@@ -15,6 +15,7 @@ import 'viewmodels/technician_home_viewmodel.dart';
 import 'widgets/tech_home_header.dart';
 import 'widgets/tech_stats_row.dart';
 import 'widgets/schedule_item_card.dart';
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 
 class TechnicianHomeScreen extends StatelessWidget {
   const TechnicianHomeScreen({super.key});
@@ -48,6 +49,8 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
         NotificationNavigator.processPendingNotification(context, role);
       });
     }
+    // Refresh notifications unread count on entry
+    context.read<NotificationsViewModel>().fetchUnreadCount();
   }
 
   @override

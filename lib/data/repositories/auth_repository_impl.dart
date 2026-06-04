@@ -437,4 +437,17 @@ class AuthRepositoryImpl implements AuthRepository {
     final userMap = await authRemoteService.getMe(accessToken: accessToken);
     return UserModel.fromJson(userMap);
   }
+
+  @override
+  Future<User> getUserById(String userId) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    final userMap = await authRemoteService.getUserById(
+      accessToken: accessToken,
+      userId: userId,
+    );
+    return UserModel.fromJson(userMap);
+  }
 }

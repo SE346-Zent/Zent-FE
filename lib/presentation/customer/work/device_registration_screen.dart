@@ -229,6 +229,7 @@ class _DeviceRegistrationView extends StatelessWidget {
               .toList(),
           onChanged: viewModel.onCityChanged,
           isRequired: true,
+          isSearchable: true,
         ),
         const SizedBox(height: AppDimens.spaceMd),
         CustomerTextField(

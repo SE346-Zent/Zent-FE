@@ -10,10 +10,17 @@ import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import '../account/widgets/customer_app_bar.dart';
 import 'viewmodels/detailed_product_viewmodel.dart';
+import 'package:zent_fe/domain/entities/product_detail.dart';
+import 'package:intl/intl.dart';
 
 class MyDetailedProductScreen extends StatefulWidget {
   final String serialNumber;
-  const MyDetailedProductScreen({super.key, required this.serialNumber});
+  final String productId;
+  const MyDetailedProductScreen({
+    super.key,
+    required this.serialNumber,
+    required this.productId,
+  });
 
   @override
   State<MyDetailedProductScreen> createState() =>
@@ -27,7 +34,7 @@ class _MyDetailedProductScreenState extends State<MyDetailedProductScreen> {
   void initState() {
     super.initState();
     _viewModel = sl<DetailedProductViewModel>();
-    _viewModel.init(widget.serialNumber);
+    _viewModel.init(widget.productId);
   }
 
   @override
@@ -45,16 +52,19 @@ class _DetailedProductView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<DetailedProductViewModel>();
+    final detail = viewModel.productDetail;
 
     return Scaffold(
       backgroundColor: AppColors.surface100,
       appBar: CustomerAppBar(
-        title: viewModel.product?.name ?? 'Detail',
+        title: detail?.title ?? 'Detail',
         showBackButton: true,
         showBottomDivider: true,
       ),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
+          : detail == null
+          ? const Center(child: Text('Product not found'))
           : SingleChildScrollView(
               padding: const EdgeInsets.only(
                 left: AppDimens.spaceMd,
@@ -92,11 +102,11 @@ class _DetailedProductView extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Product Info
+                              // Product Name
                               Container(
                                 margin: const EdgeInsets.only(right: 16.0),
                                 child: Text(
-                                  viewModel.product?.name ?? 'Unknown Product',
+                                  detail.title,
                                   style: TextStyles.headline.copyWith(
                                     color: Colors.black,
                                     fontSize: 24,
@@ -114,7 +124,7 @@ class _DetailedProductView extends StatelessWidget {
                                   Expanded(
                                     flex: 3,
                                     child: Text(
-                                      'S/N: ${viewModel.product?.serialNumber ?? viewModel.currentSerialNumber ?? 'NA'}',
+                                      'S/N: ${detail.serialNumber}',
                                       style: TextStyles.bodyLarge.copyWith(
                                         color: AppColors.secondary500,
                                       ),
@@ -124,7 +134,7 @@ class _DetailedProductView extends StatelessWidget {
                                   Expanded(
                                     flex: 2,
                                     child: Text(
-                                      'MTM: ${viewModel.product?.model ?? 'NA'}',
+                                      'MTM: ${detail.modelCode}',
                                       textAlign: TextAlign.right,
                                       style: TextStyles.bodyLarge.copyWith(
                                         color: AppColors.secondary500,
@@ -167,15 +177,10 @@ class _DetailedProductView extends StatelessWidget {
                               ),
                               const SizedBox(height: AppDimens.spaceMd),
 
-                              // Warranty Status & Support Status Calculation
+                              // Warranty Status & Support Status
                               Builder(
                                 builder: (context) {
-                                  final endDate =
-                                      viewModel
-                                          .productDetail
-                                          ?.warranty
-                                          ?.endDate ??
-                                      viewModel.product?.warrantyUntil;
+                                  final endDate = detail.warranty?.endDate;
                                   final isInWarranty =
                                       endDate != null &&
                                       endDate.isAfter(DateTime.now());
@@ -259,16 +264,8 @@ class _DetailedProductView extends StatelessWidget {
                               LayoutBuilder(
                                 builder: (context, constraints) {
                                   final width = constraints.maxWidth;
-                                  DateTime? startDate = viewModel
-                                      .productDetail
-                                      ?.warranty
-                                      ?.startDate;
-                                  DateTime? endDate =
-                                      viewModel
-                                          .productDetail
-                                          ?.warranty
-                                          ?.endDate ??
-                                      viewModel.product?.warrantyUntil;
+                                  final startDate = detail.warranty?.startDate;
+                                  final endDate = detail.warranty?.endDate;
 
                                   double progress = 0.0;
                                   double elapsedProportion = 0.0;
@@ -299,7 +296,8 @@ class _DetailedProductView extends StatelessWidget {
                                     final remainingDays = endDate
                                         .difference(DateTime.now())
                                         .inDays;
-                                    final totalDays = 365 * 3; // 3 years mock
+                                    const totalDays =
+                                        365 * 3; // 3-year fallback
                                     progress = (remainingDays / totalDays)
                                         .clamp(0.0, 1.0);
                                     elapsedProportion = 1.0 - progress;
@@ -314,9 +312,7 @@ class _DetailedProductView extends StatelessWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          // Spacing for Today label
                                           const SizedBox(height: 20),
-                                          // Bar
                                           Container(
                                             height: 12,
                                             decoration: BoxDecoration(
@@ -349,7 +345,6 @@ class _DetailedProductView extends StatelessWidget {
                                             ),
                                           ),
                                           const SizedBox(height: 8),
-                                          // Dates
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -363,7 +358,7 @@ class _DetailedProductView extends StatelessWidget {
                                                     ),
                                               ),
                                               Text(
-                                                viewModel.warrantyDate
+                                                viewModel.warrantyEndDate
                                                     .replaceAll(', ', ',\n'),
                                                 textAlign: TextAlign.right,
                                                 style: TextStyles.label
@@ -376,14 +371,11 @@ class _DetailedProductView extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      // Today Pin
                                       if (isWarrantyAvailable &&
                                           elapsedProportion > 0 &&
                                           elapsedProportion < 1)
                                         Positioned(
-                                          left:
-                                              todayOffset -
-                                              10, // Center the 40px wide column over the point
+                                          left: todayOffset - 10,
                                           top: 0,
                                           child: SizedBox(
                                             width: 40,
@@ -411,86 +403,7 @@ class _DetailedProductView extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: AppDimens.spaceSm),
-                              viewModel.history.isEmpty
-                                  ? Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(
-                                        AppDimens.spaceLg,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                          AppDimens.boraMd,
-                                        ),
-                                        border: Border.all(
-                                          color: AppColors.secondary100,
-                                        ),
-                                        color: Colors.white,
-                                        boxShadow: [BoxShadowStyles.subtle],
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'This product has no repair history.',
-                                          style: TextStyles.bodyMedium.copyWith(
-                                            color: AppColors.secondary400,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                          AppDimens.boraMd,
-                                        ),
-                                        border: Border.all(
-                                          color: AppColors.secondary100,
-                                        ),
-                                        color: Colors.white,
-                                        boxShadow: [BoxShadowStyles.subtle],
-                                      ),
-                                      child: ListView.separated(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: viewModel.history.length,
-                                        separatorBuilder: (_, _) =>
-                                            const Divider(
-                                              height: 1,
-                                              color: AppColors.secondary100,
-                                            ),
-                                        itemBuilder: (context, index) {
-                                          final item = viewModel.history[index];
-                                          return Padding(
-                                            padding: const EdgeInsets.all(
-                                              AppDimens.spaceMd,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  item.orderNumber,
-                                                  style: TextStyles.bodyLarge
-                                                      .copyWith(
-                                                        color: AppColors
-                                                            .secondary500,
-                                                      ),
-                                                ),
-                                                Text(
-                                                  item.date,
-                                                  style: TextStyles.label
-                                                      .copyWith(
-                                                        color: AppColors
-                                                            .secondary300,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
+                              _buildHistorySection(detail),
                             ],
                           ),
                         ),
@@ -503,13 +416,12 @@ class _DetailedProductView extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildBottomButton('Repair Status', () {
+                          final activeId = viewModel.activeWorkOrderId;
                           context.pushNamed(
                             RouteNames.customerActiveRepairs,
                             queryParameters: {
-                              if (viewModel.activeWorkOrderForProduct?.id !=
-                                  null)
-                                'workOrderId':
-                                    viewModel.activeWorkOrderForProduct!.id,
+                              if (activeId != null && activeId.isNotEmpty)
+                                'workOrderId': activeId,
                             },
                           );
                         }),
@@ -517,14 +429,12 @@ class _DetailedProductView extends StatelessWidget {
                       const SizedBox(width: AppDimens.spaceMd),
                       Expanded(
                         child: _buildBottomButton('Parts', () {
-                          context.pushNamed(
+                          context.goNamed(
                             RouteNames.customerDetailedProductParts,
                             pathParameters: {
-                              'serialNumber':
-                                  viewModel.product?.serialNumber ??
-                                  viewModel.currentSerialNumber ??
-                                  'NA',
+                              'serialNumber': detail.serialNumber,
                             },
+                            queryParameters: {'modelCode': detail.modelCode},
                           );
                         }),
                       ),
@@ -533,6 +443,76 @@ class _DetailedProductView extends StatelessWidget {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildHistorySection(ProductDetail productDetail) {
+    final history = productDetail.workOrderHistory;
+    if (history.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppDimens.spaceLg),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppDimens.boraMd),
+          border: Border.all(color: AppColors.secondary100),
+          color: Colors.white,
+          boxShadow: [BoxShadowStyles.subtle],
+        ),
+        child: Center(
+          child: Text(
+            'This product has no repair history.',
+            style: TextStyles.bodyMedium.copyWith(
+              color: AppColors.secondary400,
+            ),
+          ),
+        ),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary100),
+        color: Colors.white,
+        boxShadow: [BoxShadowStyles.subtle],
+      ),
+      child: ListView.separated(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: history.length,
+        separatorBuilder: (_, _) =>
+            const Divider(height: 1, color: AppColors.secondary100),
+        itemBuilder: (context, index) {
+          final item = history[index];
+          final orderNum = '#${item.workOrderNumber}';
+          String dateStr;
+          try {
+            dateStr = DateFormat('MMM dd').format(DateTime.parse(item.date));
+          } catch (_) {
+            dateStr = item.date;
+          }
+          return Padding(
+            padding: const EdgeInsets.all(AppDimens.spaceMd),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  orderNum,
+                  style: TextStyles.bodyLarge.copyWith(
+                    color: AppColors.secondary500,
+                  ),
+                ),
+                Text(
+                  dateStr,
+                  style: TextStyles.label.copyWith(
+                    color: AppColors.secondary300,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 

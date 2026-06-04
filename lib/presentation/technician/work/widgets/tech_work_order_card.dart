@@ -29,7 +29,7 @@ class WorkOrderCard extends StatelessWidget {
         : AppColors.surface600;
 
     // Status Color Processing
-    Color statusColor = AppColors.tertiary400;
+    Color statusColor = AppColors.tertiary500;
     if (isCompleted) {
       statusColor = AppColors.success500;
     }
@@ -88,7 +88,11 @@ class WorkOrderCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6.0),
                   Text(
-                    order.status.name.toUpperCase(),
+                    order.statusId == 2
+                        ? 'ASSIGNED'
+                        : order.statusId == 3
+                        ? 'IN PROGRESS'
+                        : order.status.name.toUpperCase(),
                     style: TextStyles.label.copyWith(color: statusColor),
                   ),
                 ],
@@ -135,7 +139,9 @@ class WorkOrderCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildActionButton(
-                    text: isPending ? 'Start Job' : 'Complete',
+                    text: (order.statusId == 1 || order.statusId == 2)
+                        ? 'Start Job'
+                        : 'Complete',
                     textColor: AppColors.surface100,
                     bgColor: AppColors.tertiary500,
                     onPressed: order.id.isNotEmpty

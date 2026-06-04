@@ -76,201 +76,206 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TechSecurityViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      appBar: const TechAppBar(
-        title: 'Security Settings',
-        showBackButton: true,
-        showBottomDivider: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // CHANGE PASSWORD
-              _buildSectionTitle(Icons.lock_outline, 'Change Password'),
-              _buildGroupWrapper(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TechTextField(
-                      controller: _currentPasswordCtrl,
-                      label: 'Current Password',
-                      hint: '••••••••',
-                      suffixIcon: Icons.visibility_off_outlined,
-                      obscureText: true,
-                      labelStyle: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.primary500,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    TechTextField(
-                      controller: _newPasswordCtrl,
-                      label: 'New Password',
-                      hint: '••••••••',
-                      suffixIcon: Icons.visibility_off_outlined,
-                      obscureText: true,
-                      labelStyle: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.primary500,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    TechTextField(
-                      controller: _confirmPasswordCtrl,
-                      label: 'Confirm New Password',
-                      hint: '••••••••',
-                      suffixIcon: Icons.visibility_off_outlined,
-                      obscureText: true,
-                      labelStyle: TextStyles.bodyLarge.copyWith(
-                        color: AppColors.primary500,
-                      ),
-                    ),
-                    if (viewModel.changePasswordError != null) ...[
-                      const SizedBox(height: AppDimens.spaceSm),
-                      Text(
-                        viewModel.changePasswordError!,
-                        style: TextStyles.label.copyWith(color: Colors.red),
-                      ),
-                    ] else if (viewModel.changePasswordSuccess) ...[
-                      const SizedBox(height: AppDimens.spaceSm),
-                      Text(
-                        'Password changed successfully!',
-                        style: TextStyles.label.copyWith(
-                          color: AppColors.tertiary500,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        appBar: const TechAppBar(
+          title: 'Security Settings',
+          showBackButton: true,
+          showBottomDivider: true,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimens.spaceMd),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // CHANGE PASSWORD
+                _buildSectionTitle(Icons.lock_outline, 'Change Password'),
+                _buildGroupWrapper(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TechTextField(
+                        controller: _currentPasswordCtrl,
+                        label: 'Current Password',
+                        hint: '••••••••',
+                        suffixIcon: Icons.visibility_off_outlined,
+                        obscureText: true,
+                        labelStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.primary500,
                         ),
                       ),
-                    ],
-                    const SizedBox(height: AppDimens.spaceMd),
-                    TechPrimaryButton(
-                      text: viewModel.isChangePasswordLoading
-                          ? 'Changing…'
-                          : 'Change Password',
-                      isLoading: viewModel.isChangePasswordLoading,
-                      onPressed: viewModel.isChangePasswordLoading
-                          ? null
-                          : () {
-                              final current = _currentPasswordCtrl.text;
-                              final newPass = _newPasswordCtrl.text;
-                              final confirm = _confirmPasswordCtrl.text;
+                      const SizedBox(height: AppDimens.spaceMd),
+                      TechTextField(
+                        controller: _newPasswordCtrl,
+                        label: 'New Password',
+                        hint: '••••••••',
+                        suffixIcon: Icons.visibility_off_outlined,
+                        obscureText: true,
+                        labelStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.primary500,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimens.spaceMd),
+                      TechTextField(
+                        controller: _confirmPasswordCtrl,
+                        label: 'Confirm New Password',
+                        hint: '••••••••',
+                        suffixIcon: Icons.visibility_off_outlined,
+                        obscureText: true,
+                        labelStyle: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.primary500,
+                        ),
+                      ),
+                      if (viewModel.changePasswordError != null) ...[
+                        const SizedBox(height: AppDimens.spaceSm),
+                        Text(
+                          viewModel.changePasswordError!,
+                          style: TextStyles.label.copyWith(color: Colors.red),
+                        ),
+                      ] else if (viewModel.changePasswordSuccess) ...[
+                        const SizedBox(height: AppDimens.spaceSm),
+                        Text(
+                          'Password changed successfully!',
+                          style: TextStyles.label.copyWith(
+                            color: AppColors.tertiary500,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AppDimens.spaceMd),
+                      TechPrimaryButton(
+                        text: viewModel.isChangePasswordLoading
+                            ? 'Changing…'
+                            : 'Change Password',
+                        isLoading: viewModel.isChangePasswordLoading,
+                        onPressed: viewModel.isChangePasswordLoading
+                            ? null
+                            : () {
+                                final current = _currentPasswordCtrl.text;
+                                final newPass = _newPasswordCtrl.text;
+                                final confirm = _confirmPasswordCtrl.text;
 
-                              if (current.isEmpty ||
-                                  newPass.isEmpty ||
-                                  confirm.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Please fill all password fields',
+                                if (current.isEmpty ||
+                                    newPass.isEmpty ||
+                                    confirm.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please fill all password fields',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (newPass != confirm) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'New passwords do not match',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                viewModel
+                                    .changePassword(
+                                      currentPassword: current,
+                                      newPassword: newPass,
+                                    )
+                                    .then((_) {
+                                      if (viewModel.changePasswordSuccess) {
+                                        _currentPasswordCtrl.clear();
+                                        _newPasswordCtrl.clear();
+                                        _confirmPasswordCtrl.clear();
+                                      }
+                                    });
+                              },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppDimens.spaceXl),
+
+                // RECOVERY EMAIL
+                _buildSectionTitle(Icons.mail_outline, 'Recovery Email'),
+                _buildRecoveryEmailSection(context, viewModel),
+                const SizedBox(height: AppDimens.spaceXl),
+
+                // LOGIN HISTORY
+                _buildSectionTitle(Icons.history, 'Login History'),
+                _buildGroupWrapper(
+                  padding: EdgeInsets.zero,
+                  child: Container(
+                    constraints: const BoxConstraints(maxHeight: 220),
+                    child: viewModel.isLoadingHistory
+                        ? const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.tertiary500,
+                              ),
+                            ),
+                          )
+                        : viewModel.loginHistory.isEmpty
+                        ? const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: Text(
+                                'No login history available',
+                                style: TextStyle(color: AppColors.secondary400),
+                              ),
+                            ),
+                          )
+                        : Scrollbar(
+                            controller: _historyScrollController,
+                            thumbVisibility: true,
+                            radius: const Radius.circular(AppDimens.boraXs),
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              controller: _historyScrollController,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppDimens.spaceXs,
+                              ),
+                              itemCount: viewModel.loginHistory.length,
+                              separatorBuilder: (_, _) => const Divider(
+                                height: 1.0,
+                                color: AppColors.surface600,
+                              ),
+                              itemBuilder: (context, index) {
+                                final item = viewModel.loginHistory[index];
+                                return ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: AppDimens.spaceMd,
+                                  ),
+                                  title: Text(
+                                    item.deviceName,
+                                    style: TextStyles.bodyLarge.copyWith(
+                                      color: AppColors.primary500,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    item.location ?? 'Unknown',
+                                    style: TextStyles.label.copyWith(
+                                      color: AppColors.secondary300,
+                                    ),
+                                  ),
+                                  trailing: Text(
+                                    '${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}',
+                                    style: TextStyles.label.copyWith(
+                                      color: AppColors.secondary500,
                                     ),
                                   ),
                                 );
-                                return;
-                              }
-                              if (newPass != confirm) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('New passwords do not match'),
-                                  ),
-                                );
-                                return;
-                              }
-                              viewModel
-                                  .changePassword(
-                                    currentPassword: current,
-                                    newPassword: newPass,
-                                  )
-                                  .then((_) {
-                                    if (viewModel.changePasswordSuccess) {
-                                      _currentPasswordCtrl.clear();
-                                      _newPasswordCtrl.clear();
-                                      _confirmPasswordCtrl.clear();
-                                    }
-                                  });
-                            },
-                    ),
-                  ],
+                              },
+                            ),
+                          ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppDimens.spaceXl),
-
-              // RECOVERY EMAIL
-              _buildSectionTitle(Icons.mail_outline, 'Recovery Email'),
-              _buildRecoveryEmailSection(context, viewModel),
-              const SizedBox(height: AppDimens.spaceXl),
-
-              // LOGIN HISTORY
-              _buildSectionTitle(Icons.history, 'Login History'),
-              _buildGroupWrapper(
-                padding: EdgeInsets.zero,
-                child: Container(
-                  constraints: const BoxConstraints(maxHeight: 220),
-                  child: viewModel.isLoadingHistory
-                      ? const SizedBox(
-                          height: 100,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.tertiary500,
-                            ),
-                          ),
-                        )
-                      : viewModel.loginHistory.isEmpty
-                      ? const SizedBox(
-                          height: 100,
-                          child: Center(
-                            child: Text(
-                              'No login history available',
-                              style: TextStyle(color: AppColors.secondary400),
-                            ),
-                          ),
-                        )
-                      : Scrollbar(
-                          controller: _historyScrollController,
-                          thumbVisibility: true,
-                          radius: const Radius.circular(AppDimens.boraXs),
-                          child: ListView.separated(
-                            shrinkWrap: true,
-                            controller: _historyScrollController,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppDimens.spaceXs,
-                            ),
-                            itemCount: viewModel.loginHistory.length,
-                            separatorBuilder: (_, _) => const Divider(
-                              height: 1.0,
-                              color: AppColors.surface600,
-                            ),
-                            itemBuilder: (context, index) {
-                              final item = viewModel.loginHistory[index];
-                              return ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: AppDimens.spaceMd,
-                                ),
-                                title: Text(
-                                  item.deviceName,
-                                  style: TextStyles.bodyLarge.copyWith(
-                                    color: AppColors.primary500,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  item.location ?? 'Unknown',
-                                  style: TextStyles.label.copyWith(
-                                    color: AppColors.secondary300,
-                                  ),
-                                ),
-                                trailing: Text(
-                                  '${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}',
-                                  style: TextStyles.label.copyWith(
-                                    color: AppColors.secondary500,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-            ],
+                const SizedBox(height: AppDimens.spaceLg),
+              ],
+            ),
           ),
         ),
       ),

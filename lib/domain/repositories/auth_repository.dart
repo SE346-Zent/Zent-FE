@@ -67,4 +67,5 @@ abstract class AuthRepository {
   Future<void> updateUserStatus(String userId, int statusId);
   Future<void> closeAccount();
   Future<User> getMe();
+  Future<User> getUserById(String userId);
 }

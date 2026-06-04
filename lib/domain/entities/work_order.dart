@@ -5,6 +5,7 @@ class WorkOrder {
   final String title;
   final String addressString;
   final WorkOrderStatus status;
+  final int? statusId;
   final String description;
   final String rejectReason;
   final String refusalNote;
@@ -39,6 +40,7 @@ class WorkOrder {
     required this.title,
     required this.addressString,
     required this.status,
+    this.statusId,
     required this.description,
     required this.rejectReason,
     this.refusalNote = '',

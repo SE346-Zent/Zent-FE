@@ -29,7 +29,8 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier
 
   List<String> get filters {
     if (currentUser == null) return [];
-    if (currentUser!.role == UserRoles.admin) {
+    if (currentUser!.role == UserRoles.admin ||
+        currentUser!.role == UserRoles.superAdmin) {
       return [
         "All Jobs",
         "Assigned",
@@ -129,7 +130,7 @@ class WorkOrdersHistoryViewModel extends ChangeNotifier
       );
     } else if (role == UserRoles.customer) {
       // No client-side filtering for customer because the backend API already restricts returned WOs to the customer's own WOs
-    } else if (role == UserRoles.admin) {
+    } else if (role == UserRoles.admin || role == UserRoles.superAdmin) {
       var province = currentUser!.province.toUpperCase();
       if (province.isEmpty) {
         final email = currentUser!.email.toLowerCase();

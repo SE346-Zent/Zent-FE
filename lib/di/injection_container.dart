@@ -310,12 +310,7 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(
-    () => DetailedProductViewModel(
-      getMyProductsUseCase: sl(),
-      getCurrentUserUseCase: sl(),
-      getProductDetailUseCase: sl(),
-      getManyWorkOrdersUseCase: sl(),
-    ),
+    () => DetailedProductViewModel(getProductDetailUseCase: sl()),
   );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(
@@ -358,6 +353,7 @@ Future<void> init() async {
       getMyProductsUseCase: sl(),
       getCurrentUserUseCase: sl(),
       getPartCatalogUseCase: sl(),
+      getScmProductsUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => NotificationsViewModel());

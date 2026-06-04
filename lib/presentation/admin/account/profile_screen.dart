@@ -10,6 +10,7 @@ import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
 import 'viewmodels/profile_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -30,10 +31,17 @@ class _ProfileScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final authViewModel = context.watch<AuthViewModel>();
     final userName = authViewModel.currentUser?.name ?? 'Admin';
-    final role = authViewModel.currentUser?.role != null
-        ? (authViewModel.currentUser!.role.name[0].toUpperCase() +
-              authViewModel.currentUser!.role.name.substring(1))
-        : 'Administrator';
+    String role = 'Administrator';
+    if (authViewModel.currentUser?.role != null) {
+      final r = authViewModel.currentUser!.role;
+      if (r == UserRoles.superAdmin) {
+        role = 'Super Admin';
+      } else if (r == UserRoles.admin) {
+        role = 'Administrator';
+      } else {
+        role = r.name[0].toUpperCase() + r.name.substring(1);
+      }
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background500,

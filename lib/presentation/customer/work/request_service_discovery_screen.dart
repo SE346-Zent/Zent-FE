@@ -7,6 +7,8 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/auth/login/widgets/auth_primary_button.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 import 'viewmodels/request_service_viewmodel.dart';
 import 'viewmodels/products_viewmodel.dart';
 import 'widgets/selectable_device_card.dart';
@@ -126,6 +128,11 @@ class _RequestServiceDiscoveryScreenState
                                 onTap: () => viewModel.selectDevice(
                                   product.id,
                                   product.serialNumber,
+                                  warrantyStatus: productsVM.getProductStatus(
+                                    product,
+                                  ),
+                                  name: product.name,
+                                  model: product.model,
                                 ),
                               );
                             },
@@ -150,7 +157,17 @@ class _RequestServiceDiscoveryScreenState
         child: AuthPrimaryButton(
           text: 'Next',
           boxShadow: [BoxShadowStyles.raised],
-          onPressed: isNextEnabled ? () => viewModel.nextStep() : null,
+          onPressed: isNextEnabled
+              ? () async {
+                  try {
+                    await viewModel.nextStep();
+                  } on BusinessException catch (e) {
+                    if (mounted) {
+                      ZentErrorPopup.show(context, e.message);
+                    }
+                  }
+                }
+              : null,
         ),
       ),
     );

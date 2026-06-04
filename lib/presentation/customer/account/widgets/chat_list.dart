@@ -26,7 +26,7 @@ class ChatList extends StatelessWidget {
         pathParameters: {'chatId': chat.id},
         queryParameters: {'name': chat.name},
       );
-    } else if (role == UserRoles.admin) {
+    } else if (role == UserRoles.admin || role == UserRoles.superAdmin) {
       context.pushNamed(
         'adminDetailedChat',
         pathParameters: {'chatId': chat.id},

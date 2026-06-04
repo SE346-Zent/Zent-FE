@@ -117,6 +117,8 @@ class ProfileViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   String _mapRoleToDisplay(UserRoles role) {
     switch (role) {
+      case UserRoles.superAdmin:
+        return 'Super Admin';
       case UserRoles.admin:
         return 'Administrator';
       case UserRoles.technician:

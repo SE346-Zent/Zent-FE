@@ -16,6 +16,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:zent_fe/presentation/common/core/ui/chat_banner_listener.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/gps_service_guard.dart';
 
 // 1. Create a GlobalKey to control SnackBars from anywhere
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
@@ -43,7 +44,10 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   try {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     await dotenv.load(fileName: ".env");
     await di.init();
 
@@ -72,7 +76,7 @@ Future<void> main() async {
     const InitializationSettings initializationSettings =
         InitializationSettings(
           android: AndroidInitializationSettings(
-            '@mipmap/ic_launcher',
+            '@mipmap/launcher_icon',
           ), // Use your app icon
         );
     await flutterLocalNotificationsPlugin.initialize(
@@ -167,14 +171,16 @@ void _setupForegroundMessaging() {
       // Use jsonEncode so we can properly parse it in onDidReceiveNotificationResponse
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
-        notification.title,
+        notification.title?.isNotEmpty == true
+            ? notification.title
+            : 'Unknown Product',
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
             channelDescription: channel.description,
-            icon: '@mipmap/ic_launcher',
+            icon: '@mipmap/launcher_icon',
             importance: Importance.max,
             priority: Priority.high,
           ),
@@ -261,7 +267,9 @@ class MyApp extends StatelessWidget {
         ),
         routerConfig: appRouter,
         builder: (context, child) {
-          return ChatBannerListener(child: child ?? const SizedBox.shrink());
+          return GpsServiceGuard(
+            child: ChatBannerListener(child: child ?? const SizedBox.shrink()),
+          );
         },
       ),
     );

@@ -60,13 +60,7 @@ class StaffDetailViewModel extends ChangeNotifier with SafeChangeNotifier {
       errorMsg = "";
       notifyListeners();
 
-      final users = await authRepository.getUsers(pageSize: 100);
-      final index = users.indexWhere((u) => u.id == userId);
-      if (index != -1) {
-        staffUser = users[index];
-      } else {
-        errorMsg = "Staff member not found";
-      }
+      staffUser = await authRepository.getUserById(userId);
     } catch (e) {
       errorMsg = e.toString();
       debugPrint("Error fetching staff details: $e");

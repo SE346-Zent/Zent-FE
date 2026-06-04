@@ -632,11 +632,11 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
         throw BusinessException(message);
       }
 
-      throw Exception('Silent API error');
+      throw Exception('Server error ($statusCode)');
     } on BusinessException {
       rethrow;
-    } catch (_) {
-      throw Exception('Silent parse error');
+    } catch (e) {
+      throw Exception('Server error ($statusCode)');
     }
   }
 }

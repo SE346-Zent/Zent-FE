@@ -76,6 +76,10 @@ abstract class AuthRemoteDatasource {
   });
   Future<void> closeAccount({required String accessToken});
   Future<Map<String, dynamic>> getMe({required String accessToken});
+  Future<Map<String, dynamic>> getUserById({
+    required String accessToken,
+    required String userId,
+  });
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -123,7 +127,26 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
             timeLimit: Duration(seconds: 4),
           ),
         );
-        return "${position.latitude}, ${position.longitude}";
+        final lat = position.latitude;
+        final lon = position.longitude;
+        try {
+          final url = Uri.parse(
+            'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lon',
+          );
+          final response = await client
+              .get(url, headers: {'User-Agent': 'Zent-FE-App'})
+              .timeout(const Duration(seconds: 4));
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final displayName = data['display_name'] as String?;
+            if (displayName != null && displayName.isNotEmpty) {
+              return displayName;
+            }
+          }
+        } catch (e) {
+          debugPrint("Error reverse geocoding via Nominatim: $e");
+        }
+        return "$lat, $lon";
       }
     } catch (e) {
       debugPrint("Error getting location: $e");
@@ -906,6 +929,47 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Get user profile error: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserById({
+    required String accessToken,
+    required String userId,
+  }) async {
+    final url = Uri.parse('$_baseURL/users/$userId');
+    try {
+      final response = await client
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as Map<String, dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!;
+      } else {
+        throw Exception(
+          apiResponse.message ?? 'Failed to get user profile by ID',
+        );
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Get user profile by ID error: $e');
     }
   }
 

@@ -5,6 +5,8 @@ import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
 
 // Core Routing & Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -110,10 +112,42 @@ class _LoginScreenContent extends StatelessWidget {
                               onPressed: () async {
                                 final user = await viewModel.login();
                                 if (user != null && context.mounted) {
+                                  if (user.role == UserRoles.admin ||
+                                      user.role == UserRoles.superAdmin ||
+                                      user.role == UserRoles.technician) {
+                                    final permission =
+                                        await Geolocator.checkPermission();
+                                    if (permission ==
+                                        LocationPermission.denied) {
+                                      await Geolocator.requestPermission();
+                                    }
+                                    final currentPermission =
+                                        await Geolocator.checkPermission();
+                                    if (currentPermission ==
+                                            LocationPermission.denied ||
+                                        currentPermission ==
+                                            LocationPermission.deniedForever) {
+                                      await di.sl<LogoutUseCase>().execute();
+                                      if (context.mounted) {
+                                        context
+                                            .read<AuthViewModel>()
+                                            .clearUser();
+                                        ZentErrorPopup.show(
+                                          context,
+                                          'Location permission is required for Admin and Technician roles.',
+                                        );
+                                      }
+                                      return;
+                                    }
+                                  }
+
+                                  if (!context.mounted) return;
+
                                   context.read<AuthViewModel>().setLoggedInUser(
                                     user,
                                   );
                                   switch (user.role) {
+                                    case UserRoles.superAdmin:
                                     case UserRoles.admin:
                                       context.goNamed(
                                         RouteNames.adminDashboard,

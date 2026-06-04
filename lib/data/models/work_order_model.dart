@@ -7,6 +7,7 @@ class WorkOrderModel extends WorkOrder {
     required super.title,
     required super.addressString,
     required super.status,
+    super.statusId,
     required super.description,
     required super.rejectReason,
     super.refusalNote = '',
@@ -42,6 +43,7 @@ class WorkOrderModel extends WorkOrder {
       title: entity.title,
       addressString: entity.addressString,
       status: entity.status,
+      statusId: entity.statusId,
       description: entity.description,
       rejectReason: entity.rejectReason,
       refusalNote: entity.refusalNote,
@@ -73,6 +75,41 @@ class WorkOrderModel extends WorkOrder {
   }
 
   factory WorkOrderModel.fromJson(Map<String, dynamic> json) {
+    final rawStatusVal =
+        json['work_order_status_id'] ??
+        json['status_id'] ??
+        json['statusId'] ??
+        json['status'];
+    int? parsedStatusId;
+    if (rawStatusVal is int) {
+      parsedStatusId = rawStatusVal;
+    } else if (rawStatusVal is String) {
+      parsedStatusId = int.tryParse(rawStatusVal);
+      if (parsedStatusId == null) {
+        final s = rawStatusVal
+            .toLowerCase()
+            .replaceAll('_', '')
+            .replaceAll(' ', '');
+        if (s == 'pending' || s.contains('pending')) {
+          parsedStatusId = 1;
+        } else if (s == 'assigned' || s.contains('assigned')) {
+          parsedStatusId = 2;
+        } else if (s == 'inprogress' || s == 'inprog' || s.contains('prog')) {
+          parsedStatusId = 3;
+        } else if (s == 'complete' ||
+            s == 'completed' ||
+            s == 'closed' ||
+            s.contains('complete') ||
+            s.contains('closed')) {
+          parsedStatusId = 4;
+        } else if (s == 'rejectinreview' || s.contains('rejectinreview')) {
+          parsedStatusId = 5;
+        } else if (s == 'rejected' || s.contains('rejected')) {
+          parsedStatusId = 6;
+        }
+      }
+    }
+
     return WorkOrderModel(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
       title:
@@ -84,12 +121,8 @@ class WorkOrderModel extends WorkOrder {
       addressString: _buildAddress(json),
       symptomName:
           json['symptomName'] as String? ?? json['symptom_name'] as String?,
-      status: _parseStatus(
-        json['work_order_status_id'] ??
-            json['status_id'] ??
-            json['statusId'] ??
-            json['status'],
-      ),
+      status: _parseStatus(rawStatusVal),
+      statusId: parsedStatusId,
       description: json['description'] as String? ?? '',
       rejectReason:
           json['reject_reason'] as String? ??
@@ -226,10 +259,13 @@ class WorkOrderModel extends WorkOrder {
         case 2:
           return WorkOrderStatus.assigned;
         case 3:
-          return WorkOrderStatus.complete;
+          return WorkOrderStatus
+              .assigned; // In progress -> assigned frontend state
         case 4:
-          return WorkOrderStatus.rejectInReview;
+          return WorkOrderStatus.complete; // Closed -> complete frontend state
         case 5:
+          return WorkOrderStatus.rejectInReview;
+        case 6:
           return WorkOrderStatus.rejected;
         default:
           return WorkOrderStatus.pending;
@@ -278,25 +314,34 @@ class WorkOrderModel extends WorkOrder {
     // Try pre-built string first
     final prebuilt =
         json['addressString'] as String? ?? json['address_string'] as String?;
-    if (prebuilt != null && prebuilt.isNotEmpty) return prebuilt;
+    String addressString = prebuilt ?? '';
 
-    // Build from WorkOrderDetails fields: address, building, ward, city, province, country
-    final parts = <String>[];
-    final address = json['address'] as String?;
-    final building = json['building'] as String?;
-    final ward = json['ward'] as String? ?? json['Ward'] as String?;
-    final city = json['city'] as String?;
-    final province = json['province'] as String?;
-    final country = json['country'] as String?;
+    if (addressString.isEmpty) {
+      // Build from WorkOrderDetails fields: address, building, ward, city, province, country
+      final parts = <String>[];
+      final address = json['address'] as String?;
+      final building = json['building'] as String?;
+      final ward = json['ward'] as String? ?? json['Ward'] as String?;
+      final city = json['city'] as String?;
+      final province = json['province'] as String?;
+      final country = json['country'] as String?;
 
-    if (building != null && building.isNotEmpty) parts.add(building);
-    if (address != null && address.isNotEmpty) parts.add(address);
-    if (ward != null && ward.isNotEmpty) parts.add(ward);
-    if (city != null && city.isNotEmpty) parts.add(city);
-    if (province != null && province.isNotEmpty) parts.add(province);
-    if (country != null && country.isNotEmpty) parts.add(country);
+      if (building != null && building.isNotEmpty) parts.add(building);
+      if (address != null && address.isNotEmpty) parts.add(address);
+      if (ward != null && ward.isNotEmpty) parts.add(ward);
+      if (city != null && city.isNotEmpty) parts.add(city);
+      if (province != null && province.isNotEmpty) parts.add(province);
+      if (country != null && country.isNotEmpty) parts.add(country);
 
-    return parts.join(', ');
+      addressString = parts.join(', ');
+    }
+
+    // Clean address strings by replacing standalone HN and HCM
+    addressString = addressString
+        .replaceAll(RegExp(r'\bHCM\b'), 'Thành phố Hồ Chí Minh')
+        .replaceAll(RegExp(r'\bHN\b'), 'Thành phố Hà Nội');
+
+    return addressString;
   }
 
   Map<String, dynamic> toJson() {
@@ -305,6 +350,7 @@ class WorkOrderModel extends WorkOrder {
       'title': title,
       'address': addressString,
       'status': status.name,
+      'statusId': statusId,
       'description': description,
       'reject_reason': rejectReason,
       'refusal_note': refusalNote,

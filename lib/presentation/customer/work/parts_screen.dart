@@ -13,7 +13,12 @@ import 'viewmodels/parts_viewmodel.dart';
 
 class PartsScreen extends StatefulWidget {
   final String serialNumber;
-  const PartsScreen({super.key, required this.serialNumber});
+  final String modelCode;
+  const PartsScreen({
+    super.key,
+    required this.serialNumber,
+    this.modelCode = '',
+  });
 
   @override
   State<PartsScreen> createState() => _PartsScreenState();
@@ -27,7 +32,7 @@ class _PartsScreenState extends State<PartsScreen> {
   void initState() {
     super.initState();
     _viewModel = sl<PartsViewModel>();
-    _viewModel.init(widget.serialNumber);
+    _viewModel.init(widget.serialNumber, modelCode: widget.modelCode);
   }
 
   @override
@@ -37,6 +42,7 @@ class _PartsScreenState extends State<PartsScreen> {
       child: _PartsView(
         searchBarKey: _searchBarKey,
         serialNumber: widget.serialNumber,
+        modelCode: widget.modelCode,
       ),
     );
   }
@@ -45,7 +51,12 @@ class _PartsScreenState extends State<PartsScreen> {
 class _PartsView extends StatelessWidget {
   final GlobalKey searchBarKey;
   final String serialNumber;
-  const _PartsView({required this.searchBarKey, required this.serialNumber});
+  final String modelCode;
+  const _PartsView({
+    required this.searchBarKey,
+    required this.serialNumber,
+    this.modelCode = '',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +141,7 @@ class _PartsView extends StatelessWidget {
                                     const SizedBox(width: AppDimens.spaceSm),
                                     Expanded(
                                       child: Text(
-                                        'MTM: ${viewModel.product?.model ?? 'NA'}',
+                                        'MTM: ${viewModel.product?.model ?? (modelCode.isNotEmpty ? modelCode : 'NA')}',
                                         textAlign: TextAlign.right,
                                         style: TextStyles.bodyLarge.copyWith(
                                           color: AppColors.secondary500,
@@ -216,7 +227,6 @@ class _PartsView extends StatelessWidget {
                           const SizedBox(height: AppDimens.spaceMd),
                       itemBuilder: (context, index) {
                         final part = viewModel.filteredParts[index];
-                        final isAvailable = part.status == 'Available';
 
                         return Container(
                           padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -285,6 +295,12 @@ class _PartsView extends StatelessWidget {
                                         color: AppColors.secondary500,
                                       ),
                                     ),
+                                    Text(
+                                      'MTM: ${part.modelCode}',
+                                      style: TextStyles.label.copyWith(
+                                        color: AppColors.secondary500,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -292,9 +308,15 @@ class _PartsView extends StatelessWidget {
                               Text(
                                 part.status,
                                 style: TextStyles.bodyLarge.copyWith(
-                                  color: isAvailable
+                                  color:
+                                      part.status.toLowerCase().contains(
+                                            'new',
+                                          ) ||
+                                          part.status.toLowerCase().contains(
+                                            'available',
+                                          )
                                       ? AppColors.success500
-                                      : AppColors.secondary400,
+                                      : AppColors.secondary500,
                                 ),
                               ),
                             ],

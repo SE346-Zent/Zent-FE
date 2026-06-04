@@ -13,7 +13,6 @@ import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/common/auth/register/register_screen.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
@@ -93,17 +92,7 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
     if (role == UserRoles.admin ||
         role == UserRoles.superAdmin ||
         role == UserRoles.technician) {
-      try {
-        final settings = await FirebaseMessaging.instance.requestPermission();
-        if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-          return Routes.login;
-        }
-      } catch (e) {
-        debugPrint(
-          "Firebase Messaging permission request failed in redirect: $e",
-        );
-        // Cứ tiếp tục điều hướng nếu lỗi Firebase cấu hình ở môi trường Release
-      }
+      // FirebaseMessaging permission request removed to prevent blocking redirects.
     }
     final isPublic = _publicPrefixes.any(
       (p) => location == p || location.startsWith('$p/'),
@@ -706,8 +695,11 @@ final GoRouter appRouter = GoRouter(
                       builder: (context, state) {
                         final serialNumber =
                             state.pathParameters['serialNumber']!;
+                        final productId =
+                            state.uri.queryParameters['productId'] ?? '';
                         return MyDetailedProductScreen(
                           serialNumber: serialNumber,
+                          productId: productId,
                         );
                       },
                       routes: [
@@ -718,7 +710,12 @@ final GoRouter appRouter = GoRouter(
                           builder: (context, state) {
                             final serialNumber =
                                 state.pathParameters['serialNumber']!;
-                            return PartsScreen(serialNumber: serialNumber);
+                            final modelCode =
+                                state.uri.queryParameters['modelCode'] ?? '';
+                            return PartsScreen(
+                              serialNumber: serialNumber,
+                              modelCode: modelCode,
+                            );
                           },
                         ),
                       ],

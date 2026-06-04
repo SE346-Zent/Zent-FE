@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:zent_fe/data/models/create_work_order_request.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/work_order/create_work_order_usecase.dart';
+import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
 import 'package:intl/intl.dart';
@@ -85,6 +87,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   RequestServiceViewModel(this.createWorkOrderUseCase);
 
   int _currentStep = 1;
+  String? _selectedProductWarrantyStatus;
   bool _isLoading = false;
 
   int get currentStep => _currentStep;
@@ -94,6 +97,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   // Selected device
   String? selectedProductId;
   String? selectedSerialNumber;
+  String? selectedProductName;
+  String? selectedProductModel;
 
   // Selected information for Step 2
   String? symptom;
@@ -213,9 +218,19 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     ),
   ];
 
-  void selectDevice(String id, String sn) {
+  void selectDevice(
+    String id,
+    String sn, {
+    String? warrantyStatus,
+    String? name,
+    String? model,
+  }) {
     selectedProductId = id;
     selectedSerialNumber = sn;
+    _selectedProductWarrantyStatus = warrantyStatus;
+    selectedProductName = name;
+    selectedProductModel = model;
+    errorMessage = null; // Clear previous error when new device selected
     notifyListeners();
   }
 
@@ -393,6 +408,16 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   Future<void> nextStep() async {
     if (currentStep < 5) {
       if (_currentStep == 1 && selectedProductId != null) {
+        // Block proceeding if product has no warranty or is expired
+        if (_selectedProductWarrantyStatus == 'No Warranty' ||
+            _selectedProductWarrantyStatus == 'Expired') {
+          throw BusinessException(
+            _selectedProductWarrantyStatus == 'No Warranty'
+                ? 'This product has no warranty coverage. Please register a product with valid warranty to request service.'
+                : 'This product\'s warranty has expired. Please renew the warranty or register a different product to request service.',
+          );
+        }
+
         await _loadDraftForProduct(selectedProductId!);
         if (_currentStep > 1) {
           await _saveDraft();
@@ -400,6 +425,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
           return;
         }
       }
+      errorMessage = null;
       _currentStep++;
       await _saveDraft();
       notifyListeners();
@@ -458,11 +484,15 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       }
 
       String finalProv = province ?? '';
-      if (finalProv.contains('Hồ Chí Minh')) {
-        finalProv = 'HCM';
-      } else if (finalProv.contains('Hà Nội')) {
-        finalProv = 'HN';
+      if (finalProv.contains('Hồ Chí Minh') || finalProv == 'HCM') {
+        finalProv = 'Thành phố Hồ Chí Minh';
+      } else if (finalProv.contains('Hà Nội') || finalProv == 'HN') {
+        finalProv = 'Thành phố Hà Nội';
       }
+
+      final resolvedReferenceTicketId = await _resolveReferenceTicketId(
+        ticketRef,
+      );
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
@@ -475,9 +505,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         lastName: lastName ?? '',
         phoneNumber: phone,
         productId: selectedProductId ?? '',
-        referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
-            ? ticketRef
-            : null,
+        referenceTicketId: resolvedReferenceTicketId,
         ward: ward ?? '',
         province: finalProv,
         workOrderSymptomId: symptomId,
@@ -506,6 +534,40 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<String?> _resolveReferenceTicketId(String? ticketRef) async {
+    if (ticketRef == null || ticketRef.trim().isEmpty) {
+      return null;
+    }
+    final trimmed = ticketRef.trim();
+    final uuidRegex = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    );
+    final uuidNoDashesRegex = RegExp(r'^[0-9a-fA-F]{32}$');
+    if (uuidRegex.hasMatch(trimmed) || uuidNoDashesRegex.hasMatch(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      final getManyUseCase = sl<GetManyWorkOrdersUseCase>();
+      final orders = await getManyUseCase.execute(limit: 1000);
+      final match = orders.cast<WorkOrder?>().firstWhere(
+        (o) =>
+            o != null &&
+            o.workOrderNum.trim().toLowerCase() == trimmed.toLowerCase(),
+        orElse: () => null,
+      );
+      if (match != null) {
+        return match.id;
+      }
+    } catch (e) {
+      debugPrint("Error resolving reference ticket UUID: $e");
+    }
+
+    throw BusinessException(
+      'Reference ticket "$trimmed" not found. Please enter a valid Work Order number.',
+    );
   }
 
   Future<void> reset() async {
@@ -540,7 +602,12 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
     selectedProductId = null;
     selectedSerialNumber = null;
+    selectedProductName = null;
+    selectedProductModel = null;
     selectedServiceId = null;
+
+    _selectedProductWarrantyStatus = null;
+    errorMessage = null;
 
     notifyListeners();
   }
@@ -569,6 +636,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       final draftMap = {
         'selectedProductId': selectedProductId,
         'selectedSerialNumber': selectedSerialNumber,
+        'selectedProductName': selectedProductName,
+        'selectedProductModel': selectedProductModel,
         'symptom': symptom,
         'ticketRef': ticketRef,
         'description': description,
@@ -606,6 +675,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         final draftMap = json.decode(jsonString) as Map<String, dynamic>;
         selectedProductId = draftMap['selectedProductId'] as String?;
         selectedSerialNumber = draftMap['selectedSerialNumber'] as String?;
+        selectedProductName = draftMap['selectedProductName'] as String?;
+        selectedProductModel = draftMap['selectedProductModel'] as String?;
         symptom = draftMap['symptom'] as String?;
         ticketRef = draftMap['ticketRef'] as String?;
         description = draftMap['description'] as String?;

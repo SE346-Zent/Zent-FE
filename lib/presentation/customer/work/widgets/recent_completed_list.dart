@@ -34,7 +34,7 @@ class RecentCompletedList extends StatelessWidget {
               horizontal: AppDimens.spaceMd,
               vertical: AppDimens.spaceSm,
             ),
-            child: Text('Other Active WO', style: TextStyles.middle),
+            child: Text('Recent Completed', style: TextStyles.middle),
           ),
           const Divider(height: 1, color: AppColors.secondary50),
 
@@ -62,7 +62,9 @@ class RecentCompletedList extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                recentCompleted[i].title,
+                                recentCompleted[i].title.isNotEmpty
+                                    ? recentCompleted[i].title
+                                    : 'No Title',
                                 style: TextStyles.bodyLarge.copyWith(
                                   color: AppColors.secondary500,
                                 ),

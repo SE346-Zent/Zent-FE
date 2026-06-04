@@ -19,6 +19,7 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   int currentStatusStep = 0;
   WorkOrder? activeWorkOrder;
+  List<WorkOrder> activeWorkOrders = [];
   List<WorkOrder> recentCompleted = [];
 
   Future<void> fetchWorkOrders({String? workOrderId}) async {
@@ -39,6 +40,9 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
           )
           .toList();
 
+      activeOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      activeWorkOrders = activeOrders;
+
       if (workOrderId != null && workOrderId.isNotEmpty) {
         // If a specific workOrderId was requested, find it from the entire list first
         try {
@@ -51,7 +55,6 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
         }
       } else {
         if (activeOrders.isNotEmpty) {
-          activeOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
           activeWorkOrder = activeOrders.first;
           currentStatusStep = _mapStatusToStep(activeWorkOrder!);
         } else {
@@ -60,18 +63,12 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
         }
       }
 
-      final otherActiveOrders = customerOrders
-          .where(
-            (o) =>
-                (o.status == WorkOrderStatus.pending ||
-                    o.status == WorkOrderStatus.assigned ||
-                    o.status == WorkOrderStatus.rejectInReview) &&
-                o.id != activeWorkOrder?.id,
-          )
+      final completedOrders = customerOrders
+          .where((o) => o.status == WorkOrderStatus.complete)
           .toList();
-      otherActiveOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      completedOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      recentCompleted = otherActiveOrders;
+      recentCompleted = completedOrders;
 
       isLoading = false;
       notifyListeners();
@@ -100,6 +97,10 @@ class ActiveRepairsViewModel extends ChangeNotifier with SafeChangeNotifier {
       recentCompleted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
     notifyListeners();
+  }
+
+  int mapStatusToStep(WorkOrder order) {
+    return _mapStatusToStep(order);
   }
 
   int _mapStatusToStep(WorkOrder order) {

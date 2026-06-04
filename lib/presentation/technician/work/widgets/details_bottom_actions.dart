@@ -15,15 +15,18 @@ class DetailsBottomActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = viewModel.workOrder?.status;
-    final isPending = status == WorkOrderStatus.pending;
+    final order = viewModel.workOrder;
+    final status = order?.status;
+    final statusId = order?.statusId;
+    final isPending = statusId == 1 || statusId == 2;
     final isCompletedOrRejected =
         status == WorkOrderStatus.complete ||
         status == WorkOrderStatus.rejected ||
         status == WorkOrderStatus.rejectInReview;
 
     final String leftLabel;
-    if (status == WorkOrderStatus.rejected ||
+    if (isPending ||
+        status == WorkOrderStatus.rejected ||
         status == WorkOrderStatus.rejectInReview) {
       leftLabel = "Reject";
     } else {
@@ -67,7 +70,7 @@ class DetailsBottomActions extends StatelessWidget {
             child: PrimaryActionButton(
               label: isCompletedOrRejected
                   ? "View Report"
-                  : (isPending ? "Start Job" : "Fill Form"),
+                  : (isPending ? "Start Job" : "Complete"),
               icon: isCompletedOrRejected
                   ? Icons.remove_red_eye_outlined
                   : (isPending

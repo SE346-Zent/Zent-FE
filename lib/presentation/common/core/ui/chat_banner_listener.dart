@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/routing/router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'in_app_chat_banner.dart';
 
 class _BannerData {
@@ -100,7 +101,13 @@ class _ChatBannerListenerState extends State<ChatBannerListener> {
     }
   }
 
-  void _handleIncomingMessage(Map<String, dynamic> event) {
+  Future<void> _handleIncomingMessage(Map<String, dynamic> event) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isEnabled = prefs.getBool('pref_direct_message_enabled') ?? true;
+      if (!isEnabled) return;
+    } catch (_) {}
+
     if (!_userIdResolved) _resolveUserId();
 
     // Support flat event structure or wrapped 'message' object

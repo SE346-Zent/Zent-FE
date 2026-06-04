@@ -1,5 +1,8 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
+import 'dart:io';
+import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:native_exif/native_exif.dart';
 import 'package:zent_fe/domain/entities/work_order_completion_draft.dart';
@@ -34,6 +37,23 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
 
   String _workOrderNum = '';
   String get workOrderNum => _workOrderNum;
+
+  DateTime? _appointment;
+  DateTime? get appointment => _appointment;
+
+  String get appointmentFormatted {
+    final dt = _appointment;
+    if (dt == null) return 'N/A';
+    final now = DateTime.now();
+    final isToday =
+        dt.year == now.year && dt.month == now.month && dt.day == now.day;
+    final timeStr = DateFormat("hh:mm a").format(dt);
+    if (isToday) {
+      return '$timeStr - Today';
+    } else {
+      return '$timeStr - ${DateFormat("dd/MM/yyyy").format(dt)}';
+    }
+  }
 
   // Step Management (0-indexed, 0-4 for steps 1-5)
   static const int totalSteps = 5;
@@ -171,23 +191,30 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
         );
       }
 
+      final List<PartChangeInput> partChanges = [];
+
+      for (int i = 0; i < _installedParts.length; i++) {
+        partChanges.add(
+          PartChangeInput(
+            partId: _toValidUuid(_installedParts[i].id),
+            changeType: 'installed',
+          ),
+        );
+      }
+
+      for (int i = 0; i < _uninstalledParts.length; i++) {
+        partChanges.add(
+          PartChangeInput(
+            partId: _toValidUuid(_uninstalledParts[i].id),
+            changeType: 'uninstalled',
+          ),
+        );
+      }
+
       final request = CompleteWorkOrderRequest(
         mtm: mtm,
         serialNumber: serialNumber,
-        partChanges: [
-          ..._installedParts.map(
-            (p) => PartChangeInput(
-              partId: _toValidUuid(p.id),
-              changeType: 'INSTALL',
-            ),
-          ),
-          ..._uninstalledParts.map(
-            (p) => PartChangeInput(
-              partId: _toValidUuid(p.id),
-              changeType: 'UNINSTALL',
-            ),
-          ),
-        ],
+        partChanges: partChanges,
         diagnosis: diagnosticNotes,
         latitude: lat,
         longitude: lng,
@@ -216,19 +243,11 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
   }
 
   String _toValidUuid(String id) {
-    if (id == 'P-101') return '11111111-2222-3333-4444-555555555551';
-    if (id == 'P-102') return '11111111-2222-3333-4444-555555555552';
-    if (id == 'P-201') return '22222222-3333-4444-5555-666666666661';
     final uuidRegex = RegExp(
       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
     );
     if (uuidRegex.hasMatch(id)) return id;
-    final hash = id.hashCode
-        .abs()
-        .toString()
-        .padRight(12, '0')
-        .substring(0, 12);
-    return '00000000-0000-0000-0000-$hash';
+    return '11111111-2222-3333-4444-555555555551';
   }
 
   // --- Draft Persistence ---
@@ -240,6 +259,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
         final cleanId = workOrderId.replaceAll('#', '');
         final wo = await getSingleWorkOrderUseCase.execute(cleanId);
         _workOrderNum = wo.workOrderNum;
+        _appointment = wo.appointment;
         _isReadOnly =
             wo.status == WorkOrderStatus.complete ||
             wo.status == WorkOrderStatus.rejected ||
@@ -343,13 +363,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
         _signaturePoints.addAll(draft.signaturePoints);
 
         // Update controllers (this triggers listeners, but is guarded by _isLoading)
-        mtmController.text = draft.mtm.isEmpty ? '20H1A001VN' : draft.mtm;
-        serialNumberController.text = draft.serialNumber.isEmpty
-            ? 'PF0QWER1'
-            : draft.serialNumber;
-        diagnosticNotesController.text = draft.diagnosticNotes.isEmpty
-            ? 'Replaced faulty motherboard and verified all components. Hardware tests passed.'
-            : draft.diagnosticNotes;
+        mtmController.text = draft.mtm;
+        serialNumberController.text = draft.serialNumber;
+        diagnosticNotesController.text = draft.diagnosticNotes;
 
         notifyListeners();
       } else {
@@ -362,35 +378,12 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
   }
 
   void _setInitialMockData() {
-    mtmController.text = '20H1A001VN';
-    serialNumberController.text = 'PF0QWER1';
-    diagnosticNotesController.text =
-        'Replaced faulty motherboard and verified all components. Hardware tests passed.';
+    mtmController.text = '';
+    serialNumberController.text = '';
+    diagnosticNotesController.text = '';
 
     _uninstalledParts.clear();
-    _uninstalledParts.addAll([
-      TechWorkOrderPart(
-        id: '00153f24-ef17-42e7-ac68-fa953fa96bb5',
-        name: 'Laptop Lenovo',
-        serialNumber: 'SN-B7E00BFB',
-        quantity: 1,
-      ),
-      TechWorkOrderPart(
-        id: '00619771-ae3a-47ee-b4f0-0fb6ec4ed4b0',
-        name: 'Laptop Lenovo',
-        serialNumber: 'SN-FDCDD27B',
-        quantity: 1,
-      ),
-    ]);
     _installedParts.clear();
-    _installedParts.addAll([
-      TechWorkOrderPart(
-        id: '01db530b-d089-4723-a86a-03a0042fbf9b',
-        name: 'Laptop Lenovo',
-        serialNumber: 'SN-5A18D658',
-        quantity: 1,
-      ),
-    ]);
     _checklist.clear();
     _checklist.addAll([
       TechWorkOrderChecklistItem(id: 1, result: true, notes: "Normal"),
@@ -539,6 +532,37 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
     _photoUploadError = null;
   }
 
+  Future<void> _compressImage(String path) async {
+    try {
+      final file = File(path);
+      final bytes = await file.readAsBytes();
+      final image = img.decodeImage(bytes);
+      if (image == null) {
+        debugPrint("Failed to decode image at $path");
+        return;
+      }
+
+      // Resize the image to a maximum width of 1080px (maintain aspect ratio)
+      img.Image resized;
+      if (image.width > 1080) {
+        resized = img.copyResize(image, width: 1080);
+      } else {
+        resized = image;
+      }
+
+      // Compress to JPEG with 80% quality
+      final compressedBytes = img.encodeJpg(resized, quality: 80);
+
+      // Write back to the same file path
+      await file.writeAsBytes(compressedBytes);
+      debugPrint(
+        "Image compressed successfully: ${bytes.length} -> ${compressedBytes.length} bytes",
+      );
+    } catch (e) {
+      debugPrint("Error compressing image: $e");
+    }
+  }
+
   Future<void> addPhoto(String path, String phase) async {
     if (_isReadOnly) return;
     List<String> target;
@@ -566,6 +590,10 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
       final pos = await _getCurrentLocation();
       final lat = pos?.latitude ?? 10.7769; // Fallback to HCM
       final lng = pos?.longitude ?? 106.7009;
+
+      // Compress the image first
+      debugPrint("Compressing image before upload...");
+      await _compressImage(path);
 
       // 2. Write GPS EXIF attributes
       await _writeGpsToExif(path, lat, lng);
@@ -674,6 +702,36 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
   }
 
   // Part Management
+  void addUninstalledPart(
+    String partId,
+    String partName,
+    String? serialNumber,
+  ) {
+    if (_isReadOnly) return;
+    final newPart = TechWorkOrderPart(
+      id: partId,
+      name: partName,
+      serialNumber: serialNumber,
+      quantity: 1,
+    );
+    _uninstalledParts.add(newPart);
+    _saveDraft();
+    notifyListeners();
+  }
+
+  void addInstalledPart(String partId, String partName, String? serialNumber) {
+    if (_isReadOnly) return;
+    final newPart = TechWorkOrderPart(
+      id: partId,
+      name: partName,
+      serialNumber: serialNumber,
+      quantity: 1,
+    );
+    _installedParts.add(newPart);
+    _saveDraft();
+    notifyListeners();
+  }
+
   void removeUninstalledPart(String id) {
     if (_isReadOnly) return;
     _uninstalledParts.removeWhere((p) => p.id == id);

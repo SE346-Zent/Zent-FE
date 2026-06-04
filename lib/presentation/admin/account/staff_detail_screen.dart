@@ -196,7 +196,7 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                     _showDisableConfirmation(context, viewModel);
                   }
                 },
-                offset: const Offset(-138, 40),
+                offset: const Offset(-15, 25),
                 elevation: 0,
                 color: Colors.transparent,
                 shadowColor: Colors.transparent,
@@ -290,7 +290,12 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                           children: [
                             Icon(Icons.info_outline, size: 18),
                             SizedBox(width: 6),
-                            Text('Account Information'),
+                            Flexible(
+                              child: Text(
+                                'Account Info',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -300,7 +305,12 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                           children: [
                             Icon(Icons.work_outline, size: 18),
                             SizedBox(width: 6),
-                            Text('Work Performance'),
+                            Flexible(
+                              child: Text(
+                                'Performance',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -343,7 +353,7 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
           TechTextField(
             label: 'Employee ID',
             hint: 'Employee ID',
-            controller: TextEditingController(text: user.employeeId ?? ''),
+            controller: TextEditingController(text: user.employeeId ?? user.id),
             readOnly: true,
             prefixIcon: Icons.work_outline,
             suffixIcon: Icons.lock,

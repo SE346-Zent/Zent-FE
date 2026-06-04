@@ -87,16 +87,17 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    UserAvatar(
-                                      size: 20,
-                                      name: workOrder.technicianName ?? 'Technician',
-                                      avatarUrl: workOrder.technicianAvatarUrl,
-                                    ),
-                                    const SizedBox(width: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                UserAvatar(
+                                  size: 20,
+                                  name:
+                                      workOrder.technicianName ?? 'Technician',
+                                  avatarUrl: workOrder.technicianAvatarUrl,
+                                ),
+                                const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
                                     workOrder.technicianName ?? 'N/A',
@@ -123,16 +124,16 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    UserAvatar(
-                                      size: 20,
-                                      name: workOrder.customerName,
-                                      avatarUrl: workOrder.customerAvatarUrl,
-                                    ),
-                                    const SizedBox(width: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                UserAvatar(
+                                  size: 20,
+                                  name: workOrder.customerName,
+                                  avatarUrl: workOrder.customerAvatarUrl,
+                                ),
+                                const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
                                     workOrder.customerName,
@@ -215,7 +216,9 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
                           )
                         : Text(
                             'Deny',
-                            style: TextStyles.middle.copyWith(color: Colors.white),
+                            style: TextStyles.middle.copyWith(
+                              color: Colors.white,
+                            ),
                           ),
                   ),
                 ),

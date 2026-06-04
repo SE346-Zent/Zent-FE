@@ -431,7 +431,10 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     builder: (iconContext) {
                       return ThrottledGestureDetector(
                         onTap: () => _showSortingDialog(iconContext, viewModel),
-                        child: const Icon(Icons.filter_list, color: Colors.black),
+                        child: const Icon(
+                          Icons.filter_list,
+                          color: Colors.black,
+                        ),
                       );
                     },
                   ),

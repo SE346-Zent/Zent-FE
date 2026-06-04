@@ -5,6 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/add_new_part_viewmodel.dart';
@@ -99,6 +100,10 @@ class _AddNewPartContentState extends State<_AddNewPartContent> {
                                         .trim(),
                                   );
                                   if (success && context.mounted) {
+                                    ZentSuccessPopup.show(
+                                      context,
+                                      'New part form submitted successfully!',
+                                    );
                                     Navigator.of(context).pop(true);
                                   } else if (context.mounted &&
                                       viewModel.errorMessage != null) {

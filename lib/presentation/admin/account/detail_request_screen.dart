@@ -107,12 +107,12 @@ class _DetailRequestScreenContent extends StatelessWidget {
                       }
                       Navigator.pop(ctx);
                       final success = await viewModel.denyPart(reason);
-                      if (ctx.mounted) {
+                      if (context.mounted) {
                         if (success) {
-                          Navigator.of(ctx).pop(true);
+                          Navigator.of(context).pop(true);
                         } else {
                           ZentErrorPopup.show(
-                            ctx,
+                            context,
                             'Failed to reject part request',
                           );
                         }

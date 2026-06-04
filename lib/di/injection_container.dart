@@ -220,7 +220,11 @@ Future<void> init() async {
     (userId, _) => StaffDetailViewModel(authRepository: sl(), userId: userId),
   );
   sl.registerFactory(
-    () => AdminDashboardViewModel(getCurrentUserUseCase: sl()),
+    () => AdminDashboardViewModel(
+      getCurrentUserUseCase: sl(),
+      getManyWorkOrdersUseCase: sl(),
+      getPartRequestsUseCase: sl(),
+    ),
   );
   sl.registerFactory(
     () => admin_personal_info.AdminPersonalInfoViewModel(

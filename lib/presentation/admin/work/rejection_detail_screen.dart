@@ -192,7 +192,7 @@ class _RejectionDetailContent extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ThrottledGestureDetector(
-                        onTap: viewModel.isLoading
+                        onTap: viewModel.isApproving || viewModel.isDenying
                             ? null
                             : () async {
                                 final error = await viewModel.denyRejection();
@@ -200,7 +200,7 @@ class _RejectionDetailContent extends StatelessWidget {
                                   if (error != null) {
                                     ZentErrorPopup.show(context, error);
                                   } else {
-                                    context.pop();
+                                    context.pop(true);
                                   }
                                 }
                               },
@@ -214,7 +214,7 @@ class _RejectionDetailContent extends StatelessWidget {
                             boxShadow: [BoxShadowStyles.glowing],
                           ),
                           alignment: Alignment.center,
-                          child: viewModel.isLoading
+                          child: viewModel.isDenying
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
@@ -236,7 +236,7 @@ class _RejectionDetailContent extends StatelessWidget {
                     const SizedBox(width: AppDimens.spaceMd),
                     Expanded(
                       child: ThrottledGestureDetector(
-                        onTap: viewModel.isLoading
+                        onTap: viewModel.isApproving || viewModel.isDenying
                             ? null
                             : () async {
                                 final error = await viewModel
@@ -245,7 +245,7 @@ class _RejectionDetailContent extends StatelessWidget {
                                   if (error != null) {
                                     ZentErrorPopup.show(context, error);
                                   } else {
-                                    context.pop();
+                                    context.pop(true);
                                   }
                                 }
                               },
@@ -258,7 +258,7 @@ class _RejectionDetailContent extends StatelessWidget {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: viewModel.isLoading
+                          child: viewModel.isApproving
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,

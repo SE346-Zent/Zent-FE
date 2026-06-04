@@ -23,6 +23,12 @@ class RejectionDetailViewModel extends ChangeNotifier with SafeChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _isApproving = false;
+  bool get isApproving => _isApproving;
+
+  bool _isDenying = false;
+  bool get isDenying => _isDenying;
+
   bool _isDisposed = false;
 
   @override
@@ -49,7 +55,7 @@ class RejectionDetailViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<String?> approveRejection() async {
     if (_workOrder == null) return 'No work order data';
-    _isLoading = true;
+    _isApproving = true;
     notifyListeners();
 
     try {
@@ -61,17 +67,18 @@ class RejectionDetailViewModel extends ChangeNotifier with SafeChangeNotifier {
       return null;
     } catch (e) {
       debugPrint('Error approving rejection: $e');
-      _isLoading = false;
+      return e.toString();
+    } finally {
+      _isApproving = false;
       if (!_isDisposed) {
         notifyListeners();
       }
-      return e.toString();
     }
   }
 
   Future<String?> denyRejection() async {
     if (_workOrder == null) return 'No work order data';
-    _isLoading = true;
+    _isDenying = true;
     notifyListeners();
 
     try {
@@ -80,11 +87,12 @@ class RejectionDetailViewModel extends ChangeNotifier with SafeChangeNotifier {
       return null;
     } catch (e) {
       debugPrint('Error denying rejection: $e');
-      _isLoading = false;
+      return e.toString();
+    } finally {
+      _isDenying = false;
       if (!_isDisposed) {
         notifyListeners();
       }
-      return e.toString();
     }
   }
 }

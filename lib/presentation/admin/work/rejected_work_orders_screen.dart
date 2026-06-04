@@ -96,10 +96,19 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
                           onApprove: () =>
                               _handleApprove(context, viewModel, wo),
                           onDeny: () => _handleDeny(context, viewModel, wo.id),
-                          onDetailTap: () => context.goNamed(
-                            RouteNames.adminRejectionDetail,
-                            pathParameters: {'id': wo.id},
-                          ),
+                          onDetailTap: () async {
+                            final refresh = await context.pushNamed<bool>(
+                              RouteNames.adminRejectionDetail,
+                              pathParameters: {'id': wo.id},
+                            );
+                            if (refresh == true && context.mounted) {
+                              ZentSuccessPopup.show(
+                                context,
+                                'Rejection request resolved successfully!',
+                              );
+                              viewModel.loadRejectedWorkOrders();
+                            }
+                          },
                         );
                       },
                     ),
@@ -117,7 +126,10 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
     if (error != null) {
       ZentErrorPopup.show(context, 'Error: $error');
     } else {
-      ZentSuccessPopup.show(context, 'Approved work order rejection successfully!');
+      ZentSuccessPopup.show(
+        context,
+        'Approved work order rejection successfully!',
+      );
     }
   }
 
@@ -131,7 +143,10 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
     if (error != null) {
       ZentErrorPopup.show(context, 'Error: $error');
     } else {
-      ZentSuccessPopup.show(context, 'Denied work order rejection successfully!');
+      ZentSuccessPopup.show(
+        context,
+        'Denied work order rejection successfully!',
+      );
     }
   }
 }

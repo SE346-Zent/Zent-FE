@@ -232,10 +232,16 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
       offset: const Offset(0, 40),
       onSelected: (value) {
         if (value == 'addPart') {
-          context.pushNamed(
-            RouteNames.techAddNewPart,
-            extra: {'workOrderId': cleanId, 'workOrderNumber': woNum},
-          );
+          context
+              .pushNamed(
+                RouteNames.techAddNewPart,
+                extra: {'workOrderId': cleanId, 'workOrderNumber': woNum},
+              )
+              .then((refresh) {
+                if (refresh == true && context.mounted) {
+                  viewModel.loadDetails();
+                }
+              });
         } else if (value == 'reject') {
           context
               .pushNamed(

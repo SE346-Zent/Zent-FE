@@ -19,6 +19,7 @@ class WorkOrder {
   final String customerName;
   final String technicianId;
   final String? technicianName;
+  final double? technicianRating;
   final String workOrderNum;
   final List<String> rejectionPhotos;
   final String? productName;
@@ -54,6 +55,7 @@ class WorkOrder {
     this.customerName = '',
     required this.technicianId,
     this.technicianName,
+    this.technicianRating,
     required this.workOrderNum,
     this.rejectionPhotos = const [],
     this.productName,

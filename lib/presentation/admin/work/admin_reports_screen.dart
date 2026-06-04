@@ -344,12 +344,17 @@ class _AdminReportsScreenContentState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        cat['name'],
-                        style: TextStyles.bodyLarge.copyWith(
-                          color: AppColors.secondary500,
+                      Expanded(
+                        child: Text(
+                          cat['name'],
+                          style: TextStyles.bodyLarge.copyWith(
+                            color: AppColors.secondary500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),
                       ),
+                      const SizedBox(width: AppDimens.spaceSm),
                       Text(
                         cat['label'],
                         style: TextStyles.label.copyWith(

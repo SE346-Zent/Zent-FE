@@ -1,5 +1,6 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../domain/entities/work_order.dart';
 import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
@@ -17,8 +18,10 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
   List<WorkOrder> _allWorkOrders = [];
   bool isLoading = false;
   bool _isDisposed = false;
+  String _appointmentSort = 'None';
 
   int get activeTabIndex => _activeTabIndex;
+  String get appointmentSort => _appointmentSort;
 
   @override
   void dispose() {
@@ -31,6 +34,20 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
       _activeTabIndex = index;
       notifyListeners();
       loadWorkOrders();
+    }
+  }
+
+  void updateAppointmentSort(String sort) {
+    if (_appointmentSort != sort) {
+      _appointmentSort = sort;
+      notifyListeners();
+    }
+  }
+
+  void resetSort() {
+    if (_appointmentSort != 'None') {
+      _appointmentSort = 'None';
+      notifyListeners();
     }
   }
 
@@ -98,11 +115,11 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
       if (backendStatus == 'pending') {
         if (wo.technicianId.isEmpty) {
           uiStatusEnum = 'unassigned';
-          statusDisplay = 'Pending assignment';
+          statusDisplay = 'Pending';
           isAssigned = false;
         } else {
           uiStatusEnum = 'pending_acceptance';
-          statusDisplay = 'Pending assignment';
+          statusDisplay = 'Pending';
           isAssigned = true;
         }
       } else if (backendStatus == 'Assigned' || backendStatus == 'assigned') {
@@ -143,19 +160,25 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
 
       return {
         'id': '#${wo.id}',
+        'displayId': '#${wo.workOrderNum.isNotEmpty ? wo.workOrderNum : wo.id}',
         'title': wo.title,
         'assignee': assigneeText,
         'isAssigned': isAssigned,
         'location': wo.addressString,
-        'time': wo.createdAt.toIso8601String(),
+        'time': DateFormat(
+          "MMM dd, yyyy - hh:mm a",
+        ).format(wo.appointment ?? wo.createdAt),
         'status': statusDisplay,
         'statusEnum': uiStatusEnum,
+        'createdAt': wo.createdAt,
       };
     }).toList();
 
+    List<Map<String, dynamic>> filteredJobs = jobs;
+
     switch (_activeTabIndex) {
       case 1: // Assigned
-        return jobs
+        filteredJobs = jobs
             .where(
               (j) =>
                   j['isAssigned'] == true &&
@@ -163,23 +186,38 @@ class OperationalQueueViewModel extends ChangeNotifier with SafeChangeNotifier {
                   j['statusEnum'] != 'rejected',
             )
             .toList();
+        break;
       case 2: // Unassigned
-        return jobs.where((j) => j['statusEnum'] == 'unassigned').toList();
+        filteredJobs = jobs
+            .where((j) => j['statusEnum'] == 'unassigned')
+            .toList();
+        break;
       case 3: // Completed
-        return jobs
+        filteredJobs = jobs
             .where(
               (j) =>
                   j['statusEnum'] == 'completed' ||
                   j['statusEnum'] == 'rejected',
             )
             .toList();
+        break;
       case 4: // Rejections
-        return jobs
+        filteredJobs = jobs
             .where((j) => j['statusEnum'] == 'reject_in_review')
             .toList();
+        break;
       case 0: // All Jobs
       default:
-        return jobs;
+        filteredJobs = jobs;
+        break;
     }
+
+    if (_appointmentSort == 'Latest first') {
+      filteredJobs.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+    } else if (_appointmentSort == 'Earliest first') {
+      filteredJobs.sort((a, b) => a['createdAt'].compareTo(b['createdAt']));
+    }
+
+    return filteredJobs;
   }
 }

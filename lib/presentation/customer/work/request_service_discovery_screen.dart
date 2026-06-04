@@ -71,11 +71,13 @@ class _RequestServiceDiscoveryScreenState
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Registered Devices',
-                              style: TextStyles.title.copyWith(
-                                color: Colors.black,
-                                fontSize: 20,
+                            Expanded(
+                              child: Text(
+                                'Registered Devices',
+                                style: TextStyles.title.copyWith(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
                               ),
                             ),
                             TextButton.icon(

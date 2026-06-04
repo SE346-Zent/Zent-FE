@@ -21,6 +21,7 @@ class WorkOrderModel extends WorkOrder {
     super.customerName = '',
     required super.technicianId,
     super.technicianName,
+    super.technicianRating,
     required super.workOrderNum,
     super.rejectionPhotos = const [],
     super.productName,
@@ -57,6 +58,7 @@ class WorkOrderModel extends WorkOrder {
       customerName: entity.customerName,
       technicianId: entity.technicianId,
       technicianName: entity.technicianName,
+      technicianRating: entity.technicianRating,
       workOrderNum: entity.workOrderNum,
       rejectionPhotos: entity.rejectionPhotos,
       productName: entity.productName,
@@ -166,6 +168,18 @@ class WorkOrderModel extends WorkOrder {
       technicianName:
           json['technicianName'] as String? ??
           json['technician_name'] as String?,
+      technicianRating:
+          (json['technicianAverageRating'] as num?)?.toDouble() ??
+          (json['averageRating'] as num?)?.toDouble() ??
+          (json['technician_rating'] as num?)?.toDouble() ??
+          (json['technician'] is Map
+                  ? (json['technician'] as Map)['averageRating'] as num?
+                  : null)
+              ?.toDouble() ??
+          (json['technician'] is Map
+                  ? (json['technician'] as Map)['rating'] as num?
+                  : null)
+              ?.toDouble(),
       workOrderNum:
           json['workOrderNum'] as String? ??
           json['workOrderNumber'] as String? ??

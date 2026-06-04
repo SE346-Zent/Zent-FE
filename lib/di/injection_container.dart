@@ -240,6 +240,7 @@ Future<void> init() async {
     () => AssignWorkOrderViewModel(
       getTechniciansUseCase: sl(),
       assignWorkOrderUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
     ),
   );
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());

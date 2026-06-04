@@ -355,6 +355,7 @@ Future<void> init() async {
       getMyProductsUseCase: sl(),
       getCurrentUserUseCase: sl(),
       getPartCatalogUseCase: sl(),
+      getScmProductsUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => NotificationsViewModel());

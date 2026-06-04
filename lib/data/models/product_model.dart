@@ -50,13 +50,21 @@ class ProductModel extends Product {
         ? ProductWarrantyModel.fromJson(warrantyJson)
         : null;
 
+    DateTime? parsedWarrantyUntil;
+    if (warranty != null && warranty.endDate.isNotEmpty) {
+      try {
+        parsedWarrantyUntil = DateTime.parse(warranty.endDate);
+      } catch (_) {}
+    }
+
     return ProductModel(
       id: json['productId']?.toString() ?? '',
       name: json['productName']?.toString() ?? '',
-      model: '',        // Zent BE doesn't return model code in this endpoint
+      model: (json['model'] ?? json['modelCode'] ?? json['modelName'] ?? json['productModel'] ?? '').toString(),
       serialNumber: json['serialNumber']?.toString() ?? '',
       productImageUrl: (json['productImageUrl'] ?? json['imageUrl'])?.toString(),
       warranty: warranty,
+      warrantyUntil: parsedWarrantyUntil,
     );
   }
 
@@ -64,7 +72,7 @@ class ProductModel extends Product {
     return ProductModel(
       id: json['id'] as String,
       name: json['name'] as String,
-      model: json['model'] as String,
+      model: (json['model'] ?? json['modelCode'] ?? json['modelName'] ?? json['productModel'] ?? '') as String,
       serialNumber: json['serialNumber'] as String,
       warrantyUntil: json['warrantyUntil'] != null
           ? DateTime.parse(json['warrantyUntil'] as String)

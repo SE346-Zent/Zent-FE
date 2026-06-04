@@ -10,6 +10,7 @@ import 'package:zent_fe/presentation/customer/account/widgets/background.dart';
 import 'package:zent_fe/presentation/customer/work/widgets/service_action_card.dart';
 import 'package:zent_fe/presentation/customer/work/widgets/service_header.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 
 class CustomerServiceScreen extends StatelessWidget {
   const CustomerServiceScreen({super.key});
@@ -43,6 +44,8 @@ class _ServiceScreenContentState extends State<_ServiceScreenContent> {
         NotificationNavigator.processPendingNotification(context, role);
       });
     }
+    // Refresh notifications unread count on entry
+    context.read<NotificationsViewModel>().fetchUnreadCount();
   }
 
   void _onServiceCardTapped(BuildContext context, String? routeName) {

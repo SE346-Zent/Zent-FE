@@ -57,17 +57,33 @@ class ServiceHeader extends StatelessWidget {
                           ),
                           if (hasUnread)
                             Positioned(
-                              top: 0,
-                              right: 0,
+                              top: -4,
+                              right: -4,
                               child: Container(
-                                width: 8,
-                                height: 8,
+                                padding: const EdgeInsets.all(2),
                                 decoration: BoxDecoration(
                                   color: AppColors.tertiary500,
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: AppColors.primary500,
                                     width: 1.5,
+                                  ),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    viewModel.unreadCount > 99
+                                        ? '99+'
+                                        : '${viewModel.unreadCount}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),

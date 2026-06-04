@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:zent_fe/data/models/create_work_order_request.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/work_order/create_work_order_usecase.dart';
+import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
 import 'package:intl/intl.dart';
@@ -462,6 +464,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         finalProv = 'HN';
       }
 
+      final resolvedReferenceTicketId = await _resolveReferenceTicketId(ticketRef);
+
       final request = CreateWorkOrderRequest(
         address: address ?? '',
         appointment: formattedAppointment,
@@ -473,9 +477,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         lastName: lastName ?? '',
         phoneNumber: phone,
         productId: selectedProductId ?? '',
-        referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
-            ? ticketRef
-            : null,
+        referenceTicketId: resolvedReferenceTicketId,
         ward: ward ?? '',
         province: finalProv,
         workOrderSymptomId: symptomId,
@@ -504,6 +506,38 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<String?> _resolveReferenceTicketId(String? ticketRef) async {
+    if (ticketRef == null || ticketRef.trim().isEmpty) {
+      return null;
+    }
+    final trimmed = ticketRef.trim();
+    final uuidRegex = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    );
+    final uuidNoDashesRegex = RegExp(r'^[0-9a-fA-F]{32}$');
+    if (uuidRegex.hasMatch(trimmed) || uuidNoDashesRegex.hasMatch(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      final getManyUseCase = sl<GetManyWorkOrdersUseCase>();
+      final orders = await getManyUseCase.execute(limit: 1000);
+      final match = orders.cast<WorkOrder?>().firstWhere(
+        (o) => o != null && o.workOrderNum.trim().toLowerCase() == trimmed.toLowerCase(),
+        orElse: () => null,
+      );
+      if (match != null) {
+        return match.id;
+      }
+    } catch (e) {
+      debugPrint("Error resolving reference ticket UUID: $e");
+    }
+
+    throw BusinessException(
+      'Reference ticket "$trimmed" not found. Please enter a valid Work Order number.',
+    );
   }
 
   Future<void> reset() async {

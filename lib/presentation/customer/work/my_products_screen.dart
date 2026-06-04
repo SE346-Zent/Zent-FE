@@ -162,6 +162,7 @@ class _MyProductsView extends StatelessWidget {
                             return ProductItemCard(
                               name: product.name,
                               serialNumber: product.serialNumber,
+                              model: product.model,
                               warrantyDate: warrantyDate,
                               status: viewModel.getProductStatus(product),
                               imagePath: viewModel.getProductImage(product),

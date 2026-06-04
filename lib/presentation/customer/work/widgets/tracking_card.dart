@@ -60,7 +60,7 @@ class TrackingCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          workOrder.title,
+                          workOrder.title.isNotEmpty ? workOrder.title : 'No Title',
                           style: TextStyles.headline.copyWith(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -93,7 +93,13 @@ class TrackingCard extends StatelessWidget {
                                         '',
                                       ),
                                     },
-                                  );
+                                  ).then((_) {
+                                    if (context.mounted) {
+                                      context
+                                          .read<ActiveRepairsViewModel>()
+                                          .fetchWorkOrders();
+                                    }
+                                  });
                                 },
                               ),
                             ),
@@ -104,8 +110,8 @@ class TrackingCard extends StatelessWidget {
                                 bgColor: AppColors.tertiary500,
                                 textColor: Colors.white,
                                 shadow: BoxShadowStyles.glowing,
-                                onTap: () async {
-                                  final result = await context.pushNamed(
+                                onTap: () {
+                                  context.pushNamed(
                                     RouteNames.customerEditWorkOrder,
                                     pathParameters: {
                                       'workOrderId': workOrder.id,
@@ -114,12 +120,13 @@ class TrackingCard extends StatelessWidget {
                                           ? workOrder.workOrderNum
                                           : workOrder.id,
                                     },
-                                  );
-                                  if (result == true && context.mounted) {
-                                    context
-                                        .read<ActiveRepairsViewModel>()
-                                        .fetchWorkOrders();
-                                  }
+                                  ).then((_) {
+                                    if (context.mounted) {
+                                      context
+                                          .read<ActiveRepairsViewModel>()
+                                          .fetchWorkOrders();
+                                    }
+                                  });
                                 },
                               ),
                             ),
@@ -206,9 +213,9 @@ class TrackingCard extends StatelessWidget {
                         });
                   }
                 },
-                child: const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Icon(
+                child: Padding(
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.28),
+                  child: const Icon(
                     Icons.more_horiz,
                     color: AppColors.secondary500,
                     size: 24,

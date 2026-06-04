@@ -1,6 +1,7 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import '../../../../domain/entities/work_order.dart';
+import '../../../../domain/entities/enums/work_order_status.dart';
 import '../../../../domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 
@@ -17,7 +18,7 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
   final List<String> filters = [
     'All Jobs',
     'In Progress',
-    'Pending',
+    'Assigned',
     'Completed',
   ];
 
@@ -28,13 +29,18 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
     if (selectedFilterIndex == 0) return _allOrders;
     final statusFilter = filters[selectedFilterIndex].toLowerCase();
 
-    // Simple mapping for demo/logic
     return _allOrders.where((order) {
-      final status = order.status.name; // Use exact enum name
-      if (statusFilter == 'in progress') return status == 'inProg';
-      if (statusFilter == 'pending') return status == 'pending';
-      if (statusFilter == 'completed') return status == 'complete';
-      return status.toLowerCase() == statusFilter;
+      final status = order.status;
+      if (statusFilter == 'in progress') {
+        return status == WorkOrderStatus.assigned && order.statusId == 3;
+      }
+      if (statusFilter == 'assigned') {
+        return status == WorkOrderStatus.assigned && order.statusId == 2;
+      }
+      if (statusFilter == 'completed') {
+        return status == WorkOrderStatus.complete;
+      }
+      return status.name.toLowerCase() == statusFilter;
     }).toList();
   }
 
@@ -45,8 +51,10 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
     try {
       final user = await getCurrentUserUseCase.execute();
       if (user != null) {
-        final results = await getManyWorkOrdersUseCase.execute(limit: 100);
-        // The server already filters work orders by the technician's token identity.
+        final results = await getManyWorkOrdersUseCase.execute(
+          limit: 100,
+          technicianId: user.id,
+        );
         _allOrders = results;
       }
     } catch (e) {

@@ -79,7 +79,7 @@ class UserModel extends User {
       role: _mapRole(json['role'], json['roleId'] ?? json['roleId']),
       province: (json['province'] ?? '').toString(),
       avatarUrl: AvatarUtils.getAvatarUrl(avatarRaw),
-      employeeId: json['employeeId'] as String?,
+      employeeId: (json['employeeId'] ?? json['employee_id'])?.toString(),
       ratingCounts: ratingCounts,
       status: status,
     );

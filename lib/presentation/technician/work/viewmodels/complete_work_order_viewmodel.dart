@@ -343,10 +343,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
         _signaturePoints.addAll(draft.signaturePoints);
 
         // Update controllers (this triggers listeners, but is guarded by _isLoading)
-        mtmController.text = draft.mtm.isEmpty ? '20H1A001VN' : draft.mtm;
-        serialNumberController.text = draft.serialNumber.isEmpty
-            ? 'PF0QWER1'
-            : draft.serialNumber;
+        mtmController.text = draft.mtm;
+        serialNumberController.text = draft.serialNumber;
         diagnosticNotesController.text = draft.diagnosticNotes.isEmpty
             ? 'Replaced faulty motherboard and verified all components. Hardware tests passed.'
             : draft.diagnosticNotes;
@@ -362,8 +360,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
   }
 
   void _setInitialMockData() {
-    mtmController.text = '20H1A001VN';
-    serialNumberController.text = 'PF0QWER1';
+    mtmController.text = '';
+    serialNumberController.text = '';
     diagnosticNotesController.text =
         'Replaced faulty motherboard and verified all components. Hardware tests passed.';
 

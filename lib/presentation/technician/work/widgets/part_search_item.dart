@@ -66,8 +66,6 @@ class PartSearchItem extends StatelessWidget {
                         style: TextStyles.label.copyWith(
                           color: AppColors.secondary500,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

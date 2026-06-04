@@ -33,8 +33,8 @@ class AdminPersonalInfoViewModel extends ChangeNotifier
         email = user.email;
         phoneNumber = user.phoneNumber;
         avatarUrl = user.avatarUrl;
-        adminId =
-            'ADMIN-${user.id.length > 4 ? user.id.substring(0, 4) : user.id}';
+        final rawId = user.employeeId ?? user.id;
+        adminId = rawId.length > 10 ? rawId.substring(0, 10).toUpperCase() : rawId.toUpperCase();
         notifyListeners();
       }
     } catch (e) {

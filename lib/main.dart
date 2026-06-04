@@ -43,7 +43,7 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   try {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
     await dotenv.load(fileName: ".env");
     await di.init();
     
@@ -70,7 +70,7 @@ Future<void> main() async {
     const InitializationSettings initializationSettings =
         InitializationSettings(
           android: AndroidInitializationSettings(
-            '@mipmap/ic_launcher',
+            '@mipmap/launcher_icon',
           ), // Use your app icon
         );
     await flutterLocalNotificationsPlugin.initialize(
@@ -165,14 +165,14 @@ void _setupForegroundMessaging() {
       // Use jsonEncode so we can properly parse it in onDidReceiveNotificationResponse
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
-        notification.title,
+        notification.title?.isNotEmpty == true ? notification.title : 'Unknown Product',
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
             channelDescription: channel.description,
-            icon: '@mipmap/ic_launcher',
+            icon: '@mipmap/launcher_icon',
             importance: Importance.max,
             priority: Priority.high,
           ),

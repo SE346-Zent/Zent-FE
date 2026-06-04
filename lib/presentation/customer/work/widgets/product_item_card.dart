@@ -10,6 +10,7 @@ import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 class ProductItemCard extends StatelessWidget {
   final String name;
   final String serialNumber;
+  final String model;
   final String warrantyDate;
   final String status;
   final String imagePath;
@@ -18,6 +19,7 @@ class ProductItemCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.serialNumber,
+    required this.model,
     required this.warrantyDate,
     required this.status,
     required this.imagePath,
@@ -109,6 +111,25 @@ class ProductItemCard extends StatelessWidget {
                       ),
                       Text(
                         serialNumber,
+                        style: TextStyles.bodyMedium.copyWith(
+                          color: AppColors.secondary700,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Model
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Model',
+                        style: TextStyles.bodyLarge.copyWith(
+                          color: AppColors.secondary500,
+                        ),
+                      ),
+                      Text(
+                        model.isNotEmpty ? model : 'N/A',
                         style: TextStyles.bodyMedium.copyWith(
                           color: AppColors.secondary700,
                         ),

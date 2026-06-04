@@ -18,7 +18,8 @@ class WorkOrderCard extends StatelessWidget {
     // Priority: 0-Normal, 1-High (based on typical mapping, check if different)
     final isHighPriority = order.priority > 0;
     final isCompleted = order.status == WorkOrderStatus.complete;
-    final isPending = order.status == WorkOrderStatus.pending;
+    final isPending = order.status == WorkOrderStatus.pending ||
+        (order.status == WorkOrderStatus.assigned && order.statusId == 2);
 
     // Priority Color Processing
     final priorityColor = isHighPriority

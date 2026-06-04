@@ -26,12 +26,14 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetMyProductsUseCase getMyProductsUseCase;
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final GetPartCatalogUseCase getPartCatalogUseCase;
+  final GetScmProductsUseCase getScmProductsUseCase;
 
   PartsViewModel({
     required this.getPartsUseCase,
     required this.getMyProductsUseCase,
     required this.getCurrentUserUseCase,
     required this.getPartCatalogUseCase,
+    required this.getScmProductsUseCase,
   });
 
   Product? product;
@@ -63,6 +65,17 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
           productId = product?.id;
         } catch (_) {
           product = null;
+        }
+
+        // Resolve SCM product ID by querying SCM database using the serial number first
+        try {
+          final (scmProducts, _) = await getScmProductsUseCase.execute(query: serialNumber);
+          final scmMatch = scmProducts.firstWhere(
+            (p) => p.serialNumber == serialNumber,
+          );
+          productId = scmMatch.id;
+        } catch (_) {
+          // Fall back to resolved local product ID
         }
 
         if (productId != null) {

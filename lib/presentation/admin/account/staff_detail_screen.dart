@@ -335,7 +335,7 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
           TechTextField(
             label: 'Employee ID',
             hint: 'Employee ID',
-            controller: TextEditingController(text: user.employeeId ?? ''),
+            controller: TextEditingController(text: user.employeeId ?? user.id),
             readOnly: true,
             prefixIcon: Icons.work_outline,
             suffixIcon: Icons.lock,

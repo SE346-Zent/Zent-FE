@@ -75,13 +75,15 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TechSecurityViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      appBar: const TechAppBar(
-        title: 'Security Settings',
-        showBackButton: true,
-        showBottomDivider: true,
-      ),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        appBar: const TechAppBar(
+          title: 'Security Settings',
+          showBackButton: true,
+          showBottomDivider: true,
+        ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -259,7 +261,7 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildRecoveryEmailSection(

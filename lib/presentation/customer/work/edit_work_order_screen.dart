@@ -234,6 +234,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                                             }
                                           },
                                           isRequired: true,
+                                          isSearchable: true,
                                         ),
                                         const SizedBox(
                                           height: AppDimens.spaceMd,

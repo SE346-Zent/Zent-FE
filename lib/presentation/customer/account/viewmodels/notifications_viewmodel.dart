@@ -2,6 +2,9 @@ import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/repositories/notification_repository.dart';
 import 'package:zent_fe/data/models/notification_preference_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 
 class CustomerNotificationsViewModel extends ChangeNotifier
     with SafeChangeNotifier {
@@ -63,6 +66,8 @@ class CustomerNotificationsViewModel extends ChangeNotifier
     try {
       _preferences = await notificationRepository.getNotificationPreferences();
       _localToggles.clear();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('pref_direct_message_enabled', directMessage);
     } catch (e) {
       debugPrint('Error loading notification preferences: $e');
     } finally {
@@ -127,19 +132,17 @@ class CustomerNotificationsViewModel extends ChangeNotifier
 
       await loadPreferences();
 
+      // Explicitly store the updated preference after loadPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('pref_direct_message_enabled', directMessage);
+
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Notification settings saved successfully!'),
-          ),
-        );
+        ZentSuccessPopup.show(context, 'Notification settings saved successfully!');
       }
     } catch (e) {
       debugPrint('Error saving notification preferences: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save settings: $e')),
-        );
+        ZentErrorPopup.show(context, 'Failed to save settings: $e');
       }
     } finally {
       _isLoading = false;

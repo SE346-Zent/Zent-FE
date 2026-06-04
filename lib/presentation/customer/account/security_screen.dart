@@ -73,13 +73,15 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<CustomerSecurityViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      appBar: const CustomerAppBar(
-        title: 'Security Settings',
-        showBackButton: true,
-        showBottomDivider: true,
-      ),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        appBar: const CustomerAppBar(
+          title: 'Security Settings',
+          showBackButton: true,
+          showBottomDivider: true,
+        ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -192,7 +194,7 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildRecoveryEmailSection(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -89,12 +91,15 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                         ),
                         const SizedBox(height: AppDimens.spaceLg),
 
-                        if (viewModel.activeWorkOrder != null) ...[
-                          TrackingCard(
-                            workOrder: viewModel.activeWorkOrder!,
-                            currentStatusStep: viewModel.currentStatusStep,
-                          ),
-                          const SizedBox(height: AppDimens.spaceXl),
+                        if (viewModel.activeWorkOrders.isNotEmpty) ...[
+                          for (final order in viewModel.activeWorkOrders) ...[
+                            TrackingCard(
+                              workOrder: order,
+                              currentStatusStep: viewModel.mapStatusToStep(order),
+                            ),
+                            const SizedBox(height: AppDimens.spaceLg),
+                          ],
+                          const SizedBox(height: AppDimens.spaceMd),
                         ] else ...[
                           Container(
                             padding: const EdgeInsets.all(AppDimens.spaceLg),
@@ -127,7 +132,18 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
                         ? const SizedBox()
                         : RecentCompletedList(
                             recentCompleted: viewModel.recentCompleted,
-                            onSelected: viewModel.selectActiveWorkOrder,
+                            onSelected: (order) {
+                              context.pushNamed(
+                                RouteNames.customerWorkOrderDetails,
+                                pathParameters: {
+                                  'workOrderId': order.id.replaceAll('#', ''),
+                                },
+                              ).then((_) {
+                                if (context.mounted) {
+                                  viewModel.fetchWorkOrders();
+                                }
+                              });
+                            },
                           ),
                   ),
                 ),

@@ -8,7 +8,6 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/customer/account/widgets/customer_app_bar.dart';
 import 'viewmodels/edit_work_order_viewmodel.dart';
-import 'widgets/small_product_item_card.dart';
 import 'widgets/customer_text_field.dart';
 import 'widgets/customer_dropdown_field.dart';
 import 'widgets/appointment_mask.dart';
@@ -30,7 +29,6 @@ class EditWorkOrderScreen extends StatefulWidget {
 class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
   late final EditWorkOrderViewModel _viewModel;
 
-  bool _isProductsExpanded = true;
   bool _isAddressExpanded = true;
   bool _isAppointmentExpanded = true;
 
@@ -190,60 +188,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // 1. Products Section
-                          _buildSectionHeader(
-                            title: "Products",
-                            isExpanded: _isProductsExpanded,
-                            onTap: () => setState(
-                              () => _isProductsExpanded = !_isProductsExpanded,
-                            ),
-                          ),
-                          AnimatedSize(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            child: _isProductsExpanded
-                                ? Container(
-                                    height: 110,
-                                    margin: const EdgeInsets.only(
-                                      top: AppDimens.spaceSm,
-                                      bottom: AppDimens.spaceMd,
-                                    ),
-                                    child: vm.products.isEmpty
-                                        ? const Center(
-                                            child: Text("No products found"),
-                                          )
-                                        : ListView.separated(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: vm.products.length,
-                                            separatorBuilder:
-                                                (context, index) =>
-                                                    const SizedBox(
-                                                      width: AppDimens.spaceMd,
-                                                    ),
-                                            itemBuilder: (context, index) {
-                                              final product =
-                                                  vm.products[index];
-                                              return SmallProductItemCard(
-                                                name: product.name,
-                                                status: vm.getProductStatus(
-                                                  product,
-                                                ),
-                                                imagePath:
-                                                    product.productImageUrl ??
-                                                    '',
-                                                isSelected:
-                                                    vm.selectedSerialNumber ==
-                                                    product.serialNumber,
-                                                onTap: () => vm.selectDevice(
-                                                  product.id,
-                                                  product.serialNumber,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
+
                           // 2. Change Address Section
                           _buildSectionHeader(
                             title: "Change Address",

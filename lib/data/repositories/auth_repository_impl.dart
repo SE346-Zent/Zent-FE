@@ -9,6 +9,7 @@ import '../models/login_history_entry_model.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/exceptions/business_exception.dart';
+import 'package:zent_fe/presentation/common/core/ui/avatar_utils.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -37,10 +38,19 @@ class AuthRepositoryImpl implements AuthRepository {
       response.refreshToken,
     );
 
-    // 2. Save User Info
-    await authLocalDataSource.saveUser(response.user);
+    // 2. Fetch fresh user info to get the actual uploaded avatar url, etc.
+    User latestUser;
+    try {
+      latestUser = await getMe();
+    } catch (e) {
+      debugPrint("Failed to fetch fresh user profile on login: $e");
+      latestUser = response.user;
+    }
 
-    return response.user;
+    // 3. Save User Info
+    await authLocalDataSource.saveUser(latestUser);
+
+    return latestUser;
   }
 
   @override
@@ -56,10 +66,19 @@ class AuthRepositoryImpl implements AuthRepository {
       response.refreshToken,
     );
 
-    // 2. Save User Info
-    await authLocalDataSource.saveUser(response.user);
+    // 2. Fetch fresh user info
+    User latestUser;
+    try {
+      latestUser = await getMe();
+    } catch (e) {
+      debugPrint("Failed to fetch fresh user profile on googleLogin: $e");
+      latestUser = response.user;
+    }
 
-    return response.user;
+    // 3. Save User Info
+    await authLocalDataSource.saveUser(latestUser);
+
+    return latestUser;
   }
 
   @override
@@ -174,10 +193,19 @@ class AuthRepositoryImpl implements AuthRepository {
             response.accessToken,
             response.refreshToken,
           );
-          await authLocalDataSource.saveUser(response.user);
+
+          User latestUser;
+          try {
+            latestUser = await getMe();
+          } catch (e) {
+            debugPrint("Failed to fetch fresh user profile on restoreSession: $e");
+            latestUser = response.user;
+          }
+
+          await authLocalDataSource.saveUser(latestUser);
 
           try {
-            sl<AuthViewModel>().setLoggedInUser(response.user);
+            sl<AuthViewModel>().setLoggedInUser(latestUser);
           } catch (e) {
             debugPrint("Could not set user in AuthViewModel: $e");
           }
@@ -332,5 +360,71 @@ class AuthRepositoryImpl implements AuthRepository {
       currentPassword: currentPassword,
       newPassword: newPassword,
     );
+  }
+
+  @override
+  Future<String> uploadAvatar(String filePath) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+
+    final avatarName = await authRemoteService.uploadAvatar(
+      accessToken: accessToken,
+      filePath: filePath,
+    );
+
+    final fullUrl = AvatarUtils.getAvatarUrl(avatarName);
+
+    final currentUser = await authLocalDataSource.getUser();
+    if (currentUser != null) {
+      final updatedUser = UserModel(
+        id: currentUser.id,
+        email: currentUser.email,
+        name: currentUser.name,
+        phoneNumber: currentUser.phoneNumber,
+        role: currentUser.role,
+        province: currentUser.province,
+        avatarUrl: fullUrl,
+      );
+      await authLocalDataSource.saveUser(updatedUser);
+      sl<AuthViewModel>().setLoggedInUser(updatedUser);
+    }
+
+    return avatarName;
+  }
+
+  @override
+  Future<void> updateUserStatus(String userId, int statusId) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.updateUserStatus(
+      accessToken: accessToken,
+      userId: userId,
+      statusId: statusId,
+    );
+  }
+
+  @override
+  Future<void> closeAccount() async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.closeAccount(accessToken: accessToken);
+    await logout();
+    sl<AuthViewModel>().clearUser();
+  }
+
+  @override
+  Future<User> getMe() async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    final userMap = await authRemoteService.getMe(accessToken: accessToken);
+    return UserModel.fromJson(userMap);
   }
 }

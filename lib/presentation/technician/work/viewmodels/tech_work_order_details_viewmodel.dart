@@ -62,6 +62,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
   }
 
   String get customerName => workOrder?.customerName ?? "John Doe";
+  String? get customerAvatarUrl => workOrder?.customerAvatarUrl;
   String get customerAddress =>
       workOrder?.addressString ?? "123 Hoa Binh, Quan Tan Phu, TPHCM";
 

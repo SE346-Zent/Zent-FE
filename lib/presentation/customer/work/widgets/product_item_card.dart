@@ -50,7 +50,7 @@ class ProductItemCard extends StatelessWidget {
           children: [
             // Image
             AppNetworkImage(
-              url: imagePath.startsWith('http') ? imagePath : null,
+              url: imagePath,
               width: double.infinity,
               height: 140,
               fit: BoxFit.cover,
@@ -58,19 +58,6 @@ class ProductItemCard extends StatelessWidget {
                 topLeft: Radius.circular(AppDimens.boraMd),
                 topRight: Radius.circular(AppDimens.boraMd),
               ),
-              errorWidget: imagePath.isNotEmpty && !imagePath.startsWith('http')
-                  ? Image.asset(
-                      imagePath,
-                      height: 140,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 140,
-                        color: AppColors.secondary50,
-                        child: const Icon(Icons.broken_image, color: AppColors.secondary200, size: 40),
-                      ),
-                    )
-                  : null,
             ),
 
             // Details

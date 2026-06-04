@@ -48,6 +48,7 @@ abstract final class RouteNames {
 
   // all sub routes
   static const String adminUserManagement = 'adminUserManagement';
+  static const String adminStaffDetail = 'adminStaffDetail';
   static const String adminSecuritySettings = 'adminSecuritySettings';
   static const String adminSystemLog = 'adminSystemLog';
   static const String adminChooseRoleCreateAccount =

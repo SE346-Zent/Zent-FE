@@ -133,7 +133,11 @@ class _AdminDashboardScreenContentState
                         border: Border.all(color: Colors.white, width: 2.0),
                         boxShadow: [BoxShadowStyles.raised],
                       ),
-                      child: UserAvatar(name: userName, size: 32),
+                      child: UserAvatar(
+                        name: userName,
+                        avatarUrl: authViewModel.currentUser?.avatarUrl,
+                        size: 32,
+                      ),
                     ),
                   ),
                 ],

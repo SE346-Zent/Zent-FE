@@ -127,6 +127,11 @@ class DetailedProductViewModel extends ChangeNotifier with SafeChangeNotifier {
         product!.productImageUrl!.isNotEmpty) {
       return product!.productImageUrl!;
     }
+    if (productDetail != null &&
+        productDetail!.productImageUrl != null &&
+        productDetail!.productImageUrl!.isNotEmpty) {
+      return productDetail!.productImageUrl!;
+    }
     if (product == null) return AppAssets.laptopA;
     if (product!.name.toLowerCase().contains('laptop b')) {
       return AppAssets.laptopB;

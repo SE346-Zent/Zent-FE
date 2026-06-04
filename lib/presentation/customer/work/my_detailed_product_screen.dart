@@ -80,24 +80,12 @@ class _DetailedProductView extends StatelessWidget {
                       children: [
                         // Product Image
                         AppNetworkImage(
-                          url: viewModel.imagePath.startsWith('http') ||
-                                  viewModel.imagePath.startsWith('https')
-                              ? viewModel.imagePath
-                              : null,
+                          url: viewModel.imagePath,
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
                           borderRadius: BorderRadius.circular(AppDimens.boraMd),
                           enableViewer: true,
-                          errorWidget: viewModel.imagePath.isNotEmpty &&
-                                  !viewModel.imagePath.startsWith('http')
-                              ? Image.asset(
-                                  viewModel.imagePath,
-                                  height: 200,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
                         ),
                         Padding(
                           padding: const EdgeInsets.all(AppDimens.spaceLg),

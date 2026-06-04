@@ -58,7 +58,7 @@ class UserManagementViewModel extends ChangeNotifier with SafeChangeNotifier {
 
       _userStatuses.clear();
       for (final user in [..._technicians, ..._admins]) {
-        _userStatuses[user.id] = AccountStatus.active;
+        _userStatuses[user.id] = user.status;
       }
     } catch (e) {
       debugPrint('Error fetching users: $e');

@@ -90,7 +90,11 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
             onTap: () => FocusScope.of(context).unfocus(),
             child: Scaffold(
               backgroundColor: AppColors.surface100,
-              appBar: _buildCustomHeader(context, viewModel.chatPartnerName),
+              appBar: _buildCustomHeader(
+                context,
+                viewModel.chatPartnerName,
+                viewModel.chatPartnerAvatarUrl,
+              ),
               body: SafeArea(
                 child: Column(
                   children: [
@@ -227,7 +231,11 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
     );
   }
 
-  PreferredSizeWidget _buildCustomHeader(BuildContext context, String name) {
+  PreferredSizeWidget _buildCustomHeader(
+    BuildContext context,
+    String name,
+    String? avatarUrl,
+  ) {
     return AppBar(
       backgroundColor: AppColors.tertiary400,
       elevation: 4.0,
@@ -250,6 +258,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
               border: Border.all(color: Colors.white, width: 1.5),
             ),
             child: UserAvatar(
+              avatarUrl: avatarUrl,
               name: name.isEmpty ? 'Chat Partner' : name,
               size: 36,
             ),
@@ -295,7 +304,11 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (!message.isMe) ...[
-          UserAvatar(name: viewModel.chatPartnerName, size: 32),
+          UserAvatar(
+            avatarUrl: viewModel.chatPartnerAvatarUrl,
+            name: viewModel.chatPartnerName,
+            size: 32,
+          ),
           const SizedBox(width: 8),
         ],
         Flexible(
@@ -422,7 +435,11 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
         ),
         if (message.isMe) ...[
           const SizedBox(width: 8),
-          UserAvatar(name: viewModel.myName, size: 32),
+          UserAvatar(
+            avatarUrl: viewModel.myAvatarUrl,
+            name: viewModel.myName,
+            size: 32,
+          ),
         ],
       ],
     );

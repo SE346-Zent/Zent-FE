@@ -17,6 +17,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
+import '../presentation/admin/account/staff_detail_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
 import '../presentation/admin/account/personal_info_screen.dart';
@@ -308,6 +309,15 @@ final GoRouter appRouter = GoRouter(
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const UserManagementScreen(),
                   routes: [
+                    GoRoute(
+                      name: RouteNames.adminStaffDetail,
+                      path: Routes.adminStaffDetail,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final userId = state.pathParameters['userId'] ?? '';
+                        return StaffDetailScreen(userId: userId);
+                      },
+                    ),
                     GoRoute(
                       name: RouteNames.adminChooseRoleCreateAccount,
                       path: Routes.adminChooseRoleCreateAccount,

@@ -15,6 +15,7 @@ class AdminPersonalInfoViewModel extends ChangeNotifier
   String adminId = 'ADMIN-1234';
   String email = "";
   String phoneNumber = '';
+  String? avatarUrl;
   bool isLoading = false;
 
   AdminPersonalInfoViewModel({
@@ -31,6 +32,7 @@ class AdminPersonalInfoViewModel extends ChangeNotifier
         fullName = user.name;
         email = user.email;
         phoneNumber = user.phoneNumber;
+        avatarUrl = user.avatarUrl;
         adminId =
             'ADMIN-${user.id.length > 4 ? user.id.substring(0, 4) : user.id}';
         notifyListeners();

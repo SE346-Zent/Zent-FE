@@ -32,6 +32,7 @@ class WorkOrderModel extends WorkOrder {
     super.symptomName,
     super.phoneNumber,
     super.addressLine1,
+    super.customerAvatarUrl,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -65,6 +66,7 @@ class WorkOrderModel extends WorkOrder {
       symptomName: entity.symptomName,
       phoneNumber: entity.phoneNumber,
       addressLine1: entity.addressLine1,
+      customerAvatarUrl: entity.customerAvatarUrl,
     );
   }
 
@@ -158,6 +160,25 @@ class WorkOrderModel extends WorkOrder {
           json['phone_number'] as String? ??
           json['phone'] as String?,
       addressLine1: json['address'] as String?,
+      customerAvatarUrl: json['customerAvatarUrl'] as String? ??
+          json['customer_avatar_url'] as String? ??
+          json['customerAvatarName'] as String? ??
+          json['customer_avatar_name'] as String? ??
+          json['customerImageUrl'] as String? ??
+          json['customer_image_url'] as String? ??
+          json['customerImage'] as String? ??
+          json['customer_image'] as String? ??
+          json['customerAvatar'] as String? ??
+          json['customer_avatar'] as String? ??
+          json['oppositeImage'] as String? ??
+          json['opposite_image'] as String? ??
+          json['oppositeImageUrl'] as String? ??
+          json['opposite_image_url'] as String? ??
+          (json['customer'] is Map ? (json['customer'] as Map)['avatarUrl']?.toString() : null) ??
+          (json['customer'] is Map ? (json['customer'] as Map)['avatar_url']?.toString() : null) ??
+          (json['customer'] is Map ? (json['customer'] as Map)['avatarImageName']?.toString() : null) ??
+          (json['customer'] is Map ? (json['customer'] as Map)['avatarName']?.toString() : null) ??
+          (json['customer'] is Map ? (json['customer'] as Map)['avatar']?.toString() : null),
     );
   }
 
@@ -287,6 +308,7 @@ class WorkOrderModel extends WorkOrder {
       'technician_name': technicianName,
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,
+      'customerAvatarUrl': customerAvatarUrl,
     };
   }
 }

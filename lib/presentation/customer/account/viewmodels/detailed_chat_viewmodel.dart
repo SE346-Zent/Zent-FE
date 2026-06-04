@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zent_fe/data/services/chat_service.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart';
 
 class ChatMessage {
   final String id;
@@ -108,7 +110,6 @@ class ChatMessage {
     }
   }
 }
-
 class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   final ChatService chatService;
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -116,6 +117,7 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   // Static RAM caches for instant room loading on re-entrance
   static final Map<String, List<ChatMessage>> _roomMessagesCache = {};
   static final Map<String, String> _roomPartnerNamesCache = {};
+  static final Map<String, String?> _roomPartnerAvatarsCache = {};
   static final Map<String, bool> _hasMoreCache = {};
   static String? _cachedUserId;
   static String? _cachedMyName;
@@ -123,6 +125,7 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   static void clearCache() {
     _roomMessagesCache.clear();
     _roomPartnerNamesCache.clear();
+    _roomPartnerAvatarsCache.clear();
     _hasMoreCache.clear();
     _cachedUserId = null;
     _cachedMyName = null;
@@ -130,7 +133,9 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   String? currentChatId;
   String chatPartnerName = "";
+  String? chatPartnerAvatarUrl;
   String myName = "";
+  String? get myAvatarUrl => sl<AuthViewModel>().currentUser?.avatarUrl;
   String? currentUserId;
   bool isLoading = false;
   bool isLoadMoreLoading = false;
@@ -238,10 +243,12 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
       messages = List.from(_roomMessagesCache[chatId]!);
       chatPartnerName =
           _roomPartnerNamesCache[chatId] ?? (initialPartnerName ?? "");
+      chatPartnerAvatarUrl = _roomPartnerAvatarsCache[chatId];
       hasMore = _hasMoreCache[chatId] ?? true;
       isLoading = false;
     } else {
       chatPartnerName = initialPartnerName ?? "";
+      chatPartnerAvatarUrl = null;
       isLoading = true;
       hasMore = true;
     }
@@ -293,11 +300,12 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
       // 2. Fetch messages from REST API
       final fetchedMessages = await chatService.getMessages(chatId);
 
-      // Get partner name from the rooms list first
+      // Get partner name and avatar from the rooms list first
       try {
         final rooms = await chatService.getRooms();
         final room = rooms.firstWhere((r) => r.id == chatId);
         chatPartnerName = room.oppositeUserName;
+        chatPartnerAvatarUrl = room.oppositeAvatarUrl;
       } catch (_) {
         // Fallback to checking messages if rooms list fails
         if (fetchedMessages.isNotEmpty) {
@@ -311,10 +319,12 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
         } else {
           chatPartnerName = "Chat Partner";
         }
+        chatPartnerAvatarUrl = null;
       }
 
-      // Update partner name in cache
+      // Update partner name and avatar in cache
       _roomPartnerNamesCache[chatId] = chatPartnerName;
+      _roomPartnerAvatarsCache[chatId] = chatPartnerAvatarUrl;
 
       // Convert fetched messages to UI messages
       messages = fetchedMessages.reversed.map((msg) {

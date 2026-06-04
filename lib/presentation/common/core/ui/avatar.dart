@@ -27,11 +27,15 @@ class Avatar extends StatelessWidget {
   /// Whether to show the edit badge. Defaults to true.
   final bool showEditIcon;
 
+  /// Optional callback when avatar is tapped.
+  final VoidCallback? onTap;
+
   const Avatar({
     super.key,
     this.imageUrl,
     required this.name,
     this.showEditIcon = true,
+    this.onTap,
   });
 
   String get _initials => AvatarUtils.getInitials(name);
@@ -40,17 +44,22 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    final resolvedUrl = AvatarUtils.getAvatarUrl(imageUrl);
+    final hasImage = resolvedUrl != null && resolvedUrl.isNotEmpty;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
       children: [
         Container(
           width: 100.0,
           height: 100.0,
           decoration: BoxDecoration(
-            color: imageUrl == null ? _backgroundColor : AppColors.surface100,
+            color: !hasImage ? _backgroundColor : AppColors.surface100,
             shape: BoxShape.circle,
-            image: imageUrl != null && imageUrl!.isNotEmpty
+            image: hasImage
                 ? DecorationImage(
-                    image: CachedNetworkImageProvider(imageUrl!),
+                    image: CachedNetworkImageProvider(resolvedUrl),
                     fit: BoxFit.cover,
                   )
                 : null,
@@ -58,7 +67,7 @@ class Avatar extends StatelessWidget {
             boxShadow: [BoxShadowStyles.raised],
           ),
           alignment: Alignment.center,
-          child: imageUrl == null || imageUrl!.isEmpty
+          child: !hasImage
               ? Text(
                   _initials,
                   style: TextStyles.display.copyWith(
@@ -87,6 +96,6 @@ class Avatar extends StatelessWidget {
             ),
           ),
       ],
-    );
+    ),);
   }
 }

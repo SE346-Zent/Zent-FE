@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
+import 'package:zent_fe/presentation/common/core/ui/avatar_utils.dart';
 
 /// Centralized network image widget that uses CachedNetworkImage.
 ///
@@ -44,7 +45,8 @@ class AppNetworkImage extends StatelessWidget {
     double radius = 20,
     Widget? fallback,
   }) {
-    if (url == null || url.isEmpty) {
+    final resolvedUrl = AvatarUtils.getAvatarUrl(url);
+    if (resolvedUrl == null || resolvedUrl.isEmpty) {
       return fallback ??
           CircleAvatar(
             radius: radius,
@@ -57,7 +59,7 @@ class AppNetworkImage extends StatelessWidget {
           );
     }
     return CachedNetworkImage(
-      imageUrl: url,
+      imageUrl: resolvedUrl,
       imageBuilder: (context, imageProvider) => CircleAvatar(
         radius: radius,
         backgroundImage: imageProvider,
@@ -90,43 +92,64 @@ class AppNetworkImage extends StatelessWidget {
 
   /// Background image provider (for BoxDecoration / CircleAvatar).
   static CachedNetworkImageProvider provider(String url) {
-    return CachedNetworkImageProvider(url);
+    final resolved = AvatarUtils.getAvatarUrl(url) ?? url;
+    return CachedNetworkImageProvider(resolved);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (url == null || url!.isEmpty) {
-      return _buildError();
+    final resolvedUrl = AvatarUtils.getAvatarUrl(url);
+    if (resolvedUrl == null || resolvedUrl.isEmpty) {
+      return errorWidget ?? _buildError();
     }
 
-    final image = CachedNetworkImage(
-      imageUrl: url!,
+    final isNetwork = resolvedUrl.startsWith('http://') || resolvedUrl.startsWith('https://');
+
+    if (!isNetwork) {
+      Widget localImage = Image.asset(
+        resolvedUrl,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => errorWidget ?? _buildError(),
+      );
+      if (borderRadius != null) {
+        localImage = ClipRRect(borderRadius: borderRadius!, child: localImage);
+      }
+      return localImage;
+    }
+
+    // Use Image.network for better redirect/compatibility (placehold.co, etc.)
+    Widget netImage = Image.network(
+      resolvedUrl,
       width: width,
       height: height,
       fit: fit,
-      placeholder: (context, _) =>
-          placeholder ??
-          SizedBox(
-            width: width,
-            height: height,
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.tertiary500,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return placeholder ??
+            SizedBox(
+              width: width,
+              height: height,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.tertiary500,
+                ),
               ),
-            ),
-          ),
-      errorWidget: (context, urlString, error) => errorWidget ?? _buildError(),
+            );
+      },
+      errorBuilder: (context, error, stackTrace) => errorWidget ?? _buildError(),
     );
 
-    Widget resultImage = image;
+    Widget resultImage = netImage;
     if (borderRadius != null) {
-      resultImage = ClipRRect(borderRadius: borderRadius!, child: image);
+      resultImage = ClipRRect(borderRadius: borderRadius!, child: netImage);
     }
 
     if (enableViewer) {
       return GestureDetector(
-        onTap: () => ImageViewerDialog.show(context, url!),
+        onTap: () => ImageViewerDialog.show(context, resolvedUrl),
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: resultImage,

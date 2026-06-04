@@ -63,4 +63,8 @@ abstract class AuthRepository {
     required String currentPassword,
     required String newPassword,
   });
+  Future<String> uploadAvatar(String filePath);
+  Future<void> updateUserStatus(String userId, int statusId);
+  Future<void> closeAccount();
+  Future<User> getMe();
 }

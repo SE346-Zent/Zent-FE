@@ -89,7 +89,11 @@ class _AdminPersonalInfoViewState extends State<_AdminPersonalInfoView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          UserAvatar(name: viewModel.fullName, size: 80),
+                          UserAvatar(
+                            name: viewModel.fullName,
+                            avatarUrl: viewModel.avatarUrl,
+                            size: 80,
+                          ),
                           const SizedBox(height: AppDimens.spaceMd),
                           Text(
                             viewModel.fullName,

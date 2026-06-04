@@ -11,6 +11,7 @@ class PersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
   String fullName = "";
   String emailAddress = "";
   String phoneNumber = "";
+  String? avatarUrl;
   bool isLoading = false;
 
   PersonalInfoViewModel(this.getCurrentUserUseCase, this.updateProfileUseCase) {
@@ -24,6 +25,7 @@ class PersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
         fullName = user.name;
         emailAddress = user.email;
         phoneNumber = user.phoneNumber;
+        avatarUrl = user.avatarUrl;
         notifyListeners();
       }
     } catch (e) {

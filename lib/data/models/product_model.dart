@@ -55,7 +55,7 @@ class ProductModel extends Product {
       name: json['productName']?.toString() ?? '',
       model: '',        // Zent BE doesn't return model code in this endpoint
       serialNumber: json['serialNumber']?.toString() ?? '',
-      productImageUrl: json['imageUrl']?.toString(),
+      productImageUrl: (json['productImageUrl'] ?? json['imageUrl'])?.toString(),
       warranty: warranty,
     );
   }

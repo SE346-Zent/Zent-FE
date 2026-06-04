@@ -36,6 +36,7 @@ abstract final class Routes {
 
   static const adminNotifications = 'admin-notifications';
   static const adminUserManagement = 'admin-user-management';
+  static const adminStaffDetail = 'staff-detail/:userId';
   static const adminSecuritySettings = 'admin-security-settings';
   static const adminSystemLog = 'admin-system-log';
   static const adminChooseRoleCreateAccount =

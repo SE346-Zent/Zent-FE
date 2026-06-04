@@ -65,6 +65,7 @@ class DetailsJobInfo extends StatelessWidget {
                 height: 48,
                 child: Avatar(
                   name: viewModel.customerName,
+                  imageUrl: viewModel.customerAvatarUrl,
                   showEditIcon: false,
                 ),
               ),

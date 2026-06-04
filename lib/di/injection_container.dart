@@ -75,6 +75,7 @@ import '../presentation/admin/account/viewmodels/choose_role_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/create_account_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/personal_info_viewmodel.dart'
     as admin_personal_info;
+import '../presentation/admin/account/viewmodels/staff_detail_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_dashboard_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_notifications_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_reports_viewmodel.dart';
@@ -211,6 +212,9 @@ Future<void> init() async {
     () => VerifyOtpViewModel(verifyOtpUseCase: sl(), resendOtpUseCase: sl()),
   );
   sl.registerFactory(() => UserManagementViewModel(getUsersUseCase: sl()));
+  sl.registerFactoryParam<StaffDetailViewModel, String, void>(
+    (userId, _) => StaffDetailViewModel(authRepository: sl(), userId: userId),
+  );
   sl.registerFactory(
     () => AdminDashboardViewModel(getCurrentUserUseCase: sl()),
   );
@@ -258,7 +262,7 @@ Future<void> init() async {
   );
   sl.registerFactory(() => ChooseRoleViewModel());
   sl.registerFactory(() => CreateAccountViewModel());
-  sl.registerFactory(() => ProfileViewModel(sl(), sl()));
+  sl.registerFactory(() => ProfileViewModel(sl(), sl(), sl()));
   sl.registerFactory(
     () => SecuritySettingsViewModel(
       getLoginHistoryUseCase: sl(),
@@ -283,7 +287,7 @@ Future<void> init() async {
       getScmLutsUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => CustomerProfileViewModel(sl(), sl()));
+  sl.registerFactory(() => CustomerProfileViewModel(sl(), sl(), sl()));
   sl.registerFactory(() => PersonalInfoViewModel(sl(), sl()));
   sl.registerFactory(() => ServiceViewModel(getCurrentUserUseCase: sl()));
   sl.registerFactory(() => ChatViewModel(chatService: sl()));
@@ -354,7 +358,7 @@ Future<void> init() async {
     ),
   );
   sl.registerLazySingleton(() => NotificationsViewModel());
-
+ 
   sl.registerFactory(
     () => TechnicianHomeViewModel(
       getManyWorkOrdersUseCase: sl(),
@@ -391,7 +395,7 @@ Future<void> init() async {
       getSingleWorkOrderUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => TechProfileViewModel(sl(), sl()));
+  sl.registerFactory(() => TechProfileViewModel(sl(), sl(), sl()));
   sl.registerFactory(() => TechPersonalInfoViewModel(sl(), sl()));
   sl.registerFactory(() => TechNotificationsViewModel());
   sl.registerFactory(

@@ -15,6 +15,7 @@ class UserListItem extends StatelessWidget {
   final String? avatarUrl;
   final String? phoneNumber;
   final VoidCallback onEditTap;
+  final VoidCallback? onTap;
 
   const UserListItem({
     super.key,
@@ -24,6 +25,7 @@ class UserListItem extends StatelessWidget {
     this.avatarUrl,
     this.phoneNumber,
     required this.onEditTap,
+    this.onTap,
   });
 
   @override
@@ -31,17 +33,19 @@ class UserListItem extends StatelessWidget {
     return Selector<UserManagementViewModel, AccountStatus>(
       selector: (_, vm) => vm.getStatusForUser(userId),
       builder: (context, status, _) {
-        return Container(
-          width: double.infinity,
-          height: 62.0,
-          decoration: BoxDecoration(
-            color: AppColors.surface100,
-            borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            border: Border.all(color: AppColors.secondary100, width: 1.0),
-            boxShadow: [BoxShadowStyles.raised],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
-          child: Row(
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            height: 62.0,
+            decoration: BoxDecoration(
+              color: AppColors.surface100,
+              borderRadius: BorderRadius.circular(AppDimens.boraMd),
+              border: Border.all(color: AppColors.secondary100, width: 1.0),
+              boxShadow: [BoxShadowStyles.raised],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+            child: Row(
             children: [
               // Avatar Block
               SizedBox(
@@ -131,7 +135,7 @@ class UserListItem extends StatelessWidget {
               ),
             ],
           ),
-        );
+        ),);
       },
     );
   }

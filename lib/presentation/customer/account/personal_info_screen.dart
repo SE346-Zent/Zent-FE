@@ -46,6 +46,7 @@ class _PersonalInfoScreenContent extends StatelessWidget {
                           PersonalInfoAvatarGroup(
                             fullName: viewModel.fullName,
                             email: viewModel.emailAddress,
+                            avatarUrl: viewModel.avatarUrl,
                           ),
                     ),
                     const SizedBox(height: AppDimens.spaceXl),

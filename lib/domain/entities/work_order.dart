@@ -31,6 +31,8 @@ class WorkOrder {
   final String? phoneNumber;
   final String? addressLine1;
 
+  final String? customerAvatarUrl;
+
   WorkOrder({
     required this.id,
     required this.title,
@@ -61,6 +63,7 @@ class WorkOrder {
     this.symptomName,
     this.phoneNumber,
     this.addressLine1,
+    this.customerAvatarUrl,
   });
 
   String get address => addressString;

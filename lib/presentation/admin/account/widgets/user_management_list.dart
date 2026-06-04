@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/admin/account/viewmodels/user_management_viewmodel.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/user_list_item.dart';
+import 'package:zent_fe/routing/route_names.dart';
 
 class UserManagementList extends StatelessWidget {
   const UserManagementList({super.key});
@@ -30,7 +32,17 @@ class UserManagementList extends StatelessWidget {
             userName: user.name,
             userRole: user.role.name,
             phoneNumber: user.phoneNumber,
+            avatarUrl: user.avatarUrl,
             onEditTap: () => viewModel.editUser(index),
+            onTap: () async {
+              await context.pushNamed(
+                RouteNames.adminStaffDetail,
+                pathParameters: {'userId': user.id},
+              );
+              if (context.mounted) {
+                context.read<UserManagementViewModel>().refreshData();
+              }
+            },
           );
         },
       ),

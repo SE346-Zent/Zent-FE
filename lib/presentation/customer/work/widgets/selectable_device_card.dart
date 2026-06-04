@@ -49,25 +49,11 @@ class SelectableDeviceCard extends StatelessWidget {
             // Image
             RepaintBoundary(
               child: AppNetworkImage(
-                url: imagePath.startsWith('http') ? imagePath : null,
+                url: imagePath,
                 width: 64,
                 height: 64,
                 fit: BoxFit.cover,
                 borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                errorWidget: imagePath.isNotEmpty && !imagePath.startsWith('http')
-                    ? Image.asset(
-                        imagePath,
-                        width: 64,
-                        height: 64,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 64,
-                          height: 64,
-                          color: AppColors.secondary50,
-                          child: const Icon(Icons.broken_image, color: AppColors.secondary200, size: 24),
-                        ),
-                      )
-                    : null,
               ),
             ),
             const SizedBox(width: AppDimens.spaceMd),

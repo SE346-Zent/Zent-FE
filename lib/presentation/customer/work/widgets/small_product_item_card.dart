@@ -50,7 +50,7 @@ class SmallProductItemCard extends StatelessWidget {
             // Image
             Expanded(
               child: AppNetworkImage(
-                url: imagePath.startsWith('http') ? imagePath : null,
+                url: imagePath,
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
@@ -58,18 +58,6 @@ class SmallProductItemCard extends StatelessWidget {
                   topLeft: Radius.circular(AppDimens.boraSm - 1),
                   topRight: Radius.circular(AppDimens.boraSm - 1),
                 ),
-                errorWidget: imagePath.isNotEmpty && !imagePath.startsWith('http')
-                    ? Image.asset(
-                        imagePath,
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: AppColors.secondary50,
-                          child: const Icon(Icons.broken_image, size: 16, color: AppColors.secondary200),
-                        ),
-                      )
-                    : null,
               ),
             ),
             // Details

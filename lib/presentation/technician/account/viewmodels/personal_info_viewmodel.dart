@@ -12,6 +12,7 @@ class TechPersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
   String employeeId = 'TECH-1234';
   String email = "";
   String phoneNumber = '';
+  String? avatarUrl;
   bool isLoading = false;
 
   TechPersonalInfoViewModel(
@@ -28,6 +29,7 @@ class TechPersonalInfoViewModel extends ChangeNotifier with SafeChangeNotifier {
         fullName = user.name;
         email = user.email;
         phoneNumber = user.phoneNumber;
+        avatarUrl = user.avatarUrl;
         notifyListeners();
       }
     } catch (e) {

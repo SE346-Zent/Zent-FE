@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -63,6 +64,21 @@ abstract class AuthRemoteDatasource {
     required String accessToken,
     required String currentPassword,
     required String newPassword,
+  });
+  Future<String> uploadAvatar({
+    required String accessToken,
+    required String filePath,
+  });
+  Future<void> updateUserStatus({
+    required String accessToken,
+    required String userId,
+    required int statusId,
+  });
+  Future<void> closeAccount({
+    required String accessToken,
+  });
+  Future<Map<String, dynamic>> getMe({
+    required String accessToken,
   });
 }
 
@@ -748,6 +764,154 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Fetch technician metrics error: $e');
+    }
+  }
+
+  @override
+  Future<String> uploadAvatar({
+    required String accessToken,
+    required String filePath,
+  }) async {
+    final url = Uri.parse('$_baseURL/users/me/avatar');
+    try {
+      final request = http.MultipartRequest('POST', url);
+      request.headers.addAll({
+        'Authorization': 'Bearer $accessToken',
+        'Accept': 'application/json',
+      });
+      final ext = filePath.split('.').last.toLowerCase();
+      MediaType mediaType;
+      if (ext == 'png') {
+        mediaType = MediaType('image', 'png');
+      } else if (ext == 'webp') {
+        mediaType = MediaType('image', 'webp');
+      } else {
+        mediaType = MediaType('image', 'jpeg');
+      }
+
+      final file = await http.MultipartFile.fromPath(
+        'file',
+        filePath,
+        contentType: mediaType,
+      );
+      request.files.add(file);
+
+      final streamedResponse = await request.send().timeout(_timeOut);
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as Map<String, dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return (apiResponse.data!['avatarName'] ?? '').toString();
+      } else {
+        throw Exception(apiResponse.message ?? 'Upload avatar failed');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Upload avatar error: $e');
+    }
+  }
+
+  @override
+  Future<void> updateUserStatus({
+    required String accessToken,
+    required String userId,
+    required int statusId,
+  }) async {
+    final url = Uri.parse('$_baseURL/users/$userId/status');
+    try {
+      final response = await client
+          .patch(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode({
+              'accountStatusId': statusId,
+            }),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Update user status error: $e');
+    }
+  }
+
+  @override
+  Future<void> closeAccount({
+    required String accessToken,
+  }) async {
+    final url = Uri.parse('$_baseURL/users/me/close');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Close account error: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getMe({
+    required String accessToken,
+  }) async {
+    final url = Uri.parse('$_baseURL/users/me');
+    try {
+      final response = await client
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as Map<String, dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!;
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to get user profile');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Get user profile error: $e');
     }
   }
 

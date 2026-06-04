@@ -56,6 +56,8 @@ class _ServiceScreenContentState extends State<_ServiceScreenContent> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ServiceViewModel>();
+    final authViewModel = context.watch<AuthViewModel>();
+    final user = authViewModel.currentUser;
 
     return Scaffold(
       backgroundColor: AppColors.surface100, // Matching the white background
@@ -69,8 +71,8 @@ class _ServiceScreenContentState extends State<_ServiceScreenContent> {
             child: Column(
               children: [
                 ServiceHeader(
-                  userName: viewModel.userName,
-                  avatarUrl: viewModel.avatarUrl,
+                  userName: user?.name ?? viewModel.userName,
+                  avatarUrl: user?.avatarUrl,
                 ),
                 Expanded(
                   child: ListView.separated(

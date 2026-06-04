@@ -11,6 +11,8 @@ class NotificationListItemModel extends NotificationItem {
     required super.isRead,
     required super.createdAt,
     super.data,
+    super.senderAvatarName,
+    super.senderName,
   });
 
   factory NotificationListItemModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,11 @@ class NotificationListItemModel extends NotificationItem {
       isRead: json['isRead'] as bool? ?? false,
       createdAt: parseDateTime(json['createdAt'] as String),
       data: json['data'] as Map<String, dynamic>?,
+      senderAvatarName: json['senderAvatarName'] as String? ??
+          (json['data'] is Map ? (json['data'] as Map)['senderAvatarName']?.toString() : null) ??
+          (json['data'] is Map ? (json['data'] as Map)['avatarUrl']?.toString() : null),
+      senderName: json['senderName'] as String? ??
+          (json['data'] is Map ? (json['data'] as Map)['senderName']?.toString() : null),
     );
   }
 }

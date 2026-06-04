@@ -5,6 +5,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
@@ -22,6 +23,7 @@ class TechHomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final avatarUrl = context.watch<AuthViewModel>().currentUser?.avatarUrl;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -103,7 +105,7 @@ class TechHomeHeader extends StatelessWidget {
                           width: 2.0,
                         ),
                       ),
-                      child: UserAvatar(name: userName, size: 30),
+                      child: UserAvatar(name: userName, avatarUrl: avatarUrl, size: 30),
                     ),
                   ),
                 ],

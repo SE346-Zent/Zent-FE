@@ -125,6 +125,14 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
                         debugPrint('Error navigating to profile: $e');
                       }
                     },
+                    onViewAllTapped: () {
+                      try {
+                        StatefulNavigationShell.of(context).goBranch(1);
+                      } catch (e) {
+                        debugPrint('Error navigating to Work Orders: $e');
+                        context.goNamed(RouteNames.techWorkOrder);
+                      }
+                    },
                   ),
                 ),
                 Expanded(

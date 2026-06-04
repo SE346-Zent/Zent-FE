@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -14,12 +14,14 @@ class TechHomeHeader extends StatelessWidget {
   final String userName;
   final VoidCallback onMenuTapped;
   final VoidCallback onProfileTapped;
+  final VoidCallback onViewAllTapped;
 
   const TechHomeHeader({
     super.key,
     required this.userName,
     required this.onMenuTapped,
     required this.onProfileTapped,
+    required this.onViewAllTapped,
   });
 
   @override
@@ -172,9 +174,7 @@ class TechHomeHeader extends StatelessWidget {
                     ),
                   ),
                   ThrottledInkWell(
-                    onTap: () {
-                      context.goNamed(RouteNames.techWorkOrder);
-                    },
+                    onTap: onViewAllTapped,
                     child: Text(
                       "View All",
                       style: TextStyles.label.copyWith(

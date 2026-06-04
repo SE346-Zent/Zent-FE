@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,7 @@ import 'tracking_stepper.dart';
 import 'active_repairs_action_button.dart';
 
 import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import '../viewmodels/active_repairs_viewmodel.dart';
 import 'package:intl/intl.dart';
 
@@ -67,6 +68,7 @@ class TrackingCard extends StatelessWidget {
                           style: TextStyles.headline.copyWith(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
+                            color: AppColors.tertiary500,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -149,9 +151,11 @@ class TrackingCard extends StatelessWidget {
               bottom: 0,
               child: Container(
                 width: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary700,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: workOrder.status == WorkOrderStatus.complete
+                      ? AppColors.success500
+                      : AppColors.tertiary500,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(AppDimens.boraMd),
                     bottomLeft: Radius.circular(AppDimens.boraMd),
                   ),

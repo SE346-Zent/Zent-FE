@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
-class RejectedWorkOrderCard extends StatelessWidget {
+class RejectedWorkOrderCard extends StatefulWidget {
   final WorkOrder workOrder;
-  final VoidCallback onApprove;
-  final VoidCallback onDeny;
+  final Future<void> Function() onApprove;
+  final Future<void> Function() onDeny;
   final VoidCallback onDetailTap;
 
   const RejectedWorkOrderCard({
@@ -22,7 +22,19 @@ class RejectedWorkOrderCard extends StatelessWidget {
   });
 
   @override
+  State<RejectedWorkOrderCard> createState() => _RejectedWorkOrderCardState();
+}
+
+class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
+  bool _isApproving = false;
+  bool _isDenying = false;
+
+  @override
   Widget build(BuildContext context) {
+    final workOrder = widget.workOrder;
+    final onApprove = widget.onApprove;
+    final onDeny = widget.onDeny;
+    final onDetailTap = widget.onDetailTap;
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceLg),
       decoration: BoxDecoration(
@@ -35,7 +47,9 @@ class RejectedWorkOrderCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '#${workOrder.id}',
+            workOrder.workOrderNum.startsWith('WO')
+                ? workOrder.workOrderNum
+                : '#${workOrder.workOrderNum}',
             style: TextStyles.middle.copyWith(color: AppColors.tertiary500),
           ),
           const SizedBox(height: 4.0),
@@ -73,17 +87,16 @@ class RejectedWorkOrderCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const CircleAvatar(
-                                  radius: 10,
-                                  backgroundImage: CachedNetworkImageProvider(
-                                    'https://i.pravatar.cc/150?img=11',
-                                  ),
-                                ),
-                                const SizedBox(width: 8.0),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    UserAvatar(
+                                      size: 20,
+                                      name: workOrder.technicianName ?? 'Technician',
+                                      avatarUrl: workOrder.technicianAvatarUrl,
+                                    ),
+                                    const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
                                     workOrder.technicianName ?? 'N/A',
@@ -110,17 +123,16 @@ class RejectedWorkOrderCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const CircleAvatar(
-                                  radius: 10,
-                                  backgroundImage: CachedNetworkImageProvider(
-                                    'https://i.pravatar.cc/150?img=5',
-                                  ),
-                                ),
-                                const SizedBox(width: 8.0),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    UserAvatar(
+                                      size: 20,
+                                      name: workOrder.customerName,
+                                      avatarUrl: workOrder.customerAvatarUrl,
+                                    ),
+                                    const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
                                     workOrder.customerName,
@@ -164,7 +176,22 @@ class RejectedWorkOrderCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ThrottledGestureDetector(
-                  onTap: onDeny,
+                  onTap: _isApproving || _isDenying
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isDenying = true;
+                          });
+                          try {
+                            await onDeny();
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isDenying = false;
+                              });
+                            }
+                          }
+                        },
                   child: Container(
                     height: 44,
                     decoration: BoxDecoration(
@@ -177,17 +204,41 @@ class RejectedWorkOrderCard extends StatelessWidget {
                       boxShadow: [BoxShadowStyles.glowing],
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Deny',
-                      style: TextStyles.middle.copyWith(color: Colors.white),
-                    ),
+                    child: _isDenying
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Deny',
+                            style: TextStyles.middle.copyWith(color: Colors.white),
+                          ),
                   ),
                 ),
               ),
               const SizedBox(width: AppDimens.spaceMd),
               Expanded(
                 child: ThrottledGestureDetector(
-                  onTap: onApprove,
+                  onTap: _isApproving || _isDenying
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isApproving = true;
+                          });
+                          try {
+                            await onApprove();
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isApproving = false;
+                              });
+                            }
+                          }
+                        },
                   child: Container(
                     height: 44,
                     decoration: BoxDecoration(
@@ -199,12 +250,21 @@ class RejectedWorkOrderCard extends StatelessWidget {
                       ),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Approve',
-                      style: TextStyles.middle.copyWith(
-                        color: AppColors.primary500,
-                      ),
-                    ),
+                    child: _isApproving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary500,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Approve',
+                            style: TextStyles.middle.copyWith(
+                              color: AppColors.primary500,
+                            ),
+                          ),
                   ),
                 ),
               ),

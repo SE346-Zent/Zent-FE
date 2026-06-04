@@ -34,6 +34,7 @@ class WorkOrder {
   final String? addressLine1;
 
   final String? customerAvatarUrl;
+  final String? technicianAvatarUrl;
   final DateTime? startAt;
 
   WorkOrder({
@@ -69,6 +70,7 @@ class WorkOrder {
     this.phoneNumber,
     this.addressLine1,
     this.customerAvatarUrl,
+    this.technicianAvatarUrl,
     this.startAt,
   });
 

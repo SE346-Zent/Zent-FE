@@ -35,6 +35,7 @@ class WorkOrderModel extends WorkOrder {
     super.phoneNumber,
     super.addressLine1,
     super.customerAvatarUrl,
+    super.technicianAvatarUrl,
     super.startAt,
   });
 
@@ -72,6 +73,7 @@ class WorkOrderModel extends WorkOrder {
       phoneNumber: entity.phoneNumber,
       addressLine1: entity.addressLine1,
       customerAvatarUrl: entity.customerAvatarUrl,
+      technicianAvatarUrl: entity.technicianAvatarUrl,
       startAt: entity.startAt,
     );
   }
@@ -238,6 +240,32 @@ class WorkOrderModel extends WorkOrder {
           (json['customer'] is Map
               ? (json['customer'] as Map)['avatar']?.toString()
               : null),
+      technicianAvatarUrl:
+          json['technicianAvatarUrl'] as String? ??
+          json['technician_avatar_url'] as String? ??
+          json['technicianAvatarName'] as String? ??
+          json['technician_avatar_name'] as String? ??
+          json['technicianImageUrl'] as String? ??
+          json['technician_image_url'] as String? ??
+          json['technicianImage'] as String? ??
+          json['technician_image'] as String? ??
+          json['technicianAvatar'] as String? ??
+          json['technician_avatar'] as String? ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatarUrl']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatar_url']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatarImageName']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatarName']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatar']?.toString()
+              : null),
       startAt: json['startedAt'] != null
           ? DateTime.tryParse(json['startedAt'] as String)
           : (json['started_at'] != null
@@ -390,6 +418,7 @@ class WorkOrderModel extends WorkOrder {
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,
       'customerAvatarUrl': customerAvatarUrl,
+      'technicianAvatarUrl': technicianAvatarUrl,
       'start_at': startAt?.toIso8601String(),
       'startedAt': startAt?.toIso8601String(),
     };

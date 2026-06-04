@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/routing/route_names.dart';
@@ -106,27 +107,31 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
     );
   }
 
-  void _handleApprove(
+  Future<void> _handleApprove(
     BuildContext context,
     RejectedWorkOrdersViewModel viewModel,
     dynamic wo,
-  ) {
-    viewModel.approveRejection(wo).then((error) {
-      if (error != null && context.mounted) {
-        ZentErrorPopup.show(context, 'Error: $error');
-      }
-    });
+  ) async {
+    final error = await viewModel.approveRejection(wo);
+    if (!context.mounted) return;
+    if (error != null) {
+      ZentErrorPopup.show(context, 'Error: $error');
+    } else {
+      ZentSuccessPopup.show(context, 'Approved work order rejection successfully!');
+    }
   }
 
-  void _handleDeny(
+  Future<void> _handleDeny(
     BuildContext context,
     RejectedWorkOrdersViewModel viewModel,
     String id,
-  ) {
-    viewModel.denyRejection(id).then((error) {
-      if (error != null && context.mounted) {
-        ZentErrorPopup.show(context, 'Error: $error');
-      }
-    });
+  ) async {
+    final error = await viewModel.denyRejection(id);
+    if (!context.mounted) return;
+    if (error != null) {
+      ZentErrorPopup.show(context, 'Error: $error');
+    } else {
+      ZentSuccessPopup.show(context, 'Denied work order rejection successfully!');
+    }
   }
 }

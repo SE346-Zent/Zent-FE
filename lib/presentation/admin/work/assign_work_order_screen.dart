@@ -467,7 +467,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '${data['rating']}',
+                            text: '${data['averageRating'] ?? data['rating'] ?? "5.0"}',
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),
@@ -494,7 +494,11 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                   const SizedBox(height: 4.0),
                   Row(
                     children: List.generate(4, (index) {
-                      final isActive = index < (data['workload'] as int);
+                      int workloadVal = 0;
+                      if (data['workload'] != null) {
+                        workloadVal = (num.tryParse(data['workload'].toString()) ?? 0).toInt();
+                      }
+                      final isActive = index < workloadVal;
                       return Container(
                         margin: const EdgeInsets.only(left: 2.0),
                         width: 5,

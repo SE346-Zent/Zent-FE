@@ -40,10 +40,9 @@ class AssignWorkOrderViewModel extends ChangeNotifier {
       technicians = realUsers
           .map(
             (user) => {
+              ...user,
               'id': user['id'],
-              'name': user['fullName'] ?? 'Unknown Technician',
-              'rating': 4.5,
-              'workload': 2,
+              'name': user['fullName'] ?? user['name'] ?? 'Unknown Technician',
             },
           )
           .toList();

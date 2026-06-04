@@ -61,14 +61,22 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
       final backendStatus = workOrder.status.name;
       _isRejectInReview = backendStatus == 'rejectInReview';
 
+      final techs = await repo.getTechnicians();
+      final tech = techs.firstWhere(
+        (t) => t['id'] == workOrder.technicianId,
+        orElse: () => <String, dynamic>{},
+      );
+
       technician = {
         'id': workOrder.technicianId,
         'name':
             (workOrder.technicianName != null &&
                 workOrder.technicianName!.isNotEmpty)
             ? workOrder.technicianName
-            : 'Tech (ID: ${workOrder.technicianId.substring(0, 4)})',
-        'rating': 5.0,
+            : (tech['fullName'] ?? tech['name'] ?? 'Tech (ID: ${workOrder.technicianId.substring(0, 4)})'),
+        'rating': tech.isNotEmpty
+            ? (tech['averageRating'] ?? tech['rating'] ?? 0.0)
+            : (workOrder.technicianRating ?? 0.0),
       };
     } catch (e) {
       debugPrint("Lỗi lấy chi tiết đơn hàng: $e");

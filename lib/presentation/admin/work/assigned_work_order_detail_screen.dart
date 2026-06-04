@@ -496,7 +496,7 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '${viewModel.technician['rating']}',
+                            text: '${viewModel.technician['averageRating'] ?? viewModel.technician['rating'] ?? "5.0"}',
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),
@@ -523,12 +523,15 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
             ),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final cleanId = viewModel.orderId.replaceAll('#', '');
-                context.pushNamed(
+                final result = await context.pushNamed(
                   'adminReassignWorkOrder',
                   pathParameters: {'workOrderId': cleanId},
                 );
+                if (result == true) {
+                  viewModel.initData(viewModel.orderId);
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.tertiary500,

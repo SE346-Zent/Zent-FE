@@ -4,6 +4,7 @@ import '../../data/models/refuse_work_order_request.dart';
 import '../../data/models/edit_work_order_request.dart';
 import '../entities/work_order.dart';
 import '../entities/work_order_completion_draft.dart';
+import '../entities/reject_form.dart';
 
 abstract class WorkOrderRepository {
   Future<void> createWorkOrder(CreateWorkOrderRequest request);
@@ -46,4 +47,11 @@ abstract class WorkOrderRepository {
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft);
   Future<WorkOrderCompletionDraft?> getWorkOrderDraft(String workOrderId);
   Future<void> clearWorkOrderDraft(String workOrderId);
+
+  // Dedicated reject forms endpoint
+  Future<List<RejectForm>> getRejectForms({String? province});
+  Future<RejectForm> getRejectFormById(
+    String rejectFormId, {
+    String workOrderId = '',
+  });
 }

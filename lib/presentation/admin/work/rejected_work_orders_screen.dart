@@ -8,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/domain/entities/reject_form.dart';
 import 'viewmodels/rejected_work_orders_viewmodel.dart';
 import 'widgets/rejected_work_order_card.dart';
 
@@ -50,11 +51,11 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
           child: Container(color: AppColors.secondary50, height: 1.0),
         ),
       ),
-      body: viewModel.isLoading && viewModel.workOrders.isEmpty
+      body: viewModel.isLoading && viewModel.rejectForms.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: viewModel.loadRejectedWorkOrders,
-              child: viewModel.workOrders.isEmpty
+              child: viewModel.rejectForms.isEmpty
                   ? LayoutBuilder(
                       builder: (context, constraints) {
                         return SingleChildScrollView(
@@ -88,18 +89,19 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.all(AppDimens.spaceLg),
-                      itemCount: viewModel.workOrders.length,
+                      itemCount: viewModel.rejectForms.length,
                       itemBuilder: (context, index) {
-                        final wo = viewModel.workOrders[index];
+                        final form = viewModel.rejectForms[index];
                         return RejectedWorkOrderCard(
-                          workOrder: wo,
+                          rejectForm: form,
                           onApprove: () =>
-                              _handleApprove(context, viewModel, wo),
-                          onDeny: () => _handleDeny(context, viewModel, wo.id),
+                              _handleApprove(context, viewModel, form),
+                          onDeny: () =>
+                              _handleDeny(context, viewModel, form.workOrderId),
                           onDetailTap: () async {
                             final refresh = await context.pushNamed<bool>(
                               RouteNames.adminRejectionDetail,
-                              pathParameters: {'id': wo.id},
+                              pathParameters: {'id': form.id},
                             );
                             if (refresh == true && context.mounted) {
                               ZentSuccessPopup.show(
@@ -119,9 +121,9 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
   Future<void> _handleApprove(
     BuildContext context,
     RejectedWorkOrdersViewModel viewModel,
-    dynamic wo,
+    RejectForm form,
   ) async {
-    final error = await viewModel.approveRejection(wo);
+    final error = await viewModel.approveRejection(form);
     if (!context.mounted) return;
     if (error != null) {
       ZentErrorPopup.show(context, 'Error: $error');
@@ -136,9 +138,9 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
   Future<void> _handleDeny(
     BuildContext context,
     RejectedWorkOrdersViewModel viewModel,
-    String id,
+    String workOrderId,
   ) async {
-    final error = await viewModel.denyRejection(id);
+    final error = await viewModel.denyRejection(workOrderId);
     if (!context.mounted) return;
     if (error != null) {
       ZentErrorPopup.show(context, 'Error: $error');

@@ -13,7 +13,7 @@ import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
-import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/reject_form.dart';
 import 'package:zent_fe/domain/entities/new_part_form.dart';
 
 import 'viewmodels/admin_dashboard_viewmodel.dart';
@@ -85,7 +85,7 @@ class _AdminDashboardScreenContentState
     );
   }
 
-  Widget _buildRejectionCard(BuildContext context, WorkOrder workOrder) {
+  Widget _buildRejectionCard(BuildContext context, RejectForm form) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceMd),
       padding: const EdgeInsets.symmetric(
@@ -102,7 +102,7 @@ class _AdminDashboardScreenContentState
         onTap: () async {
           final refresh = await context.pushNamed<bool>(
             RouteNames.adminRejectionDetail,
-            pathParameters: {'id': workOrder.id},
+            pathParameters: {'id': form.id},
           );
           if (refresh == true && context.mounted) {
             ZentSuccessPopup.show(
@@ -121,11 +121,11 @@ class _AdminDashboardScreenContentState
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    workOrder.workOrderNum.startsWith('WO')
-                        ? '#${workOrder.workOrderNum}'
-                        : workOrder.workOrderNum.startsWith('#WO')
-                        ? workOrder.workOrderNum
-                        : '#${workOrder.workOrderNum}',
+                    form.workOrderNumber.startsWith('WO')
+                        ? '#${form.workOrderNumber}'
+                        : form.workOrderNumber.startsWith('#WO')
+                        ? form.workOrderNumber
+                        : '#${form.workOrderNumber}',
                     style: TextStyles.bodyLarge.copyWith(
                       color: AppColors.tertiary500,
                       fontWeight: FontWeight.w600,
@@ -133,7 +133,7 @@ class _AdminDashboardScreenContentState
                   ),
                   const SizedBox(height: 4.0),
                   Text(
-                    workOrder.title.isNotEmpty ? workOrder.title : 'No Title',
+                    form.reason.isNotEmpty ? form.reason : 'No reason provided',
                     style: TextStyles.title.copyWith(
                       color: AppColors.primary500,
                       fontWeight: FontWeight.bold,
@@ -149,14 +149,16 @@ class _AdminDashboardScreenContentState
               mainAxisSize: MainAxisSize.min,
               children: [
                 UserAvatar(
-                  name: workOrder.technicianName ?? 'Technician',
-                  avatarUrl: workOrder.technicianAvatarUrl,
-                  size: 36,
+                  name: form.technicianName.isNotEmpty
+                      ? form.technicianName
+                      : 'Technician',
+                  avatarUrl: null,
+                  size: 42,
                 ),
                 const SizedBox(width: 8.0),
                 Text(
-                  workOrder.technicianName ?? 'N/A',
-                  style: TextStyles.bodyMedium.copyWith(
+                  form.technicianName.isNotEmpty ? form.technicianName : 'N/A',
+                  style: TextStyles.bodyLarge.copyWith(
                     color: AppColors.primary500,
                     fontWeight: FontWeight.w600,
                   ),

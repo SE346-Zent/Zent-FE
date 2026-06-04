@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../models/api_response.dart';
 import '../../models/work_order_model.dart';
+import '../../models/reject_form_model.dart';
 import '../../models/create_work_order_request.dart';
 import '../../models/complete_work_order_request.dart';
 import '../../models/refuse_work_order_request.dart';
@@ -48,6 +49,11 @@ abstract class WorkOrderRemoteDataSource {
     String workOrderNumber,
     EditWorkOrderRequest request,
   );
+  Future<List<RejectFormModel>> getRejectForms({String? province});
+  Future<RejectFormModel> getRejectFormById(
+    String rejectFormId, {
+    String workOrderId = '',
+  });
 }
 
 class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
@@ -610,6 +616,85 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Error editing work order: $e');
+    }
+  }
+
+  @override
+  Future<List<RejectFormModel>> getRejectForms({String? province}) async {
+    final queryParameters = <String, String>{};
+    if (province != null) queryParameters['province'] = province;
+
+    final url = Uri.parse('$_baseURL/work_orders/reject_forms').replace(
+      queryParameters: queryParameters.isNotEmpty ? queryParameters : null,
+    );
+
+    try {
+      final headers = await _getHeaders();
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      debugPrint(
+        '=== [API Response] GET /work_orders/reject_forms: ${response.body} ===',
+      );
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as List<dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!
+            .map(
+              (item) => RejectFormModel.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch reject forms');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error fetching reject forms: $e');
+    }
+  }
+
+  @override
+  Future<RejectFormModel> getRejectFormById(
+    String rejectFormId, {
+    String workOrderId = '',
+  }) async {
+    final url = Uri.parse('$_baseURL/work_orders/reject_forms/$rejectFormId');
+
+    try {
+      final headers = await _getHeaders();
+      final response = await client
+          .get(url, headers: headers)
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      debugPrint(
+        '=== [API Response] GET /work_orders/reject_forms/$rejectFormId: ${response.body} ===',
+      );
+
+      final jsonMap = jsonDecode(response.body);
+      // Response: { "data": { ... }, "message": "..." }
+      final data = jsonMap['data'] as Map<String, dynamic>?;
+      if (data == null) {
+        throw Exception('Invalid response: missing data field');
+      }
+
+      return RejectFormModel.fromDetailJson(data, workOrderId: workOrderId);
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Error fetching reject form detail: $e');
     }
   }
 

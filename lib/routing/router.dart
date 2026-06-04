@@ -363,8 +363,10 @@ final GoRouter appRouter = GoRouter(
                       path: Routes.adminRejectionDetail,
                       parentNavigatorKey: _rootNavigatorKey,
                       builder: (context, state) {
-                        final id = state.pathParameters['id'] ?? '';
-                        return RejectionDetailScreen(workOrderId: id);
+                        final rejectFormId = state.pathParameters['id'] ?? '';
+                        return RejectionDetailScreen(
+                          rejectFormId: rejectFormId,
+                        );
                       },
                     ),
                   ],

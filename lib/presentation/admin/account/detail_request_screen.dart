@@ -651,7 +651,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                           onPressed: viewModel.isProcessing
                               ? null
                               : () => _showRejectDialog(context, viewModel),
-                          child: viewModel.isProcessing
+                          child: viewModel.isDenying
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
@@ -694,7 +694,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                     }
                                   }
                                 },
-                          child: viewModel.isProcessing
+                          child: viewModel.isApproving
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,

@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
-import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_reject_forms_usecase.dart';
 import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
-import 'package:zent_fe/domain/entities/work_order.dart';
-import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
+import 'package:zent_fe/domain/entities/reject_form.dart';
 import 'package:zent_fe/domain/entities/new_part_form.dart';
 
 class AdminDashboardViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
-  final GetManyWorkOrdersUseCase getManyWorkOrdersUseCase;
+  final GetRejectFormsUseCase getRejectFormsUseCase;
   final GetPartRequestsUseCase getPartRequestsUseCase;
 
   final int _activeJobs = 120;
@@ -25,8 +24,8 @@ class AdminDashboardViewModel extends ChangeNotifier with SafeChangeNotifier {
   double get overallRating => _overallRating;
   double get ratingTrend => _ratingTrend;
 
-  List<WorkOrder> _rejectedWorkOrders = [];
-  List<WorkOrder> get rejectedWorkOrders => _rejectedWorkOrders;
+  List<RejectForm> _rejectedWorkOrders = [];
+  List<RejectForm> get rejectedWorkOrders => _rejectedWorkOrders;
 
   List<NewPartForm> _partRequests = [];
   List<NewPartForm> get partRequests => _partRequests;
@@ -36,7 +35,7 @@ class AdminDashboardViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   AdminDashboardViewModel({
     required this.getCurrentUserUseCase,
-    required this.getManyWorkOrdersUseCase,
+    required this.getRejectFormsUseCase,
     required this.getPartRequestsUseCase,
   }) {
     _loadUserInfo();
@@ -60,23 +59,28 @@ class AdminDashboardViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      final Future<List<WorkOrder>> workOrdersFuture = getManyWorkOrdersUseCase
-          .execute(limit: 100);
+      final Future<List<RejectForm>> rejectFormsFuture = getRejectFormsUseCase
+          .execute();
       final Future<(List<NewPartForm>, NewPartFormStatusSummary)>
       partRequestsFuture = getPartRequestsUseCase.execute(page: 1, limit: 100);
 
-      final results = await Future.wait([workOrdersFuture, partRequestsFuture]);
+      final results = await Future.wait([
+        rejectFormsFuture,
+        partRequestsFuture,
+      ]);
 
-      final allOrders = results[0] as List<WorkOrder>;
+      final forms = results[0] as List<RejectForm>;
       final (partItems, _) =
           results[1] as (List<NewPartForm>, NewPartFormStatusSummary);
 
-      // Filter and sort rejected work orders (WorkOrderStatus.rejectInReview)
-      final rejections = allOrders
-          .where((wo) => wo.status == WorkOrderStatus.rejectInReview)
-          .toList();
-      rejections.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-      _rejectedWorkOrders = rejections.take(3).toList();
+      // Sort and take the 3 most recent reject forms
+      forms.sort((a, b) {
+        if (a.createdAt == null && b.createdAt == null) return 0;
+        if (a.createdAt == null) return 1;
+        if (b.createdAt == null) return -1;
+        return a.createdAt!.compareTo(b.createdAt!);
+      });
+      _rejectedWorkOrders = forms.take(3).toList();
 
       // Filter and sort part requests (pending first)
       List<NewPartForm> pendingParts = partItems

@@ -31,6 +31,8 @@ import '../domain/usecases/auth/session_usecases.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../domain/usecases/work_order/get_reject_forms_usecase.dart';
+import '../domain/usecases/work_order/get_reject_form_by_id_usecase.dart';
 import '../domain/usecases/work_order/create_work_order_usecase.dart';
 import '../domain/usecases/work_order/edit_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
@@ -156,6 +158,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
   sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
+  sl.registerLazySingleton(
+    () => GetRejectFormsUseCase(repository: sl(), getCurrentUserUseCase: sl()),
+  );
+  sl.registerLazySingleton(() => GetRejectFormByIdUseCase(repository: sl()));
   sl.registerLazySingleton(() => CreateWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => EditWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetActiveRepairsUseCase(sl()));
@@ -222,7 +228,7 @@ Future<void> init() async {
   sl.registerFactory(
     () => AdminDashboardViewModel(
       getCurrentUserUseCase: sl(),
-      getManyWorkOrdersUseCase: sl(),
+      getRejectFormsUseCase: sl(),
       getPartRequestsUseCase: sl(),
     ),
   );
@@ -257,7 +263,8 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => RejectedWorkOrdersViewModel(
-      getManyWorkOrdersUseCase: sl(),
+      getRejectFormsUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
       approveRefusalUseCase: sl(),
       denyRefusalUseCase: sl(),
     ),
@@ -265,6 +272,8 @@ Future<void> init() async {
   sl.registerFactory(
     () => RejectionDetailViewModel(
       getSingleWorkOrderUseCase: sl(),
+      getRejectFormByIdUseCase: sl(),
+      getRejectFormsUseCase: sl(),
       approveRefusalUseCase: sl(),
       denyRefusalUseCase: sl(),
     ),

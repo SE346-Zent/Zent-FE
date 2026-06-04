@@ -36,7 +36,13 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   final List<String> photoUrls = [];
 
-  bool isProcessing = false;
+  bool _isApproving = false;
+  bool get isApproving => _isApproving;
+
+  bool _isDenying = false;
+  bool get isDenying => _isDenying;
+
+  bool get isProcessing => _isApproving || _isDenying;
 
   /// Whether the part has been approved/rejected already (hide approve/reject buttons).
   bool _isApproved = false;
@@ -161,7 +167,7 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<bool> acceptPart() async {
     if (currentPartId == null) return false;
-    isProcessing = true;
+    _isApproving = true;
     notifyListeners();
 
     try {
@@ -171,14 +177,14 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
       debugPrint('Error accepting part: $e');
       return false;
     } finally {
-      isProcessing = false;
+      _isApproving = false;
       notifyListeners();
     }
   }
 
   Future<bool> denyPart(String reason) async {
     if (currentPartId == null) return false;
-    isProcessing = true;
+    _isDenying = true;
     notifyListeners();
 
     try {
@@ -188,7 +194,7 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
       debugPrint('Error denying part: $e');
       return false;
     } finally {
-      isProcessing = false;
+      _isDenying = false;
       notifyListeners();
     }
   }

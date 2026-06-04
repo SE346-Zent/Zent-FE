@@ -4,18 +4,18 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/reject_form.dart';
 import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
 class RejectedWorkOrderCard extends StatefulWidget {
-  final WorkOrder workOrder;
+  final RejectForm rejectForm;
   final Future<void> Function() onApprove;
   final Future<void> Function() onDeny;
   final VoidCallback onDetailTap;
 
   const RejectedWorkOrderCard({
     super.key,
-    required this.workOrder,
+    required this.rejectForm,
     required this.onApprove,
     required this.onDeny,
     required this.onDetailTap,
@@ -31,7 +31,7 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
 
   @override
   Widget build(BuildContext context) {
-    final workOrder = widget.workOrder;
+    final form = widget.rejectForm;
     final onApprove = widget.onApprove;
     final onDeny = widget.onDeny;
     final onDetailTap = widget.onDetailTap;
@@ -47,15 +47,17 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            workOrder.workOrderNum.startsWith('WO')
-                ? workOrder.workOrderNum
-                : '#${workOrder.workOrderNum}',
+            form.workOrderNumber.startsWith('WO')
+                ? form.workOrderNumber
+                : '#${form.workOrderNumber}',
             style: TextStyles.middle.copyWith(color: AppColors.tertiary500),
           ),
           const SizedBox(height: 4.0),
           Text(
-            workOrder.title,
+            form.reason,
             style: TextStyles.headline.copyWith(color: AppColors.primary500),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppDimens.spaceMd),
           ThrottledGestureDetector(
@@ -93,14 +95,17 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
                               children: [
                                 UserAvatar(
                                   size: 20,
-                                  name:
-                                      workOrder.technicianName ?? 'Technician',
-                                  avatarUrl: workOrder.technicianAvatarUrl,
+                                  name: form.technicianName.isNotEmpty
+                                      ? form.technicianName
+                                      : 'Technician',
+                                  avatarUrl: null,
                                 ),
                                 const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
-                                    workOrder.technicianName ?? 'N/A',
+                                    form.technicianName.isNotEmpty
+                                        ? form.technicianName
+                                        : 'N/A',
                                     style: TextStyles.middle.copyWith(
                                       color: Colors.black,
                                     ),
@@ -130,13 +135,17 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
                               children: [
                                 UserAvatar(
                                   size: 20,
-                                  name: workOrder.customerName,
-                                  avatarUrl: workOrder.customerAvatarUrl,
+                                  name: form.customerName.isNotEmpty
+                                      ? form.customerName
+                                      : 'Customer',
+                                  avatarUrl: null,
                                 ),
                                 const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
-                                    workOrder.customerName,
+                                    form.customerName.isNotEmpty
+                                        ? form.customerName
+                                        : 'N/A',
                                     style: TextStyles.middle.copyWith(
                                       color: Colors.black,
                                     ),
@@ -163,7 +172,7 @@ class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
                   ),
                   const SizedBox(height: 6.0),
                   Text(
-                    '"${workOrder.refusalNote}"',
+                    '"${form.reason}"',
                     style: TextStyles.bodyLarge.copyWith(color: Colors.black),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,

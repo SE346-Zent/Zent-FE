@@ -12,15 +12,15 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/rejection_detail_viewmodel.dart';
 
 class RejectionDetailScreen extends StatelessWidget {
-  final String workOrderId;
+  final String rejectFormId;
 
-  const RejectionDetailScreen({super.key, required this.workOrderId});
+  const RejectionDetailScreen({super.key, required this.rejectFormId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) =>
-          di.sl<RejectionDetailViewModel>()..loadDetails(workOrderId),
+          di.sl<RejectionDetailViewModel>()..loadDetails(rejectFormId),
       child: const _RejectionDetailContent(),
     );
   }
@@ -104,7 +104,7 @@ class _RejectionDetailContent extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 25.0),
                           child: Text(
-                            wo.refusalReason,
+                            viewModel.reason,
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),
@@ -131,7 +131,7 @@ class _RejectionDetailContent extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 25.0),
                           child: Text(
-                            '"${wo.refusalNote}"',
+                            '"${viewModel.explanation}"',
                             style: TextStyles.bodyLarge.copyWith(
                               color: AppColors.secondary500,
                             ),
@@ -146,7 +146,7 @@ class _RejectionDetailContent extends StatelessWidget {
                     style: TextStyles.title.copyWith(color: Colors.black),
                   ),
                   const SizedBox(height: AppDimens.spaceMd),
-                  if (wo.rejectionPhotos.isEmpty)
+                  if (viewModel.photoUrls.isEmpty)
                     Text(
                       'No evidence photos provided.',
                       style: TextStyles.bodyMedium.copyWith(
@@ -157,7 +157,7 @@ class _RejectionDetailContent extends StatelessWidget {
                     Wrap(
                       spacing: AppDimens.spaceMd,
                       runSpacing: AppDimens.spaceMd,
-                      children: wo.rejectionPhotos.map((url) {
+                      children: viewModel.photoUrls.map((url) {
                         return AppNetworkImage(
                           url: url,
                           width: 90,

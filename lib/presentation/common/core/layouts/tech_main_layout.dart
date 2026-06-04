@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/di/injection_container.dart';
@@ -172,11 +173,11 @@ class _AnimatedFABState extends State<_AnimatedFAB> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
         setState(() => _isPressed = false);
-        widget.onTap();
+        TapDebounce.call(widget.onTap)?.call();
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedScale(
@@ -268,7 +269,7 @@ class _NavBarItem extends StatelessWidget {
     final color = isSelected ? AppColors.tertiary500 : AppColors.secondary300;
 
     return Expanded(
-      child: InkWell(
+      child: ThrottledInkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8.0),
         child: Column(

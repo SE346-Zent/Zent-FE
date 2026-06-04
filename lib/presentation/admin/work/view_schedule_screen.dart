@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -215,7 +216,7 @@ class _ViewScheduleScreenContent extends StatelessWidget {
           final isSelected = index == viewModel.selectedDateIndex;
 
           return Expanded(
-            child: GestureDetector(
+            child: ThrottledGestureDetector(
               onTap: () => viewModel.selectDate(index),
               behavior: HitTestBehavior.opaque,
               child: Container(

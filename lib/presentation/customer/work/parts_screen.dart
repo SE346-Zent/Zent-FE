@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -27,12 +28,29 @@ class PartsScreen extends StatefulWidget {
 class _PartsScreenState extends State<PartsScreen> {
   late PartsViewModel _viewModel;
   final GlobalKey _searchBarKey = GlobalKey();
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _viewModel = sl<PartsViewModel>();
     _viewModel.init(widget.serialNumber, modelCode: widget.modelCode);
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,6 +61,7 @@ class _PartsScreenState extends State<PartsScreen> {
         searchBarKey: _searchBarKey,
         serialNumber: widget.serialNumber,
         modelCode: widget.modelCode,
+        scrollController: _scrollController,
       ),
     );
   }
@@ -52,17 +71,19 @@ class _PartsView extends StatelessWidget {
   final GlobalKey searchBarKey;
   final String serialNumber;
   final String modelCode;
+  final ScrollController scrollController;
   const _PartsView({
     required this.searchBarKey,
     required this.serialNumber,
     this.modelCode = '',
+    required this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<PartsViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.surface100,
@@ -74,6 +95,7 @@ class _PartsView extends StatelessWidget {
         body: viewModel.isLoading
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
+                controller: scrollController,
                 padding: const EdgeInsets.all(AppDimens.spaceMd),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,6 +346,24 @@ class _PartsView extends StatelessWidget {
                         );
                       },
                     ),
+                    // --- 4. LOAD MORE FOOTER ---
+                    if (viewModel.isLoadingMore)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (viewModel.hasMorePages)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        child: Center(
+                          child: Text(
+                            'Scroll down to load more',
+                            style: TextStyles.label.copyWith(
+                              color: AppColors.secondary300,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -346,7 +386,7 @@ class _PartsView extends StatelessWidget {
         return Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 onTap: () => Navigator.of(context).pop(),
                 child: Container(color: Colors.transparent),
               ),

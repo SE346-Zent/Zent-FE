@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import '../../../../presentation/common/core/themes/boxshadow.dart';
 import '../../../../presentation/common/core/themes/colors.dart';
 import '../../../../presentation/common/core/themes/dimens.dart';
@@ -301,7 +302,7 @@ class _SearchableDropdownFieldState<T>
                           itemBuilder: (context, index) {
                             final item = _filteredItems[index];
                             final isSelected = item.value == widget.value;
-                            return InkWell(
+                            return ThrottledInkWell(
                               onTap: () {
                                 widget.onChanged(item.value);
                                 _focusNode.unfocus();

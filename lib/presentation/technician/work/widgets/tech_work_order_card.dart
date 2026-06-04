@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
+import '../viewmodels/tech_work_order_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -126,11 +129,18 @@ class WorkOrderCard extends StatelessWidget {
               textColor: AppColors.tertiary500,
               bgColor: AppColors.tertiary50,
               onPressed: order.id.isNotEmpty
-                  ? () {
-                      context.pushNamed(
+                  ? () async {
+                      await context.pushNamed(
                         RouteNames.techWorkOrderDetails,
                         pathParameters: {'workOrderId': order.id},
                       );
+                      if (context.mounted) {
+                        try {
+                          context.read<TechWorkOrderViewModel>().refreshData(
+                            silent: true,
+                          );
+                        } catch (_) {}
+                      }
                     }
                   : null,
             )
@@ -145,23 +155,37 @@ class WorkOrderCard extends StatelessWidget {
                     textColor: AppColors.surface100,
                     bgColor: AppColors.tertiary500,
                     onPressed: order.id.isNotEmpty
-                        ? () {
-                            context.pushNamed(
+                        ? () async {
+                            await context.pushNamed(
                               RouteNames.techWorkOrderDetails,
                               pathParameters: {'workOrderId': order.id},
                             );
+                            if (context.mounted) {
+                              try {
+                                context
+                                    .read<TechWorkOrderViewModel>()
+                                    .refreshData(silent: true);
+                              } catch (_) {}
+                            }
                           }
                         : null,
                   ),
                 ),
                 const SizedBox(width: 12.0),
-                GestureDetector(
+                ThrottledGestureDetector(
                   onTap: order.id.isNotEmpty
-                      ? () {
-                          context.pushNamed(
+                      ? () async {
+                          await context.pushNamed(
                             RouteNames.techWorkOrderDetails,
                             pathParameters: {'workOrderId': order.id},
                           );
+                          if (context.mounted) {
+                            try {
+                              context
+                                  .read<TechWorkOrderViewModel>()
+                                  .refreshData(silent: true);
+                            } catch (_) {}
+                          }
                         }
                       : null,
                   child: Container(
@@ -209,7 +233,7 @@ class WorkOrderCard extends StatelessWidget {
     required Color bgColor,
     required VoidCallback? onPressed,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(AppDimens.boraSm),
       child: Container(

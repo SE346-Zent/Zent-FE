@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 
 class ImageViewerDialog extends StatefulWidget {
   final String imagePath;
@@ -66,7 +67,7 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
         fit: StackFit.expand,
         children: [
           // Dismiss on tapping outside the image (only if scale is 1.0)
-          GestureDetector(
+          ThrottledGestureDetector(
             onTap: () {
               if (_transformationController.value == Matrix4.identity()) {
                 Navigator.of(context).pop();

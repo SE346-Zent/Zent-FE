@@ -55,7 +55,9 @@ class UserManagementViewModel extends ChangeNotifier with SafeChangeNotifier {
           .toList();
 
       _admins = allUsers
-          .where((u) => u.role == UserRoles.admin || u.role == UserRoles.superAdmin)
+          .where(
+            (u) => u.role == UserRoles.admin || u.role == UserRoles.superAdmin,
+          )
           .toList();
 
       _userStatuses.clear();

@@ -172,7 +172,9 @@ class PartTrackingSection extends StatelessWidget {
         return AlertDialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           title: Text(
             isUninstalled ? "Add Uninstalled Part" : "Add Installed Part",
             style: TextStyles.title.copyWith(color: AppColors.primary500),
@@ -264,9 +266,17 @@ class PartTrackingSection extends StatelessWidget {
                         return;
                       }
                       if (isUninstalled) {
-                        viewModel.addUninstalledPart(partId, partName, sn.isEmpty ? null : sn);
+                        viewModel.addUninstalledPart(
+                          partId,
+                          partName,
+                          sn.isEmpty ? null : sn,
+                        );
                       } else {
-                        viewModel.addInstalledPart(partId, partName, sn.isEmpty ? null : sn);
+                        viewModel.addInstalledPart(
+                          partId,
+                          partName,
+                          sn.isEmpty ? null : sn,
+                        );
                       }
                       Navigator.pop(ctx);
                     },

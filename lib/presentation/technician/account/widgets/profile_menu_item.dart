@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 
 // Core Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -33,7 +34,7 @@ class ProfileMenuItem extends StatelessWidget {
           side: const BorderSide(color: AppColors.surface600, width: 1.0),
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
         ),
-        child: InkWell(
+        child: ThrottledInkWell(
           onTap: () {
             Future.delayed(const Duration(milliseconds: 150), onTap);
           },

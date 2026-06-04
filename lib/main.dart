@@ -44,10 +44,9 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   try {
-    await SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values,
-    );
+    // Hide Android nav bar by default; swipe up from bottom edge to peek it
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
     await dotenv.load(fileName: ".env");
     await di.init();
 

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -48,7 +49,7 @@ class RecentCompletedList extends StatelessWidget {
             Column(
               children: [
                 for (int i = 0; i < recentCompleted.length; i++) ...[
-                  InkWell(
+                  ThrottledInkWell(
                     onTap: () => onSelected(recentCompleted[i]),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

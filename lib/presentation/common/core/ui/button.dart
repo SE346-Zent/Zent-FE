@@ -3,6 +3,7 @@ import '../themes/colors.dart';
 import '../themes/dimens.dart';
 import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
+import '../utils/tap_debounce.dart';
 
 /// The primary call-to-action button used across the application.
 ///
@@ -89,15 +90,17 @@ class PrimaryActionButton extends StatelessWidget {
       elevation: 0,
     );
 
+    final debouncedOnPressed = TapDebounce.call(onPressed);
+
     final child = icon != null
         ? ElevatedButton.icon(
-            onPressed: onPressed,
+            onPressed: debouncedOnPressed,
             icon: Icon(icon, size: iconSize),
             label: Text(label, style: resolvedTextStyle),
             style: buttonStyle,
           )
         : ElevatedButton(
-            onPressed: onPressed,
+            onPressed: debouncedOnPressed,
             style: buttonStyle,
             child: Text(label, style: resolvedTextStyle),
           );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 
 // Core Theming
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
@@ -98,7 +99,7 @@ class _CustomerTextFieldState extends State<CustomerTextField> {
                   ? Icon(widget.prefixIcon, color: AppColors.secondary100)
                   : null,
               suffixIcon: widget.obscureText
-                  ? GestureDetector(
+                  ? ThrottledGestureDetector(
                       onTap: () {
                         setState(() {
                           _obscured = !_obscured;

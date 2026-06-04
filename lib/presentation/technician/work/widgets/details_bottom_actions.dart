@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import '../viewmodels/tech_work_order_details_viewmodel.dart';
 
 class DetailsBottomActions extends StatelessWidget {
@@ -108,7 +109,7 @@ class DetailsBottomActions extends StatelessWidget {
     bool isReject = false,
     bool enabled = true,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: enabled ? onPressed : null,
       child: Container(
         height: 48,

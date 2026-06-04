@@ -1,5 +1,6 @@
-import 'package:camerawesome/camerawesome_plugin.dart';
+﻿import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -147,7 +148,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
                             bottom: 30,
                           ), // Positioned in the middle of black bar
                           child: Center(
-                            child: GestureDetector(
+                            child: ThrottledGestureDetector(
                               behavior: HitTestBehavior.opaque,
                               onTapDown: (_) =>
                                   setState(() => _isPressed = true),
@@ -233,7 +234,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
           Positioned(
             top: MediaQuery.of(context).padding.top + 10,
             left: 20,
-            child: GestureDetector(
+            child: ThrottledGestureDetector(
               onTap: () => context.pop(),
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -259,7 +260,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
     required VoidCallback onTap,
     required Color color,
   }) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),

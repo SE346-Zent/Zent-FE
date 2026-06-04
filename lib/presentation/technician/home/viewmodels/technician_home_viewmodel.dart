@@ -48,9 +48,11 @@ class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   bool isLoading = false;
 
-  Future<void> fetchTodaySchedule() async {
-    isLoading = true;
-    notifyListeners();
+  Future<void> fetchTodaySchedule({bool silent = false}) async {
+    if (!silent) {
+      isLoading = true;
+      notifyListeners();
+    }
 
     try {
       final user = await getCurrentUserUseCase?.execute();
@@ -70,7 +72,9 @@ class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
     } catch (e) {
       debugPrint("Error fetching technician home data: $e");
     } finally {
-      isLoading = false;
+      if (!silent) {
+        isLoading = false;
+      }
       notifyListeners();
     }
   }

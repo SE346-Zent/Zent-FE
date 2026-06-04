@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 
 import 'package:zent_fe/di/injection_container.dart';
@@ -74,7 +75,7 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<CustomerSecurityViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.background500,

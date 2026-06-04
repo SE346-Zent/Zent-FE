@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -24,7 +25,7 @@ class _DetailsChecklistState extends State<DetailsChecklist> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
+        ThrottledGestureDetector(
           onTap: () {
             setState(() {
               _isExpanded = !_isExpanded;
@@ -94,7 +95,7 @@ class _DetailsChecklistState extends State<DetailsChecklist> {
                     final item = viewModel.checklist[index];
                     return Row(
                       children: [
-                        GestureDetector(
+                        ThrottledGestureDetector(
                           onTap:
                               viewModel.workOrder?.status ==
                                   WorkOrderStatus.complete

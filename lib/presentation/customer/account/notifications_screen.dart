@@ -72,36 +72,33 @@ class _CustomerNotificationsView extends StatelessWidget {
                     _buildSectionTitle('Communication'),
                     _buildSwitchRow(
                       title: 'Direct message',
-                      subtitle: 'Chat messages from admin',
+                      subtitle: 'Chat messages from technician and support',
                       value: viewModel.directMessage,
-                      onChanged: (val) =>
-                          viewModel.toggleSetting('directMsg', val),
+                      onChanged: viewModel.toggleDirectMessage,
                     ),
+                    const SizedBox(height: AppDimens.spaceMd),
 
                     // Section: Work Order
-                    _buildSectionTitle('Work Order'),
-                    _buildSwitchRow(
-                      title: 'Tracking',
-                      subtitle: 'Follows the active work orders',
-                      value: viewModel.tracking,
-                      onChanged: (val) =>
-                          viewModel.toggleSetting('tracking', val),
-                    ),
-                    _buildSwitchRow(
-                      title: 'Appointment reminders',
-                      subtitle: 'Follows the active work orders',
-                      value: viewModel.appointmentReminders,
-                      onChanged: (val) =>
-                          viewModel.toggleSetting('appointmentReminders', val),
-                    ),
-                    _buildSwitchRow(
-                      title: 'Invoice',
-                      subtitle: 'Receive digital receipts reminders',
-                      value: viewModel.invoice,
-                      onChanged: (val) =>
-                          viewModel.toggleSetting('invoice', val),
-                    ),
-                    const SizedBox(height: AppDimens.spaceLg),
+                    if (viewModel.preferences.isNotEmpty) ...[
+                      _buildSectionTitle('Work Order'),
+                      ...viewModel.preferences.map((pref) {
+                        final displayName =
+                            pref.categorySlug == 'work_order_assigned'
+                            ? 'Work Order Assignment'
+                            : pref.categoryName;
+                        return _buildSwitchRow(
+                          title: displayName,
+                          subtitle: _getSubtitleForSlug(pref.categorySlug),
+                          value: viewModel.isEnabled(
+                            pref.categoryId,
+                            pref.osEnabled,
+                          ),
+                          onChanged: (val) =>
+                              viewModel.toggleSetting(pref.categoryId, val),
+                        );
+                      }),
+                      const SizedBox(height: AppDimens.spaceLg),
+                    ],
 
                     // Info Box: Push Permissions
                     Container(
@@ -156,6 +153,25 @@ class _CustomerNotificationsView extends StatelessWidget {
               ),
       ),
     );
+  }
+
+  String _getSubtitleForSlug(String slug) {
+    switch (slug) {
+      case 'work_order_assigned':
+        return 'Receive notifications when a technician is assigned to your work order';
+      case 'about_to_start':
+        return 'Get reminded when your scheduled service is about to start';
+      case 'work_order_rejection_form':
+        return 'Notifications about rejected work orders';
+      case 'add_new_part':
+        return 'Receive alerts when new parts are requested or added';
+      case 'work_order_escalation':
+        return 'Alerts when a work order needs escalation';
+      case 'chat_message':
+        return 'Receive alerts for direct chat messages';
+      default:
+        return 'Receive notifications for this category';
+    }
   }
 
   Widget _buildSectionTitle(String title) {

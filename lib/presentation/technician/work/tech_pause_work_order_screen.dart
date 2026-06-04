@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -33,7 +34,7 @@ class _TechPauseWorkOrderContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TechPauseWorkOrderViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -165,7 +166,7 @@ class _TechPauseWorkOrderContent extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10.0),

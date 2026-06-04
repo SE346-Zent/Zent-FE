@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -28,7 +29,7 @@ class PartRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: () async {
         final result = await context.pushNamed(
           RouteNames.adminDetailRequest,

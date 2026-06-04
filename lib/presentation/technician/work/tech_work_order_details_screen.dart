@@ -43,9 +43,7 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
         backgroundColor: AppColors.background500,
         body: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              AppColors.primary500,
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary500),
           ),
         ),
       );
@@ -63,7 +61,8 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
                   children: [
                     AccountHeader(
                       title: "Detailed Work",
-                      subtitle: "${viewModel.displayWorkOrderNum} • 12h30 AM",
+                      subtitle:
+                          "${viewModel.displayWorkOrderNum} • ${viewModel.appointmentFormatted}",
                       showDivider: true,
                     ),
                     Positioned(

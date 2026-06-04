@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 // Core Theming
@@ -29,7 +30,7 @@ class ProfileAvatar extends StatelessWidget {
     final resolvedUrl = AvatarUtils.getAvatarUrl(imageUrl);
     final hasImage = resolvedUrl != null && resolvedUrl.isNotEmpty;
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Stack(
         children: [

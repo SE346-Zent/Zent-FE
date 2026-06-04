@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -29,7 +30,7 @@ class SidebarMenuItem extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: ThrottledInkWell(
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
           onTap: onTap,
           child: Padding(

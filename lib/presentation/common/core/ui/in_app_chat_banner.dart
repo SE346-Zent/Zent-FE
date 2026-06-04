@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
@@ -87,7 +88,7 @@ class _InAppChatBannerState extends State<InAppChatBanner>
         position: _slideAnimation,
         child: FadeTransition(
           opacity: _fadeAnimation,
-          child: GestureDetector(
+          child: ThrottledGestureDetector(
             onTap: () {
               _autoDismissTimer?.cancel();
               _animController.reverse().then((_) {

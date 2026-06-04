@@ -35,6 +35,7 @@ class WorkOrderModel extends WorkOrder {
     super.phoneNumber,
     super.addressLine1,
     super.customerAvatarUrl,
+    super.startAt,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -71,6 +72,7 @@ class WorkOrderModel extends WorkOrder {
       phoneNumber: entity.phoneNumber,
       addressLine1: entity.addressLine1,
       customerAvatarUrl: entity.customerAvatarUrl,
+      startAt: entity.startAt,
     );
   }
 
@@ -236,6 +238,15 @@ class WorkOrderModel extends WorkOrder {
           (json['customer'] is Map
               ? (json['customer'] as Map)['avatar']?.toString()
               : null),
+      startAt: json['startedAt'] != null
+          ? DateTime.tryParse(json['startedAt'] as String)
+          : (json['started_at'] != null
+                ? DateTime.tryParse(json['started_at'] as String)
+                : (json['startAt'] != null
+                      ? DateTime.tryParse(json['startAt'] as String)
+                      : (json['start_at'] != null
+                            ? DateTime.tryParse(json['start_at'] as String)
+                            : null))),
     );
   }
 
@@ -379,6 +390,8 @@ class WorkOrderModel extends WorkOrder {
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,
       'customerAvatarUrl': customerAvatarUrl,
+      'start_at': startAt?.toIso8601String(),
+      'startedAt': startAt?.toIso8601String(),
     };
   }
 }

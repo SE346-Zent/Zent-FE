@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -75,7 +76,7 @@ class _NotificationTileState extends State<NotificationTile> {
             const SizedBox(width: AppDimens.spaceMd),
             // Content — body tap navigates, NOT expand/collapse
             Expanded(
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: widget.onTap,
                 child: Column(
@@ -118,7 +119,7 @@ class _NotificationTileState extends State<NotificationTile> {
             ),
             const SizedBox(width: AppDimens.spaceSm),
             // Expand arrow — only toggles expand/collapse
-            GestureDetector(
+            ThrottledGestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 setState(() {

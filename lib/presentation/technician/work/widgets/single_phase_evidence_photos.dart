@@ -1,5 +1,6 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -156,7 +157,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
           ),
         );
       }
-      return GestureDetector(
+      return ThrottledGestureDetector(
         onTap: () => _onOpenCamera(context),
         child: DashedBorderContainer(
           height: 100,
@@ -184,7 +185,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
             const SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
           if (index == photos.length) {
-            return GestureDetector(
+            return ThrottledGestureDetector(
               onTap: () => _onOpenCamera(context),
               child: Container(
                 width: 100,
@@ -205,7 +206,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
   Widget _buildPhotoItem(BuildContext context, String path, int index) {
     return Stack(
       children: [
-        GestureDetector(
+        ThrottledGestureDetector(
           onTap: () => ImageViewerDialog.show(context, path),
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
@@ -226,7 +227,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
           Positioned(
             top: 4,
             right: 4,
-            child: GestureDetector(
+            child: ThrottledGestureDetector(
               onTap: () => onPhotoRemoved(index),
               child: Container(
                 padding: const EdgeInsets.all(2),

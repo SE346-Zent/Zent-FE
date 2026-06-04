@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -23,7 +24,7 @@ class PartSearchItem extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: ThrottledInkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
           child: Padding(

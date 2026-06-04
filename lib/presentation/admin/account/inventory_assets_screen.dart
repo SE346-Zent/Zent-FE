@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -85,7 +86,7 @@ class _InventoryAssetsScreenContent extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: AppDimens.spaceMd),
-                          GestureDetector(
+                          ThrottledGestureDetector(
                             onTap: viewModel.isExporting
                                 ? null
                                 : () async {

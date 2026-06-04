@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/string_extensions.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -57,7 +58,7 @@ class OperationalQueueJobCard extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
+      child: ThrottledInkWell(
         onTap: () => _handleNavigation(context, 'card_tap'),
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         child: Container(

@@ -34,6 +34,7 @@ class WorkOrder {
   final String? addressLine1;
 
   final String? customerAvatarUrl;
+  final DateTime? startAt;
 
   WorkOrder({
     required this.id,
@@ -68,6 +69,7 @@ class WorkOrder {
     this.phoneNumber,
     this.addressLine1,
     this.customerAvatarUrl,
+    this.startAt,
   });
 
   String get address => addressString;

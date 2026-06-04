@@ -17,7 +17,8 @@ class GpsServiceGuard extends StatefulWidget {
   State<GpsServiceGuard> createState() => _GpsServiceGuardState();
 }
 
-class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+class _GpsServiceGuardState extends State<GpsServiceGuard>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   bool _isGpsEnabled = true;
   bool _isChecking = false;
   StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
@@ -36,7 +37,9 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
     _checkGpsStatus();
 
     // Subscribe to service status updates
-    _serviceStatusSubscription = Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
+    _serviceStatusSubscription = Geolocator.getServiceStatusStream().listen((
+      ServiceStatus status,
+    ) {
       final isEnabled = status == ServiceStatus.enabled;
       if (mounted) {
         setState(() {
@@ -101,7 +104,8 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
   @override
   Widget build(BuildContext context) {
     final authViewModel = context.watch<AuthViewModel>();
-    final isTechnician = authViewModel.isLoggedIn && authViewModel.role == UserRoles.technician;
+    final isTechnician =
+        authViewModel.isLoggedIn && authViewModel.role == UserRoles.technician;
 
     // Only block if the user is a technician and GPS is disabled
     if (isTechnician && !_isGpsEnabled) {
@@ -145,19 +149,43 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
                                 alignment: Alignment.center,
                                 children: [
                                   Container(
-                                    width: 120 * (1.0 + _animationController.value * 0.15),
-                                    height: 120 * (1.0 + _animationController.value * 0.15),
+                                    width:
+                                        120 *
+                                        (1.0 +
+                                            _animationController.value * 0.15),
+                                    height:
+                                        120 *
+                                        (1.0 +
+                                            _animationController.value * 0.15),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.red.withAlpha((255 * 0.1 * (1.0 - _animationController.value)).round()),
+                                      color: Colors.red.withAlpha(
+                                        (255 *
+                                                0.1 *
+                                                (1.0 -
+                                                    _animationController.value))
+                                            .round(),
+                                      ),
                                     ),
                                   ),
                                   Container(
-                                    width: 90 * (1.0 + _animationController.value * 0.1),
-                                    height: 90 * (1.0 + _animationController.value * 0.1),
+                                    width:
+                                        90 *
+                                        (1.0 +
+                                            _animationController.value * 0.1),
+                                    height:
+                                        90 *
+                                        (1.0 +
+                                            _animationController.value * 0.1),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.red.withAlpha((255 * 0.15 * (1.0 - _animationController.value)).round()),
+                                      color: Colors.red.withAlpha(
+                                        (255 *
+                                                0.15 *
+                                                (1.0 -
+                                                    _animationController.value))
+                                            .round(),
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -201,7 +229,9 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
                             "GPS/Location services are disabled on your device. As a Technician, you must enable GPS to proceed with tasks, start jobs, and update work orders.",
                             textAlign: TextAlign.center,
                             style: TextStyles.middle.copyWith(
-                              color: Colors.white.withAlpha((255 * 0.7).round()),
+                              color: Colors.white.withAlpha(
+                                (255 * 0.7).round(),
+                              ),
                               height: 1.5,
                             ),
                           ),
@@ -214,7 +244,9 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
                               foregroundColor: AppColors.primary500,
                               minimumSize: const Size(double.infinity, 52),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.boraMd,
+                                ),
                               ),
                               elevation: 2.0,
                             ),
@@ -232,10 +264,16 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
                             onPressed: _isChecking ? null : _checkGpsStatus,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              side: BorderSide(color: Colors.white.withAlpha((255 * 0.4).round())),
+                              side: BorderSide(
+                                color: Colors.white.withAlpha(
+                                  (255 * 0.4).round(),
+                                ),
+                              ),
                               minimumSize: const Size(double.infinity, 52),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.boraMd,
+                                ),
                               ),
                             ),
                             icon: _isChecking
@@ -244,12 +282,16 @@ class _GpsServiceGuardState extends State<GpsServiceGuard> with WidgetsBindingOb
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
                                     ),
                                   )
                                 : const Icon(Icons.refresh),
                             label: Text(
-                              _isChecking ? "Checking status..." : "I've Enabled It",
+                              _isChecking
+                                  ? "Checking status..."
+                                  : "I've Enabled It",
                               style: TextStyles.middle.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,

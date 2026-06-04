@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -86,7 +87,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
             });
           }
 
-          return GestureDetector(
+          return ThrottledGestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             child: Scaffold(
               backgroundColor: AppColors.surface100,
@@ -342,7 +343,7 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                      child: GestureDetector(
+                      child: ThrottledGestureDetector(
                         onTap: () => ImageViewerDialog.show(
                           context,
                           viewModel.chatService.getAttachmentUrl(

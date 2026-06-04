@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -50,7 +51,7 @@ class _TechPrimaryButtonState extends State<TechPrimaryButton> {
       ],
     );
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTapDown: (widget.isLoading || widget.onPressed == null)
           ? null
           : (_) => setState(() => _isPressed = true),
@@ -60,7 +61,7 @@ class _TechPrimaryButtonState extends State<TechPrimaryButton> {
               setState(() => _isPressed = false);
               Future.delayed(
                 const Duration(milliseconds: 100),
-                widget.onPressed!,
+                TapDebounce.call(widget.onPressed)!,
               );
             },
       onTapCancel: () => setState(() => _isPressed = false),

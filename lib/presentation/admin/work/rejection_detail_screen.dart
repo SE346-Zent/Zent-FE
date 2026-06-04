@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -190,7 +191,7 @@ class _RejectionDetailContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: ThrottledGestureDetector(
                         onTap: viewModel.isLoading
                             ? null
                             : () async {
@@ -234,7 +235,7 @@ class _RejectionDetailContent extends StatelessWidget {
                     ),
                     const SizedBox(width: AppDimens.spaceMd),
                     Expanded(
-                      child: GestureDetector(
+                      child: ThrottledGestureDetector(
                         onTap: viewModel.isLoading
                             ? null
                             : () async {

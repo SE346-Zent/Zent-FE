@@ -21,43 +21,25 @@ class CustomerNotificationsViewModel extends ChangeNotifier
   bool get isLoading => _isLoading;
 
   // Local state changes to save on button press
-  final Map<String, bool> _localToggles = {};
+  final Map<int, bool> _localToggles = {};
+  bool? _localDirectMessage;
 
-  bool get directMessage =>
-      _localToggles['directMessage'] ??
-      _getPrefValue('message') ??
-      _getPrefValue('chat') ??
-      true;
+  bool _prefsDirectMessageEnabled = true;
 
-  bool get tracking =>
-      _localToggles['tracking'] ??
-      _getPrefValue('tracking') ??
-      _getPrefValue('work') ??
-      true;
+  bool get directMessage => _localDirectMessage ?? _prefsDirectMessageEnabled;
 
-  bool get appointmentReminders =>
-      _localToggles['appointmentReminders'] ??
-      _getPrefValue('appointment') ??
-      _getPrefValue('reminder') ??
-      true;
+  bool isEnabled(int categoryId, bool defaultVal) {
+    return _localToggles[categoryId] ?? defaultVal;
+  }
 
-  bool get invoice =>
-      _localToggles['invoice'] ??
-      _getPrefValue('invoice') ??
-      _getPrefValue('bill') ??
-      true;
+  void toggleDirectMessage(bool value) {
+    _localDirectMessage = value;
+    notifyListeners();
+  }
 
-  bool? _getPrefValue(String keyword) {
-    try {
-      final pref = _preferences.firstWhere(
-        (p) =>
-            p.categorySlug.toLowerCase().contains(keyword) ||
-            p.categoryName.toLowerCase().contains(keyword),
-      );
-      return pref.osEnabled;
-    } catch (_) {
-      return null;
-    }
+  void toggleSetting(int categoryId, bool value) {
+    _localToggles[categoryId] = value;
+    notifyListeners();
   }
 
   Future<void> loadPreferences() async {
@@ -66,8 +48,11 @@ class CustomerNotificationsViewModel extends ChangeNotifier
     try {
       _preferences = await notificationRepository.getNotificationPreferences();
       _localToggles.clear();
+      _localDirectMessage = null;
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('pref_direct_message_enabled', directMessage);
+      _prefsDirectMessageEnabled =
+          prefs.getBool('pref_direct_message_enabled') ?? true;
     } catch (e) {
       debugPrint('Error loading notification preferences: $e');
     } finally {
@@ -76,65 +61,47 @@ class CustomerNotificationsViewModel extends ChangeNotifier
     }
   }
 
-  void toggleSetting(String key, bool value) {
-    // Map 'directMsg' to 'directMessage' to fix screen key mismatch
-    final normalizedKey = key == 'directMsg' ? 'directMessage' : key;
-    _localToggles[normalizedKey] = value;
-    notifyListeners();
-  }
-
   Future<void> saveSettings(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
     try {
-      // Find and update each modified preference
+      // Find and update each modified preference on the server
       for (final entry in _localToggles.entries) {
-        final key = entry.key;
+        final categoryId = entry.key;
         final val = entry.value;
 
-        String keyword = '';
-        if (key == 'directMessage') {
-          keyword = 'message';
-        } else if (key == 'tracking') {
-          keyword = 'tracking';
-        } else if (key == 'appointmentReminders') {
-          keyword = 'appointment';
-        } else if (key == 'invoice') {
-          keyword = 'invoice';
-        }
+        await notificationRepository.updateNotificationPreference(
+          categoryId,
+          val,
+        );
 
-        NotificationPreferenceModel? pref;
-        try {
-          pref = _preferences.firstWhere(
-            (p) =>
-                p.categorySlug.toLowerCase().contains(keyword) ||
-                p.categoryName.toLowerCase().contains(keyword),
-          );
-        } catch (_) {
-          if (key == 'directMessage') {
-            try {
-              pref = _preferences.firstWhere(
-                (p) =>
-                    p.categorySlug.toLowerCase().contains('chat') ||
-                    p.categoryName.toLowerCase().contains('chat'),
-              );
-            } catch (_) {}
-          }
-        }
-
-        if (pref != null) {
-          await notificationRepository.updateNotificationPreference(
-            pref.categoryId,
-            val,
+        // Update in-memory immediately so UI reflects the saved state
+        final idx = _preferences.indexWhere((p) => p.categoryId == categoryId);
+        if (idx != -1) {
+          final pref = _preferences[idx];
+          _preferences[idx] = NotificationPreferenceModel(
+            categoryId: pref.categoryId,
+            categoryName: pref.categoryName,
+            categorySlug: pref.categorySlug,
+            osEnabled: val,
+            updatedAt: pref.updatedAt,
           );
         }
       }
 
-      await loadPreferences();
+      // Clear local overrides now that _preferences reflects the saved state
+      _localToggles.clear();
 
-      // Explicitly store the updated preference after loadPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('pref_direct_message_enabled', directMessage);
+      // Persist direct message setting to SharedPreferences
+      if (_localDirectMessage != null) {
+        _prefsDirectMessageEnabled = _localDirectMessage!;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool(
+          'pref_direct_message_enabled',
+          _prefsDirectMessageEnabled,
+        );
+        _localDirectMessage = null;
+      }
 
       if (context.mounted) {
         ZentSuccessPopup.show(

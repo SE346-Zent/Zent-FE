@@ -158,7 +158,7 @@ class ChatList extends StatelessWidget {
       color: AppColors.tertiary500,
       child: ListView.builder(
         itemCount: viewModel.chats.length,
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.only(top: 8.0, bottom: 48.0),
         physics: const AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final chat = viewModel.chats[index];

@@ -14,6 +14,7 @@ import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
 
 class CompleteWorkOrderViewModel extends ChangeNotifier
     with SafeChangeNotifier {
@@ -267,7 +268,8 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
       // Clear draft on success
       await workOrderDraftUseCase.clear(workOrderId);
       if (context.mounted) {
-        Navigator.pop(context);
+        ZentSuccessPopup.show(context, 'Work order completed successfully!');
+        Navigator.pop(context, true);
         debugPrint('Work Order Completed successfully');
       }
     } catch (e) {

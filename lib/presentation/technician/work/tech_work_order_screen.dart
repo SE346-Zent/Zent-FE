@@ -66,8 +66,11 @@ class _TechWorkOrderView extends StatelessWidget {
                       onRefresh: () => viewModel.refreshData(silent: true),
                       child: ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppDimens.spaceMd,
+                        padding: const EdgeInsets.only(
+                          left: AppDimens.spaceMd,
+                          right: AppDimens.spaceMd,
+                          top: AppDimens.spaceSm,
+                          bottom: 56.0,
                         ),
                         itemCount: viewModel.filteredOrders.length,
                         itemBuilder: (context, index) {

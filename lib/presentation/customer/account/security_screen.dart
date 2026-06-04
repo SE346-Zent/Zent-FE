@@ -3,7 +3,7 @@ import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 
 import 'package:zent_fe/di/injection_container.dart';
-import 'package:zent_fe/presentation/admin/account/widgets/active_devices_section.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/active_sessions_section.dart';
 import 'package:zent_fe/presentation/admin/account/widgets/login_history_section.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -203,8 +203,8 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
                 _buildRecoveryEmailSection(context, viewModel),
                 const SizedBox(height: AppDimens.spaceXl),
 
-                // ACTIVE DEVICES
-                ActiveDevicesSection(
+                // ACTIVE SESSIONS
+                ActiveSessionsSection(
                   sessions: viewModel.activeSessions,
                   isLoading: viewModel.isLoadingSessions,
                   onRevoke: viewModel.revokeSession,

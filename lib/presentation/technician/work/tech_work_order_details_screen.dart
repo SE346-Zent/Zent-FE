@@ -237,10 +237,16 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
             extra: {'workOrderId': cleanId, 'workOrderNumber': woNum},
           );
         } else if (value == 'reject') {
-          context.pushNamed(
-            RouteNames.techRejectWorkOrder,
-            pathParameters: {'workOrderId': cleanId},
-          );
+          context
+              .pushNamed(
+                RouteNames.techRejectWorkOrder,
+                pathParameters: {'workOrderId': cleanId},
+              )
+              .then((didReject) {
+                if (didReject == true && context.mounted) {
+                  Navigator.pop(context, true);
+                }
+              });
         }
       },
       itemBuilder: (BuildContext context) => [

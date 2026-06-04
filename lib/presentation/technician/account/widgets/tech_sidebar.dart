@@ -154,17 +154,6 @@ class TechSidebar extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Footer Section
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-              child: Text(
-                appVersion,
-                style: TextStyles.middle.copyWith(
-                  color: AppColors.secondary200,
-                ),
-              ),
-            ),
           ],
         ),
       ),

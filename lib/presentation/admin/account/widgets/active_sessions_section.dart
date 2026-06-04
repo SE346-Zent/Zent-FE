@@ -4,13 +4,13 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
-class ActiveDevicesSection extends StatelessWidget {
+class ActiveSessionsSection extends StatelessWidget {
   final List<UserSession> sessions;
   final bool isLoading;
   final Function(String sessionId) onRevoke;
   final VoidCallback onRevokeAllOthers;
 
-  const ActiveDevicesSection({
+  const ActiveSessionsSection({
     super.key,
     required this.sessions,
     required this.isLoading,
@@ -64,7 +64,7 @@ class ActiveDevicesSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Revoke Device Session?'),
+        title: const Text('Revoke Session?'),
         content: Text(
           'Are you sure you want to log out of "${session.deviceName}" (${session.ipAddress})?',
         ),
@@ -93,7 +93,7 @@ class ActiveDevicesSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Revoke All Other Devices?'),
+        title: const Text('Revoke All Other Sessions?'),
         content: const Text(
           'Are you sure you want to log out of all other active sessions? You will remain logged in on this device.',
         ),
@@ -139,7 +139,7 @@ class ActiveDevicesSection extends StatelessWidget {
                   ),
                   const SizedBox(width: AppDimens.spaceSm),
                   Text(
-                    'Active Devices',
+                    'Active Sessions',
                     style: TextStyles.title.copyWith(
                       color: AppColors.primary500,
                     ),
@@ -195,7 +195,7 @@ class ActiveDevicesSection extends StatelessWidget {
                   height: 120,
                   child: Center(
                     child: Text(
-                      'No active devices found',
+                      'No active sessions found',
                       style: TextStyle(color: AppColors.secondary400),
                     ),
                   ),

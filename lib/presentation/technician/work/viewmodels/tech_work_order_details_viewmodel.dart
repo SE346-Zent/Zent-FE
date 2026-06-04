@@ -42,7 +42,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     required this.getSingleWorkOrderUseCase,
     required this.sharedPreferences,
   }) {
-    _loadDetails();
+    loadDetails();
   }
 
   String get jobName => workOrder?.title ?? "Laptop Repair";
@@ -204,7 +204,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     await sharedPreferences.setStringList(key, listToSave);
   }
 
-  Future<void> _loadDetails() async {
+  Future<void> loadDetails() async {
     _isLoading = true;
     notifyListeners();
     try {
@@ -300,7 +300,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
       // 3. Refresh work order details
       debugPrint("Refreshing work order details...");
-      await _loadDetails();
+      await loadDetails();
       debugPrint(
         "Work order details refreshed successfully. Current status: $status",
       );

@@ -116,7 +116,9 @@ class _TechMainLayoutState extends State<TechMainLayout> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background500,
+        backgroundColor: widget.navigationShell.currentIndex == 2
+            ? AppColors.surface100
+            : AppColors.background500,
         resizeToAvoidBottomInset: false,
         drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
         drawer: TechSidebar(userName: userName, employeeId: 'TECH-1234'),
@@ -124,7 +126,7 @@ class _TechMainLayoutState extends State<TechMainLayout> {
           children: [
             Padding(
               padding: EdgeInsets.only(
-                bottom: 110.0 + MediaQuery.paddingOf(context).bottom,
+                bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
               ),
               child: widget.navigationShell,
             ),

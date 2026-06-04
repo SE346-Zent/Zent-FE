@@ -20,6 +20,7 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
     'In Progress',
     'Assigned',
     'Completed',
+    'Reject In Review',
   ];
 
   List<WorkOrder> _allOrders = [];
@@ -39,6 +40,9 @@ class TechWorkOrderViewModel extends ChangeNotifier with SafeChangeNotifier {
       }
       if (statusFilter == 'completed') {
         return status == WorkOrderStatus.complete;
+      }
+      if (statusFilter == 'reject in review') {
+        return status == WorkOrderStatus.rejectInReview;
       }
       return status.name.toLowerCase() == statusFilter;
     }).toList();

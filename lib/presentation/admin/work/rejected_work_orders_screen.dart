@@ -53,22 +53,55 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: viewModel.loadRejectedWorkOrders,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(AppDimens.spaceLg),
-                itemCount: viewModel.workOrders.length,
-                itemBuilder: (context, index) {
-                  final wo = viewModel.workOrders[index];
-                  return RejectedWorkOrderCard(
-                    workOrder: wo,
-                    onApprove: () => _handleApprove(context, viewModel, wo),
-                    onDeny: () => _handleDeny(context, viewModel, wo.id),
-                    onDetailTap: () => context.goNamed(
-                      RouteNames.adminRejectionDetail,
-                      pathParameters: {'id': wo.id},
+              child: viewModel.workOrders.isEmpty
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.assignment_turned_in_outlined,
+                                  size: 64,
+                                  color: AppColors.secondary300,
+                                ),
+                                const SizedBox(height: AppDimens.spaceMd),
+                                Center(
+                                  child: Text(
+                                    'No rejected work orders',
+                                    style: TextStyles.bodyLarge.copyWith(
+                                      color: AppColors.secondary400,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(AppDimens.spaceLg),
+                      itemCount: viewModel.workOrders.length,
+                      itemBuilder: (context, index) {
+                        final wo = viewModel.workOrders[index];
+                        return RejectedWorkOrderCard(
+                          workOrder: wo,
+                          onApprove: () =>
+                              _handleApprove(context, viewModel, wo),
+                          onDeny: () => _handleDeny(context, viewModel, wo.id),
+                          onDetailTap: () => context.goNamed(
+                            RouteNames.adminRejectionDetail,
+                            pathParameters: {'id': wo.id},
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
     );
   }

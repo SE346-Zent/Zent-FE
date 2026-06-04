@@ -183,7 +183,7 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
                           jobsDone: viewModel.jobsDone,
                           averageRating: viewModel.averageRating,
                         ),
-                        const SizedBox(height: AppDimens.spaceXl),
+                        const SizedBox(height: 56.0),
                       ],
                     ),
                   ),

@@ -6,7 +6,7 @@ import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'widgets/change_password_section.dart';
 import 'widgets/recovery_email_section.dart';
 import 'widgets/login_history_section.dart';
-import 'package:zent_fe/presentation/admin/account/widgets/active_devices_section.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/active_sessions_section.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/security_settings_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -51,7 +51,7 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
                       const SizedBox(height: AppDimens.spaceXl),
                       const RecoveryEmailSection(),
                       const SizedBox(height: AppDimens.spaceXl),
-                      ActiveDevicesSection(
+                      ActiveSessionsSection(
                         sessions: viewModel.activeSessions,
                         isLoading: viewModel.isLoadingSessions,
                         onRevoke: viewModel.revokeSession,

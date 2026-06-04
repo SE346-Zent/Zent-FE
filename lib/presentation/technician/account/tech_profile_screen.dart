@@ -65,7 +65,7 @@ class _TechProfileView extends StatelessWidget {
               const SizedBox(height: AppDimens.spaceXl),
 
               const ProfileMenuOptions(),
-              const SizedBox(height: AppDimens.spaceXl),
+              const SizedBox(height: 56.0),
             ],
           ),
         ),

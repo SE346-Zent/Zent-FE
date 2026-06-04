@@ -52,10 +52,16 @@ class DetailsBottomActions extends StatelessWidget {
                   : () {
                       final cleanId = viewModel.workOrderId.replaceAll('#', '');
                       if (isPending) {
-                        context.pushNamed(
-                          RouteNames.techRejectWorkOrder,
-                          pathParameters: {'workOrderId': cleanId},
-                        );
+                        context
+                            .pushNamed(
+                              RouteNames.techRejectWorkOrder,
+                              pathParameters: {'workOrderId': cleanId},
+                            )
+                            .then((didReject) {
+                              if (didReject == true && context.mounted) {
+                                Navigator.pop(context, true);
+                              }
+                            });
                       } else {
                         context.pushNamed(
                           RouteNames.techPauseWorkOrder,
@@ -79,7 +85,7 @@ class DetailsBottomActions extends StatelessWidget {
                         : Icons.assignment_turned_in_outlined),
               backgroundColor: isCompletedOrRejected
                   ? AppColors.primary300
-                  : (isPending ? Colors.green.shade600 : AppColors.tertiary500),
+                  : AppColors.tertiary500,
               onPressed: () {
                 if (isCompletedOrRejected) {
                   context.pushNamed(
@@ -90,10 +96,16 @@ class DetailsBottomActions extends StatelessWidget {
                   viewModel.startJob(context);
                 } else {
                   viewModel.onFillFormPressed(context);
-                  context.pushNamed(
-                    RouteNames.techCompleteWorkOrder,
-                    pathParameters: {'workOrderId': viewModel.workOrderId},
-                  );
+                  context
+                      .pushNamed(
+                        RouteNames.techCompleteWorkOrder,
+                        pathParameters: {'workOrderId': viewModel.workOrderId},
+                      )
+                      .then((didComplete) {
+                        if (didComplete == true && context.mounted) {
+                          Navigator.pop(context, true);
+                        }
+                      });
                 }
               },
             ),

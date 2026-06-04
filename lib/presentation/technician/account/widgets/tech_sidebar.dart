@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -91,26 +91,6 @@ class TechSidebar extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SidebarMenuItem(
-                      title: "QR Code Scanner",
-                      icon: const Icon(
-                        Icons.qr_code_scanner,
-                        color: AppColors.surface100,
-                      ),
-                      isActive: true,
-                      onTap: () {
-                        Navigator.pop(context); // Close the drawer first
-                        context.pushNamed(
-                          RouteNames.qrScanner,
-                          extra: {
-                            'onScanned': (String result) {
-                              debugPrint('Sidebar QR Scanned: $result');
-                            },
-                          },
-                        );
-                      },
-                    ),
-
                     SidebarMenuItem(
                       title: "Part Search",
                       icon: const Icon(

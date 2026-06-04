@@ -323,6 +323,7 @@ class ChatService extends ChangeNotifier {
 
       final token = await authLocalDataSource.getAccessToken();
       if (token == null) return;
+      final sessionId = await authLocalDataSource.getSessionId();
 
       _messageStreamController = StreamController<dynamic>.broadcast();
 
@@ -350,7 +351,7 @@ class ChatService extends ChangeNotifier {
           notifyListeners();
 
           // Immediately register AUTH frame with server
-          sendAuth(token);
+          sendAuth(token, sessionId: sessionId);
 
           // Establish message listening stream on the active connection channel
           _wsSubscription = _channel!.stream.listen(
@@ -375,8 +376,13 @@ class ChatService extends ChangeNotifier {
               disconnect(intentional: false);
             },
             onDone: () {
-              debugPrint("WS Done");
-              disconnect(intentional: false);
+              final closeCode = _channel?.closeCode;
+              debugPrint("WS Done, closeCode: $closeCode");
+              if (closeCode == 4004) {
+                _handleSessionRevoked();
+              } else {
+                disconnect(intentional: false);
+              }
             },
           );
           return;
@@ -490,8 +496,27 @@ class ChatService extends ChangeNotifier {
     }
   }
 
-  void sendAuth(String token) {
-    _sendFrame({'type': 'AUTH', 'token': token});
+  void sendAuth(String token, {String? sessionId}) {
+    final frame = <String, dynamic>{'type': 'AUTH', 'token': token};
+    if (sessionId != null) {
+      frame['session_id'] = sessionId;
+    }
+    _sendFrame(frame);
+  }
+
+  Future<void> _handleSessionRevoked() async {
+    debugPrint(
+      "WS Close Code 4004: Session revoked. Logging out and redirecting to login...",
+    );
+    try {
+      await sl<AuthRepository>().logout();
+    } catch (e) {
+      debugPrint("Error logging out on session revoked: $e");
+    } finally {
+      sl<AuthViewModel>().clearUser();
+      disconnect(intentional: true);
+      appRouter.go(Routes.login);
+    }
   }
 
   void sendRefreshToken(String newToken) {

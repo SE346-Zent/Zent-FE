@@ -27,6 +27,7 @@ import '../domain/usecases/work_order/reassign_work_order_usecase.dart';
 import '../domain/usecases/auth/get_login_history_usecase.dart';
 import '../domain/usecases/auth/change_password_usecase.dart';
 import '../domain/usecases/auth/recovery_and_metrics_usecases.dart';
+import '../domain/usecases/auth/session_usecases.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
@@ -147,6 +148,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => VerifyRecoveryEmailUseCase(sl()));
   sl.registerLazySingleton(() => GetTechnicianMetricsUseCase(sl()));
   sl.registerLazySingleton(() => ChangePasswordUseCase(sl()));
+  sl.registerLazySingleton(() => GetActiveSessionsUseCase(sl()));
+  sl.registerLazySingleton(() => RevokeSessionUseCase(sl()));
+  sl.registerLazySingleton(() => RevokeAllOtherSessionsUseCase(sl()));
 
   // Work Order Use Cases
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
@@ -269,6 +273,9 @@ Future<void> init() async {
       setRecoveryEmailUseCase: sl(),
       verifyRecoveryEmailUseCase: sl(),
       changePasswordUseCase: sl(),
+      getActiveSessionsUseCase: sl(),
+      revokeSessionUseCase: sl(),
+      revokeAllOtherSessionsUseCase: sl(),
     ),
   );
   sl.registerFactory(() => PartRequestsViewModel(getPartRequestsUseCase: sl()));
@@ -297,6 +304,9 @@ Future<void> init() async {
       setRecoveryEmailUseCase: sl(),
       verifyRecoveryEmailUseCase: sl(),
       changePasswordUseCase: sl(),
+      getActiveSessionsUseCase: sl(),
+      revokeSessionUseCase: sl(),
+      revokeAllOtherSessionsUseCase: sl(),
     ),
   );
   sl.registerFactory(
@@ -402,6 +412,9 @@ Future<void> init() async {
       setRecoveryEmailUseCase: sl(),
       verifyRecoveryEmailUseCase: sl(),
       changePasswordUseCase: sl(),
+      getActiveSessionsUseCase: sl(),
+      revokeSessionUseCase: sl(),
+      revokeAllOtherSessionsUseCase: sl(),
     ),
   );
   sl.registerFactory(() => PartSearchViewModel(getPartCatalogUseCase: sl()));

@@ -5,9 +5,14 @@ import '../../models/user_model.dart';
 import '../../../domain/entities/user.dart';
 
 abstract class AuthLocalDataSource {
-  Future<void> saveCredentials(String accessToken, String refreshToken);
+  Future<void> saveCredentials(
+    String accessToken,
+    String refreshToken, {
+    String? sessionId,
+  });
   Future<String?> getAccessToken();
   Future<String?> getRefreshToken();
+  Future<String?> getSessionId();
   Future<void> clearCredentials();
 
   Future<void> saveUser(User user);
@@ -27,9 +32,16 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   });
 
   @override
-  Future<void> saveCredentials(String accessToken, String refreshToken) async {
+  Future<void> saveCredentials(
+    String accessToken,
+    String refreshToken, {
+    String? sessionId,
+  }) async {
     await secureStorage.write(key: 'ACCESS_TOKEN', value: accessToken);
     await secureStorage.write(key: 'REFRESH_TOKEN', value: refreshToken);
+    if (sessionId != null) {
+      await secureStorage.write(key: 'session_id', value: sessionId);
+    }
   }
 
   @override
@@ -43,9 +55,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }
 
   @override
+  Future<String?> getSessionId() async {
+    return await secureStorage.read(key: 'session_id');
+  }
+
+  @override
   Future<void> clearCredentials() async {
     await secureStorage.delete(key: 'ACCESS_TOKEN');
     await secureStorage.delete(key: 'REFRESH_TOKEN');
+    await secureStorage.delete(key: 'session_id');
     await sharedPreferences.remove('USER_DATA');
   }
 

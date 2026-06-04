@@ -9,6 +9,7 @@ import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 import 'widgets/admin_text_field.dart';
 import 'widgets/save_changes_button.dart';
 import 'viewmodels/personal_info_viewmodel.dart';
+import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 
 class AdminPersonalInfoScreen extends StatelessWidget {
   const AdminPersonalInfoScreen({super.key});
@@ -72,6 +73,16 @@ class _AdminPersonalInfoViewState extends State<_AdminPersonalInfoView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<AdminPersonalInfoViewModel>();
 
+    String role = 'Administrator';
+    final r = viewModel.role;
+    if (r == UserRoles.superAdmin) {
+      role = 'Super Admin';
+    } else if (r == UserRoles.admin) {
+      role = 'Administrator';
+    } else {
+      role = r.name[0].toUpperCase() + r.name.substring(1);
+    }
+
     // Sync controllers with async viewmodel data
     _syncControllersFromViewModel();
 
@@ -103,7 +114,7 @@ class _AdminPersonalInfoViewState extends State<_AdminPersonalInfoView> {
                             ),
                           ),
                           Text(
-                            'Administrator',
+                            role,
                             style: TextStyles.bodyMedium.copyWith(
                               color: AppColors.secondary500,
                             ),

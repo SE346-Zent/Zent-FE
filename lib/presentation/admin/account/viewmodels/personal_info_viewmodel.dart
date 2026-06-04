@@ -6,6 +6,8 @@ import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart';
 
+import 'package:zent_fe/domain/entities/enums/user_roles.dart';
+
 class AdminPersonalInfoViewModel extends ChangeNotifier
     with SafeChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
@@ -16,6 +18,7 @@ class AdminPersonalInfoViewModel extends ChangeNotifier
   String email = "";
   String phoneNumber = '';
   String? avatarUrl;
+  UserRoles role = UserRoles.admin;
   bool isLoading = false;
 
   AdminPersonalInfoViewModel({
@@ -33,10 +36,13 @@ class AdminPersonalInfoViewModel extends ChangeNotifier
         email = user.email;
         phoneNumber = user.phoneNumber;
         avatarUrl = user.avatarUrl;
+        role = user.role;
         final rawId = user.employeeId ?? user.id;
         adminId = rawId.length > 10
             ? rawId.substring(0, 10).toUpperCase()
             : rawId.toUpperCase();
+
+        sl<AuthViewModel>().setLoggedInUser(user);
         notifyListeners();
       }
     } catch (e) {

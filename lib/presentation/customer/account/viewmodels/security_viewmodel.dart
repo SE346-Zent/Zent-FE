@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/entities/login_history_entry.dart';
+import 'package:zent_fe/domain/entities/user_session.dart';
 import 'package:zent_fe/domain/exceptions/business_exception.dart';
 import 'package:zent_fe/domain/usecases/auth/get_login_history_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/change_password_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/recovery_and_metrics_usecases.dart';
+import 'package:zent_fe/domain/usecases/auth/session_usecases.dart';
 import '../../../common/core/safe_change_notifier.dart';
 
 enum RecoveryEmailStep { idle, awaitingOtp, done }
@@ -13,12 +15,21 @@ class CustomerSecurityViewModel extends ChangeNotifier with SafeChangeNotifier {
   final SetRecoveryEmailUseCase setRecoveryEmailUseCase;
   final VerifyRecoveryEmailUseCase verifyRecoveryEmailUseCase;
   final ChangePasswordUseCase changePasswordUseCase;
+  final GetActiveSessionsUseCase getActiveSessionsUseCase;
+  final RevokeSessionUseCase revokeSessionUseCase;
+  final RevokeAllOtherSessionsUseCase revokeAllOtherSessionsUseCase;
 
   List<LoginHistoryEntry> _loginHistory = [];
   List<LoginHistoryEntry> get loginHistory => _loginHistory;
 
   bool _isLoadingHistory = false;
   bool get isLoadingHistory => _isLoadingHistory;
+
+  List<UserSession> _activeSessions = [];
+  List<UserSession> get activeSessions => _activeSessions;
+
+  bool _isLoadingSessions = false;
+  bool get isLoadingSessions => _isLoadingSessions;
 
   bool _isRecoveryLoading = false;
   bool get isRecoveryLoading => _isRecoveryLoading;
@@ -43,8 +54,53 @@ class CustomerSecurityViewModel extends ChangeNotifier with SafeChangeNotifier {
     required this.setRecoveryEmailUseCase,
     required this.verifyRecoveryEmailUseCase,
     required this.changePasswordUseCase,
+    required this.getActiveSessionsUseCase,
+    required this.revokeSessionUseCase,
+    required this.revokeAllOtherSessionsUseCase,
   }) {
     fetchLoginHistory();
+    fetchActiveSessions();
+  }
+
+  Future<void> fetchActiveSessions() async {
+    _isLoadingSessions = true;
+    notifyListeners();
+    try {
+      _activeSessions = await getActiveSessionsUseCase.execute();
+    } catch (e) {
+      debugPrint('Error fetching active sessions: $e');
+    } finally {
+      _isLoadingSessions = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> revokeSession(String sessionId) async {
+    _isLoadingSessions = true;
+    notifyListeners();
+    try {
+      await revokeSessionUseCase.execute(sessionId);
+      await fetchActiveSessions();
+    } catch (e) {
+      debugPrint('Error revoking session: $e');
+    } finally {
+      _isLoadingSessions = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> revokeAllOtherSessions() async {
+    _isLoadingSessions = true;
+    notifyListeners();
+    try {
+      await revokeAllOtherSessionsUseCase.execute();
+      await fetchActiveSessions();
+    } catch (e) {
+      debugPrint('Error revoking other sessions: $e');
+    } finally {
+      _isLoadingSessions = false;
+      notifyListeners();
+    }
   }
 
   Future<void> fetchLoginHistory() async {

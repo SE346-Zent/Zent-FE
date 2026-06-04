@@ -12,6 +12,7 @@ import 'widgets/tech_app_bar.dart';
 import 'widgets/tech_text_field.dart';
 import 'widgets/tech_primary_button.dart';
 import 'viewmodels/security_viewmodel.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/active_devices_section.dart';
 
 class TechSecurityScreen extends StatelessWidget {
   const TechSecurityScreen({super.key});
@@ -202,6 +203,15 @@ class _TechSecurityViewState extends State<_TechSecurityView> {
                 // RECOVERY EMAIL
                 _buildSectionTitle(Icons.mail_outline, 'Recovery Email'),
                 _buildRecoveryEmailSection(context, viewModel),
+                const SizedBox(height: AppDimens.spaceXl),
+
+                // ACTIVE DEVICES
+                ActiveDevicesSection(
+                  sessions: viewModel.activeSessions,
+                  isLoading: viewModel.isLoadingSessions,
+                  onRevoke: viewModel.revokeSession,
+                  onRevokeAllOthers: viewModel.revokeAllOtherSessions,
+                ),
                 const SizedBox(height: AppDimens.spaceXl),
 
                 // LOGIN HISTORY

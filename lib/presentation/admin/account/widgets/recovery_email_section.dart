@@ -5,6 +5,8 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/admin/account/viewmodels/security_settings_viewmodel.dart';
+import 'security_card_container.dart';
+import 'admin_primary_button.dart';
 
 /// Admin recovery email section – 2-step flow:
 /// 1. User enters recovery email + current password → sends OTP
@@ -53,15 +55,7 @@ class _RecoveryEmailSectionState extends State<RecoveryEmailSection> {
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimens.boraMd),
-            border: Border.all(color: AppColors.secondary100),
-          ),
-          child: _buildContent(context, viewModel),
-        ),
+        SecurityCardContainer(child: _buildContent(context, viewModel)),
       ],
     );
   }
@@ -120,24 +114,20 @@ class _RecoveryEmailSectionState extends State<RecoveryEmailSection> {
                     : viewModel.resetRecoveryFlow,
                 child: const Text('Back'),
               ),
-              const Spacer(),
-              FilledButton(
-                onPressed: viewModel.isRecoveryLoading
-                    ? null
-                    : () => viewModel.verifyRecoveryOtp(
-                        context: context,
-                        otpCode: _otpCtrl.text.trim(),
-                      ),
-                child: viewModel.isRecoveryLoading
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+              const SizedBox(width: AppDimens.spaceMd),
+              Expanded(
+                child: AdminPrimaryButton(
+                  text: viewModel.isRecoveryLoading
+                      ? 'Verifying…'
+                      : 'Verify OTP',
+                  isLoading: viewModel.isRecoveryLoading,
+                  onPressed: viewModel.isRecoveryLoading
+                      ? null
+                      : () => viewModel.verifyRecoveryOtp(
+                          context: context,
+                          otpCode: _otpCtrl.text.trim(),
                         ),
-                      )
-                    : const Text('Verify OTP'),
+                ),
               ),
             ],
           ),
@@ -178,27 +168,18 @@ class _RecoveryEmailSectionState extends State<RecoveryEmailSection> {
           ),
         ],
         const SizedBox(height: AppDimens.spaceMd),
-        Align(
-          alignment: Alignment.centerRight,
-          child: FilledButton(
-            onPressed: viewModel.isRecoveryLoading
-                ? null
-                : () => viewModel.requestRecoveryEmailOtp(
-                    context: context,
-                    recoveryEmail: _emailCtrl.text.trim(),
-                    password: _passwordCtrl.text,
-                  ),
-            child: viewModel.isRecoveryLoading
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Text('Set Recovery Email'),
-          ),
+        AdminPrimaryButton(
+          text: viewModel.isRecoveryLoading
+              ? 'Sending OTP…'
+              : 'Set Recovery Email',
+          isLoading: viewModel.isRecoveryLoading,
+          onPressed: viewModel.isRecoveryLoading
+              ? null
+              : () => viewModel.requestRecoveryEmailOtp(
+                  context: context,
+                  recoveryEmail: _emailCtrl.text.trim(),
+                  password: _passwordCtrl.text,
+                ),
         ),
       ],
     );

@@ -8,6 +8,8 @@ import 'password_input_field.dart';
 import 'security_card_container.dart';
 import 'security_section_title.dart';
 
+import 'admin_primary_button.dart';
+
 class ChangePasswordSection extends StatefulWidget {
   const ChangePasswordSection({super.key});
 
@@ -95,60 +97,49 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
                 ),
               ],
               const SizedBox(height: AppDimens.spaceMd),
-              Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton(
-                  onPressed: viewModel.isChangePasswordLoading
-                      ? null
-                      : () {
-                          final current = _currentPasswordCtrl.text;
-                          final newPass = _newPasswordCtrl.text;
-                          final confirm = _confirmPasswordCtrl.text;
+              AdminPrimaryButton(
+                text: viewModel.isChangePasswordLoading
+                    ? 'Changing…'
+                    : 'Change Password',
+                isLoading: viewModel.isChangePasswordLoading,
+                onPressed: viewModel.isChangePasswordLoading
+                    ? null
+                    : () {
+                        final current = _currentPasswordCtrl.text;
+                        final newPass = _newPasswordCtrl.text;
+                        final confirm = _confirmPasswordCtrl.text;
 
-                          if (current.isEmpty ||
-                              newPass.isEmpty ||
-                              confirm.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Please fill all password fields',
-                                ),
-                              ),
-                            );
-                            return;
-                          }
-                          if (newPass != confirm) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('New passwords do not match'),
-                              ),
-                            );
-                            return;
-                          }
-                          viewModel
-                              .changePassword(
-                                currentPassword: current,
-                                newPassword: newPass,
-                              )
-                              .then((_) {
-                                if (viewModel.changePasswordSuccess) {
-                                  _currentPasswordCtrl.clear();
-                                  _newPasswordCtrl.clear();
-                                  _confirmPasswordCtrl.clear();
-                                }
-                              });
-                        },
-                  child: viewModel.isChangePasswordLoading
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Change Password'),
-                ),
+                        if (current.isEmpty ||
+                            newPass.isEmpty ||
+                            confirm.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fill all password fields'),
+                            ),
+                          );
+                          return;
+                        }
+                        if (newPass != confirm) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('New passwords do not match'),
+                            ),
+                          );
+                          return;
+                        }
+                        viewModel
+                            .changePassword(
+                              currentPassword: current,
+                              newPassword: newPass,
+                            )
+                            .then((_) {
+                              if (viewModel.changePasswordSuccess) {
+                                _currentPasswordCtrl.clear();
+                                _newPasswordCtrl.clear();
+                                _confirmPasswordCtrl.clear();
+                              }
+                            });
+                      },
               ),
             ],
           ),

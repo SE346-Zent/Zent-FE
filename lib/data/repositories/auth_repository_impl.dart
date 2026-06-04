@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/entities/login_history_entry.dart';
+import '../../domain/entities/user_session.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
 import '../models/user_model.dart';
 import '../models/login_history_entry_model.dart';
+import '../models/user_session_model.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/exceptions/business_exception.dart';
@@ -36,6 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
+      sessionId: response.sessionId,
     );
 
     // 2. Fetch fresh user info to get the actual uploaded avatar url, etc.
@@ -64,6 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
+      sessionId: response.sessionId,
     );
 
     // 2. Fetch fresh user info
@@ -171,6 +175,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await authLocalDataSource.saveCredentials(
         response.accessToken,
         response.refreshToken,
+        sessionId: response.sessionId,
       );
     }
   }
@@ -192,6 +197,7 @@ class AuthRepositoryImpl implements AuthRepository {
           await authLocalDataSource.saveCredentials(
             response.accessToken,
             response.refreshToken,
+            sessionId: response.sessionId,
           );
 
           User latestUser;
@@ -449,5 +455,44 @@ class AuthRepositoryImpl implements AuthRepository {
       userId: userId,
     );
     return UserModel.fromJson(userMap);
+  }
+
+  @override
+  Future<List<UserSession>> getActiveSessions() async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    final currentSessionId = await authLocalDataSource.getSessionId();
+    final sessionsJson = await authRemoteService.getActiveSessions(accessToken);
+    return sessionsJson
+        .map(
+          (json) => UserSessionModel.fromJson(
+            json,
+            currentSessionId: currentSessionId,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<void> revokeSession(String sessionId) async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    await authRemoteService.revokeSession(
+      accessToken: accessToken,
+      sessionId: sessionId,
+    );
+  }
+
+  @override
+  Future<void> revokeAllOtherSessions() async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    await authRemoteService.revokeAllOtherSessions(accessToken: accessToken);
   }
 }

@@ -80,6 +80,12 @@ abstract class AuthRemoteDatasource {
     required String accessToken,
     required String userId,
   });
+  Future<List<Map<String, dynamic>>> getActiveSessions(String accessToken);
+  Future<void> revokeSession({
+    required String accessToken,
+    required String sessionId,
+  });
+  Future<void> revokeAllOtherSessions({required String accessToken});
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -970,6 +976,121 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (e) {
       if (e is Exception) rethrow;
       throw Exception('Get user profile by ID error: $e');
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getActiveSessions(
+    String accessToken,
+  ) async {
+    final url = Uri.parse('$_baseURL/auth/sessions');
+    try {
+      final response = await client
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as List<dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+      } else {
+        throw Exception(
+          apiResponse.message ?? 'Failed to fetch active sessions',
+        );
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Active sessions error: $e');
+    }
+  }
+
+  @override
+  Future<void> revokeSession({
+    required String accessToken,
+    required String sessionId,
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/sessions/$sessionId');
+    try {
+      final response = await client
+          .delete(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+
+      if (!apiResponse.isSuccessful) {
+        throw Exception(apiResponse.message ?? 'Failed to revoke session');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Revoke session error: $e');
+    }
+  }
+
+  @override
+  Future<void> revokeAllOtherSessions({required String accessToken}) async {
+    final url = Uri.parse('$_baseURL/auth/sessions');
+    try {
+      final response = await client
+          .delete(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+
+      if (!apiResponse.isSuccessful) {
+        throw Exception(
+          apiResponse.message ?? 'Failed to revoke all other sessions',
+        );
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Revoke all other sessions error: $e');
     }
   }
 

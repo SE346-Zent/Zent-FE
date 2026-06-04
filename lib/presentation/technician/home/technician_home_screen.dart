@@ -38,6 +38,7 @@ class _TechnicianHomeContent extends StatefulWidget {
 
 class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
   bool _pendingProcessed = false;
+  bool _wasVisible = true; // Initialized to true to avoid double fetch on first load
 
   @override
   void didChangeDependencies() {
@@ -51,6 +52,36 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
     }
     // Refresh notifications unread count on entry
     context.read<NotificationsViewModel>().fetchUnreadCount();
+
+    // Auto-reload schedule and metrics when returning to or arriving at Home screen
+    _checkAndReloadData();
+  }
+
+  void _checkAndReloadData() {
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
+
+    bool isHomeTab = true;
+    try {
+      final shell = StatefulNavigationShell.of(context);
+      isHomeTab = shell.currentIndex == 0;
+    } catch (_) {}
+
+    final isVisible = isCurrentRoute && isHomeTab;
+
+    if (_wasVisible != isVisible) {
+      _wasVisible = isVisible;
+      if (isVisible) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            try {
+              context.read<TechnicianHomeViewModel>().fetchTodaySchedule(silent: true);
+            } catch (e) {
+              debugPrint("Error reloading home data on return: $e");
+            }
+          }
+        });
+      }
+    }
   }
 
   @override

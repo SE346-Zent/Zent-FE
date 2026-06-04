@@ -166,10 +166,10 @@ class TrackingCard extends StatelessWidget {
                       maxWidth: 160,
                     ),
                     position: RelativeRect.fromLTRB(
-                      tapPos.dx - 155,               // menu right edge aligns with tap
-                      tapPos.dy + 12,                // just below the icon
-                      size.width - tapPos.dx,        // distance from right screen edge
-                      size.height - tapPos.dy - 12,  // distance from bottom
+                      tapPos.dx - 155, // menu right edge aligns with tap
+                      tapPos.dy + 12, // just below the icon
+                      size.width - tapPos.dx, // distance from right screen edge
+                      size.height - tapPos.dy - 12, // distance from bottom
                     ),
                     items: [
                       PopupMenuItem<String>(

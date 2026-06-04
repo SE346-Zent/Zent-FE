@@ -44,15 +44,15 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
   }
 
   void _showDisableConfirmation(
-      BuildContext context, StaffDetailViewModel viewModel) {
+    BuildContext context,
+    StaffDetailViewModel viewModel,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Center(
           child: Text(
             'Disable Account',
@@ -107,11 +107,16 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                     Navigator.pop(ctx);
                     final success = await viewModel.disableAccount();
                     if (success && context.mounted) {
-                      ZentSuccessPopup.show(context, 'Account disabled successfully');
+                      ZentSuccessPopup.show(
+                        context,
+                        'Account disabled successfully',
+                      );
                       Navigator.pop(context); // Back to list
                     } else if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to disable account')),
+                        const SnackBar(
+                          content: Text('Failed to disable account'),
+                        ),
                       );
                     }
                   },
@@ -154,8 +159,8 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                 child: Center(
                   child: Text(
                     viewModel.errorMsg.isNotEmpty
-                      ? viewModel.errorMsg
-                      : 'Staff member not found.',
+                        ? viewModel.errorMsg
+                        : 'Staff member not found.',
                     style: TextStyles.bodyLarge,
                   ),
                 ),
@@ -233,7 +238,7 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                     color: Colors.black.withAlpha(20),
                     blurRadius: 8.0,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
               child: UserAvatar(
@@ -260,45 +265,50 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
             const SizedBox(height: AppDimens.spaceLg),
             if (isTech && _tabController != null) ...[
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceMd,
+                ),
                 child: Container(
                   decoration: const BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: AppColors.secondary100, width: 1.0),
+                      bottom: BorderSide(
+                        color: AppColors.secondary100,
+                        width: 1.0,
+                      ),
                     ),
                   ),
                   child: TabBar(
-                  controller: _tabController,
-                  labelColor: AppColors.tertiary500,
-                  unselectedLabelColor: AppColors.secondary300,
-                  indicatorColor: AppColors.tertiary500,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  tabs: const [
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.info_outline, size: 18),
-                          SizedBox(width: 6),
-                          Text('Account Information'),
-                        ],
+                    controller: _tabController,
+                    labelColor: AppColors.tertiary500,
+                    unselectedLabelColor: AppColors.secondary300,
+                    indicatorColor: AppColors.tertiary500,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: const [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.info_outline, size: 18),
+                            SizedBox(width: 6),
+                            Text('Account Information'),
+                          ],
+                        ),
                       ),
-                    ),
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.work_outline, size: 18),
-                          SizedBox(width: 6),
-                          Text('Work Performance'),
-                        ],
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.work_outline, size: 18),
+                            SizedBox(width: 6),
+                            Text('Work Performance'),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Expanded(
+              Expanded(
                 child: TabBarView(
                   controller: _tabController,
                   children: [
@@ -309,9 +319,7 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
               ),
             ] else ...[
               const Divider(color: AppColors.secondary50),
-              Expanded(
-                child: _buildAccountInfo(user),
-              ),
+              Expanded(child: _buildAccountInfo(user)),
             ],
           ],
         ),
@@ -365,10 +373,7 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
     return ListView(
       padding: const EdgeInsets.all(AppDimens.spaceMd),
       children: viewModel.performanceRatings.entries.map((entry) {
-        return PerformanceRatingBar(
-          label: entry.key,
-          value: entry.value,
-        );
+        return PerformanceRatingBar(label: entry.key, value: entry.value);
       }).toList(),
     );
   }

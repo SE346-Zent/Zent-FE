@@ -79,7 +79,7 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
             page: 1,
             limit: 1000,
           );
-          
+
           allParts = parts.map((part) {
             final catalog = catalogMap[part.partCatalogId];
             return PartModel(

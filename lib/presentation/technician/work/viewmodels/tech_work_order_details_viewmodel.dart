@@ -207,7 +207,10 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
       }
     } catch (e) {
       if (context.mounted) {
-        ZentErrorPopup.show(context, e.toString().replaceAll('Exception: ', ''));
+        ZentErrorPopup.show(
+          context,
+          e.toString().replaceAll('Exception: ', ''),
+        );
       }
     }
   }

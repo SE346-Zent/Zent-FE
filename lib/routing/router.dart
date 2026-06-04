@@ -23,7 +23,7 @@ import '../presentation/admin/account/create_account_screen.dart';
 import '../presentation/admin/account/personal_info_screen.dart';
 import '../presentation/admin/work/admin_dashboard_screen.dart';
 import '../presentation/admin/work/operational_queue_screen.dart';
-import '../presentation/admin/work/work_order_detail_screen.dart';
+import '../presentation/admin/work/assign_work_order_screen.dart';
 import '../presentation/admin/work/assigned_work_order_detail_screen.dart';
 import '../presentation/admin/work/rejected_work_orders_screen.dart';
 import '../presentation/admin/work/rejection_detail_screen.dart';
@@ -736,7 +736,8 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.activeRepairs,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) {
-                    final workOrderId = state.uri.queryParameters['workOrderId'];
+                    final workOrderId =
+                        state.uri.queryParameters['workOrderId'];
                     return ActiveRepairsScreen(workOrderId: workOrderId);
                   },
                 ),

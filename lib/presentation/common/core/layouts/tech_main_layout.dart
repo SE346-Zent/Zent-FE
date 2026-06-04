@@ -41,8 +41,9 @@ class _TechMainLayoutState extends State<TechMainLayout> {
       );
 
       // Filter only assigned (in-progress) WOs
-      final activeOrders =
-          orders.where((o) => o.status == WorkOrderStatus.assigned).toList();
+      final activeOrders = orders
+          .where((o) => o.status == WorkOrderStatus.assigned)
+          .toList();
 
       if (activeOrders.isNotEmpty && context.mounted) {
         final now = DateTime.now();
@@ -56,7 +57,9 @@ class _TechMainLayoutState extends State<TechMainLayout> {
         String targetId;
         if (upcomingOrders.isNotEmpty) {
           // Sort upcoming by appointment time (soonest upcoming first)
-          upcomingOrders.sort((a, b) => a.appointment!.compareTo(b.appointment!));
+          upcomingOrders.sort(
+            (a, b) => a.appointment!.compareTo(b.appointment!),
+          );
           targetId = upcomingOrders.first.id;
         } else {
           // Fallback: sort all active orders by absolute time difference to now
@@ -146,9 +149,7 @@ class _TechMainLayoutState extends State<TechMainLayout> {
               left: 0,
               right: 0,
               child: Center(
-                child: _AnimatedFAB(
-                  onTap: () => _navigateToActiveWO(context),
-                ),
+                child: _AnimatedFAB(onTap: () => _navigateToActiveWO(context)),
               ),
             ),
           ],

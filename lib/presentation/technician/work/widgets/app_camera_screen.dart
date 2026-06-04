@@ -50,9 +50,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
     if (!_permissionChecked) {
       return const Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
 
@@ -63,7 +61,11 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.camera_alt_outlined, color: Colors.white54, size: 64),
+              const Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white54,
+                size: 64,
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Camera is unavailable',
@@ -72,7 +74,10 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
               const SizedBox(height: 24),
               TextButton(
                 onPressed: () => context.pop(),
-                child: const Text('Go Back', style: TextStyle(color: Colors.white70)),
+                child: const Text(
+                  'Go Back',
+                  style: TextStyle(color: Colors.white70),
+                ),
               ),
             ],
           ),

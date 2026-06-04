@@ -236,6 +236,7 @@ Future<void> init() async {
     () => AssignWorkOrderViewModel(
       getTechniciansUseCase: sl(),
       assignWorkOrderUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
     ),
   );
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
@@ -299,7 +300,9 @@ Future<void> init() async {
       changePasswordUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => CustomerNotificationsViewModel(notificationRepository: sl()));
+  sl.registerFactory(
+    () => CustomerNotificationsViewModel(notificationRepository: sl()),
+  );
   sl.registerFactory(
     () => ProductsViewModel(
       getMyProductsUseCase: sl(),
@@ -358,7 +361,7 @@ Future<void> init() async {
     ),
   );
   sl.registerLazySingleton(() => NotificationsViewModel());
- 
+
   sl.registerFactory(
     () => TechnicianHomeViewModel(
       getManyWorkOrdersUseCase: sl(),

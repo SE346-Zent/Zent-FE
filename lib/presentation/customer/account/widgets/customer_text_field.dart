@@ -65,7 +65,9 @@ class _CustomerTextFieldState extends State<CustomerTextField> {
 
         Container(
           decoration: BoxDecoration(
-            color: widget.readOnly ? AppColors.secondary50 : AppColors.surface100,
+            color: widget.readOnly
+                ? AppColors.secondary50
+                : AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary100, width: 1.0),
             boxShadow: [BoxShadowStyles.subtle],
@@ -78,7 +80,9 @@ class _CustomerTextFieldState extends State<CustomerTextField> {
             keyboardType: widget.keyboardType,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
-              color: widget.readOnly ? AppColors.secondary200 : AppColors.primary500,
+              color: widget.readOnly
+                  ? AppColors.secondary200
+                  : AppColors.primary500,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -108,8 +112,8 @@ class _CustomerTextFieldState extends State<CustomerTextField> {
                       ),
                     )
                   : (widget.suffixIcon != null
-                      ? Icon(widget.suffixIcon, color: AppColors.secondary100)
-                      : null),
+                        ? Icon(widget.suffixIcon, color: AppColors.secondary100)
+                        : null),
             ),
           ),
         ),

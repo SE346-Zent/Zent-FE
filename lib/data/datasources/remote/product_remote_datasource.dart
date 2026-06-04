@@ -44,7 +44,9 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
     try {
       final headers = await _getHeaders();
-      final response = await client.get(uri, headers: headers).timeout(_timeOut);
+      final response = await client
+          .get(uri, headers: headers)
+          .timeout(_timeOut);
 
       debugPrint(
         '=== [ProductAPI] GET /inventory/products/mine ${response.statusCode}: ${response.body} ===',

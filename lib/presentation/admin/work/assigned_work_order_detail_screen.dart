@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/core/utils/string_extensions.dart';
 
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -55,7 +56,7 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    viewModel.orderId,
+                    viewModel.displayOrderId.toShortWorkOrderId,
                     style: TextStyles.label.copyWith(
                       color: AppColors.secondary500,
                     ),
@@ -496,7 +497,8 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '${viewModel.technician['averageRating'] ?? viewModel.technician['rating'] ?? "5.0"}',
+                            text:
+                                '${viewModel.technician['averageRating'] ?? viewModel.technician['rating'] ?? "5.0"}',
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),

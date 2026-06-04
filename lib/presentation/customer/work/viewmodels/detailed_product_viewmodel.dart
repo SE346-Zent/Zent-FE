@@ -64,16 +64,24 @@ class DetailedProductViewModel extends ChangeNotifier with SafeChangeNotifier {
               '=== [DetailedProductViewModel] Found product detail: ${productDetail?.title}, warranty info: ${productDetail?.warranty?.warrantyStatus} ===',
             );
           } catch (e) {
-            debugPrint('=== [DetailedProductViewModel] Error loading product detail: $e ===');
+            debugPrint(
+              '=== [DetailedProductViewModel] Error loading product detail: $e ===',
+            );
           }
         }
 
         if (product != null && getManyWorkOrdersUseCase != null) {
           try {
-            final allOrders = await getManyWorkOrdersUseCase!.execute(limit: 1000);
-            debugPrint('=== [DetailedProductViewModel] Total orders from API: ${allOrders.length} ===');
+            final allOrders = await getManyWorkOrdersUseCase!.execute(
+              limit: 1000,
+            );
+            debugPrint(
+              '=== [DetailedProductViewModel] Total orders from API: ${allOrders.length} ===',
+            );
             for (var o in allOrders) {
-              debugPrint('Order title: "${o.title}", productName: "${o.productName}", workOrderNum: "${o.workOrderNum}"');
+              debugPrint(
+                'Order title: "${o.title}", productName: "${o.productName}", workOrderNum: "${o.workOrderNum}"',
+              );
             }
             final matchedOrders = allOrders.where((wo) {
               final woProd = (wo.productName ?? wo.title).toLowerCase();
@@ -83,7 +91,9 @@ class DetailedProductViewModel extends ChangeNotifier with SafeChangeNotifier {
                   ? '${words[0]} ${words[1]} ${words[2]}'
                   : currentProd;
               final matched = woProd.contains(matchBase.toLowerCase());
-              debugPrint('Comparing woProd: "$woProd" with matchBase: "$matchBase" -> Matched: $matched');
+              debugPrint(
+                'Comparing woProd: "$woProd" with matchBase: "$matchBase" -> Matched: $matched',
+              );
               return matched;
             }).toList();
 
@@ -101,7 +111,9 @@ class DetailedProductViewModel extends ChangeNotifier with SafeChangeNotifier {
             } catch (_) {
               activeWorkOrderForProduct = null;
             }
-            debugPrint('=== [DetailedProductViewModel] activeWorkOrderForProduct: ${activeWorkOrderForProduct?.id} ===');
+            debugPrint(
+              '=== [DetailedProductViewModel] activeWorkOrderForProduct: ${activeWorkOrderForProduct?.id} ===',
+            );
 
             history = matchedOrders.map((wo) {
               final dateStr = DateFormat('MMM dd').format(wo.createdAt);
@@ -141,14 +153,18 @@ class DetailedProductViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   String get purchaseDate {
     if (productDetail?.warranty?.startDate != null) {
-      return DateFormat('MMM dd, yyyy').format(productDetail!.warranty!.startDate!);
+      return DateFormat(
+        'MMM dd, yyyy',
+      ).format(productDetail!.warranty!.startDate!);
     }
     return 'NA';
   }
 
   String get warrantyDate {
     if (productDetail?.warranty?.endDate != null) {
-      return DateFormat('MMM dd, yyyy').format(productDetail!.warranty!.endDate!);
+      return DateFormat(
+        'MMM dd, yyyy',
+      ).format(productDetail!.warranty!.endDate!);
     }
     if (product?.warrantyUntil == null) return 'No Warranty';
     return DateFormat('MMM dd, yyyy').format(product!.warrantyUntil!);

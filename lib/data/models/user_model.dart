@@ -45,16 +45,22 @@ class UserModel extends User {
                 'temp_id')
             .toString();
 
-    final String? avatarRaw = json['avatarImageName'] as String? ??
+    final String? avatarRaw =
+        json['avatarImageName'] as String? ??
         json['avatarName'] as String? ??
         json['avatarUrl'] as String? ??
         json['avatar_url'] as String? ??
         json['avatar'] as String?;
 
-    final ratingCounts = (json['ratingCounts'] as Map<String, dynamic>?)
-        ?.map((key, value) => MapEntry(key, (value as num).toInt()));
+    final ratingCounts = (json['ratingCounts'] as Map<String, dynamic>?)?.map(
+      (key, value) => MapEntry(key, (value as num).toInt()),
+    );
 
-    final dynamic statusRaw = json['accountStatus'] ?? json['accountStatusId'] ?? json['statusId'] ?? json['status'];
+    final dynamic statusRaw =
+        json['accountStatus'] ??
+        json['accountStatusId'] ??
+        json['statusId'] ??
+        json['status'];
     AccountStatus status = AccountStatus.active;
     if (statusRaw != null) {
       final str = statusRaw.toString().toLowerCase();

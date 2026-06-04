@@ -60,27 +60,30 @@ class _PartsView extends StatelessWidget {
           showBackButton: true,
           showBottomDivider: true,
         ),
-      body: viewModel.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(AppDimens.spaceMd),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- 1. PRODUCT CARD ---
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                      boxShadow: [BoxShadowStyles.raised],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                         AppNetworkImage(
-                            url: viewModel.product?.productImageUrl != null &&
-                                    (viewModel.product!.productImageUrl!.startsWith('http') ||
-                                        viewModel.product!.productImageUrl!.startsWith('https'))
+        body: viewModel.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(AppDimens.spaceMd),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // --- 1. PRODUCT CARD ---
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                        boxShadow: [BoxShadowStyles.raised],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppNetworkImage(
+                            url:
+                                viewModel.product?.productImageUrl != null &&
+                                    (viewModel.product!.productImageUrl!
+                                            .startsWith('http') ||
+                                        viewModel.product!.productImageUrl!
+                                            .startsWith('https'))
                                 ? viewModel.product!.productImageUrl!
                                 : null,
                             height: 180,
@@ -98,193 +101,210 @@ class _PartsView extends StatelessWidget {
                               fit: BoxFit.cover,
                             ),
                           ),
-                        Padding(
-                          padding: const EdgeInsets.all(AppDimens.spaceMd),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                viewModel.product?.name ?? 'Product Details',
-                                style: TextStyles.headline.copyWith(
-                                  color: AppColors.primary500,
+                          Padding(
+                            padding: const EdgeInsets.all(AppDimens.spaceMd),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  viewModel.product?.name ?? 'Product Details',
+                                  style: TextStyles.headline.copyWith(
+                                    color: AppColors.primary500,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: AppDimens.spaceMd),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'S/N: $serialNumber',
-                                      style: TextStyles.bodyLarge.copyWith(
-                                        color: AppColors.secondary500,
+                                const SizedBox(height: AppDimens.spaceMd),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'S/N: $serialNumber',
+                                        style: TextStyles.bodyLarge.copyWith(
+                                          color: AppColors.secondary500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                  const SizedBox(width: AppDimens.spaceSm),
-                                  Expanded(
-                                    child: Text(
-                                      'MTM: ${viewModel.product?.model ?? 'NA'}',
-                                      textAlign: TextAlign.right,
-                                      style: TextStyles.bodyLarge.copyWith(
-                                        color: AppColors.secondary500,
+                                    const SizedBox(width: AppDimens.spaceSm),
+                                    Expanded(
+                                      child: Text(
+                                        'MTM: ${viewModel.product?.model ?? 'NA'}',
+                                        textAlign: TextAlign.right,
+                                        style: TextStyles.bodyLarge.copyWith(
+                                          color: AppColors.secondary500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppDimens.spaceXl),
+                    const SizedBox(height: AppDimens.spaceXl),
 
-              // --- 2. LIST PARTS HEADER & SEARCH ---
-              Text('List Parts', style: TextStyles.headline),
-              const SizedBox(height: AppDimens.spaceMd),
-              Container(
-                key: searchBarKey,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                  boxShadow: [BoxShadowStyles.subtle],
-                ),
-                child: TextField(
-                  controller: viewModel.searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search parts',
-                    hintStyle: TextStyles.bodyLarge.copyWith(
-                      color: AppColors.secondary300,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                      borderSide: const BorderSide(
-                        color: AppColors.secondary200,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                      borderSide: const BorderSide(
-                        color: AppColors.secondary200,
-                      ),
-                    ),
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: AppColors.secondary400,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: const Icon(
-                        Icons.filter_list,
-                        color: AppColors.secondary600,
-                      ),
-                      onPressed: () {
-                        _showFilterMenu(context, viewModel);
-                      },
-                    ),
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-
-              // --- 3. PARTS LIST ---
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: viewModel.filteredParts.length,
-                separatorBuilder: (_, _) =>
+                    // --- 2. LIST PARTS HEADER & SEARCH ---
+                    Text('List Parts', style: TextStyles.headline),
                     const SizedBox(height: AppDimens.spaceMd),
-                itemBuilder: (context, index) {
-                  final part = viewModel.filteredParts[index];
-                  final isAvailable = part.status == 'Available';
-
-                  return Container(
-                    padding: const EdgeInsets.all(AppDimens.spaceMd),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                      boxShadow: [BoxShadowStyles.raised],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppColors.secondary100,
+                    Container(
+                      key: searchBarKey,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                        boxShadow: [BoxShadowStyles.subtle],
+                      ),
+                      child: TextField(
+                        controller: viewModel.searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search parts',
+                          hintStyle: TextStyles.bodyLarge.copyWith(
+                            color: AppColors.secondary300,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(
                               AppDimens.boraSm,
                             ),
+                            borderSide: const BorderSide(
+                              color: AppColors.secondary200,
+                            ),
                           ),
-                          child: part.imageUrl != null && part.imageUrl!.isNotEmpty
-                              ? AppNetworkImage(
-                                  url: part.imageUrl!.startsWith('http') ? part.imageUrl! : null,
-                                  fit: BoxFit.cover,
-                                  borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                                  enableViewer: true,
-                                  errorWidget: !part.imageUrl!.startsWith('http')
-                                      ? Image.asset(part.imageUrl!, fit: BoxFit.cover)
-                                      : null,
-                                )
-                              : const Icon(
-                                  Icons.dns_outlined,
-                                  color: AppColors.secondary500,
-                                  size: 28,
-                                ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimens.boraSm,
+                            ),
+                            borderSide: const BorderSide(
+                              color: AppColors.secondary200,
+                            ),
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: AppColors.secondary400,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(
+                              Icons.filter_list,
+                              color: AppColors.secondary600,
+                            ),
+                            onPressed: () {
+                              _showFilterMenu(context, viewModel);
+                            },
+                          ),
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
-                        const SizedBox(width: AppDimens.spaceMd),
+                      ),
+                    ),
+                    const SizedBox(height: AppDimens.spaceLg),
 
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    // --- 3. PARTS LIST ---
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: viewModel.filteredParts.length,
+                      separatorBuilder: (_, _) =>
+                          const SizedBox(height: AppDimens.spaceMd),
+                      itemBuilder: (context, index) {
+                        final part = viewModel.filteredParts[index];
+                        final isAvailable = part.status == 'Available';
+
+                        return Container(
+                          padding: const EdgeInsets.all(AppDimens.spaceMd),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                              AppDimens.boraMd,
+                            ),
+                            boxShadow: [BoxShadowStyles.raised],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(part.title, style: TextStyles.title),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Part No: ${part.partNo}',
-                                style: TextStyles.label.copyWith(
-                                  color: AppColors.secondary500,
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: AppColors.secondary100,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimens.boraSm,
+                                  ),
+                                ),
+                                child:
+                                    part.imageUrl != null &&
+                                        part.imageUrl!.isNotEmpty
+                                    ? AppNetworkImage(
+                                        url: part.imageUrl!.startsWith('http')
+                                            ? part.imageUrl!
+                                            : null,
+                                        fit: BoxFit.cover,
+                                        borderRadius: BorderRadius.circular(
+                                          AppDimens.boraSm,
+                                        ),
+                                        enableViewer: true,
+                                        errorWidget:
+                                            !part.imageUrl!.startsWith('http')
+                                            ? Image.asset(
+                                                part.imageUrl!,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null,
+                                      )
+                                    : const Icon(
+                                        Icons.dns_outlined,
+                                        color: AppColors.secondary500,
+                                        size: 28,
+                                      ),
+                              ),
+                              const SizedBox(width: AppDimens.spaceMd),
+
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(part.title, style: TextStyles.title),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Part No: ${part.partNo}',
+                                      style: TextStyles.label.copyWith(
+                                        color: AppColors.secondary500,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Commodity: ${part.commodity}',
+                                      style: TextStyles.label.copyWith(
+                                        color: AppColors.secondary500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+
                               Text(
-                                'Commodity: ${part.commodity}',
-                                style: TextStyles.label.copyWith(
-                                  color: AppColors.secondary500,
+                                part.status,
+                                style: TextStyles.bodyLarge.copyWith(
+                                  color: isAvailable
+                                      ? AppColors.success500
+                                      : AppColors.secondary400,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-
-                        Text(
-                          part.status,
-                          style: TextStyles.bodyLarge.copyWith(
-                            color: isAvailable
-                                ? AppColors.success500
-                                : AppColors.secondary400,
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -151,7 +151,9 @@ class InterceptedHttpClient extends http.BaseClient {
       }
 
       // Otherwise (e.g. 500, 503, 504, 404, etc.), it's a server/transient error -> throw to prevent logout
-      throw Exception('Server returned status ${response.statusCode} during token refresh');
+      throw Exception(
+        'Server returned status ${response.statusCode} during token refresh',
+      );
     } catch (e) {
       if (e is FormatException || e is TypeError) {
         throw Exception('Data parsing error during token refresh: $e');

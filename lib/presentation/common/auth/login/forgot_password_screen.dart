@@ -64,7 +64,7 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                 const ForgotPasswordHeader(),
                                 const SizedBox(height: AppDimens.spaceXl),
 
-                                 // Email input field
+                                // Email input field
                                 AuthTextField(
                                   hintText: 'Enter your email address',
                                   keyboardType: TextInputType.emailAddress,
@@ -80,7 +80,8 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                       child: _EmailTypeButton(
                                         label: 'Primary Email',
                                         isSelected: !viewModel.useRecoveryEmail,
-                                        onTap: () => viewModel.setUseRecoveryEmail(false),
+                                        onTap: () => viewModel
+                                            .setUseRecoveryEmail(false),
                                       ),
                                     ),
                                     const SizedBox(width: AppDimens.spaceMd),
@@ -88,7 +89,8 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                       child: _EmailTypeButton(
                                         label: 'Recovery Email',
                                         isSelected: viewModel.useRecoveryEmail,
-                                        onTap: () => viewModel.setUseRecoveryEmail(true),
+                                        onTap: () =>
+                                            viewModel.setUseRecoveryEmail(true),
                                       ),
                                     ),
                                   ],
@@ -114,8 +116,8 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                       : () async {
                                           FocusScope.of(context).unfocus();
 
-                                          final isSuccess =
-                                              await viewModel.requestOTP();
+                                          final isSuccess = await viewModel
+                                              .requestOTP();
 
                                           if (isSuccess && context.mounted) {
                                             context.goNamed(
@@ -178,10 +180,10 @@ class _EmailTypeButton extends StatelessWidget {
           color: isSelected ? AppColors.tertiary300 : AppColors.secondary200,
           width: 1.5,
         ),
-        backgroundColor:
-            isSelected ? AppColors.tertiary50 : Colors.transparent,
-        foregroundColor:
-            isSelected ? AppColors.tertiary500 : AppColors.primary500,
+        backgroundColor: isSelected ? AppColors.tertiary50 : Colors.transparent,
+        foregroundColor: isSelected
+            ? AppColors.tertiary500
+            : AppColors.primary500,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
         ),

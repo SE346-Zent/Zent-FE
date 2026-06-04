@@ -50,10 +50,7 @@ class StaffDetailViewModel extends ChangeNotifier with SafeChangeNotifier {
     };
   }
 
-  StaffDetailViewModel({
-    required this.authRepository,
-    required this.userId,
-  }) {
+  StaffDetailViewModel({required this.authRepository, required this.userId}) {
     fetchStaffDetails();
   }
 

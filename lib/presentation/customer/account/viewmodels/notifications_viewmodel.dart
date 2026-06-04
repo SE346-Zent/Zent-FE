@@ -137,9 +137,9 @@ class CustomerNotificationsViewModel extends ChangeNotifier
     } catch (e) {
       debugPrint('Error saving notification preferences: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save settings: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to save settings: $e')));
       }
     } finally {
       _isLoading = false;

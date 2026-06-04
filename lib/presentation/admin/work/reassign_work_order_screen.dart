@@ -275,11 +275,10 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
           label,
           style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
         ),
-        // 🚀 Bọc trong PopupMenuButton để xử lý logic thả xuống
         PopupMenuButton<String>(
           initialValue: value,
           onSelected: onChanged,
-          offset: const Offset(0, 40), // Căn chỉnh vị trí menu hiện ra
+          offset: const Offset(0, 40),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 12.0,
@@ -294,7 +293,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  value, // 🚀 Hiển thị giá trị đang chọn
+                  value,
                   style: TextStyles.bodyMedium.copyWith(
                     color: AppColors.secondary500,
                   ),
@@ -372,7 +371,8 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '${data['averageRating'] ?? data['rating'] ?? "5.0"}',
+                            text:
+                                '${data['averageRating'] ?? data['rating'] ?? "5.0"}',
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,

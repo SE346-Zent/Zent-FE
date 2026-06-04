@@ -111,7 +111,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   String? country = 'Vietnam';
   String? province;
   String? ward;
-  String? city; // We map 'city' to the API field, but in UI we label it Province/City. The backend requires 'province' or 'ward' (as HN/HCM). Wait, the deserialization error: "missing field `province`". Let's check: Backend needs `province` but our request class did not define a `province` parameter, it had `ward`! No, wait, look at the deserialization error: "Failed to deserialize the JSON body into the target type: missing field `province` at line 1 column 329". This means the request body sent to the backend MUST contain a field named `province`!
+  String?
+  city; // We map 'city' to the API field, but in UI we label it Province/City. The backend requires 'province' or 'ward' (as HN/HCM). Wait, the deserialization error: "missing field `province`". Let's check: Backend needs `province` but our request class did not define a `province` parameter, it had `ward`! No, wait, look at the deserialization error: "Failed to deserialize the JSON body into the target type: missing field `province` at line 1 column 329". This means the request body sent to the backend MUST contain a field named `province`!
   // Let's check CreateWorkOrderRequest toJson() or property definition. It has 'ward' but not 'province'! Ah! CreateWorkOrderRequest had:
   // final String country;
   // final String ward;
@@ -154,7 +155,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       for (var item in data) {
         final provName = item['name'] as String;
         // Limit to only 'Thành phố Hồ Chí Minh' and 'Thành phố Hà Nội'
-        if (provName == 'Thành phố Hồ Chí Minh' || provName == 'Thành phố Hà Nội') {
+        if (provName == 'Thành phố Hồ Chí Minh' ||
+            provName == 'Thành phố Hà Nội') {
           provinces.add(provName);
           final wardsList = (item['cities'] as List)
               .map((e) => e.toString())

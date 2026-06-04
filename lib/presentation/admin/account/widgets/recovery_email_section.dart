@@ -94,7 +94,9 @@ class _RecoveryEmailSectionState extends State<RecoveryEmailSection> {
         children: [
           Text(
             'Enter the 6-digit OTP sent to your recovery email.',
-            style: TextStyles.bodyMedium.copyWith(color: AppColors.secondary400),
+            style: TextStyles.bodyMedium.copyWith(
+              color: AppColors.secondary400,
+            ),
           ),
           const SizedBox(height: AppDimens.spaceMd),
           AdminTextField(
@@ -123,9 +125,9 @@ class _RecoveryEmailSectionState extends State<RecoveryEmailSection> {
                 onPressed: viewModel.isRecoveryLoading
                     ? null
                     : () => viewModel.verifyRecoveryOtp(
-                          context: context,
-                          otpCode: _otpCtrl.text.trim(),
-                        ),
+                        context: context,
+                        otpCode: _otpCtrl.text.trim(),
+                      ),
                 child: viewModel.isRecoveryLoading
                     ? const SizedBox(
                         width: 16,
@@ -182,10 +184,10 @@ class _RecoveryEmailSectionState extends State<RecoveryEmailSection> {
             onPressed: viewModel.isRecoveryLoading
                 ? null
                 : () => viewModel.requestRecoveryEmailOtp(
-                      context: context,
-                      recoveryEmail: _emailCtrl.text.trim(),
-                      password: _passwordCtrl.text,
-                    ),
+                    context: context,
+                    recoveryEmail: _emailCtrl.text.trim(),
+                    password: _passwordCtrl.text,
+                  ),
             child: viewModel.isRecoveryLoading
                 ? const SizedBox(
                     width: 16,

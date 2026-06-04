@@ -30,7 +30,8 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
 
   void _onPasswordFieldsChanged() {
     final viewModel = context.read<SecuritySettingsViewModel>();
-    if (viewModel.changePasswordSuccess || viewModel.changePasswordError != null) {
+    if (viewModel.changePasswordSuccess ||
+        viewModel.changePasswordError != null) {
       viewModel.resetChangePasswordState();
     }
   }
@@ -88,7 +89,9 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
                 const SizedBox(height: AppDimens.spaceSm),
                 Text(
                   'Password changed successfully!',
-                  style: TextStyles.label.copyWith(color: AppColors.tertiary500),
+                  style: TextStyles.label.copyWith(
+                    color: AppColors.tertiary500,
+                  ),
                 ),
               ],
               const SizedBox(height: AppDimens.spaceMd),
@@ -101,29 +104,39 @@ class _ChangePasswordSectionState extends State<ChangePasswordSection> {
                           final current = _currentPasswordCtrl.text;
                           final newPass = _newPasswordCtrl.text;
                           final confirm = _confirmPasswordCtrl.text;
-                          
-                          if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+
+                          if (current.isEmpty ||
+                              newPass.isEmpty ||
+                              confirm.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please fill all password fields')),
+                              const SnackBar(
+                                content: Text(
+                                  'Please fill all password fields',
+                                ),
+                              ),
                             );
                             return;
                           }
                           if (newPass != confirm) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('New passwords do not match')),
+                              const SnackBar(
+                                content: Text('New passwords do not match'),
+                              ),
                             );
                             return;
                           }
-                          viewModel.changePassword(
-                            currentPassword: current,
-                            newPassword: newPass,
-                          ).then((_) {
-                            if (viewModel.changePasswordSuccess) {
-                              _currentPasswordCtrl.clear();
-                              _newPasswordCtrl.clear();
-                              _confirmPasswordCtrl.clear();
-                            }
-                          });
+                          viewModel
+                              .changePassword(
+                                currentPassword: current,
+                                newPassword: newPass,
+                              )
+                              .then((_) {
+                                if (viewModel.changePasswordSuccess) {
+                                  _currentPasswordCtrl.clear();
+                                  _newPasswordCtrl.clear();
+                                  _confirmPasswordCtrl.clear();
+                                }
+                              });
                         },
                   child: viewModel.isChangePasswordLoading
                       ? const SizedBox(

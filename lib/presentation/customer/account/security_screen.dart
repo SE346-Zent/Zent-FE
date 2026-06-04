@@ -50,7 +50,8 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
 
   void _onPasswordFieldsChanged() {
     final viewModel = context.read<CustomerSecurityViewModel>();
-    if (viewModel.changePasswordSuccess || viewModel.changePasswordError != null) {
+    if (viewModel.changePasswordSuccess ||
+        viewModel.changePasswordError != null) {
       viewModel.resetChangePasswordState();
     }
   }
@@ -134,12 +135,16 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
                       const SizedBox(height: AppDimens.spaceSm),
                       Text(
                         'Password changed successfully!',
-                        style: TextStyles.label.copyWith(color: AppColors.tertiary500),
+                        style: TextStyles.label.copyWith(
+                          color: AppColors.tertiary500,
+                        ),
                       ),
                     ],
                     const SizedBox(height: AppDimens.spaceMd),
                     CustomerPrimaryButton(
-                      text: viewModel.isChangePasswordLoading ? 'Changing…' : 'Change Password',
+                      text: viewModel.isChangePasswordLoading
+                          ? 'Changing…'
+                          : 'Change Password',
                       isLoading: viewModel.isChangePasswordLoading,
                       onPressed: viewModel.isChangePasswordLoading
                           ? null
@@ -147,29 +152,39 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
                               final current = _currentPasswordCtrl.text;
                               final newPass = _newPasswordCtrl.text;
                               final confirm = _confirmPasswordCtrl.text;
-                              
-                              if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+
+                              if (current.isEmpty ||
+                                  newPass.isEmpty ||
+                                  confirm.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Please fill all password fields')),
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please fill all password fields',
+                                    ),
+                                  ),
                                 );
                                 return;
                               }
                               if (newPass != confirm) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('New passwords do not match')),
+                                  const SnackBar(
+                                    content: Text('New passwords do not match'),
+                                  ),
                                 );
                                 return;
                               }
-                              viewModel.changePassword(
-                                currentPassword: current,
-                                newPassword: newPass,
-                              ).then((_) {
-                                if (viewModel.changePasswordSuccess) {
-                                  _currentPasswordCtrl.clear();
-                                  _newPasswordCtrl.clear();
-                                  _confirmPasswordCtrl.clear();
-                                }
-                              });
+                              viewModel
+                                  .changePassword(
+                                    currentPassword: current,
+                                    newPassword: newPass,
+                                  )
+                                  .then((_) {
+                                    if (viewModel.changePasswordSuccess) {
+                                      _currentPasswordCtrl.clear();
+                                      _newPasswordCtrl.clear();
+                                      _confirmPasswordCtrl.clear();
+                                    }
+                                  });
                             },
                     ),
                   ],
@@ -207,7 +222,9 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
             const SizedBox(width: AppDimens.spaceSm),
             Text(
               'Recovery email verified!',
-              style: TextStyles.bodyLarge.copyWith(color: AppColors.tertiary500),
+              style: TextStyles.bodyLarge.copyWith(
+                color: AppColors.tertiary500,
+              ),
             ),
             const Spacer(),
             TextButton(
@@ -259,14 +276,16 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
                 const SizedBox(width: AppDimens.spaceMd),
                 Expanded(
                   child: CustomerPrimaryButton(
-                    text: viewModel.isRecoveryLoading ? 'Verifying…' : 'Verify OTP',
+                    text: viewModel.isRecoveryLoading
+                        ? 'Verifying…'
+                        : 'Verify OTP',
                     isLoading: viewModel.isRecoveryLoading,
                     onPressed: viewModel.isRecoveryLoading
                         ? null
                         : () => viewModel.verifyRecoveryOtp(
-                              context: context,
-                              otpCode: _otpCtrl.text.trim(),
-                            ),
+                            context: context,
+                            otpCode: _otpCtrl.text.trim(),
+                          ),
                   ),
                 ),
               ],
@@ -310,15 +329,17 @@ class _CustomerSecurityViewState extends State<_CustomerSecurityView> {
           ],
           const SizedBox(height: AppDimens.spaceMd),
           CustomerPrimaryButton(
-            text: viewModel.isRecoveryLoading ? 'Sending OTP…' : 'Set Recovery Email',
+            text: viewModel.isRecoveryLoading
+                ? 'Sending OTP…'
+                : 'Set Recovery Email',
             isLoading: viewModel.isRecoveryLoading,
             onPressed: viewModel.isRecoveryLoading
                 ? null
                 : () => viewModel.requestRecoveryEmailOtp(
-                      context: context,
-                      recoveryEmail: _recoveryEmailCtrl.text.trim(),
-                      password: _recoveryPasswordCtrl.text,
-                    ),
+                    context: context,
+                    recoveryEmail: _recoveryEmailCtrl.text.trim(),
+                    password: _recoveryPasswordCtrl.text,
+                  ),
           ),
         ],
       ),

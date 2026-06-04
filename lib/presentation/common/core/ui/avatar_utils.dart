@@ -96,11 +96,7 @@ class AvatarUtils {
   ///  - via.placeholder.com
   ///  - dummyimage.com
   static String _fixSvgPlaceholderUrl(String url) {
-    const svgHosts = [
-      'placehold.co',
-      'via.placeholder.com',
-      'dummyimage.com',
-    ];
+    const svgHosts = ['placehold.co', 'via.placeholder.com', 'dummyimage.com'];
 
     Uri uri;
     try {
@@ -116,7 +112,10 @@ class AvatarUtils {
 
     // Already has a raster extension → no action needed
     final path = uri.path.toLowerCase();
-    if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.webp')) {
+    if (path.endsWith('.png') ||
+        path.endsWith('.jpg') ||
+        path.endsWith('.jpeg') ||
+        path.endsWith('.webp')) {
       return url;
     }
 
@@ -125,4 +124,3 @@ class AvatarUtils {
     return pngUri.toString();
   }
 }
-

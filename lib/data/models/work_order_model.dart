@@ -137,8 +137,14 @@ class WorkOrderModel extends WorkOrder {
           (json['technicianAverageRating'] as num?)?.toDouble() ??
           (json['averageRating'] as num?)?.toDouble() ??
           (json['technician_rating'] as num?)?.toDouble() ??
-          (json['technician'] is Map ? (json['technician'] as Map)['averageRating'] as num? : null)?.toDouble() ??
-          (json['technician'] is Map ? (json['technician'] as Map)['rating'] as num? : null)?.toDouble(),
+          (json['technician'] is Map
+                  ? (json['technician'] as Map)['averageRating'] as num?
+                  : null)
+              ?.toDouble() ??
+          (json['technician'] is Map
+                  ? (json['technician'] as Map)['rating'] as num?
+                  : null)
+              ?.toDouble(),
       workOrderNum:
           json['workOrderNum'] as String? ??
           json['workOrderNumber'] as String? ??
@@ -153,8 +159,7 @@ class WorkOrderModel extends WorkOrder {
               .toList() ??
           const [],
       productName:
-          json['productName'] as String? ??
-          json['product_name'] as String?,
+          json['productName'] as String? ?? json['product_name'] as String?,
       appointment: json['appointment'] != null
           ? DateTime.tryParse(json['appointment'] as String)
           : null,
@@ -168,7 +173,8 @@ class WorkOrderModel extends WorkOrder {
           json['phone_number'] as String? ??
           json['phone'] as String?,
       addressLine1: json['address'] as String?,
-      customerAvatarUrl: json['customerAvatarUrl'] as String? ??
+      customerAvatarUrl:
+          json['customerAvatarUrl'] as String? ??
           json['customer_avatar_url'] as String? ??
           json['customerAvatarName'] as String? ??
           json['customer_avatar_name'] as String? ??
@@ -182,11 +188,21 @@ class WorkOrderModel extends WorkOrder {
           json['opposite_image'] as String? ??
           json['oppositeImageUrl'] as String? ??
           json['opposite_image_url'] as String? ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatarUrl']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatar_url']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatarImageName']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatarName']?.toString() : null) ??
-          (json['customer'] is Map ? (json['customer'] as Map)['avatar']?.toString() : null),
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarUrl']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatar_url']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarImageName']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarName']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatar']?.toString()
+              : null),
     );
   }
 

@@ -87,7 +87,10 @@ class VerifyForgotOtpViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      await forgotPasswordUseCase.call(_email, useRecoveryEmail: _useRecoveryEmail);
+      await forgotPasswordUseCase.call(
+        _email,
+        useRecoveryEmail: _useRecoveryEmail,
+      );
       startResendTimer();
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');

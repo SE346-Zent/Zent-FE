@@ -36,7 +36,7 @@ class ReassignWorkOrderViewModel extends ChangeNotifier {
 
   void applySort() {
     technicians = List.from(_originalTechnicians);
-    
+
     technicians.sort((a, b) {
       if (workloadSort != 'None') {
         final wlA = int.tryParse(a['workload']?.toString() ?? '0') ?? 0;
@@ -49,14 +49,18 @@ class ReassignWorkOrderViewModel extends ChangeNotifier {
       }
 
       if (nameSort != 'None') {
-        final nameA = (a['fullName'] ?? a['name'] ?? '').toString().toLowerCase();
-        final nameB = (b['fullName'] ?? b['name'] ?? '').toString().toLowerCase();
+        final nameA = (a['fullName'] ?? a['name'] ?? '')
+            .toString()
+            .toLowerCase();
+        final nameB = (b['fullName'] ?? b['name'] ?? '')
+            .toString()
+            .toLowerCase();
         if (nameSort == 'A to Z') return nameA.compareTo(nameB);
         if (nameSort == 'Z to A') return nameB.compareTo(nameA);
       }
       return 0;
     });
-    
+
     notifyListeners();
   }
 
@@ -74,21 +78,21 @@ class ReassignWorkOrderViewModel extends ChangeNotifier {
 
     try {
       final repo = sl<WorkOrderRepository>();
-      
-      // Fetch both technicians and the current work order details concurrently
+
       final cleanId = _orderId.replaceAll('#', '');
       final results = await Future.wait([
         repo.getTechnicians(),
         repo.getWorkOrderDetail(id: cleanId),
       ]);
-      
+
       final realTechs = results[0] as List<Map<String, dynamic>>;
-      final workOrder = results[1] as dynamic; // It returns WorkOrderEntity
-      
+      final workOrder = results[1] as dynamic;
+
       final currentTechId = workOrder.technicianId;
 
-      // Filter out the currently assigned technician
-      technicians = realTechs.where((tech) => tech['id'] != currentTechId).toList();
+      technicians = realTechs
+          .where((tech) => tech['id'] != currentTechId)
+          .toList();
       _originalTechnicians = List.from(technicians);
       applySort();
     } catch (e) {

@@ -100,12 +100,13 @@ class TechHomeHeader extends StatelessWidget {
                       height: 34,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2.0,
-                        ),
+                        border: Border.all(color: Colors.white, width: 2.0),
                       ),
-                      child: UserAvatar(name: userName, avatarUrl: avatarUrl, size: 30),
+                      child: UserAvatar(
+                        name: userName,
+                        avatarUrl: avatarUrl,
+                        size: 30,
+                      ),
                     ),
                   ),
                 ],

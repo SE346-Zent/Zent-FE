@@ -46,15 +46,17 @@ Future<void> main() async {
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     await dotenv.load(fileName: ".env");
     await di.init();
-    
+
     // Request location permission asynchronously on startup
-    Geolocator.checkPermission().then((permission) {
-      if (permission == LocationPermission.denied) {
-        Geolocator.requestPermission();
-      }
-    }).catchError((e) {
-      developer.log("Error requesting location permission on startup: $e");
-    });
+    Geolocator.checkPermission()
+        .then((permission) {
+          if (permission == LocationPermission.denied) {
+            Geolocator.requestPermission();
+          }
+        })
+        .catchError((e) {
+          developer.log("Error requesting location permission on startup: $e");
+        });
   } catch (e) {
     developer.log("Local initialization failed: $e");
   }

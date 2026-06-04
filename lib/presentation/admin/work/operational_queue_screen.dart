@@ -20,12 +20,15 @@ class OperationalQueueScreen extends StatefulWidget {
 }
 
 class _OperationalQueueScreenState extends State<OperationalQueueScreen> {
-  void _showFilterDialog(BuildContext context) {
+  void _showFilterDialog(
+    BuildContext context,
+    OperationalQueueViewModel viewModel,
+  ) {
     showDialog(
       context: context,
       barrierColor: Colors.transparent,
       builder: (ctx) {
-        return const FilterDialog();
+        return FilterDialog(viewModel: viewModel);
       },
     );
   }
@@ -71,7 +74,7 @@ class _OperationalQueueScreenState extends State<OperationalQueueScreen> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: () => _showFilterDialog(context),
+                          onTap: () => _showFilterDialog(context, viewModel),
                           child: Container(
                             padding: const EdgeInsets.all(8.0),
                             color: Colors.transparent,
@@ -98,7 +101,7 @@ class _OperationalQueueScreenState extends State<OperationalQueueScreen> {
                                   onTap: () => viewModel.changeTab(1),
                                 ),
                                 OperationalQueueTabItem(
-                                  title: 'Unassigned',
+                                  title: 'Pending',
                                   isSelected: viewModel.activeTabIndex == 2,
                                   onTap: () => viewModel.changeTab(2),
                                 ),

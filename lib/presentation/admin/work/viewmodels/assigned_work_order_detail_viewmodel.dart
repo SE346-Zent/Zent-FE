@@ -11,6 +11,8 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
 
   String get orderId => _orderId;
 
+  String displayOrderId = '';
+
   String techAssignedTime = '';
   String symptom = '';
   String description = '';
@@ -40,6 +42,10 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
       final cleanId = id.replaceAll('#', '');
 
       final workOrder = await repo.getWorkOrderDetail(id: cleanId);
+
+      displayOrderId = workOrder.workOrderNum.isNotEmpty
+          ? workOrder.workOrderNum
+          : _orderId;
 
       symptom = workOrder.symptomName ?? 'N/A';
       description = workOrder.description;
@@ -73,7 +79,9 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
             (workOrder.technicianName != null &&
                 workOrder.technicianName!.isNotEmpty)
             ? workOrder.technicianName
-            : (tech['fullName'] ?? tech['name'] ?? 'Tech (ID: ${workOrder.technicianId.substring(0, 4)})'),
+            : (tech['fullName'] ??
+                  tech['name'] ??
+                  'Tech (ID: ${workOrder.technicianId.substring(0, 4)})'),
         'rating': tech.isNotEmpty
             ? (tech['averageRating'] ?? tech['rating'] ?? 0.0)
             : (workOrder.technicianRating ?? 0.0),

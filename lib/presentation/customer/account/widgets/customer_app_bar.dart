@@ -39,7 +39,8 @@ class CustomerAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (words.length > 3) {
             // Split title roughly in half at the word boundaries to prevent long product names from squeezing to one side
             final splitIndex = (words.length / 2).floor();
-            displayTitle = '${words.sublist(0, splitIndex).join(' ')}\n${words.sublist(splitIndex).join(' ')}';
+            displayTitle =
+                '${words.sublist(0, splitIndex).join(' ')}\n${words.sublist(splitIndex).join(' ')}';
           }
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -64,7 +65,7 @@ class CustomerAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ],
           );
-        }
+        },
       ),
       centerTitle: true,
 

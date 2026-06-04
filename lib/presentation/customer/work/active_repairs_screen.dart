@@ -16,7 +16,9 @@ class ActiveRepairsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => sl<ActiveRepairsViewModel>()..fetchWorkOrders(workOrderId: workOrderId),
+      create: (_) =>
+          sl<ActiveRepairsViewModel>()
+            ..fetchWorkOrders(workOrderId: workOrderId),
       child: _ActiveRepairsView(workOrderId: workOrderId),
     );
   }
@@ -35,7 +37,9 @@ class _ActiveRepairsViewState extends State<_ActiveRepairsView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ActiveRepairsViewModel>().fetchWorkOrders(workOrderId: widget.workOrderId);
+      context.read<ActiveRepairsViewModel>().fetchWorkOrders(
+        workOrderId: widget.workOrderId,
+      );
     });
   }
 

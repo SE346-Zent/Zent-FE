@@ -16,6 +16,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:zent_fe/presentation/common/core/ui/chat_banner_listener.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/gps_service_guard.dart';
 
 // 1. Create a GlobalKey to control SnackBars from anywhere
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
@@ -266,7 +267,9 @@ class MyApp extends StatelessWidget {
         ),
         routerConfig: appRouter,
         builder: (context, child) {
-          return ChatBannerListener(child: child ?? const SizedBox.shrink());
+          return GpsServiceGuard(
+            child: ChatBannerListener(child: child ?? const SizedBox.shrink()),
+          );
         },
       ),
     );

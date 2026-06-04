@@ -72,6 +72,7 @@ class SocialLoginSection extends StatelessWidget {
 
                     context.read<AuthViewModel>().setLoggedInUser(user);
                     switch (user.role) {
+                      case UserRoles.superAdmin:
                       case UserRoles.admin:
                         context.goNamed(RouteNames.adminDashboard);
                         break;

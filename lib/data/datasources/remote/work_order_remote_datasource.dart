@@ -636,7 +636,6 @@ class WorkOrderRemoteDataSourceImpl implements WorkOrderRemoteDataSource {
     } on BusinessException {
       rethrow;
     } catch (e) {
-      if (e is Exception) rethrow;
       throw Exception('Server error ($statusCode)');
     }
   }

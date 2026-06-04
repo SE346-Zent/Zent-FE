@@ -237,7 +237,7 @@ class _NotificationsListScreenContentState
                     final category = item.categoryName.toLowerCase();
                     final role = context.read<AuthViewModel>().role;
 
-                    if (role == UserRoles.admin) {
+                    if (role == UserRoles.admin || role == UserRoles.superAdmin) {
                       if (category.contains('reject')) {
                         context.pushNamed(
                           RouteNames.adminRejectionDetail,

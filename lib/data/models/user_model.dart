@@ -52,8 +52,11 @@ class UserModel extends User {
         json['avatar_url'] as String? ??
         json['avatar'] as String?;
 
-    final ratingCounts = (json['ratingCounts'] as Map<String, dynamic>?)?.map(
-      (key, value) => MapEntry(key, (value as num).toInt()),
+    final ratingCounts = (json['ratingCounts'] as Map<dynamic, dynamic>?)?.map(
+      (key, value) {
+        final val = int.tryParse(value?.toString() ?? '') ?? 0;
+        return MapEntry(key.toString(), val);
+      },
     );
 
     final dynamic statusRaw =
@@ -92,16 +95,19 @@ class UserModel extends User {
   }
 
   static UserRoles _mapRole(dynamic roleStr, dynamic roleId) {
-    if (roleId != null) {
-      final id = int.tryParse(roleId.toString());
-      if (id == 1 || id == 2) return UserRoles.admin;
+    final targetId = roleId ?? roleStr;
+    if (targetId != null) {
+      final id = int.tryParse(targetId.toString());
+      if (id == 2) return UserRoles.superAdmin;
+      if (id == 1) return UserRoles.admin;
       if (id == 3) return UserRoles.customer;
       if (id == 4) return UserRoles.technician;
     }
 
     if (roleStr != null && roleStr is String) {
+      final normalized = roleStr.replaceAll('_', '').replaceAll(' ', '').toUpperCase();
       return UserRoles.values.firstWhere(
-        (e) => e.name.toUpperCase() == roleStr.toUpperCase(),
+        (e) => e.name.toUpperCase() == normalized,
         orElse: () => UserRoles.customer,
       );
     }

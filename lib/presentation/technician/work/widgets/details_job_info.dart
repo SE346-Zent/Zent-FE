@@ -104,8 +104,6 @@ class DetailsJobInfo extends StatelessWidget {
                             style: TextStyles.label.copyWith(
                               color: AppColors.secondary300,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

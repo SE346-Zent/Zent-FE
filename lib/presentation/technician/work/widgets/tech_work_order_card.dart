@@ -139,7 +139,9 @@ class WorkOrderCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildActionButton(
-                    text: isPending ? 'Start Job' : 'Complete',
+                    text: (order.statusId == 1 || order.statusId == 2)
+                        ? 'Start Job'
+                        : 'Complete',
                     textColor: AppColors.surface100,
                     bgColor: AppColors.tertiary500,
                     onPressed: order.id.isNotEmpty

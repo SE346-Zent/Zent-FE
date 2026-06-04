@@ -7,7 +7,7 @@ import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
 import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
-import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
+import 'package:zent_fe/domain/repositories/work_order_repository.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zent_fe/domain/exceptions/business_exception.dart';
@@ -231,26 +231,36 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
   // Start Job with Geofencing
   Future<void> startJob(BuildContext context) async {
+    debugPrint("=== START JOB TRIGGERED ===");
+    debugPrint("Work Order ID: $workOrderId");
     _isLoading = true;
     notifyListeners();
     try {
       // 1. Get current GPS location
+      debugPrint("Retrieving current GPS location...");
       final pos = await _getCurrentLocation();
       final lat = pos.latitude;
       final lng = pos.longitude;
+      debugPrint("Current GPS Location: lat=$lat, lng=$lng");
 
       // 2. Call Start Job API
-      final repo = sl<WorkOrderRepositoryImpl>();
+      final repo = sl<WorkOrderRepository>();
       final cleanId = workOrderId.replaceAll('#', '');
+      debugPrint("Calling startWorkOrder API for cleanId=$cleanId...");
       await repo.startWorkOrder(cleanId, lat, lng);
+      debugPrint("startWorkOrder API call completed successfully!");
 
       // 3. Refresh work order details
+      debugPrint("Refreshing work order details...");
       await _loadDetails();
+      debugPrint("Work order details refreshed successfully. Current status: $status");
     } on BusinessException catch (e) {
+      debugPrint("BusinessException caught: ${e.message}");
       if (context.mounted) {
         ZentErrorPopup.show(context, e.message);
       }
     } catch (e) {
+      debugPrint("Exception caught during startJob: $e");
       if (context.mounted) {
         ZentErrorPopup.show(
           context,

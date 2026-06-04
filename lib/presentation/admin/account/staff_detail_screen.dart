@@ -290,7 +290,12 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                           children: [
                             Icon(Icons.info_outline, size: 18),
                             SizedBox(width: 6),
-                            Text('Account Information'),
+                            Flexible(
+                              child: Text(
+                                'Account Info',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -300,7 +305,12 @@ class _StaffDetailContentState extends State<_StaffDetailContent>
                           children: [
                             Icon(Icons.work_outline, size: 18),
                             SizedBox(width: 6),
-                            Text('Work Performance'),
+                            Flexible(
+                              child: Text(
+                                'Performance',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),

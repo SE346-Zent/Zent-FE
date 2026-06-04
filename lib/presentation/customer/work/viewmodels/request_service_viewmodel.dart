@@ -484,10 +484,10 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       }
 
       String finalProv = province ?? '';
-      if (finalProv.contains('Hồ Chí Minh')) {
-        finalProv = 'HCM';
-      } else if (finalProv.contains('Hà Nội')) {
-        finalProv = 'HN';
+      if (finalProv.contains('Hồ Chí Minh') || finalProv == 'HCM') {
+        finalProv = 'Thành phố Hồ Chí Minh';
+      } else if (finalProv.contains('Hà Nội') || finalProv == 'HN') {
+        finalProv = 'Thành phố Hà Nội';
       }
 
       final resolvedReferenceTicketId = await _resolveReferenceTicketId(

@@ -38,63 +38,83 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<TechWorkOrderDetailsViewModel>();
 
+    if (viewModel.workOrder == null) {
+      return const Scaffold(
+        backgroundColor: AppColors.background500,
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              AppColors.primary500,
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       body: SafeArea(
-        child: viewModel.isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.primary500,
-                  ),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    AccountHeader(
+                      title: "Detailed Work",
+                      subtitle: "${viewModel.displayWorkOrderNum} • 12h30 AM",
+                      showDivider: true,
+                    ),
+                    Positioned(
+                      right: AppDimens.spaceSm,
+                      top: 4.0,
+                      child:
+                          (viewModel.workOrder?.status ==
+                                  WorkOrderStatus.complete ||
+                              viewModel.workOrder?.status ==
+                                  WorkOrderStatus.rejected ||
+                              viewModel.workOrder?.status ==
+                                  WorkOrderStatus.rejectInReview)
+                          ? const SizedBox.shrink()
+                          : _buildPopupMenu(context),
+                    ),
+                  ],
                 ),
-              )
-            : Column(
-                children: [
-                  Stack(
-                    alignment: Alignment.centerRight,
-                    children: [
-                      AccountHeader(
-                        title: "Detailed Work",
-                        subtitle: "${viewModel.displayWorkOrderNum} • 12h30 AM",
-                        showDivider: true,
-                      ),
-                      Positioned(
-                        right: AppDimens.spaceSm,
-                        top: 4.0,
-                        child:
-                            (viewModel.workOrder?.status ==
-                                    WorkOrderStatus.complete ||
-                                viewModel.workOrder?.status ==
-                                    WorkOrderStatus.rejected ||
-                                viewModel.workOrder?.status ==
-                                    WorkOrderStatus.rejectInReview)
-                            ? const SizedBox.shrink()
-                            : _buildPopupMenu(context),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(AppDimens.spaceMd),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          DetailsJobInfo(viewModel: viewModel),
-                          const SizedBox(height: AppDimens.spaceLg),
-                          DetailsJobTimer(viewModel: viewModel),
-                          const SizedBox(height: AppDimens.spaceLg),
-                          DetailsChecklist(viewModel: viewModel),
-                          const SizedBox(height: AppDimens.spaceLg),
-                          _buildWorkOrderInfoCard(viewModel),
-                          const SizedBox(height: AppDimens.spaceXl),
-                        ],
-                      ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppDimens.spaceMd),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DetailsJobInfo(viewModel: viewModel),
+                        const SizedBox(height: AppDimens.spaceLg),
+                        DetailsJobTimer(viewModel: viewModel),
+                        const SizedBox(height: AppDimens.spaceLg),
+                        DetailsChecklist(viewModel: viewModel),
+                        const SizedBox(height: AppDimens.spaceLg),
+                        _buildWorkOrderInfoCard(viewModel),
+                        const SizedBox(height: AppDimens.spaceXl),
+                      ],
                     ),
                   ),
-                  DetailsBottomActions(viewModel: viewModel),
-                ],
+                ),
+                DetailsBottomActions(viewModel: viewModel),
+              ],
+            ),
+            if (viewModel.isLoading)
+              Container(
+                color: Colors.black.withAlpha(90),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary500,
+                    ),
+                  ),
+                ),
               ),
+          ],
+        ),
       ),
     );
   }

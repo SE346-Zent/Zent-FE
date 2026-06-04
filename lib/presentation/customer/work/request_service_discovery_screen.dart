@@ -160,7 +160,7 @@ class _RequestServiceDiscoveryScreenState
                   try {
                     await viewModel.nextStep();
                   } on BusinessException catch (e) {
-                    if (context.mounted) {
+                    if (mounted) {
                       ZentErrorPopup.show(context, e.message);
                     }
                   }

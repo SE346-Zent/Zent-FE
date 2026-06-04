@@ -70,14 +70,11 @@ class _CompleteWorkOrderContent extends StatelessWidget {
                 AccountHeader(
                   title: "Complete Work Order",
                   subtitle:
-                      "${viewModel.workOrderNum.isNotEmpty ? viewModel.workOrderNum : viewModel.workOrderId} • 12h30 AM",
+                      "${viewModel.workOrderNum.isNotEmpty ? viewModel.workOrderNum : viewModel.workOrderId} • ${viewModel.appointmentFormatted}",
                   showDivider: true,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    physics: viewModel.currentStep == 4
-                        ? const NeverScrollableScrollPhysics()
-                        : null,
                     padding: const EdgeInsets.all(AppDimens.spaceMd),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,7 +85,8 @@ class _CompleteWorkOrderContent extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimens.spaceMd),
                         _buildStepContent(viewModel),
-                        const SizedBox(height: AppDimens.spaceLg),
+                        if (viewModel.currentStep == 4)
+                          const SizedBox(height: 120),
                       ],
                     ),
                   ),

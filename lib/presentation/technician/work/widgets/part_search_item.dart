@@ -62,7 +62,14 @@ class PartSearchItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 2.0),
                       Text(
-                        'Part No: ${part.partNo} | Commodity: ${part.commodity}',
+                        'Part No: ${part.partNo}',
+                        style: TextStyles.label.copyWith(
+                          color: AppColors.secondary500,
+                        ),
+                      ),
+                      const SizedBox(height: 2.0),
+                      Text(
+                        'Commodity: ${part.commodity}',
                         style: TextStyles.label.copyWith(
                           color: AppColors.secondary500,
                         ),

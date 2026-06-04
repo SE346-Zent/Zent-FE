@@ -47,6 +47,12 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
   String get jobName => workOrder?.title ?? "Laptop Repair";
   String get status {
     if (workOrder == null) return "In Progress";
+    if (workOrder!.statusId == 2) {
+      return "Assigned";
+    }
+    if (workOrder!.statusId == 3) {
+      return "In Progress";
+    }
     switch (workOrder!.status) {
       case WorkOrderStatus.pending:
         return "Pending";
@@ -227,8 +233,8 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     try {
       // 1. Get current GPS location
       final pos = await _getCurrentLocation();
-      final lat = pos?.latitude ?? 10.7769; // Fallback to HCM
-      final lng = pos?.longitude ?? 106.7009;
+      final lat = pos.latitude;
+      final lng = pos.longitude;
 
       // 2. Call Start Job API
       final repo = sl<WorkOrderRepositoryImpl>();
@@ -250,31 +256,33 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     }
   }
 
-  Future<Position?> _getCurrentLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return null;
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled. Please enable GPS.');
+    }
 
-      LocationPermission permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return null;
+        throw Exception('Location permission denied.');
       }
+    }
 
-      if (permission == LocationPermission.deniedForever) return null;
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception('Location permissions are permanently denied. Please enable them in settings.');
+    }
 
-      try {
-        return await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.high,
-            timeLimit: Duration(seconds: 5),
-          ),
-        );
-      } catch (_) {
-        return null;
-      }
-    } catch (_) {
-      return null;
+    try {
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 5),
+        ),
+      );
+    } catch (e) {
+      throw Exception('Failed to retrieve GPS location: ${e.toString()}');
     }
   }
 }

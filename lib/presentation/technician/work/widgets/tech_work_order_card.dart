@@ -18,8 +18,7 @@ class WorkOrderCard extends StatelessWidget {
     // Priority: 0-Normal, 1-High (based on typical mapping, check if different)
     final isHighPriority = order.priority > 0;
     final isCompleted = order.status == WorkOrderStatus.complete;
-    final isPending = order.status == WorkOrderStatus.pending ||
-        (order.status == WorkOrderStatus.assigned && order.statusId == 2);
+    final isPending = order.status == WorkOrderStatus.pending;
 
     // Priority Color Processing
     final priorityColor = isHighPriority
@@ -30,7 +29,7 @@ class WorkOrderCard extends StatelessWidget {
         : AppColors.surface600;
 
     // Status Color Processing
-    Color statusColor = AppColors.tertiary400;
+    Color statusColor = AppColors.tertiary500;
     if (isCompleted) {
       statusColor = AppColors.success500;
     }
@@ -89,7 +88,11 @@ class WorkOrderCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6.0),
                   Text(
-                    order.status.name.toUpperCase(),
+                    order.statusId == 2
+                        ? 'ASSIGNED'
+                        : order.statusId == 3
+                            ? 'IN PROGRESS'
+                            : order.status.name.toUpperCase(),
                     style: TextStyles.label.copyWith(color: statusColor),
                   ),
                 ],

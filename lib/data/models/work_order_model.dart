@@ -82,6 +82,22 @@ class WorkOrderModel extends WorkOrder {
       parsedStatusId = rawStatusVal;
     } else if (rawStatusVal is String) {
       parsedStatusId = int.tryParse(rawStatusVal);
+      if (parsedStatusId == null) {
+        final s = rawStatusVal.toLowerCase().replaceAll('_', '').replaceAll(' ', '');
+        if (s == 'pending' || s.contains('pending')) {
+          parsedStatusId = 1;
+        } else if (s == 'assigned' || s.contains('assigned')) {
+          parsedStatusId = 2;
+        } else if (s == 'inprogress' || s == 'inprog' || s.contains('prog')) {
+          parsedStatusId = 3;
+        } else if (s == 'complete' || s == 'completed' || s == 'closed' || s.contains('complete') || s.contains('closed')) {
+          parsedStatusId = 4;
+        } else if (s == 'rejectinreview' || s.contains('rejectinreview')) {
+          parsedStatusId = 5;
+        } else if (s == 'rejected' || s.contains('rejected')) {
+          parsedStatusId = 6;
+        }
+      }
     }
 
     return WorkOrderModel(

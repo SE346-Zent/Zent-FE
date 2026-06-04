@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,6 +22,23 @@ class AdminMainLayout extends StatefulWidget {
 }
 
 class _AdminMainLayoutState extends State<AdminMainLayout> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        await Geolocator.requestPermission();
+      }
+    } catch (e) {
+      debugPrint("Error checking/requesting location permission on admin layout init: $e");
+    }
+  }
+
   void _goBranch(int index) {
     widget.navigationShell.goBranch(
       index,

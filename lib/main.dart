@@ -14,7 +14,6 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:zent_fe/presentation/common/core/ui/chat_banner_listener.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/gps_service_guard.dart';
 
@@ -50,16 +49,7 @@ Future<void> main() async {
     await dotenv.load(fileName: ".env");
     await di.init();
 
-    // Request location permission asynchronously on startup
-    Geolocator.checkPermission()
-        .then((permission) {
-          if (permission == LocationPermission.denied) {
-            Geolocator.requestPermission();
-          }
-        })
-        .catchError((e) {
-          developer.log("Error requesting location permission on startup: $e");
-        });
+    // Location permission request deferred to login and layout states to prevent early startup blocks
   } catch (e) {
     developer.log("Local initialization failed: $e");
   }
@@ -126,7 +116,8 @@ Future<void> main() async {
   }
 
   try {
-    await _setupFCMForTesting();
+    // Setup FCM for testing asynchronously to prevent blocking runApp()
+    _setupFCMForTesting();
   } catch (e) {
     developer.log("FCM Setup failed: $e");
   }
@@ -225,20 +216,14 @@ Future<void> fetchInstallationId() async {
 Future<void> _setupFCMForTesting() async {
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    // Notification permission request is deferred to after splash screen removal.
+    // Fetch token silently for background messaging.
+    String? token = await messaging.getToken();
+    developer.log('FCM TOKEN: $token');
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      String? token = await messaging.getToken();
-      developer.log('FCM TOKEN: $token');
-
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-        developer.log('FCM TOKEN REFRESHED: $newToken');
-      });
-    }
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      developer.log('FCM TOKEN REFRESHED: $newToken');
+    });
   } catch (e) {
     developer.log("Error during FCM setup: $e");
   }

@@ -153,12 +153,12 @@ class _AdminDashboardScreenContentState
                       ? form.technicianName
                       : 'Technician',
                   avatarUrl: null,
-                  size: 42,
+                  size: 36,
                 ),
                 const SizedBox(width: 8.0),
                 Text(
                   form.technicianName.isNotEmpty ? form.technicianName : 'N/A',
-                  style: TextStyles.bodyLarge.copyWith(
+                  style: TextStyles.bodyMedium.copyWith(
                     color: AppColors.primary500,
                     fontWeight: FontWeight.w600,
                   ),

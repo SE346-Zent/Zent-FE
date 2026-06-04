@@ -111,7 +111,7 @@ class TechRejectWorkOrderViewModel extends ChangeNotifier
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return 'Failed to reject work order: $e';
+      return 'Failed to submit rejection request: $e';
     }
   }
 

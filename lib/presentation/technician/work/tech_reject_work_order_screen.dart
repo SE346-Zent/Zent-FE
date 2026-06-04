@@ -282,7 +282,7 @@ class _TechRejectWorkOrderScreenState extends State<TechRejectWorkOrderScreen> {
                         if (error == null) {
                           ZentSuccessPopup.show(
                             context,
-                            'Work order rejected successfully!',
+                            'Rejection request submitted successfully!',
                           );
                           Navigator.pop(context, true);
                         } else {

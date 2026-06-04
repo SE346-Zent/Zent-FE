@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -33,7 +34,7 @@ class UserListItem extends StatelessWidget {
     return Selector<UserManagementViewModel, AccountStatus>(
       selector: (_, vm) => vm.getStatusForUser(userId),
       builder: (context, status, _) {
-        return GestureDetector(
+        return ThrottledGestureDetector(
           onTap: onTap,
           child: Container(
             width: double.infinity,
@@ -125,7 +126,7 @@ class UserListItem extends StatelessWidget {
                 const SizedBox(width: AppDimens.spaceMd),
 
                 // Trailing Edit Icon
-                InkWell(
+                ThrottledInkWell(
                   onTap: onEditTap,
                   child: const SizedBox(
                     width: 17.0,

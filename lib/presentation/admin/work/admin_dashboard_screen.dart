@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -142,7 +143,7 @@ class _AdminDashboardScreenContentState
                       );
                     },
                   ),
-                  GestureDetector(
+                  ThrottledGestureDetector(
                     onTap: () => context.goNamed(RouteNames.adminMe),
                     child: Container(
                       margin: const EdgeInsets.only(right: 16.0),

@@ -81,8 +81,16 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
   String get description => workOrder?.description ?? '';
   String get appointmentFormatted {
     final dt = workOrder?.appointment;
-    if (dt == null) return '';
-    return DateFormat("HH'h'mm, dd/MM/yyyy").format(dt);
+    if (dt == null) return 'N/A';
+    final now = DateTime.now();
+    final isToday =
+        dt.year == now.year && dt.month == now.month && dt.day == now.day;
+    final timeStr = DateFormat("hh:mm a").format(dt);
+    if (isToday) {
+      return '$timeStr - Today';
+    } else {
+      return '$timeStr - ${DateFormat("dd/MM/yyyy").format(dt)}';
+    }
   }
 
   // Timer state

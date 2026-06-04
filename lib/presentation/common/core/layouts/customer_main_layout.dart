@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
@@ -108,7 +109,7 @@ class _NavBarItem extends StatelessWidget {
     final color = isSelected ? AppColors.tertiary300 : AppColors.secondary300;
 
     return Expanded(
-      child: InkWell(
+      child: ThrottledInkWell(
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

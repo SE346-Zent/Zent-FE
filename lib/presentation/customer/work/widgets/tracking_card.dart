@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -160,7 +161,7 @@ class TrackingCard extends StatelessWidget {
             Positioned(
               right: AppDimens.spaceSm,
               top: AppDimens.spaceSm,
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 onTapDown: (TapDownDetails details) async {
                   final tapPos = details.globalPosition;
                   final size = MediaQuery.of(context).size;

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart';
@@ -171,7 +172,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
         itemCount: vm.filters.length,
         itemBuilder: (context, index) {
           final isSelected = vm.selectedFilterIndex == index;
-          return GestureDetector(
+          return ThrottledGestureDetector(
             onTap: () => vm.setFilterIndex(index),
             child: Container(
               margin: const EdgeInsets.only(right: AppDimens.spaceSm),
@@ -221,7 +222,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: ThrottledInkWell(
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
           onTap: () {
             if (isCustomer) {
@@ -445,7 +446,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
             width: double.infinity,
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            child: InkWell(
+            child: ThrottledInkWell(
               onTap: () {
                 Navigator.pop(context);
                 if (!isComplete) {
@@ -542,7 +543,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                       children: List.generate(5, (index) {
                         final score = index + 1;
                         final isFilled = score <= rating;
-                        return GestureDetector(
+                        return ThrottledGestureDetector(
                           onTap: () => setState(() => rating = score),
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 3.0),

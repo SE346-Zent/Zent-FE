@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -32,7 +33,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ReassignWorkOrderViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.background500,
@@ -85,7 +86,7 @@ class _ReassignWorkOrderScreenContent extends StatelessWidget {
                   children: [
                     Expanded(child: _buildSearchBar()),
                     const SizedBox(width: AppDimens.spaceMd),
-                    GestureDetector(
+                    ThrottledGestureDetector(
                       onTap: () {},
                       child: Container(
                         padding: const EdgeInsets.all(8.0),

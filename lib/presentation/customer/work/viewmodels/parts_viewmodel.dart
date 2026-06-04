@@ -41,7 +41,20 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
   Product? product;
   List<PartModel> allParts = [];
   List<PartModel> filteredParts = [];
+
+  // --- Loading states ---
   bool isLoading = false;
+  bool isLoadingMore = false;
+  bool hasMorePages = false;
+
+  // --- Pagination state ---
+  static const int _pageSize = 20;
+  int _currentPage = 1;
+  String? _productId;
+  String _modelCode = '';
+
+  // --- Catalog cache (fetched once) ---
+  Map<String, dynamic> _catalogMap = {};
 
   final TextEditingController searchController = TextEditingController();
 
@@ -49,85 +62,123 @@ class PartsViewModel extends ChangeNotifier with SafeChangeNotifier {
   String filterStatus = 'None';
 
   Future<void> init(String serialNumber, {String modelCode = ''}) async {
+    _modelCode = modelCode;
     searchController.addListener(_onSearchChanged);
     await fetchParts(serialNumber, modelCode: modelCode);
   }
 
   Future<void> fetchParts(String serialNumber, {String modelCode = ''}) async {
+    _modelCode = modelCode;
+    _currentPage = 1;
+    allParts = [];
+    filteredParts = [];
+    hasMorePages = false;
     isLoading = true;
     notifyListeners();
 
     try {
       final user = await getCurrentUserUseCase.execute();
-      if (user != null) {
-        final products = await getMyProductsUseCase.execute(user.id);
-        String? productId;
-        try {
-          product = products.firstWhere((p) => p.serialNumber == serialNumber);
-          productId = product?.id;
-        } catch (_) {
-          product = null;
-        }
+      if (user == null) return;
 
-        // Resolve SCM product ID by querying SCM database using the serial number first
-        try {
-          final (scmProducts, _) = await getScmProductsUseCase.execute(
-            query: serialNumber,
-          );
-          final scmMatch = scmProducts.firstWhere(
-            (p) => p.serialNumber == serialNumber,
-          );
-          productId = scmMatch.id;
-        } catch (_) {
-          // Fall back to resolved local product ID
-        }
-
-        if (productId != null) {
-          // Fetch all part catalog entries to map descriptions/names in-memory
-          final (catalogList, _) = await getPartCatalogUseCase.execute(
-            page: 1,
-            limit: 1000,
-          );
-          final catalogMap = {for (var entry in catalogList) entry.id: entry};
-
-          // Fetch parts for this specific product ID
-          final (parts, _) = await getPartsUseCase.execute(
-            productId: productId,
-            page: 1,
-            limit: 1000,
-          );
-
-          allParts = parts.map((part) {
-            final catalog = catalogMap[part.partCatalogId];
-            return PartModel(
-              title: catalog?.description ?? part.partTypeName ?? 'Part',
-              partNo: catalog?.partNumber ?? part.serialNumber,
-              commodity: part.partTypeName ?? 'General',
-              status:
-                  part.partConditionName ??
-                  (part.partConditionId == 1 ? 'Available' : 'Unavailable'),
-              imageUrl: part.imageUrl,
-              modelCode: modelCode.isNotEmpty
-                  ? modelCode
-                  : (product?.model ?? 'NA'),
-            );
-          }).toList();
-          debugPrint('=== [DEBUG PARTS] Fetch Parts Successful ===');
-          for (var p in allParts) {
-            debugPrint(
-              'Part -> title: ${p.title}, partNo: ${p.partNo}, commodity: ${p.commodity}, status: ${p.status}',
-            );
-          }
-          debugPrint('============================================');
-        } else {
-          allParts = [];
-        }
+      // Resolve local product info
+      final products = await getMyProductsUseCase.execute(user.id);
+      String? productId;
+      try {
+        product = products.firstWhere((p) => p.serialNumber == serialNumber);
+        productId = product?.id;
+      } catch (_) {
+        product = null;
       }
-      _filterParts();
+
+      // Try resolving SCM product ID
+      try {
+        final (scmProducts, _) = await getScmProductsUseCase.execute(
+          query: serialNumber,
+        );
+        final scmMatch = scmProducts.firstWhere(
+          (p) => p.serialNumber == serialNumber,
+        );
+        productId = scmMatch.id;
+      } catch (_) {
+        // Fall back to resolved local product ID
+      }
+
+      _productId = productId;
+
+      if (_productId == null) {
+        allParts = [];
+        _filterParts();
+        return;
+      }
+
+      // Fetch part catalog once and cache it
+      final (catalogList, _) = await getPartCatalogUseCase.execute(
+        page: 1,
+        limit: 1000,
+      );
+      _catalogMap = {for (var entry in catalogList) entry.id: entry};
+
+      // Fetch first page of parts
+      await _fetchPage(1, append: false);
     } catch (e) {
       debugPrint('Error fetching parts for $serialNumber: $e');
     } finally {
       isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Fetches [page] of parts. If [append] is true, appends to existing list.
+  Future<void> _fetchPage(int page, {required bool append}) async {
+    final (parts, meta) = await getPartsUseCase.execute(
+      productId: _productId,
+      page: page,
+      limit: _pageSize,
+    );
+
+    final newModels = parts.map((part) {
+      final catalog = _catalogMap[part.partCatalogId];
+      return PartModel(
+        title: catalog?.description ?? part.partTypeName ?? 'Part',
+        partNo: catalog?.partNumber ?? part.serialNumber,
+        commodity: part.partTypeName ?? 'General',
+        status:
+            part.partConditionName ??
+            (part.partConditionId == 1 ? 'Available' : 'Unavailable'),
+        imageUrl: part.imageUrl,
+        modelCode: _modelCode.isNotEmpty
+            ? _modelCode
+            : (product?.model ?? 'NA'),
+      );
+    }).toList();
+
+    if (append) {
+      allParts.addAll(newModels);
+    } else {
+      allParts = newModels;
+    }
+
+    _currentPage = page;
+    hasMorePages = meta.page < meta.totalPages;
+
+    debugPrint(
+      '[PartsVM] page=$page totalPages=${meta.totalPages} loaded=${allParts.length} hasMore=$hasMorePages',
+    );
+
+    _filterParts();
+  }
+
+  /// Call this when the user scrolls near the bottom.
+  Future<void> loadMore() async {
+    if (isLoadingMore || !hasMorePages || _productId == null) return;
+    isLoadingMore = true;
+    notifyListeners();
+    try {
+      await _fetchPage(_currentPage + 1, append: true);
+    } catch (e) {
+      debugPrint('Error loading more parts: $e');
+    } finally {
+      isLoadingMore = false;
       notifyListeners();
     }
   }

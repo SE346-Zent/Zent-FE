@@ -72,6 +72,9 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
     super.mtm,
     super.serialNumber,
     super.diagnosticNotes,
+    super.diagnosticNote1,
+    super.diagnosticNote2,
+    super.diagnosticNote3,
     super.uninstalledParts,
     super.installedParts,
     super.prePhotos,
@@ -90,6 +93,9 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       mtm: entity.mtm,
       serialNumber: entity.serialNumber,
       diagnosticNotes: entity.diagnosticNotes,
+      diagnosticNote1: entity.diagnosticNote1,
+      diagnosticNote2: entity.diagnosticNote2,
+      diagnosticNote3: entity.diagnosticNote3,
       uninstalledParts: entity.uninstalledParts,
       installedParts: entity.installedParts,
       prePhotos: entity.prePhotos,
@@ -107,6 +113,9 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       mtm: json['mtm'] as String? ?? "",
       serialNumber: json['serialNumber'] as String? ?? "",
       diagnosticNotes: json['diagnosticNotes'] as String? ?? "",
+      diagnosticNote1: json['diagnosticNote1'] as String? ?? "",
+      diagnosticNote2: json['diagnosticNote2'] as String? ?? "",
+      diagnosticNote3: json['diagnosticNote3'] as String? ?? "",
       uninstalledParts: (json['uninstalledParts'] as List? ?? [])
           .map(
             (e) => TechWorkOrderPartModel.fromJson(e as Map<String, dynamic>),
@@ -140,6 +149,9 @@ class WorkOrderCompletionDraftModel extends WorkOrderCompletionDraft {
       'mtm': mtm,
       'serialNumber': serialNumber,
       'diagnosticNotes': diagnosticNotes,
+      'diagnosticNote1': diagnosticNote1,
+      'diagnosticNote2': diagnosticNote2,
+      'diagnosticNote3': diagnosticNote3,
       'uninstalledParts': uninstalledParts
           .map((e) => TechWorkOrderPartModel.fromEntity(e).toJson())
           .toList(),

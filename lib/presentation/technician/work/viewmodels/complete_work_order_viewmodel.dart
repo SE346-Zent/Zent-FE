@@ -28,6 +28,12 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
   final TextEditingController serialNumberController = TextEditingController();
   final TextEditingController diagnosticNotesController =
       TextEditingController();
+  final TextEditingController diagnosticNote1Controller =
+      TextEditingController();
+  final TextEditingController diagnosticNote2Controller =
+      TextEditingController();
+  final TextEditingController diagnosticNote3Controller =
+      TextEditingController();
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
@@ -93,6 +99,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
     mtmController.addListener(_saveDraft);
     serialNumberController.addListener(_saveDraft);
     diagnosticNotesController.addListener(_saveDraft);
+    diagnosticNote1Controller.addListener(_saveDraft);
+    diagnosticNote2Controller.addListener(_saveDraft);
+    diagnosticNote3Controller.addListener(_saveDraft);
 
     _loadDraft();
   }
@@ -103,9 +112,15 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
     mtmController.removeListener(_saveDraft);
     serialNumberController.removeListener(_saveDraft);
     diagnosticNotesController.removeListener(_saveDraft);
+    diagnosticNote1Controller.removeListener(_saveDraft);
+    diagnosticNote2Controller.removeListener(_saveDraft);
+    diagnosticNote3Controller.removeListener(_saveDraft);
     mtmController.dispose();
     serialNumberController.dispose();
     diagnosticNotesController.dispose();
+    diagnosticNote1Controller.dispose();
+    diagnosticNote2Controller.dispose();
+    diagnosticNote3Controller.dispose();
     super.dispose();
   }
 
@@ -120,6 +135,29 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
 
   void nextStepPressed() {
     if (_currentStep < totalSteps - 1) {
+      if (_currentStep == 2) {
+        // Compile diagnostic notes from steps 1, 2, and 3
+        final notes = <String>[];
+        if (diagnosticNote1Controller.text.trim().isNotEmpty) {
+          notes.add(
+            "Machine Info Notes:\n${diagnosticNote1Controller.text.trim()}",
+          );
+        }
+        if (diagnosticNote2Controller.text.trim().isNotEmpty) {
+          notes.add(
+            "Disassembly Notes:\n${diagnosticNote2Controller.text.trim()}",
+          );
+        }
+        if (diagnosticNote3Controller.text.trim().isNotEmpty) {
+          notes.add(
+            "Assembly Notes:\n${diagnosticNote3Controller.text.trim()}",
+          );
+        }
+
+        if (diagnosticNotesController.text.isEmpty && notes.isNotEmpty) {
+          diagnosticNotesController.text = notes.join("\n\n");
+        }
+      }
       _currentStep++;
       _saveDraft();
       notifyListeners();
@@ -366,6 +404,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
         mtmController.text = draft.mtm;
         serialNumberController.text = draft.serialNumber;
         diagnosticNotesController.text = draft.diagnosticNotes;
+        diagnosticNote1Controller.text = draft.diagnosticNote1;
+        diagnosticNote2Controller.text = draft.diagnosticNote2;
+        diagnosticNote3Controller.text = draft.diagnosticNote3;
 
         notifyListeners();
       } else {
@@ -381,6 +422,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
     mtmController.text = '';
     serialNumberController.text = '';
     diagnosticNotesController.text = '';
+    diagnosticNote1Controller.text = '';
+    diagnosticNote2Controller.text = '';
+    diagnosticNote3Controller.text = '';
 
     _uninstalledParts.clear();
     _installedParts.clear();
@@ -444,6 +488,9 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
       mtm: mtmController.text,
       serialNumber: serialNumberController.text,
       diagnosticNotes: diagnosticNotesController.text,
+      diagnosticNote1: diagnosticNote1Controller.text,
+      diagnosticNote2: diagnosticNote2Controller.text,
+      diagnosticNote3: diagnosticNote3Controller.text,
       uninstalledParts: _uninstalledParts,
       installedParts: _installedParts,
       prePhotos: _prePhotos,

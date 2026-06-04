@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -164,7 +165,7 @@ class _CustomerWorkOrderDetailsScreenState
     required bool isExpanded,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),

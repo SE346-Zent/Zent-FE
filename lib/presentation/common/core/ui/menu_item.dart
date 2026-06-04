@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/dimens.dart';
 import '../../../common/core/themes/text_styles.dart';
@@ -55,7 +56,7 @@ class MenuItem extends StatelessWidget {
           side: const BorderSide(color: AppColors.surface600, width: 1.0),
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
         ),
-        child: InkWell(
+        child: ThrottledInkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
           child: Container(

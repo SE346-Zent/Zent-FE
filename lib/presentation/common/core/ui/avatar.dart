@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../common/core/themes/colors.dart';
 import '../../../common/core/themes/text_styles.dart';
@@ -47,7 +48,7 @@ class Avatar extends StatelessWidget {
     final resolvedUrl = AvatarUtils.getAvatarUrl(imageUrl);
     final hasImage = resolvedUrl != null && resolvedUrl.isNotEmpty;
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Stack(
         children: [

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -44,7 +45,7 @@ class ServiceHeader extends StatelessWidget {
                       final hasUnread = viewModel.unreadCount > 0;
                       return Stack(
                         children: [
-                          GestureDetector(
+                          ThrottledGestureDetector(
                             onTap: () {
                               context.pushNamed(
                                 RouteNames.customerNotificationsList,
@@ -93,7 +94,7 @@ class ServiceHeader extends StatelessWidget {
                     },
                   ),
                   const SizedBox(width: AppDimens.spaceMd),
-                  InkWell(
+                  ThrottledInkWell(
                     onTap: () => _onAvatarTap(context),
                     child: Container(
                       decoration: BoxDecoration(

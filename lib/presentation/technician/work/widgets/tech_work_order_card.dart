@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -155,7 +156,7 @@ class WorkOrderCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12.0),
-                GestureDetector(
+                ThrottledGestureDetector(
                   onTap: order.id.isNotEmpty
                       ? () {
                           context.pushNamed(
@@ -209,7 +210,7 @@ class WorkOrderCard extends StatelessWidget {
     required Color bgColor,
     required VoidCallback? onPressed,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(AppDimens.boraSm),
       child: Container(

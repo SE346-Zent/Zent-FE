@@ -63,7 +63,7 @@ class _TechWorkOrderDetailsContent extends StatelessWidget {
                   children: [
                     AccountHeader(
                       title: "Detailed Work",
-                      subtitle: "${viewModel.displayWorkOrderNum} • 12h30 AM",
+                      subtitle: "${viewModel.displayWorkOrderNum} • ${viewModel.appointmentFormatted}",
                       showDivider: true,
                     ),
                     Positioned(

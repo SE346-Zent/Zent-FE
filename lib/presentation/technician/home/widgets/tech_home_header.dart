@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -37,7 +38,7 @@ class TechHomeHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  GestureDetector(
+                  ThrottledGestureDetector(
                     onTap: onMenuTapped,
                     behavior: HitTestBehavior.opaque,
                     child: const Icon(
@@ -62,7 +63,7 @@ class TechHomeHeader extends StatelessWidget {
                       final hasUnread = viewModel.unreadCount > 0;
                       return Stack(
                         children: [
-                          GestureDetector(
+                          ThrottledGestureDetector(
                             onTap: () {
                               context.pushNamed(RouteNames.techNotifications);
                             },
@@ -109,7 +110,7 @@ class TechHomeHeader extends StatelessWidget {
                     },
                   ),
                   const SizedBox(width: AppDimens.spaceSm),
-                  GestureDetector(
+                  ThrottledGestureDetector(
                     onTap: onProfileTapped,
                     child: Container(
                       width: 34,
@@ -170,7 +171,7 @@ class TechHomeHeader extends StatelessWidget {
                       color: AppColors.primary400,
                     ),
                   ),
-                  InkWell(
+                  ThrottledInkWell(
                     onTap: () {
                       context.goNamed(RouteNames.techWorkOrder);
                     },

@@ -1,5 +1,6 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -96,7 +97,7 @@ class EvidencePhotosSection extends StatelessWidget {
         ),
         const SizedBox(height: AppDimens.spaceSm),
         if (photos.isEmpty)
-          GestureDetector(
+          ThrottledGestureDetector(
             onTap: () => _openCamera(context, phase),
             child: Container(
               width: double.infinity,
@@ -125,7 +126,7 @@ class EvidencePhotosSection extends StatelessWidget {
                   const SizedBox(width: AppDimens.spaceSm),
               itemBuilder: (context, index) {
                 if (index == photos.length) {
-                  return GestureDetector(
+                  return ThrottledGestureDetector(
                     onTap: () => _openCamera(context, phase),
                     child: Container(
                       width: 100,
@@ -156,7 +157,7 @@ class EvidencePhotosSection extends StatelessWidget {
   ) {
     return Stack(
       children: [
-        GestureDetector(
+        ThrottledGestureDetector(
           onTap: () => ImageViewerDialog.show(context, path),
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
@@ -176,7 +177,7 @@ class EvidencePhotosSection extends StatelessWidget {
         Positioned(
           top: 4,
           right: 4,
-          child: GestureDetector(
+          child: ThrottledGestureDetector(
             onTap: () => viewModel.removePhoto(index, phase),
             child: Container(
               padding: const EdgeInsets.all(2),

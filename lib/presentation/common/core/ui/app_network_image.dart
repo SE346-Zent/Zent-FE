@@ -1,5 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar_utils.dart';
@@ -149,7 +150,7 @@ class AppNetworkImage extends StatelessWidget {
     }
 
     if (enableViewer) {
-      return GestureDetector(
+      return ThrottledGestureDetector(
         onTap: () => ImageViewerDialog.show(context, resolvedUrl),
         child: MouseRegion(
           cursor: SystemMouseCursors.click,

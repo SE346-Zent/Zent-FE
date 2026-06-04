@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -43,7 +44,7 @@ class RejectedWorkOrderCard extends StatelessWidget {
             style: TextStyles.headline.copyWith(color: AppColors.primary500),
           ),
           const SizedBox(height: AppDimens.spaceMd),
-          GestureDetector(
+          ThrottledGestureDetector(
             onTap: onDetailTap,
             child: Container(
               padding: const EdgeInsets.symmetric(
@@ -162,7 +163,7 @@ class RejectedWorkOrderCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: GestureDetector(
+                child: ThrottledGestureDetector(
                   onTap: onDeny,
                   child: Container(
                     height: 44,
@@ -185,7 +186,7 @@ class RejectedWorkOrderCard extends StatelessWidget {
               ),
               const SizedBox(width: AppDimens.spaceMd),
               Expanded(
-                child: GestureDetector(
+                child: ThrottledGestureDetector(
                   onTap: onApprove,
                   child: Container(
                     height: 44,

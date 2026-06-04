@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -76,7 +77,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     required VoidCallback onTap,
     IconData? icon,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),

@@ -29,6 +29,9 @@ class WorkOrderCompletionDraft {
   final String mtm;
   final String serialNumber;
   final String diagnosticNotes;
+  final String diagnosticNote1;
+  final String diagnosticNote2;
+  final String diagnosticNote3;
   final List<TechWorkOrderPart> uninstalledParts;
   final List<TechWorkOrderPart> installedParts;
   final List<String> prePhotos;
@@ -43,6 +46,9 @@ class WorkOrderCompletionDraft {
     this.mtm = "",
     this.serialNumber = "",
     this.diagnosticNotes = "",
+    this.diagnosticNote1 = "",
+    this.diagnosticNote2 = "",
+    this.diagnosticNote3 = "",
     this.uninstalledParts = const [],
     this.installedParts = const [],
     this.prePhotos = const [],

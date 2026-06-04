@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -31,7 +32,7 @@ class _DeviceRegistrationView extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<DeviceRegistrationViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.surface100,
@@ -145,7 +146,7 @@ class _DeviceRegistrationView extends StatelessWidget {
               ],
               const SizedBox(height: AppDimens.spaceXl),
 
-              InkWell(
+              ThrottledInkWell(
                 onTap: viewModel.toggleStep2,
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,

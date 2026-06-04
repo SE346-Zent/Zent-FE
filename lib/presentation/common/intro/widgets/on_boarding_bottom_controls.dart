@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -26,7 +27,7 @@ class OnBoardingBottomControls extends StatelessWidget {
             : MainAxisAlignment.spaceBetween,
         children: [
           if (!isLastPage)
-            InkWell(
+            ThrottledInkWell(
               onTap: onSkipPressed,
               child: Text(
                 "SKIP",

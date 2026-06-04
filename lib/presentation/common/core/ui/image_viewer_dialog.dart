@@ -78,7 +78,7 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
       }
 
       final tempDir = await getTemporaryDirectory();
-      
+
       String fileName;
       if (isNetwork) {
         final uri = Uri.parse(widget.imagePath);
@@ -255,7 +255,11 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
                             ),
                           )
                         : IconButton(
-                            icon: const Icon(Icons.download, color: Colors.white, size: 24),
+                            icon: const Icon(
+                              Icons.download,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                             onPressed: _downloadImage,
                             tooltip: 'Tải về',
                           ),
@@ -266,7 +270,11 @@ class _ImageViewerDialogState extends State<ImageViewerDialog> {
                     shape: const CircleBorder(),
                     clipBehavior: Clip.antiAlias,
                     child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white, size: 24),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: 'Đóng',
                     ),

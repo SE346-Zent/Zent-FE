@@ -38,7 +38,8 @@ class _TechnicianHomeContent extends StatefulWidget {
 
 class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
   bool _pendingProcessed = false;
-  bool _wasVisible = true; // Initialized to true to avoid double fetch on first load
+  bool _wasVisible =
+      true; // Initialized to true to avoid double fetch on first load
 
   @override
   void didChangeDependencies() {
@@ -74,7 +75,9 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             try {
-              context.read<TechnicianHomeViewModel>().fetchTodaySchedule(silent: true);
+              context.read<TechnicianHomeViewModel>().fetchTodaySchedule(
+                silent: true,
+              );
             } catch (e) {
               debugPrint("Error reloading home data on return: $e");
             }

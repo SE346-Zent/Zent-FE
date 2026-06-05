@@ -4,6 +4,8 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/add_new_part_viewmodel.dart';
@@ -98,22 +100,16 @@ class _AddNewPartContentState extends State<_AddNewPartContent> {
                                         .trim(),
                                   );
                                   if (success && context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Part added successfully!',
-                                        ),
-                                        backgroundColor: AppColors.success500,
-                                      ),
+                                    ZentSuccessPopup.show(
+                                      context,
+                                      'New part form submitted successfully!',
                                     );
                                     Navigator.of(context).pop(true);
                                   } else if (context.mounted &&
                                       viewModel.errorMessage != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(viewModel.errorMessage!),
-                                        backgroundColor: AppColors.error500,
-                                      ),
+                                    ZentErrorPopup.show(
+                                      context,
+                                      viewModel.errorMessage!,
                                     );
                                   }
                                 }

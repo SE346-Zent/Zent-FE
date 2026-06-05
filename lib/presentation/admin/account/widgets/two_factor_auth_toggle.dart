@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -60,7 +61,7 @@ class _TwoFactorAuthToggleState extends State<TwoFactorAuthToggle> {
           ),
         ),
         const SizedBox(width: AppDimens.spaceMd),
-        GestureDetector(
+        ThrottledGestureDetector(
           onTap: () => _onToggle(!_value),
           child: Container(
             width: 58.0,

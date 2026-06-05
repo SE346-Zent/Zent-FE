@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
 import 'package:zent_fe/domain/usecases/inventory/zent_inventory_usecases.dart';
 import '../../../common/core/safe_change_notifier.dart';
@@ -35,14 +36,31 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   final List<String> photoUrls = [];
 
-  bool isProcessing = false;
+  bool _isApproving = false;
+  bool get isApproving => _isApproving;
+
+  bool _isDenying = false;
+  bool get isDenying => _isDenying;
+
+  bool get isProcessing => _isApproving || _isDenying;
 
   /// Whether the part has been approved/rejected already (hide approve/reject buttons).
   bool _isApproved = false;
   bool get isApproved => _isApproved;
 
+  bool get isReviewed => _status.toLowerCase() != 'pending';
+
   String _status = 'Pending';
   String get status => _status;
+
+  String? _reviewedBy;
+  String? get reviewedBy => _reviewedBy;
+
+  String? _reviewedAtFormatted;
+  String? get reviewedAtFormatted => _reviewedAtFormatted;
+
+  String? _denialReason;
+  String? get denialReason => _denialReason;
 
   /// Loading state for initial API fetch — avoid placeholder flash.
   bool _isLoadingDetail = false;
@@ -123,6 +141,15 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
 
       // If status is not Pending, we treat it as already processed/approved
       _isApproved = _status.toLowerCase() != 'pending';
+
+      // Bind review info
+      _reviewedBy = part.reviewedBy;
+      if (part.reviewedAt != null) {
+        _reviewedAtFormatted = DateFormat(
+          "HH'h'mm, dd/MM/yyyy",
+        ).format(part.reviewedAt!);
+      }
+      _denialReason = part.denialReason;
     } catch (e) {
       debugPrint('Error loading part detail: $e');
     } finally {
@@ -140,7 +167,7 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<bool> acceptPart() async {
     if (currentPartId == null) return false;
-    isProcessing = true;
+    _isApproving = true;
     notifyListeners();
 
     try {
@@ -150,14 +177,14 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
       debugPrint('Error accepting part: $e');
       return false;
     } finally {
-      isProcessing = false;
+      _isApproving = false;
       notifyListeners();
     }
   }
 
   Future<bool> denyPart(String reason) async {
     if (currentPartId == null) return false;
-    isProcessing = true;
+    _isDenying = true;
     notifyListeners();
 
     try {
@@ -167,7 +194,7 @@ class DetailRequestViewModel extends ChangeNotifier with SafeChangeNotifier {
       debugPrint('Error denying part: $e');
       return false;
     } finally {
-      isProcessing = false;
+      _isDenying = false;
       notifyListeners();
     }
   }

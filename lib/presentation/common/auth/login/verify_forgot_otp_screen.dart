@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -23,8 +24,13 @@ import 'package:zent_fe/di/injection_container.dart' as di;
 
 class VerifyForgotOtpScreen extends StatefulWidget {
   final String email;
+  final bool useRecoveryEmail;
 
-  const VerifyForgotOtpScreen({super.key, required this.email});
+  const VerifyForgotOtpScreen({
+    super.key,
+    required this.email,
+    this.useRecoveryEmail = false,
+  });
 
   @override
   State<VerifyForgotOtpScreen> createState() => _VerifyForgotOtpScreenState();
@@ -38,7 +44,10 @@ class _VerifyForgotOtpScreenState extends State<VerifyForgotOtpScreen> {
     super.initState();
     _viewModel = di.sl<VerifyForgotOtpViewModel>();
     // Bỏ cái isRegistration đi
-    _viewModel.init(email: widget.email);
+    _viewModel.init(
+      email: widget.email,
+      useRecoveryEmail: widget.useRecoveryEmail,
+    );
   }
 
   @override
@@ -63,7 +72,7 @@ class _VerifyForgotOtpScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<VerifyForgotOtpViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.surface50,

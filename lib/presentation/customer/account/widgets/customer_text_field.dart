@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 
 // Core Theming
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
@@ -6,7 +7,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
-class CustomerTextField extends StatelessWidget {
+class CustomerTextField extends StatefulWidget {
   final String label;
   final String hint;
   final IconData? prefixIcon;
@@ -16,6 +17,7 @@ class CustomerTextField extends StatelessWidget {
   final bool readOnly;
   final TextStyle? labelStyle;
   final bool obscureText;
+  final TextInputType? keyboardType;
 
   const CustomerTextField({
     super.key,
@@ -28,7 +30,21 @@ class CustomerTextField extends StatelessWidget {
     this.readOnly = false,
     this.labelStyle,
     this.obscureText = false,
+    this.keyboardType,
   });
+
+  @override
+  State<CustomerTextField> createState() => _CustomerTextFieldState();
+}
+
+class _CustomerTextFieldState extends State<CustomerTextField> {
+  late bool _obscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscured = widget.obscureText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,28 +57,33 @@ class CustomerTextField extends StatelessWidget {
             left: AppDimens.spaceXs,
           ),
           child: Text(
-            label,
+            widget.label,
             style:
-                labelStyle ??
+                widget.labelStyle ??
                 TextStyles.title.copyWith(color: AppColors.primary500),
           ),
         ),
 
         Container(
           decoration: BoxDecoration(
-            color: readOnly ? AppColors.secondary50 : AppColors.surface100,
+            color: widget.readOnly
+                ? AppColors.secondary50
+                : AppColors.surface100,
             borderRadius: BorderRadius.circular(AppDimens.boraMd),
             border: Border.all(color: AppColors.secondary100, width: 1.0),
             boxShadow: [BoxShadowStyles.subtle],
           ),
           child: TextField(
-            controller: controller,
-            maxLines: obscureText ? 1 : maxLines,
-            readOnly: readOnly,
-            obscureText: obscureText,
+            controller: widget.controller,
+            maxLines: _obscured ? 1 : widget.maxLines,
+            readOnly: widget.readOnly,
+            obscureText: _obscured,
+            keyboardType: widget.keyboardType,
             cursorColor: AppColors.primary500,
             style: TextStyles.bodyLarge.copyWith(
-              color: readOnly ? AppColors.secondary200 : AppColors.primary500,
+              color: widget.readOnly
+                  ? AppColors.secondary200
+                  : AppColors.primary500,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -70,16 +91,30 @@ class CustomerTextField extends StatelessWidget {
                 horizontal: AppDimens.spaceSm,
                 vertical: 12.0,
               ),
-              hintText: hint,
+              hintText: widget.hint,
               hintStyle: TextStyles.bodyLarge.copyWith(
                 color: AppColors.secondary200,
               ),
-              prefixIcon: prefixIcon != null
-                  ? Icon(prefixIcon, color: AppColors.secondary100)
+              prefixIcon: widget.prefixIcon != null
+                  ? Icon(widget.prefixIcon, color: AppColors.secondary100)
                   : null,
-              suffixIcon: suffixIcon != null
-                  ? Icon(suffixIcon, color: AppColors.secondary100)
-                  : null,
+              suffixIcon: widget.obscureText
+                  ? ThrottledGestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _obscured = !_obscured;
+                        });
+                      },
+                      child: Icon(
+                        _obscured
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppColors.secondary200,
+                      ),
+                    )
+                  : (widget.suffixIcon != null
+                        ? Icon(widget.suffixIcon, color: AppColors.secondary100)
+                        : null),
             ),
           ),
         ),

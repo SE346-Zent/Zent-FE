@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'avatar_utils.dart';
 
@@ -34,26 +35,26 @@ class UserAvatar extends StatelessWidget {
   /// on every device, isolate, and app restart.
   Color get _backgroundColor => AvatarUtils.getColor(name);
 
-  bool get _hasImage => avatarUrl != null && avatarUrl!.isNotEmpty;
-
   @override
   Widget build(BuildContext context) {
+    final resolvedUrl = AvatarUtils.getAvatarUrl(avatarUrl);
+    final hasImage = resolvedUrl != null && resolvedUrl.isNotEmpty;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: _hasImage ? const Color(0xFFFAFAFA) : _backgroundColor,
+        color: hasImage ? const Color(0xFFFAFAFA) : _backgroundColor,
         shape: BoxShape.circle,
-        image: _hasImage
+        image: hasImage
             ? DecorationImage(
-                image: NetworkImage(avatarUrl!),
+                image: CachedNetworkImageProvider(resolvedUrl),
                 fit: BoxFit.cover,
-                onError: (e, s) {}, // silently fall back on network error
               )
             : null,
       ),
       alignment: Alignment.center,
-      child: _hasImage
+      child: hasImage
           ? null
           : Text(
               _initials,

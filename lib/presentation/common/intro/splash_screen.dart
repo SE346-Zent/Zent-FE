@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -66,9 +67,29 @@ class _SplashScreenContentState extends State<_SplashScreenContent> {
 
     await Future.delayed(const Duration(milliseconds: 2000));
 
+    // Remove the native splash screen
     FlutterNativeSplash.remove();
 
+    // Fallback retries to ensure the native splash is removed
+    Future.delayed(const Duration(milliseconds: 500), () {
+      FlutterNativeSplash.remove();
+    });
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      FlutterNativeSplash.remove();
+    });
+
     if (!mounted) return;
+
+    // Safely request notification permission after splash screen removal
+    try {
+      FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } catch (e) {
+      debugPrint("Error requesting notification permission on startup: $e");
+    }
 
     try {
       final splashViewModel = context.read<SplashViewModel>();

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../routing/route_names.dart';
 
+import 'package:zent_fe/presentation/common/core/utils/string_extensions.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -21,89 +23,126 @@ class AssignWorkOrderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<AssignWorkOrderViewModel>()..initData(workOrderId),
-      child: _WorkOrderDetailScreenContent(),
+      child: const _WorkOrderDetailScreenContent(),
     );
   }
 }
 
 class _WorkOrderDetailScreenContent extends StatelessWidget {
-  _WorkOrderDetailScreenContent();
-
-  final GlobalKey _filterKey = GlobalKey();
-
-  void _showSortingDialog(BuildContext context) {
-    final RenderBox? renderBox =
-        _filterKey.currentContext?.findRenderObject() as RenderBox?;
-    final position = renderBox?.localToGlobal(Offset.zero);
+  const _WorkOrderDetailScreenContent();
+  void _showSortingDialog(
+    BuildContext iconContext,
+    AssignWorkOrderViewModel viewModel,
+  ) {
+    final RenderBox renderBox = iconContext.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final size = renderBox.size;
+    final screenWidth = MediaQuery.of(iconContext).size.width;
 
     showDialog(
-      context: context,
+      context: iconContext,
       barrierColor: Colors.transparent,
+      useSafeArea: false,
       builder: (ctx) {
         return Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 onTap: () => Navigator.pop(ctx),
                 behavior: HitTestBehavior.opaque,
                 child: const SizedBox.expand(),
               ),
             ),
             Positioned(
-              top: (position?.dy ?? 250.0) - 20,
-              right: 16.0,
-              child: Material(
-                color: Colors.transparent,
-                child: Container(
-                  width: 220,
-                  padding: const EdgeInsets.all(AppDimens.spaceSm),
-                  decoration: BoxDecoration(
+              top: offset.dy + size.height + 8.0,
+              right: screenWidth - offset.dx - size.width,
+              child: StatefulBuilder(
+                builder: (context, setState) {
+                  return Material(
                     color: Colors.white,
+                    elevation: 8,
+                    shadowColor: Colors.black26,
                     borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                    boxShadow: [BoxShadowStyles.overlay],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Sorting',
-                        style: TextStyles.middle.copyWith(
-                          color: AppColors.primary500,
+                    child: Container(
+                      width: 240,
+                      padding: const EdgeInsets.all(AppDimens.spaceMd),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                        border: Border.all(
+                          color: AppColors.secondary200,
+                          width: 1,
                         ),
                       ),
-                      const SizedBox(height: AppDimens.spaceSm),
-                      const Divider(
-                        color: AppColors.secondary50,
-                        height: 1.0,
-                        thickness: 1.0,
-                      ),
-                      const SizedBox(height: AppDimens.spaceXs),
-                      _buildSortRow('Rating'),
-                      const SizedBox(height: AppDimens.spaceXs),
-                      _buildSortRow('Workload'),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.tertiary500,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppDimens.boraSm,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sorting',
+                            style: TextStyles.middle.copyWith(
+                              color: AppColors.primary500,
                             ),
-                            side: BorderSide.none,
                           ),
-                        ),
-                        child: Text(
-                          'Reset',
-                          style: TextStyles.bodyLarge.copyWith(
-                            color: Colors.white,
+                          const Divider(
+                            color: AppColors.secondary50,
+                            height: 16.0,
+                            thickness: 1.0,
                           ),
-                        ),
+                          const SizedBox(height: AppDimens.spaceSm),
+                          _buildSortRow(
+                            'Rating',
+                            viewModel.ratingSort,
+                            ['None', 'Highest first', 'Lowest first'],
+                            (val) {
+                              if (val != null) {
+                                viewModel.updateRatingSort(val);
+                                setState(() {});
+                              }
+                            },
+                          ),
+                          const SizedBox(height: AppDimens.spaceSm),
+                          _buildSortRow(
+                            'Workload',
+                            viewModel.workloadSort,
+                            ['None', 'Highest first', 'Lowest first'],
+                            (val) {
+                              if (val != null) {
+                                viewModel.updateWorkloadSort(val);
+                                setState(() {});
+                              }
+                            },
+                          ),
+                          const SizedBox(height: AppDimens.spaceMd),
+                          ElevatedButton(
+                            onPressed: () {
+                              viewModel.resetSort();
+                              setState(() {});
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.tertiary500,
+                              minimumSize: const Size(80, 36),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppDimens.spaceLg,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.boraSm,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Reset',
+                              style: TextStyles.bodyLarge.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -112,7 +151,12 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSortRow(String label) {
+  Widget _buildSortRow(
+    String label,
+    String value,
+    List<String> options,
+    ValueChanged<String?> onChanged,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -120,30 +164,56 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           label,
           style: TextStyles.bodyLarge.copyWith(color: AppColors.secondary500),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimens.boraSm),
-            border: Border.all(color: AppColors.secondary200),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'None',
-                style: TextStyles.bodyMedium.copyWith(
+        PopupMenuButton<String>(
+          initialValue: value,
+          onSelected: onChanged,
+          offset: const Offset(0, 40),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 4.0,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppDimens.boraSm),
+              border: Border.all(color: AppColors.secondary200),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: TextStyles.bodyMedium.copyWith(
+                    color: AppColors.secondary500,
+                  ),
+                ),
+                const SizedBox(width: 4.0),
+                const Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 16,
                   color: AppColors.secondary500,
                 ),
-              ),
-              const SizedBox(width: 4.0),
-              const Icon(
-                Icons.keyboard_arrow_down,
-                size: 16,
-                color: AppColors.secondary500,
-              ),
-            ],
+              ],
+            ),
           ),
+          itemBuilder: (BuildContext context) {
+            return options.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(
+                  choice,
+                  style: TextStyles.bodyMedium.copyWith(
+                    color: choice == value
+                        ? AppColors.primary500
+                        : AppColors.secondary500,
+                    fontWeight: choice == value
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              );
+            }).toList();
+          },
         ),
       ],
     );
@@ -215,6 +285,10 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<AssignWorkOrderViewModel>();
 
+    final String displayId = viewModel.displayOrderId.isNotEmpty
+        ? viewModel.displayOrderId
+        : viewModel.orderId;
+
     return Scaffold(
       backgroundColor: AppColors.background500,
       appBar: PreferredSize(
@@ -250,7 +324,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
+              ThrottledGestureDetector(
                 onTap: () {
                   final cleanId = viewModel.orderId.replaceAll('#', '');
                   context.pushNamed(
@@ -276,7 +350,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  viewModel.orderId,
+                                  displayId.toShortWorkOrderId,
                                   style: TextStyles.middle.copyWith(
                                     color: AppColors.secondary500,
                                   ),
@@ -353,10 +427,16 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     'Select Technician',
                     style: TextStyles.headline.copyWith(color: Colors.black),
                   ),
-                  GestureDetector(
-                    key: _filterKey,
-                    onTap: () => _showSortingDialog(context),
-                    child: const Icon(Icons.filter_list, color: Colors.black),
+                  Builder(
+                    builder: (iconContext) {
+                      return ThrottledGestureDetector(
+                        onTap: () => _showSortingDialog(iconContext, viewModel),
+                        child: const Icon(
+                          Icons.filter_list,
+                          color: Colors.black,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -388,7 +468,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
   }
 
   Widget _buildInfoCard(IconData icon, String text, VoidCallback? onTap) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -399,9 +479,6 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppDimens.boraMd),
           boxShadow: [BoxShadowStyles.raised],
-          border: onTap != null
-              ? Border.all(color: AppColors.secondary100)
-              : null,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,7 +544,8 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '${data['rating']}',
+                            text:
+                                '${data['averageRating'] ?? data['rating'] ?? "5.0"}',
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),
@@ -494,7 +572,13 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                   const SizedBox(height: 4.0),
                   Row(
                     children: List.generate(4, (index) {
-                      final isActive = index < (data['workload'] as int);
+                      int workloadVal = 0;
+                      if (data['workload'] != null) {
+                        workloadVal =
+                            (num.tryParse(data['workload'].toString()) ?? 0)
+                                .toInt();
+                      }
+                      final isActive = index < workloadVal;
                       return Container(
                         margin: const EdgeInsets.only(left: 2.0),
                         width: 5,
@@ -512,7 +596,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppDimens.spaceLg),
+          const SizedBox(height: AppDimens.spaceMd),
           Row(
             children: [
               Expanded(
@@ -530,7 +614,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
                       side: const BorderSide(
                         color: AppColors.tertiary500,
                         width: 1.5,
@@ -606,7 +690,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.tertiary500,
                       elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 14.0),
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
                       side: const BorderSide(
                         color: AppColors.tertiary500,
                         width: 1.5,

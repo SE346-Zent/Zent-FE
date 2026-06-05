@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -62,9 +63,12 @@ class _NotificationTileState extends State<NotificationTile> {
             Padding(
               padding: EdgeInsets.only(top: _isExpanded ? 4.0 : 0),
               child: UserAvatar(
-                avatarUrl: widget.notification.data?['avatarUrl'],
+                avatarUrl:
+                    widget.notification.senderAvatarName ??
+                    widget.notification.data?['avatarUrl'] as String?,
                 name:
-                    widget.notification.data?['senderName'] ??
+                    widget.notification.senderName ??
+                    widget.notification.data?['senderName'] as String? ??
                     widget.notification.title,
                 size: 44,
               ),
@@ -72,7 +76,7 @@ class _NotificationTileState extends State<NotificationTile> {
             const SizedBox(width: AppDimens.spaceMd),
             // Content — body tap navigates, NOT expand/collapse
             Expanded(
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: widget.onTap,
                 child: Column(
@@ -115,7 +119,7 @@ class _NotificationTileState extends State<NotificationTile> {
             ),
             const SizedBox(width: AppDimens.spaceSm),
             // Expand arrow — only toggles expand/collapse
-            GestureDetector(
+            ThrottledGestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 setState(() {

@@ -1,9 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/enums/user_roles.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
 
 // Core Routing & Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -48,7 +52,7 @@ class _LoginScreenContent extends StatelessWidget {
 
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.background500,
@@ -109,10 +113,42 @@ class _LoginScreenContent extends StatelessWidget {
                               onPressed: () async {
                                 final user = await viewModel.login();
                                 if (user != null && context.mounted) {
+                                  if (user.role == UserRoles.admin ||
+                                      user.role == UserRoles.superAdmin ||
+                                      user.role == UserRoles.technician) {
+                                    final permission =
+                                        await Geolocator.checkPermission();
+                                    if (permission ==
+                                        LocationPermission.denied) {
+                                      await Geolocator.requestPermission();
+                                    }
+                                    final currentPermission =
+                                        await Geolocator.checkPermission();
+                                    if (currentPermission ==
+                                            LocationPermission.denied ||
+                                        currentPermission ==
+                                            LocationPermission.deniedForever) {
+                                      await di.sl<LogoutUseCase>().execute();
+                                      if (context.mounted) {
+                                        context
+                                            .read<AuthViewModel>()
+                                            .clearUser();
+                                        ZentErrorPopup.show(
+                                          context,
+                                          'Location permission is required for Admin and Technician roles.',
+                                        );
+                                      }
+                                      return;
+                                    }
+                                  }
+
+                                  if (!context.mounted) return;
+
                                   context.read<AuthViewModel>().setLoggedInUser(
                                     user,
                                   );
                                   switch (user.role) {
+                                    case UserRoles.superAdmin:
                                     case UserRoles.admin:
                                       context.goNamed(
                                         RouteNames.adminDashboard,
@@ -131,11 +167,9 @@ class _LoginScreenContent extends StatelessWidget {
                                   }
                                 } else if (viewModel.errorMessage != null &&
                                     context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(viewModel.errorMessage!),
-                                      backgroundColor: Colors.red,
-                                    ),
+                                  ZentErrorPopup.show(
+                                    context,
+                                    viewModel.errorMessage!,
                                   );
                                 }
                               },

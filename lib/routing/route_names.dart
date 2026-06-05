@@ -48,6 +48,7 @@ abstract final class RouteNames {
 
   // all sub routes
   static const String adminUserManagement = 'adminUserManagement';
+  static const String adminStaffDetail = 'adminStaffDetail';
   static const String adminSecuritySettings = 'adminSecuritySettings';
   static const String adminSystemLog = 'adminSystemLog';
   static const String adminChooseRoleCreateAccount =
@@ -62,6 +63,7 @@ abstract final class RouteNames {
   static const String techRejectWorkOrder = 'techRejectWorkOrder';
   static const String techNotifications = 'techNotifications';
   static const String techWorkOrderHistory = 'techWorkOrderHistory';
+  static const String techDetailedHistory = 'techDetailedHistory';
 
   static const String customerMyProducts = 'customerMyProducts';
   static const String customerRequestService = 'customerRequestService';
@@ -70,10 +72,14 @@ abstract final class RouteNames {
   static const String customerPersonalInfo = 'customerPersonalInfo';
   static const String customerSecuritySettings = 'customerSecuritySettings';
   static const String customerNotifications = 'customerNotifications';
+  static const String customerNotificationsList = 'customerNotificationsList';
   static const String customerDetailedProduct = 'customerDetailedProduct';
   static const String customerDetailedChat = 'customerDetailedChat';
   static const String customerDeviceRegistration = 'customerDeviceRegistration';
   static const String customerDetailedProductParts =
       'customerDetailedProductParts';
   static const String customerWorkOrderHistory = 'customerWorkOrderHistory';
+  static const String adminPersonalInfo = 'adminPersonalInfo';
+  static const String customerEditWorkOrder = 'customerEditWorkOrder';
+  static const String customerWorkOrderDetails = 'customerWorkOrderDetails';
 }

@@ -5,6 +5,7 @@ class WorkOrder {
   final String title;
   final String addressString;
   final WorkOrderStatus status;
+  final int? statusId;
   final String description;
   final String rejectReason;
   final String refusalNote;
@@ -18,6 +19,7 @@ class WorkOrder {
   final String customerName;
   final String technicianId;
   final String? technicianName;
+  final double? technicianRating;
   final String workOrderNum;
   final List<String> rejectionPhotos;
   final String? productName;
@@ -29,12 +31,18 @@ class WorkOrder {
   final String? firstName;
   final String? symptomName;
   final String? phoneNumber;
+  final String? addressLine1;
+
+  final String? customerAvatarUrl;
+  final String? technicianAvatarUrl;
+  final DateTime? startAt;
 
   WorkOrder({
     required this.id,
     required this.title,
     required this.addressString,
     required this.status,
+    this.statusId,
     required this.description,
     required this.rejectReason,
     this.refusalNote = '',
@@ -48,6 +56,7 @@ class WorkOrder {
     this.customerName = '',
     required this.technicianId,
     this.technicianName,
+    this.technicianRating,
     required this.workOrderNum,
     this.rejectionPhotos = const [],
     this.productName,
@@ -59,6 +68,10 @@ class WorkOrder {
     this.firstName,
     this.symptomName,
     this.phoneNumber,
+    this.addressLine1,
+    this.customerAvatarUrl,
+    this.technicianAvatarUrl,
+    this.startAt,
   });
 
   String get address => addressString;

@@ -54,11 +54,15 @@ class UserManagementViewModel extends ChangeNotifier with SafeChangeNotifier {
           .where((u) => u.role == UserRoles.technician)
           .toList();
 
-      _admins = allUsers.where((u) => u.role == UserRoles.admin).toList();
+      _admins = allUsers
+          .where(
+            (u) => u.role == UserRoles.admin || u.role == UserRoles.superAdmin,
+          )
+          .toList();
 
       _userStatuses.clear();
       for (final user in [..._technicians, ..._admins]) {
-        _userStatuses[user.id] = AccountStatus.active;
+        _userStatuses[user.id] = user.status;
       }
     } catch (e) {
       debugPrint('Error fetching users: $e');

@@ -95,7 +95,10 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
           padding: const EdgeInsets.all(AppDimens.spaceMd),
           child: Column(
             children: [
-              ProfileAvatar(name: viewModel.fullName),
+              ProfileAvatar(
+                name: viewModel.fullName,
+                imageUrl: viewModel.avatarUrl,
+              ),
               const SizedBox(height: AppDimens.spaceMd),
 
               Text(
@@ -153,7 +156,9 @@ class _TechPersonalInfoViewState extends State<_TechPersonalInfoView> {
                 text: 'Save Changes',
                 icon: Icons.topic_outlined,
                 onPressed: () {
-                  debugPrint('Đã bấm nút Save Changes!');
+                  context.read<TechPersonalInfoViewModel>().saveChanges(
+                    context,
+                  );
                 },
               ),
             ],

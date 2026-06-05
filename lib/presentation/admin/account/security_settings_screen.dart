@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'widgets/change_password_section.dart';
-import 'widgets/save_changes_button.dart';
-import 'widgets/two_factor_section.dart';
 import 'widgets/recovery_email_section.dart';
 import 'widgets/login_history_section.dart';
+import 'package:zent_fe/presentation/admin/account/widgets/active_sessions_section.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/security_settings_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -30,7 +30,7 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<SecuritySettingsViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.background500,
@@ -49,12 +49,14 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
                     children: [
                       const ChangePasswordSection(),
                       const SizedBox(height: AppDimens.spaceXl),
-                      TwoFactorSection(
-                        securityData: viewModel.settingsData,
-                        onToggle: (value) => viewModel.toggleTwoFactor(value),
-                      ),
-                      const SizedBox(height: AppDimens.spaceXl),
                       const RecoveryEmailSection(),
+                      const SizedBox(height: AppDimens.spaceXl),
+                      ActiveSessionsSection(
+                        sessions: viewModel.activeSessions,
+                        isLoading: viewModel.isLoadingSessions,
+                        onRevoke: viewModel.revokeSession,
+                        onRevokeAllOthers: viewModel.revokeAllOtherSessions,
+                      ),
                       const SizedBox(height: AppDimens.spaceXl),
                       LoginHistorySection(
                         history: viewModel.loginHistory,
@@ -62,19 +64,6 @@ class _SecuritySettingsScreenContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: AppDimens.spaceMd,
-                  right: AppDimens.spaceMd,
-                  bottom: AppDimens.spaceLg,
-                  top: AppDimens.spaceSm,
-                ),
-                child: SaveChangesButton(
-                  onPressed: () {
-                    context.read<SecuritySettingsViewModel>().saveChanges();
-                  },
                 ),
               ),
             ],

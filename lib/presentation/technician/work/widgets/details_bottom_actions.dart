@@ -6,6 +6,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import '../viewmodels/tech_work_order_details_viewmodel.dart';
 
 class DetailsBottomActions extends StatelessWidget {
@@ -15,15 +16,18 @@ class DetailsBottomActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = viewModel.workOrder?.status;
-    final isPending = status == WorkOrderStatus.pending;
+    final order = viewModel.workOrder;
+    final status = order?.status;
+    final statusId = order?.statusId;
+    final isPending = statusId == 1 || statusId == 2;
     final isCompletedOrRejected =
         status == WorkOrderStatus.complete ||
         status == WorkOrderStatus.rejected ||
         status == WorkOrderStatus.rejectInReview;
 
     final String leftLabel;
-    if (status == WorkOrderStatus.rejected ||
+    if (isPending ||
+        status == WorkOrderStatus.rejected ||
         status == WorkOrderStatus.rejectInReview) {
       leftLabel = "Reject";
     } else {
@@ -48,10 +52,16 @@ class DetailsBottomActions extends StatelessWidget {
                   : () {
                       final cleanId = viewModel.workOrderId.replaceAll('#', '');
                       if (isPending) {
-                        context.pushNamed(
-                          RouteNames.techRejectWorkOrder,
-                          pathParameters: {'workOrderId': cleanId},
-                        );
+                        context
+                            .pushNamed(
+                              RouteNames.techRejectWorkOrder,
+                              pathParameters: {'workOrderId': cleanId},
+                            )
+                            .then((didReject) {
+                              if (didReject == true && context.mounted) {
+                                Navigator.pop(context, true);
+                              }
+                            });
                       } else {
                         context.pushNamed(
                           RouteNames.techPauseWorkOrder,
@@ -67,7 +77,7 @@ class DetailsBottomActions extends StatelessWidget {
             child: PrimaryActionButton(
               label: isCompletedOrRejected
                   ? "View Report"
-                  : (isPending ? "Start Job" : "Fill Form"),
+                  : (isPending ? "Start Job" : "Complete"),
               icon: isCompletedOrRejected
                   ? Icons.remove_red_eye_outlined
                   : (isPending
@@ -75,7 +85,7 @@ class DetailsBottomActions extends StatelessWidget {
                         : Icons.assignment_turned_in_outlined),
               backgroundColor: isCompletedOrRejected
                   ? AppColors.primary300
-                  : (isPending ? Colors.green.shade600 : AppColors.tertiary500),
+                  : AppColors.tertiary500,
               onPressed: () {
                 if (isCompletedOrRejected) {
                   context.pushNamed(
@@ -86,10 +96,16 @@ class DetailsBottomActions extends StatelessWidget {
                   viewModel.startJob(context);
                 } else {
                   viewModel.onFillFormPressed(context);
-                  context.pushNamed(
-                    RouteNames.techCompleteWorkOrder,
-                    pathParameters: {'workOrderId': viewModel.workOrderId},
-                  );
+                  context
+                      .pushNamed(
+                        RouteNames.techCompleteWorkOrder,
+                        pathParameters: {'workOrderId': viewModel.workOrderId},
+                      )
+                      .then((didComplete) {
+                        if (didComplete == true && context.mounted) {
+                          Navigator.pop(context, true);
+                        }
+                      });
                 }
               },
             ),
@@ -105,7 +121,7 @@ class DetailsBottomActions extends StatelessWidget {
     bool isReject = false,
     bool enabled = true,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: enabled ? onPressed : null,
       child: Container(
         height: 48,

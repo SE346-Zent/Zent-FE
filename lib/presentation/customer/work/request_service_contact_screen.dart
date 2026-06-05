@@ -32,8 +32,8 @@ class _RequestServiceContactScreenState
     return firstNameCtrl.text.isNotEmpty &&
         lastNameCtrl.text.isNotEmpty &&
         vm.country != null &&
+        vm.province != null &&
         vm.ward != null &&
-        vm.city != null &&
         addressCtrl.text.isNotEmpty;
   }
 
@@ -95,8 +95,8 @@ class _RequestServiceContactScreenState
       emailVal: emailCtrl.text,
       phoneVal: phoneCtrl.text,
       countryVal: viewModel.country,
+      provinceVal: viewModel.province,
       wardVal: viewModel.ward,
-      cityVal: viewModel.city,
       addressVal: addressCtrl.text,
       buildingVal: buildingCtrl.text,
     );
@@ -212,9 +212,24 @@ class _RequestServiceContactScreenState
               if (v != null) {
                 viewModel.saveContactInfo(
                   countryVal: v,
+                  provinceVal: viewModel.province,
                   wardVal: viewModel.ward,
-                  cityVal: viewModel.city,
                 );
+              }
+            },
+            isRequired: true,
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+
+          CustomerDropdownField<String>(
+            label: 'Province/City',
+            value: viewModel.province,
+            items: viewModel.provinces
+                .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) {
+                viewModel.updateProvince(v);
               }
             },
             isRequired: true,
@@ -224,8 +239,8 @@ class _RequestServiceContactScreenState
           CustomerDropdownField<String>(
             label: 'Ward',
             value: viewModel.ward,
-            items: viewModel.wards
-                .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+            items: viewModel.availableWards
+                .map((w) => DropdownMenuItem(value: w, child: Text(w)))
                 .toList(),
             onChanged: (v) {
               if (v != null) {
@@ -233,21 +248,7 @@ class _RequestServiceContactScreenState
               }
             },
             isRequired: true,
-          ),
-          const SizedBox(height: AppDimens.spaceMd),
-
-          CustomerDropdownField<String>(
-            label: 'Ward',
-            value: viewModel.city,
-            items: viewModel.availableCities
-                .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                .toList(),
-            onChanged: (v) {
-              if (v != null) {
-                viewModel.updateCity(v);
-              }
-            },
-            isRequired: true,
+            isSearchable: true,
           ),
           const SizedBox(height: AppDimens.spaceMd),
 

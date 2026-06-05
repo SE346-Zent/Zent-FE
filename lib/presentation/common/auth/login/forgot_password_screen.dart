@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Routing & Theming
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 // Shared Auth Components
 import 'widgets/auth_text_field.dart';
@@ -38,7 +40,7 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ForgotPasswordViewModel>();
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppColors.surface50,
@@ -63,11 +65,47 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                 const ForgotPasswordHeader(),
                                 const SizedBox(height: AppDimens.spaceXl),
 
+                                // Email input field
                                 AuthTextField(
-                                  hintText: 'Enter your new email address',
+                                  hintText: 'Enter your email address',
                                   keyboardType: TextInputType.emailAddress,
                                   onChanged: viewModel.setEmail,
                                 ),
+
+                                const SizedBox(height: AppDimens.spaceMd),
+
+                                // Selector buttons for Primary / Recovery Email
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _EmailTypeButton(
+                                        label: 'Primary Email',
+                                        isSelected: !viewModel.useRecoveryEmail,
+                                        onTap: () => viewModel
+                                            .setUseRecoveryEmail(false),
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppDimens.spaceMd),
+                                    Expanded(
+                                      child: _EmailTypeButton(
+                                        label: 'Recovery Email',
+                                        isSelected: viewModel.useRecoveryEmail,
+                                        onTap: () =>
+                                            viewModel.setUseRecoveryEmail(true),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                if (viewModel.errorMessage != null) ...[
+                                  const SizedBox(height: AppDimens.spaceSm),
+                                  Text(
+                                    viewModel.errorMessage!,
+                                    style: TextStyles.label.copyWith(
+                                      color: AppColors.error500,
+                                    ),
+                                  ),
+                                ],
 
                                 const SizedBox(height: AppDimens.spaceXl),
 
@@ -85,7 +123,11 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
                                           if (isSuccess && context.mounted) {
                                             context.goNamed(
                                               'forgotPasswordVerifyOtp',
-                                              extra: viewModel.email,
+                                              extra: {
+                                                'email': viewModel.email,
+                                                'useRecoveryEmail':
+                                                    viewModel.useRecoveryEmail,
+                                              },
                                             );
                                           }
                                         },
@@ -115,6 +157,42 @@ class _ForgotPasswordScreenContent extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Reusable toggle button for Primary / Recovery Email selection.
+class _EmailTypeButton extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _EmailTypeButton({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(
+          color: isSelected ? AppColors.tertiary300 : AppColors.secondary200,
+          width: 1.5,
+        ),
+        backgroundColor: isSelected ? AppColors.tertiary50 : Colors.transparent,
+        foregroundColor: isSelected
+            ? AppColors.tertiary500
+            : AppColors.primary500,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.boraSm),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceMd),
+        textStyle: TextStyles.bodyLarge,
+      ),
+      onPressed: onTap,
+      child: Text(label),
     );
   }
 }

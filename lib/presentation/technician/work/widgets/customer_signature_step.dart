@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:signature/signature.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -228,7 +229,7 @@ class _CustomerSignatureStepState extends State<CustomerSignatureStep> {
               style: TextStyles.middle.copyWith(color: AppColors.secondary500),
             ),
             if (_hasSignature && !widget.isReadOnly)
-              GestureDetector(
+              ThrottledGestureDetector(
                 onTap: _onClearSignature,
                 child: Text(
                   "Clear",

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
+import 'package:zent_fe/presentation/common/core/utils/string_extensions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -44,8 +46,11 @@ class OperationalQueueJobCard extends StatelessWidget {
 
     final String assigneeName = job['assignee'];
 
-    final Color dotColor =
-        (statusEnum == 'unassigned' || statusEnum == 'pending_acceptance')
+    final Color statusColor = (statusEnum == 'completed')
+        ? AppColors.success500
+        : (statusEnum == 'assigned')
+        ? AppColors.tertiary500
+        : (statusEnum == 'unassigned' || statusEnum == 'pending_acceptance')
         ? AppColors.warning500
         : (statusEnum == 'reject_in_review' || statusEnum == 'rejected')
         ? AppColors.error500
@@ -53,7 +58,7 @@ class OperationalQueueJobCard extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
+      child: ThrottledInkWell(
         onTap: () => _handleNavigation(context, 'card_tap'),
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
         child: Container(
@@ -67,7 +72,7 @@ class OperationalQueueJobCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(width: 6.0, color: AppColors.primary500),
+                Container(width: 6.0, color: statusColor),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -75,7 +80,7 @@ class OperationalQueueJobCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job['id'],
+                          job['displayId'].toString().toShortWorkOrderId,
                           style: TextStyles.middle.copyWith(
                             color: AppColors.secondary500,
                             fontWeight: FontWeight.bold,
@@ -113,7 +118,7 @@ class OperationalQueueJobCard extends StatelessWidget {
                                   width: 10,
                                   height: 10,
                                   decoration: BoxDecoration(
-                                    color: dotColor,
+                                    color: statusColor,
                                     shape: BoxShape.circle,
                                   ),
                                 ),

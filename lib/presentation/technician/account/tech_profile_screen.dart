@@ -54,14 +54,18 @@ class _TechProfileView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ProfileAvatar(name: viewModel.userInfo.userName),
+              ProfileAvatar(
+                name: viewModel.userInfo.userName,
+                imageUrl: viewModel.userInfo.avatarUrl,
+                onTap: () => viewModel.updateAvatar(context),
+              ),
               const SizedBox(height: AppDimens.spaceMd),
 
               ProfileUserInfo(userInfo: viewModel.userInfo),
               const SizedBox(height: AppDimens.spaceXl),
 
               const ProfileMenuOptions(),
-              const SizedBox(height: AppDimens.spaceXl),
+              const SizedBox(height: 56.0),
             ],
           ),
         ),

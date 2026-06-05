@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
+import 'profile_input_field.dart';
 import 'package:zent_fe/domain/entities/work_order_completion_draft.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -39,7 +42,7 @@ class PartTrackingSection extends StatelessWidget {
           icon: _buildBoxIcon(isDown: true),
           parts: viewModel.uninstalledParts,
           onScanPressed: () => _onScanUninstalledPressed(context),
-          onManualPressed: _onManualUninstalledPressed,
+          onManualPressed: () => _onManualUninstalledPressed(context),
           isUninstalled: true,
         );
       case PartTrackingMode.installedOnly:
@@ -48,7 +51,7 @@ class PartTrackingSection extends StatelessWidget {
           icon: _buildBoxIcon(isDown: false),
           parts: viewModel.installedParts,
           onScanPressed: () => _onScanInstalledPressed(context),
-          onManualPressed: _onManualInstalledPressed,
+          onManualPressed: () => _onManualInstalledPressed(context),
           isUninstalled: false,
         );
       case PartTrackingMode.both:
@@ -59,7 +62,7 @@ class PartTrackingSection extends StatelessWidget {
               icon: _buildBoxIcon(isDown: true),
               parts: viewModel.uninstalledParts,
               onScanPressed: () => _onScanUninstalledPressed(context),
-              onManualPressed: _onManualUninstalledPressed,
+              onManualPressed: () => _onManualUninstalledPressed(context),
               isUninstalled: true,
             ),
             const SizedBox(height: AppDimens.spaceLg),
@@ -68,7 +71,7 @@ class PartTrackingSection extends StatelessWidget {
               icon: _buildBoxIcon(isDown: false),
               parts: viewModel.installedParts,
               onScanPressed: () => _onScanInstalledPressed(context),
-              onManualPressed: _onManualInstalledPressed,
+              onManualPressed: () => _onManualInstalledPressed(context),
               isUninstalled: false,
             ),
           ],
@@ -81,14 +84,40 @@ class PartTrackingSection extends StatelessWidget {
       import_router.RouteNames.qrScanner,
       extra: {
         'onScanned': (String result) {
-          debugPrint('Scanned Uninstalled Part SN: $result');
+          try {
+            final decoded = jsonDecode(result);
+            if (decoded is Map && decoded.length == 3) {
+              String? partIdVal;
+              String? partNameVal;
+              String? snVal;
+              decoded.forEach((k, v) {
+                final keyLower = k.toString().toLowerCase();
+                if (keyLower == 'part_id' || keyLower == 'partid') {
+                  partIdVal = v.toString();
+                }
+                if (keyLower == 'part_name' || keyLower == 'partname') {
+                  partNameVal = v.toString();
+                }
+                if (keyLower == 'sn') {
+                  snVal = v.toString();
+                }
+              });
+              if (partIdVal != null && partNameVal != null && snVal != null) {
+                viewModel.addUninstalledPart(partIdVal!, partNameVal!, snVal!);
+                return;
+              }
+            }
+            ZentErrorPopup.show(context, 'QR không hỗ trợ');
+          } catch (e) {
+            ZentErrorPopup.show(context, 'QR không hỗ trợ');
+          }
         },
       },
     );
   }
 
-  void _onManualUninstalledPressed() {
-    debugPrint("action triggered: manual add uninstalled part");
+  void _onManualUninstalledPressed(BuildContext context) {
+    _showAddPartDialog(context, isUninstalled: true);
   }
 
   void _onScanInstalledPressed(BuildContext context) {
@@ -96,14 +125,176 @@ class PartTrackingSection extends StatelessWidget {
       import_router.RouteNames.qrScanner,
       extra: {
         'onScanned': (String result) {
-          debugPrint('Scanned Installed Part SN: $result');
+          try {
+            final decoded = jsonDecode(result);
+            if (decoded is Map && decoded.length == 3) {
+              String? partIdVal;
+              String? partNameVal;
+              String? snVal;
+              decoded.forEach((k, v) {
+                final keyLower = k.toString().toLowerCase();
+                if (keyLower == 'part_id' || keyLower == 'partid') {
+                  partIdVal = v.toString();
+                }
+                if (keyLower == 'part_name' || keyLower == 'partname') {
+                  partNameVal = v.toString();
+                }
+                if (keyLower == 'sn') {
+                  snVal = v.toString();
+                }
+              });
+              if (partIdVal != null && partNameVal != null && snVal != null) {
+                viewModel.addInstalledPart(partIdVal!, partNameVal!, snVal!);
+                return;
+              }
+            }
+            ZentErrorPopup.show(context, 'QR không hỗ trợ');
+          } catch (e) {
+            ZentErrorPopup.show(context, 'QR không hỗ trợ');
+          }
         },
       },
     );
   }
 
-  void _onManualInstalledPressed() {
-    debugPrint("action triggered: manual add installed part");
+  void _onManualInstalledPressed(BuildContext context) {
+    _showAddPartDialog(context, isUninstalled: false);
+  }
+
+  void _showAddPartDialog(BuildContext context, {required bool isUninstalled}) {
+    final idController = TextEditingController();
+    final snController = TextEditingController();
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(
+            isUninstalled ? "Add Uninstalled Part" : "Add Installed Part",
+            style: TextStyles.title.copyWith(color: AppColors.primary500),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ProfileInputField(
+                label: "Part ID",
+                hintText: "e.g. 11111111-2222-3333-4444-555555555551",
+                controller: idController,
+                labelColor: AppColors.secondary400,
+                showSubtleShadow: true,
+              ),
+              const SizedBox(height: AppDimens.spaceMd),
+              ProfileInputField(
+                label: "Serial Number",
+                hintText: "e.g. SN-123456",
+                controller: snController,
+                labelColor: AppColors.secondary400,
+                showSubtleShadow: true,
+              ),
+              const SizedBox(height: AppDimens.spaceMd),
+              ProfileInputField(
+                label: "Part Name",
+                hintText: "e.g. WiFi Adapter",
+                controller: nameController,
+                labelColor: AppColors.secondary400,
+                showSubtleShadow: true,
+              ),
+            ],
+          ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceMd,
+            vertical: AppDimens.spaceSm,
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.secondary200),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppDimens.spaceMd),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.tertiary500,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      final partId = idController.text.trim();
+                      final sn = snController.text.trim();
+                      final partName = nameController.text.trim();
+                      if (partId.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text("Part ID cannot be empty"),
+                            backgroundColor: AppColors.error500,
+                          ),
+                        );
+                        return;
+                      }
+                      if (partName.isEmpty) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text("Part Name cannot be empty"),
+                            backgroundColor: AppColors.error500,
+                          ),
+                        );
+                        return;
+                      }
+                      if (isUninstalled) {
+                        viewModel.addUninstalledPart(
+                          partId,
+                          partName,
+                          sn.isEmpty ? null : sn,
+                        );
+                      } else {
+                        viewModel.addInstalledPart(
+                          partId,
+                          partName,
+                          sn.isEmpty ? null : sn,
+                        );
+                      }
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      'Add',
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildBoxIcon({required bool isDown}) {

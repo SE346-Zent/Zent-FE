@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/core/utils/string_extensions.dart';
 
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -55,7 +56,7 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    viewModel.orderId,
+                    viewModel.displayOrderId.toShortWorkOrderId,
                     style: TextStyles.label.copyWith(
                       color: AppColors.secondary500,
                     ),
@@ -81,6 +82,12 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
               _buildCurrentStatusCard(viewModel),
               const SizedBox(height: AppDimens.spaceLg),
               _buildJobSpecificationCard(viewModel),
+              const SizedBox(height: AppDimens.spaceLg),
+              _buildAppointmentCard(viewModel),
+              const SizedBox(height: AppDimens.spaceLg),
+              _buildSymptomCard(viewModel),
+              const SizedBox(height: AppDimens.spaceLg),
+              _buildDescriptionCard(viewModel),
               const SizedBox(height: AppDimens.spaceLg),
               _buildAssignedTechnicianCard(context, viewModel),
               if (viewModel.isRejectInReview) ...[
@@ -241,46 +248,6 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppDimens.spaceMd),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Symptom: ',
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextSpan(
-                  text: viewModel.symptom,
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Description: ',
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextSpan(
-                  text: viewModel.description,
-                  style: TextStyles.bodyLarge.copyWith(
-                    color: AppColors.primary500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppDimens.spaceMd),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -339,6 +306,153 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
     );
   }
 
+  Widget _buildAppointmentCard(AssignedWorkOrderDetailViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_month_outlined,
+                color: AppColors.tertiary500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Appointment',
+                style: TextStyles.title.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Container(width: 6.0, color: AppColors.tertiary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.spaceMd),
+                    child: Text(
+                      viewModel.appointment,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSymptomCard(AssignedWorkOrderDetailViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.report_problem_outlined,
+                color: AppColors.tertiary500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Symptom',
+                style: TextStyles.title.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Container(width: 6.0, color: AppColors.tertiary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.spaceMd),
+                    child: Text(
+                      viewModel.symptom,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDescriptionCard(AssignedWorkOrderDetailViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.spaceMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+        border: Border.all(color: AppColors.secondary400, width: 1.0),
+        boxShadow: [BoxShadowStyles.raised],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.description_outlined,
+                color: AppColors.tertiary500,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Description',
+                style: TextStyles.title.copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimens.spaceMd),
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Container(width: 6.0, color: AppColors.tertiary500),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppDimens.spaceMd),
+                    child: Text(
+                      viewModel.description,
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAssignedTechnicianCard(
     BuildContext context,
     AssignedWorkOrderDetailViewModel viewModel,
@@ -383,7 +497,8 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: '${viewModel.technician['rating']}',
+                            text:
+                                '${viewModel.technician['averageRating'] ?? viewModel.technician['rating'] ?? "5.0"}',
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),
@@ -410,12 +525,15 @@ class _AssignedWorkOrderDetailScreenContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimens.boraSm),
             ),
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final cleanId = viewModel.orderId.replaceAll('#', '');
-                context.pushNamed(
+                final result = await context.pushNamed(
                   'adminReassignWorkOrder',
                   pathParameters: {'workOrderId': cleanId},
                 );
+                if (result == true) {
+                  viewModel.initData(viewModel.orderId);
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.tertiary500,

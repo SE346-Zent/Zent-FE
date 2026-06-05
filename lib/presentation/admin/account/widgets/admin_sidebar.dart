@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -8,6 +10,8 @@ import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/routing/routes.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'sidebar_menu_item.dart';
 
 class AdminSidebar extends StatelessWidget {
@@ -24,6 +28,7 @@ class AdminSidebar extends StatelessWidget {
 
   Future<void> _onLogoutPressed(BuildContext context) async {
     try {
+      DetailedChatViewModel.clearCache();
       await sl<LogoutUseCase>().execute();
     } catch (e) {
       debugPrint("Error during logout: $e");
@@ -36,6 +41,12 @@ class AdminSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authViewModel = context.watch<AuthViewModel>();
+    final currentUserName = authViewModel.currentUser?.name ?? userName;
+    final currentAdminId = authViewModel.currentUser != null
+        ? 'ADMIN-${authViewModel.currentUser!.id.length > 4 ? authViewModel.currentUser!.id.substring(0, 4) : authViewModel.currentUser!.id}'
+        : adminId;
+
     return Drawer(
       backgroundColor: AppColors.surface100,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -58,13 +69,13 @@ class AdminSidebar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        userName,
+                        currentUserName,
                         style: TextStyles.title.copyWith(
                           color: AppColors.surface100,
                         ),
                       ),
                       Text(
-                        adminId,
+                        currentAdminId,
                         style: TextStyles.bodyMedium.copyWith(
                           color: AppColors.secondary100,
                         ),
@@ -150,11 +161,24 @@ class AdminSidebar extends StatelessWidget {
                         context.goNamed(RouteNames.adminWorkOrderHistory);
                       },
                     ),
+                    SidebarMenuItem(
+                      title: "Inventory",
+                      icon: const Icon(
+                        Icons.inventory_2_outlined,
+                        color: Colors.black,
+                        size: 23.0,
+                      ),
+                      isActive: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.goNamed(RouteNames.adminInventoryAssets);
+                      },
+                    ),
                     const SizedBox(height: AppDimens.spaceSm),
                     Container(height: 1.0, color: AppColors.secondary50),
                     const SizedBox(height: AppDimens.spaceMd),
                     // Logout Action
-                    InkWell(
+                    ThrottledInkWell(
                       onTap: () => _onLogoutPressed(context),
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
                       child: Padding(
@@ -186,17 +210,6 @@ class AdminSidebar extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-
-            // Footer Section
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-              child: Text(
-                appVersion,
-                style: TextStyles.middle.copyWith(
-                  color: AppColors.secondary200,
                 ),
               ),
             ),

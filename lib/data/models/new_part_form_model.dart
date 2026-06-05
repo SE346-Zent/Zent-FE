@@ -15,6 +15,8 @@ class NewPartFormModel extends NewPartForm {
     super.modelCode,
     super.denialReason,
     required super.photoUrls,
+    super.reviewedBy,
+    super.reviewedAt,
   });
 
   factory NewPartFormModel.fromJson(Map<String, dynamic> json) {
@@ -46,6 +48,14 @@ class NewPartFormModel extends NewPartForm {
       modelCode: json['modelCode'] as String?,
       denialReason: json['denialReason'] as String?,
       photoUrls: photoUrlsList,
+      reviewedBy: (json['approverName'] ?? json['reviewedBy']) as String?,
+      reviewedAt: json['approvedAt'] != null
+          ? DateTime.tryParse(json['approvedAt'] as String)
+          : json['rejectedAt'] != null
+          ? DateTime.tryParse(json['rejectedAt'] as String)
+          : json['reviewedAt'] != null
+          ? DateTime.tryParse(json['reviewedAt'] as String)
+          : null,
     );
   }
 }

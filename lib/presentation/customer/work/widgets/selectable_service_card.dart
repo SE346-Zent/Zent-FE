@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import '../../../../presentation/common/core/themes/colors.dart';
 import '../../../../presentation/common/core/themes/dimens.dart';
 import '../../../../presentation/common/core/themes/text_styles.dart';
@@ -22,7 +23,7 @@ class SelectableServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppDimens.spaceMd),

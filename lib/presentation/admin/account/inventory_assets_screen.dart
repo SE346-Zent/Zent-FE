@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
+
+import 'package:zent_fe/core/services/file_manager_service.dart';
+
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 
 // Widgets
 import 'widgets/app_search_bar.dart';
@@ -38,30 +43,115 @@ class _InventoryAssetsScreenContent extends StatelessWidget {
           children: [
             const AccountHeader(title: 'Inventory Assets', showDivider: true),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppDimens.spaceMd),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const AppSearchBar(hintText: 'Search assets by name or ID'),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    Row(
-                      children: [
-                        _buildActionButton(Icons.filter_list, 'Filters'),
-                        const SizedBox(width: AppDimens.spaceMd),
-                        _buildActionButton(Icons.ios_share, 'Export'),
-                      ],
-                    ),
-                    const SizedBox(height: AppDimens.spaceLg),
-                    ...viewModel.assets.map(
-                      (asset) => Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: AppDimens.spaceLg,
-                        ),
-                        child: InventoryAssetCard(asset: asset),
+              child: RefreshIndicator(
+                onRefresh: () => viewModel.loadAssets(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(AppDimens.spaceMd),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppSearchBar(
+                        hintText: 'Search assets by name or ID',
+                        onChanged: (val) {
+                          viewModel.updateSearchQuery(val);
+                        },
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppDimens.spaceMd),
+                      Row(
+                        children: [
+                          PopupMenuButton<String>(
+                            offset: const Offset(0, 40),
+                            onSelected: (value) {
+                              viewModel.updateTypeFilter(value);
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<String>>[
+                                  const PopupMenuItem<String>(
+                                    value: 'ALL',
+                                    child: Text('All Types'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'PRODUCT',
+                                    child: Text('Products only'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'PART',
+                                    child: Text('Parts only'),
+                                  ),
+                                ],
+                            child: _buildActionButton(
+                              Icons.filter_list,
+                              'Type: ${viewModel.typeFilter}',
+                            ),
+                          ),
+                          const SizedBox(width: AppDimens.spaceMd),
+                          ThrottledGestureDetector(
+                            onTap: viewModel.isExporting
+                                ? null
+                                : () async {
+                                    final filePath = await viewModel
+                                        .exportAssets();
+                                    if (filePath != null) {
+                                      // Extract the directory part of the saved path
+                                      final lastSeparator = filePath
+                                          .lastIndexOf('/');
+                                      final dirPath = lastSeparator != -1
+                                          ? filePath.substring(0, lastSeparator)
+                                          : filePath;
+                                      // Open the folder in the system file manager
+                                      await FileManagerService.openFolder(
+                                        dirPath,
+                                      );
+                                    } else {
+                                      if (context.mounted) {
+                                        ZentErrorPopup.show(
+                                          context,
+                                          'Failed to export inventory assets.',
+                                        );
+                                      }
+                                    }
+                                  },
+                            child: _buildActionButton(
+                              viewModel.isExporting
+                                  ? Icons.hourglass_empty
+                                  : Icons.ios_share,
+                              viewModel.isExporting ? 'Exporting…' : 'Export',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppDimens.spaceLg),
+                      if (viewModel.isLoading)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 40.0),
+                            child: CircularProgressIndicator(
+                              color: AppColors.tertiary500,
+                            ),
+                          ),
+                        )
+                      else if (viewModel.assets.isEmpty)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 40.0),
+                            child: Text(
+                              'No inventory assets found.',
+                              style: TextStyle(color: AppColors.secondary400),
+                            ),
+                          ),
+                        )
+                      else
+                        ...viewModel.assets.map(
+                          (asset) => Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: AppDimens.spaceLg,
+                            ),
+                            child: InventoryAssetCard(asset: asset),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),

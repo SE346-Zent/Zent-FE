@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 
 /// Shared avatar utilities for deterministic initials and background color.
@@ -58,5 +59,68 @@ class AvatarUtils {
     final colors = palette ?? defaultPalette;
     final index = stableHash(name) % colors.length;
     return colors[index];
+  }
+
+  /// Convert a relative path, filename, or object storage name to a full OCI URL.
+  /// If it already starts with http/https or is an asset, it is returned as is.
+  /// Also rewrites SVG-by-default placeholder service URLs to PNG so that
+  /// Flutter's image decoder (which does not support SVG) can render them.
+  static String? getAvatarUrl(String? nameOrUrl) {
+    if (nameOrUrl == null || nameOrUrl.trim().isEmpty) return null;
+    final trimmed = nameOrUrl.trim();
+    if (trimmed.startsWith('http')) return _fixSvgPlaceholderUrl(trimmed);
+    if (trimmed.startsWith('assets/')) return trimmed;
+
+    try {
+      // Fetch OCI Storage base URL
+      final ociBase = dotenv.get("OCI_STORAGE_URL", fallback: "");
+      if (ociBase.isEmpty) return trimmed;
+
+      String cleanName = trimmed;
+      if (cleanName.startsWith('/')) {
+        cleanName = cleanName.substring(1);
+      }
+
+      return '$ociBase$cleanName';
+    } catch (e) {
+      debugPrint("Error resolving avatar url: $e");
+      return trimmed;
+    }
+  }
+
+  /// Rewrites placeholder image service URLs that return SVG by default to
+  /// explicitly request PNG format, which Flutter can decode natively.
+  ///
+  /// Supported services:
+  ///  - placehold.co  (e.g. https://placehold.co/600x400/red/white?text=X)
+  ///  - via.placeholder.com
+  ///  - dummyimage.com
+  static String _fixSvgPlaceholderUrl(String url) {
+    const svgHosts = ['placehold.co', 'via.placeholder.com', 'dummyimage.com'];
+
+    Uri uri;
+    try {
+      uri = Uri.parse(url);
+    } catch (_) {
+      return url;
+    }
+
+    final host = uri.host.toLowerCase();
+    if (!svgHosts.any((h) => host == h || host.endsWith('.$h'))) {
+      return url; // Not a known SVG placeholder — leave unchanged
+    }
+
+    // Already has a raster extension → no action needed
+    final path = uri.path.toLowerCase();
+    if (path.endsWith('.png') ||
+        path.endsWith('.jpg') ||
+        path.endsWith('.jpeg') ||
+        path.endsWith('.webp')) {
+      return url;
+    }
+
+    // Insert .png before the query string by appending to the path
+    final pngUri = uri.replace(path: '${uri.path}.png');
+    return pngUri.toString();
   }
 }

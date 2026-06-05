@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/routing/route_names.dart';
+import 'package:zent_fe/domain/entities/reject_form.dart';
 import 'viewmodels/rejected_work_orders_viewmodel.dart';
 import 'widgets/rejected_work_order_card.dart';
 
@@ -48,55 +51,104 @@ class _RejectedWorkOrdersContent extends StatelessWidget {
           child: Container(color: AppColors.secondary50, height: 1.0),
         ),
       ),
-      body: viewModel.isLoading && viewModel.workOrders.isEmpty
+      body: viewModel.isLoading && viewModel.rejectForms.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: viewModel.loadRejectedWorkOrders,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(AppDimens.spaceLg),
-                itemCount: viewModel.workOrders.length,
-                itemBuilder: (context, index) {
-                  final wo = viewModel.workOrders[index];
-                  return RejectedWorkOrderCard(
-                    workOrder: wo,
-                    onApprove: () => _handleApprove(context, viewModel, wo),
-                    onDeny: () => _handleDeny(context, viewModel, wo.id),
-                    onDetailTap: () => context.goNamed(
-                      RouteNames.adminRejectionDetail,
-                      pathParameters: {'id': wo.id},
+              child: viewModel.rejectForms.isEmpty
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.assignment_turned_in_outlined,
+                                  size: 64,
+                                  color: AppColors.secondary300,
+                                ),
+                                const SizedBox(height: AppDimens.spaceMd),
+                                Center(
+                                  child: Text(
+                                    'No rejected work orders',
+                                    style: TextStyles.bodyLarge.copyWith(
+                                      color: AppColors.secondary400,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(AppDimens.spaceLg),
+                      itemCount: viewModel.rejectForms.length,
+                      itemBuilder: (context, index) {
+                        final form = viewModel.rejectForms[index];
+                        return RejectedWorkOrderCard(
+                          rejectForm: form,
+                          onApprove: () =>
+                              _handleApprove(context, viewModel, form),
+                          onDeny: () =>
+                              _handleDeny(context, viewModel, form.workOrderId),
+                          onDetailTap: () async {
+                            final refresh = await context.pushNamed<bool>(
+                              RouteNames.adminRejectionDetail,
+                              pathParameters: {'id': form.id},
+                            );
+                            if (refresh == true && context.mounted) {
+                              ZentSuccessPopup.show(
+                                context,
+                                'Rejection request resolved successfully!',
+                              );
+                              viewModel.loadRejectedWorkOrders();
+                            }
+                          },
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
     );
   }
 
-  void _handleApprove(
+  Future<void> _handleApprove(
     BuildContext context,
     RejectedWorkOrdersViewModel viewModel,
-    dynamic wo,
-  ) {
-    viewModel.approveRejection(wo).then((error) {
-      if (error != null && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $error')));
-      }
-    });
+    RejectForm form,
+  ) async {
+    final error = await viewModel.approveRejection(form);
+    if (!context.mounted) return;
+    if (error != null) {
+      ZentErrorPopup.show(context, 'Error: $error');
+    } else {
+      ZentSuccessPopup.show(
+        context,
+        'Approved work order rejection successfully!',
+      );
+    }
   }
 
-  void _handleDeny(
+  Future<void> _handleDeny(
     BuildContext context,
     RejectedWorkOrdersViewModel viewModel,
-    String id,
-  ) {
-    viewModel.denyRejection(id).then((error) {
-      if (error != null && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $error')));
-      }
-    });
+    String workOrderId,
+  ) async {
+    final error = await viewModel.denyRejection(workOrderId);
+    if (!context.mounted) return;
+    if (error != null) {
+      ZentErrorPopup.show(context, 'Error: $error');
+    } else {
+      ZentSuccessPopup.show(
+        context,
+        'Denied work order rejection successfully!',
+      );
+    }
   }
 }

@@ -8,7 +8,6 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart'
     show AppAssets;
 import 'package:zent_fe/di/injection_container.dart' as di;
-import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/common/notifications/notification_navigator.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/routing/route_names.dart';
@@ -16,6 +15,7 @@ import 'viewmodels/technician_home_viewmodel.dart';
 import 'widgets/tech_home_header.dart';
 import 'widgets/tech_stats_row.dart';
 import 'widgets/schedule_item_card.dart';
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 
 class TechnicianHomeScreen extends StatelessWidget {
   const TechnicianHomeScreen({super.key});
@@ -24,14 +24,7 @@ class TechnicianHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => di.sl<TechnicianHomeViewModel>()..fetchTodaySchedule(),
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
-          ),
-        ],
-        child: const _TechnicianHomeContent(),
-      ),
+      child: const _TechnicianHomeContent(),
     );
   }
 }
@@ -45,6 +38,8 @@ class _TechnicianHomeContent extends StatefulWidget {
 
 class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
   bool _pendingProcessed = false;
+  bool _wasVisible =
+      true; // Initialized to true to avoid double fetch on first load
 
   @override
   void didChangeDependencies() {
@@ -55,6 +50,40 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
         final role = context.read<AuthViewModel>().role;
         NotificationNavigator.processPendingNotification(context, role);
       });
+    }
+    // Refresh notifications unread count on entry
+    context.read<NotificationsViewModel>().fetchUnreadCount();
+
+    // Auto-reload schedule and metrics when returning to or arriving at Home screen
+    _checkAndReloadData();
+  }
+
+  void _checkAndReloadData() {
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
+
+    bool isHomeTab = true;
+    try {
+      final shell = StatefulNavigationShell.of(context);
+      isHomeTab = shell.currentIndex == 0;
+    } catch (_) {}
+
+    final isVisible = isCurrentRoute && isHomeTab;
+
+    if (_wasVisible != isVisible) {
+      _wasVisible = isVisible;
+      if (isVisible) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            try {
+              context.read<TechnicianHomeViewModel>().fetchTodaySchedule(
+                silent: true,
+              );
+            } catch (e) {
+              debugPrint("Error reloading home data on return: $e");
+            }
+          }
+        });
+      }
     }
   }
 
@@ -94,6 +123,14 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
                         StatefulNavigationShell.of(context).goBranch(3);
                       } catch (e) {
                         debugPrint('Error navigating to profile: $e');
+                      }
+                    },
+                    onViewAllTapped: () {
+                      try {
+                        StatefulNavigationShell.of(context).goBranch(1);
+                      } catch (e) {
+                        debugPrint('Error navigating to Work Orders: $e');
+                        context.goNamed(RouteNames.techWorkOrder);
                       }
                     },
                   ),
@@ -161,12 +198,19 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
                               final item = viewModel.todaySchedule[index];
                               return ScheduleItemCard(
                                 item: item,
-                                onTap: () {
+                                onTap: () async {
                                   if (item.id.isNotEmpty) {
-                                    context.pushNamed(
+                                    await context.pushNamed(
                                       RouteNames.techWorkOrderDetails,
                                       pathParameters: {'workOrderId': item.id},
                                     );
+                                    if (context.mounted) {
+                                      try {
+                                        context
+                                            .read<TechnicianHomeViewModel>()
+                                            .fetchTodaySchedule(silent: true);
+                                      } catch (_) {}
+                                    }
                                   } else {
                                     debugPrint(
                                       "action triggered: tap on mock item ${item.title}",
@@ -181,7 +225,7 @@ class _TechnicianHomeContentState extends State<_TechnicianHomeContent> {
                           jobsDone: viewModel.jobsDone,
                           averageRating: viewModel.averageRating,
                         ),
-                        const SizedBox(height: AppDimens.spaceXl),
+                        const SizedBox(height: 56.0),
                       ],
                     ),
                   ),

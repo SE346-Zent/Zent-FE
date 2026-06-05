@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 
 class SecurityCardContainer extends StatelessWidget {
   final Widget child;
@@ -22,7 +23,8 @@ class SecurityCardContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface100, // #FFFFFF
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
-        border: Border.all(color: AppColors.secondary100, width: 1.0),
+        border: Border.all(color: AppColors.secondary100, width: 1.5),
+        boxShadow: [BoxShadowStyles.subtle],
       ),
       padding: const EdgeInsets.all(AppDimens.spaceMd),
       child: child,

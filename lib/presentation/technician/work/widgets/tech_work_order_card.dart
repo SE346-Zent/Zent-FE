@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
+import '../viewmodels/tech_work_order_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -29,7 +32,7 @@ class WorkOrderCard extends StatelessWidget {
         : AppColors.surface600;
 
     // Status Color Processing
-    Color statusColor = AppColors.tertiary400;
+    Color statusColor = AppColors.tertiary500;
     if (isCompleted) {
       statusColor = AppColors.success500;
     }
@@ -88,7 +91,11 @@ class WorkOrderCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6.0),
                   Text(
-                    order.status.name.toUpperCase(),
+                    order.statusId == 2
+                        ? 'ASSIGNED'
+                        : order.statusId == 3
+                        ? 'IN PROGRESS'
+                        : order.status.name.toUpperCase(),
                     style: TextStyles.label.copyWith(color: statusColor),
                   ),
                 ],
@@ -121,34 +128,66 @@ class WorkOrderCard extends StatelessWidget {
               text: 'View Details',
               textColor: AppColors.tertiary500,
               bgColor: AppColors.tertiary50,
-              onPressed: () {
-                context.pushNamed(
-                  RouteNames.techWorkOrderDetails,
-                  pathParameters: {'workOrderId': order.id},
-                );
-              },
+              onPressed: order.id.isNotEmpty
+                  ? () async {
+                      await context.pushNamed(
+                        RouteNames.techWorkOrderDetails,
+                        pathParameters: {'workOrderId': order.id},
+                      );
+                      if (context.mounted) {
+                        try {
+                          context.read<TechWorkOrderViewModel>().refreshData(
+                            silent: true,
+                          );
+                        } catch (_) {}
+                      }
+                    }
+                  : null,
             )
           else
             Row(
               children: [
                 Expanded(
                   child: _buildActionButton(
-                    text: isPending ? 'Start Job' : 'Complete',
+                    text: (order.statusId == 1 || order.statusId == 2)
+                        ? 'Start Job'
+                        : 'Complete',
                     textColor: AppColors.surface100,
                     bgColor: AppColors.tertiary500,
-                    onPressed: () {
-                      context.pushNamed(
-                        RouteNames.techWorkOrderDetails,
-                        pathParameters: {'workOrderId': order.id},
-                      );
-                    },
+                    onPressed: order.id.isNotEmpty
+                        ? () async {
+                            await context.pushNamed(
+                              RouteNames.techWorkOrderDetails,
+                              pathParameters: {'workOrderId': order.id},
+                            );
+                            if (context.mounted) {
+                              try {
+                                context
+                                    .read<TechWorkOrderViewModel>()
+                                    .refreshData(silent: true);
+                              } catch (_) {}
+                            }
+                          }
+                        : null,
                   ),
                 ),
                 const SizedBox(width: 12.0),
-                GestureDetector(
-                  onTap: () {
-                    // Quick Action: maybe navigation or status change
-                  },
+                ThrottledGestureDetector(
+                  onTap: order.id.isNotEmpty
+                      ? () async {
+                          await context.pushNamed(
+                            RouteNames.techWorkOrderDetails,
+                            pathParameters: {'workOrderId': order.id},
+                          );
+                          if (context.mounted) {
+                            try {
+                              context
+                                  .read<TechWorkOrderViewModel>()
+                                  .refreshData(silent: true);
+                            } catch (_) {}
+                          }
+                        }
+                      : null,
                   child: Container(
                     height: 44.0,
                     width: 44.0,
@@ -192,9 +231,9 @@ class WorkOrderCard extends StatelessWidget {
     required String text,
     required Color textColor,
     required Color bgColor,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(AppDimens.boraSm),
       child: Container(

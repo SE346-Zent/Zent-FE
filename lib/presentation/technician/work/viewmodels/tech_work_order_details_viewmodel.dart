@@ -1,14 +1,17 @@
-import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
 import 'package:zent_fe/domain/entities/enums/work_order_status.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_single_work_order_usecase.dart';
-import 'package:zent_fe/data/repositories/work_order_repository_impl.dart';
+import 'package:zent_fe/domain/repositories/work_order_repository.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:zent_fe/main.dart' show rootScaffoldMessengerKey;
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
 
 class TaskChecklistItem {
   final String title;
@@ -39,12 +42,18 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     required this.getSingleWorkOrderUseCase,
     required this.sharedPreferences,
   }) {
-    _loadDetails();
+    loadDetails();
   }
 
   String get jobName => workOrder?.title ?? "Laptop Repair";
   String get status {
     if (workOrder == null) return "In Progress";
+    if (workOrder!.statusId == 2) {
+      return "Assigned";
+    }
+    if (workOrder!.statusId == 3) {
+      return "In Progress";
+    }
     switch (workOrder!.status) {
       case WorkOrderStatus.pending:
         return "Pending";
@@ -60,6 +69,7 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
   }
 
   String get customerName => workOrder?.customerName ?? "John Doe";
+  String? get customerAvatarUrl => workOrder?.customerAvatarUrl;
   String get customerAddress =>
       workOrder?.addressString ?? "123 Hoa Binh, Quan Tan Phu, TPHCM";
 
@@ -68,14 +78,68 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
       ? workOrder!.workOrderNum
       : workOrderId;
 
-  // Timer state
-  final int _hours = 12;
-  final int _minutes = 22;
-  final int _seconds = 11;
+  String get symptom => workOrder?.title ?? '';
+  String get description => workOrder?.description ?? '';
+  String get appointmentFormatted {
+    final dt = workOrder?.appointment;
+    if (dt == null) return 'N/A';
+    final now = DateTime.now();
+    final isToday =
+        dt.year == now.year && dt.month == now.month && dt.day == now.day;
+    final timeStr = DateFormat("hh:mm a").format(dt);
+    if (isToday) {
+      return '$timeStr - Today';
+    } else {
+      return '$timeStr - ${DateFormat("dd/MM/yyyy").format(dt)}';
+    }
+  }
 
-  int get hours => _hours;
-  int get minutes => _minutes;
-  int get seconds => _seconds;
+  // Timer state
+  Timer? _timer;
+  Duration _elapsedDuration = Duration.zero;
+
+  int get hours => _elapsedDuration.inHours;
+  int get minutes => _elapsedDuration.inMinutes.remainder(60);
+  int get seconds => _elapsedDuration.inSeconds.remainder(60);
+
+  void _startTimer() {
+    _timer?.cancel();
+    _updateElapsedDuration();
+
+    // Only run periodic timer if the job is currently "In Progress" (statusId == 3)
+    final isTimerActive = workOrder?.statusId == 3;
+    if (isTimerActive && workOrder?.startAt != null) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        _updateElapsedDuration();
+      });
+    }
+  }
+
+  void _updateElapsedDuration() {
+    final start = workOrder?.startAt;
+    if (start == null) {
+      _elapsedDuration = Duration.zero;
+      notifyListeners();
+      return;
+    }
+
+    final isCompleted =
+        workOrder?.status == WorkOrderStatus.complete ||
+        workOrder?.statusId == 4;
+
+    if (isCompleted) {
+      final end = workOrder?.closedAt ?? workOrder?.updatedAt ?? DateTime.now();
+      _elapsedDuration = end.isAfter(start)
+          ? end.difference(start)
+          : Duration.zero;
+    } else {
+      final now = DateTime.now();
+      _elapsedDuration = now.isAfter(start)
+          ? now.difference(start)
+          : Duration.zero;
+    }
+    notifyListeners();
+  }
 
   // Checklist state
   final List<TaskChecklistItem> _checklist = [
@@ -140,13 +204,14 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     await sharedPreferences.setStringList(key, listToSave);
   }
 
-  Future<void> _loadDetails() async {
+  Future<void> loadDetails() async {
     _isLoading = true;
     notifyListeners();
     try {
       final cleanId = workOrderId.replaceAll('#', '');
       workOrder = await getSingleWorkOrderUseCase.execute(cleanId);
       await _loadChecklistFromLocal();
+      _startTimer();
     } catch (e) {
       debugPrint("Error loading work order: $e");
     } finally {
@@ -177,26 +242,30 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     }
   }
 
-  Future<void> onContactPressed() async {
-    final phone = workOrder?.phoneNumber;
-    if (phone == null || phone.isEmpty) {
-      debugPrint("No phone number available for contact");
-      rootScaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(
-          content: Text('No phone number available for this customer.'),
-        ),
-      );
-      return;
-    }
-
-    final url = Uri.parse("tel:${phone.replaceAll(' ', '')}");
+  Future<void> onContactPressed(BuildContext context) async {
     try {
-      await launchUrl(url);
+      final phone = workOrder?.phoneNumber;
+      if (phone == null || phone.isEmpty) {
+        throw BusinessException('No phone number available for this customer.');
+      }
+
+      final url = Uri.parse("tel:${phone.replaceAll(' ', '')}");
+      try {
+        await launchUrl(url);
+      } catch (e) {
+        throw BusinessException('Could not open phone dialer: $e');
+      }
+    } on BusinessException catch (e) {
+      if (context.mounted) {
+        ZentErrorPopup.show(context, e.message);
+      }
     } catch (e) {
-      debugPrint("Error launching phone dialer: $e");
-      rootScaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(content: Text('Could not open phone dialer: $e')),
-      );
+      if (context.mounted) {
+        ZentErrorPopup.show(
+          context,
+          e.toString().replaceAll('Exception: ', ''),
+        );
+      }
     }
   }
 
@@ -210,43 +279,42 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
 
   // Start Job with Geofencing
   Future<void> startJob(BuildContext context) async {
+    debugPrint("=== START JOB TRIGGERED ===");
+    debugPrint("Work Order ID: $workOrderId");
     _isLoading = true;
     notifyListeners();
     try {
       // 1. Get current GPS location
+      debugPrint("Retrieving current GPS location...");
       final pos = await _getCurrentLocation();
-      final lat = pos?.latitude ?? 10.7769; // Fallback to HCM
-      final lng = pos?.longitude ?? 106.7009;
+      final lat = pos.latitude;
+      final lng = pos.longitude;
+      debugPrint("Current GPS Location: lat=$lat, lng=$lng");
 
       // 2. Call Start Job API
-      final repo = sl<WorkOrderRepositoryImpl>();
+      final repo = sl<WorkOrderRepository>();
       final cleanId = workOrderId.replaceAll('#', '');
+      debugPrint("Calling startWorkOrder API for cleanId=$cleanId...");
       await repo.startWorkOrder(cleanId, lat, lng);
+      debugPrint("startWorkOrder API call completed successfully!");
 
       // 3. Refresh work order details
-      await _loadDetails();
-
+      debugPrint("Refreshing work order details...");
+      await loadDetails();
+      debugPrint(
+        "Work order details refreshed successfully. Current status: $status",
+      );
+    } on BusinessException catch (e) {
+      debugPrint("BusinessException caught: ${e.message}");
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Job started successfully!')),
-        );
+        ZentErrorPopup.show(context, e.message);
       }
     } catch (e) {
+      debugPrint("Exception caught during startJob: $e");
       if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Start Job Failed'),
-            content: Text(
-              'Geofencing / Verification Error:\n\n${e.toString().replaceAll('Exception: ', '')}\n\nYou must be within 2 km of the address to start this job.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+        ZentErrorPopup.show(
+          context,
+          'Start Job Failed: ${e.toString().replaceAll('Exception: ', '')}',
         );
       }
     } finally {
@@ -255,31 +323,41 @@ class TechWorkOrderDetailsViewModel extends ChangeNotifier
     }
   }
 
-  Future<Position?> _getCurrentLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return null;
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return null;
-      }
-
-      if (permission == LocationPermission.deniedForever) return null;
-
-      try {
-        return await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.high,
-            timeLimit: Duration(seconds: 5),
-          ),
-        );
-      } catch (_) {
-        return null;
-      }
-    } catch (_) {
-      return null;
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled. Please enable GPS.');
     }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permission denied.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception(
+        'Location permissions are permanently denied. Please enable them in settings.',
+      );
+    }
+
+    try {
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 5),
+        ),
+      );
+    } catch (e) {
+      throw Exception('Failed to retrieve GPS location: ${e.toString()}');
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }

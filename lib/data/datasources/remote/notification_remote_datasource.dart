@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../models/notification_list_item_model.dart';
+import '../../models/notification_preference_model.dart';
 import '../../models/api_response.dart';
 import '../local/auth_local_datasource.dart';
 
@@ -14,6 +15,10 @@ abstract class NotificationRemoteDataSource {
   });
 
   Future<int> getUnreadCount();
+
+  Future<List<NotificationPreferenceModel>> getNotificationPreferences();
+
+  Future<void> updateNotificationPreference(int categoryId, bool osEnabled);
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -80,20 +85,79 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
   @override
   Future<int> getUnreadCount() async {
-    final uri = Uri.parse(
-      '$_baseURL/notifications',
-    ).replace(queryParameters: {'page': '1', 'limit': '1'});
+    final uri = Uri.parse('$_baseURL/notifications/unread-count');
     final headers = await _getHeaders();
 
     final response = await client.get(uri, headers: headers);
 
     if (response.statusCode == 200) {
       final jsonMap = json.decode(response.body);
-      final meta = jsonMap['meta'];
-      if (meta != null && meta['unreadCount'] != null) {
-        return meta['unreadCount'] as int;
+      // Support both { data: N } and { data: { unreadCount: N } }
+      final data = jsonMap['data'];
+      if (data is int) return data;
+      if (data is Map && data['unreadCount'] != null) {
+        return (data['unreadCount'] as num).toInt();
       }
       return 0;
+    } else {
+      throw Exception('Server error: ${response.statusCode}');
+    }
+  }
+
+  @override
+  Future<List<NotificationPreferenceModel>> getNotificationPreferences() async {
+    final uri = Uri.parse('$_baseURL/notifications/preferences');
+    final headers = await _getHeaders();
+
+    final response = await client.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final jsonMap = json.decode(response.body);
+      final apiResponse = ApiResponse<List<dynamic>>.fromJson(
+        jsonMap,
+        (data) => data as List<dynamic>,
+      );
+
+      if (apiResponse.isSuccessful && apiResponse.data != null) {
+        return apiResponse.data!
+            .map(
+              (e) => NotificationPreferenceModel.fromJson(
+                e as Map<String, dynamic>,
+              ),
+            )
+            .toList();
+      } else {
+        throw Exception(apiResponse.message ?? 'Failed to fetch preferences');
+      }
+    } else {
+      throw Exception('Server error: ${response.statusCode}');
+    }
+  }
+
+  @override
+  Future<void> updateNotificationPreference(
+    int categoryId,
+    bool osEnabled,
+  ) async {
+    final uri = Uri.parse('$_baseURL/notifications/preferences');
+    final headers = await _getHeaders();
+    final body = json.encode({
+      'categoryId': categoryId,
+      'osEnabled': osEnabled,
+    });
+
+    final response = await client.put(uri, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      final jsonMap = json.decode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+
+      if (!apiResponse.isSuccessful) {
+        throw Exception(apiResponse.message ?? 'Failed to update preference');
+      }
     } else {
       throw Exception('Server error: ${response.statusCode}');
     }

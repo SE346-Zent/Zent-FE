@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'viewmodels/complete_work_order_viewmodel.dart';
@@ -29,12 +31,39 @@ class CompleteWorkOrderScreen extends StatelessWidget {
   }
 }
 
-class _CompleteWorkOrderContent extends StatelessWidget {
+class _CompleteWorkOrderContent extends StatefulWidget {
   const _CompleteWorkOrderContent();
+
+  @override
+  State<_CompleteWorkOrderContent> createState() =>
+      _CompleteWorkOrderContentState();
+}
+
+class _CompleteWorkOrderContentState extends State<_CompleteWorkOrderContent> {
+  bool _isDiagnosticOpen = false;
+  int _lastStep = 0;
+
+  TextEditingController _getStepController(
+    CompleteWorkOrderViewModel viewModel,
+  ) {
+    if (viewModel.currentStep == 0) {
+      return viewModel.diagnosticNote1Controller;
+    } else if (viewModel.currentStep == 1) {
+      return viewModel.diagnosticNote2Controller;
+    } else {
+      return viewModel.diagnosticNote3Controller;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CompleteWorkOrderViewModel>();
+
+    // Collapse diagnostic notes automatically when switching steps
+    if (viewModel.currentStep != _lastStep) {
+      _isDiagnosticOpen = false;
+      _lastStep = viewModel.currentStep;
+    }
 
     // Show verification error popup if any
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -69,14 +98,11 @@ class _CompleteWorkOrderContent extends StatelessWidget {
                 AccountHeader(
                   title: "Complete Work Order",
                   subtitle:
-                      "${viewModel.workOrderNum.isNotEmpty ? viewModel.workOrderNum : viewModel.workOrderId} • 12h30 AM",
+                      "${viewModel.workOrderNum.isNotEmpty ? viewModel.workOrderNum : viewModel.workOrderId} • ${viewModel.appointmentFormatted}",
                   showDivider: true,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    physics: viewModel.currentStep == 4
-                        ? const NeverScrollableScrollPhysics()
-                        : null,
                     padding: const EdgeInsets.all(AppDimens.spaceMd),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -87,7 +113,8 @@ class _CompleteWorkOrderContent extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimens.spaceMd),
                         _buildStepContent(viewModel),
-                        const SizedBox(height: AppDimens.spaceLg),
+                        if (viewModel.currentStep == 4)
+                          const SizedBox(height: 120),
                       ],
                     ),
                   ),
@@ -100,6 +127,183 @@ class _CompleteWorkOrderContent extends StatelessWidget {
                 ),
               ],
             ),
+            // Floating diagnostic drawer tab/drawer overlay on Step 1, 2, and 3
+            if (viewModel.currentStep < 3)
+              _isDiagnosticOpen
+                  ? Positioned(
+                      right: 16,
+                      top: MediaQuery.of(context).size.height * 0.20,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 320,
+                            height: 350,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: AppColors.tertiary300,
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 12,
+                                  offset: const Offset(-4, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Diagnostic notes',
+                                  style: TextStyles.title.copyWith(
+                                    color: AppColors.primary500,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: AppColors.secondary100,
+                                      ),
+                                    ),
+                                    child: TextField(
+                                      controller: _getStepController(viewModel),
+                                      maxLines: null,
+                                      expands: true,
+                                      enabled: !viewModel.isReadOnly,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      style: TextStyles.bodyMedium.copyWith(
+                                        color: viewModel.isReadOnly
+                                            ? AppColors.secondary300
+                                            : AppColors.primary500,
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText:
+                                            'Describe how it was used or any specific details...',
+                                        hintStyle: TextStyles.bodyMedium
+                                            .copyWith(
+                                              color: AppColors.secondary100,
+                                            ),
+                                        border: InputBorder.none,
+                                        contentPadding: const EdgeInsets.all(
+                                          12,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            left: -24,
+                            bottom: 16,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isDiagnosticOpen = false;
+                                });
+                              },
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.tertiary300,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: 24,
+                                      top: 1,
+                                      bottom: 1,
+                                      right: -2,
+                                      child: Container(color: Colors.white),
+                                    ),
+                                    const Center(
+                                      child: Icon(
+                                        Icons.chevron_right,
+                                        color: AppColors.tertiary300,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Positioned(
+                      right: 0,
+                      top: MediaQuery.of(context).size.height * 0.20,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isDiagnosticOpen = true;
+                          });
+                        },
+                        child: Container(
+                          width: 32,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                              left: BorderSide(
+                                color: AppColors.tertiary300,
+                                width: 1.5,
+                              ),
+                              top: BorderSide(
+                                color: AppColors.tertiary300,
+                                width: 1.5,
+                              ),
+                              bottom: BorderSide(
+                                color: AppColors.tertiary300,
+                                width: 1.5,
+                              ),
+                            ),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(24),
+                              bottomLeft: Radius.circular(24),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 6,
+                                offset: const Offset(-2, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Align(
+                            alignment: Alignment(-0.2, 0.0),
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: AppColors.tertiary300,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
             if (viewModel.isPhotoUploading || viewModel.isLoading)
               Container(
                 color: Colors.black38,
@@ -259,13 +463,9 @@ class _CompleteWorkOrderContent extends StatelessWidget {
     if (!viewModel.isReadOnly) {
       if (viewModel.currentStep == 0) {
         if (viewModel.prePhotos.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Vui lòng chụp ít nhất 1 ảnh trước tháo (Pre-disassembly)!',
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
+          ZentErrorPopup.show(
+            context,
+            'Vui lòng chụp ít nhất 1 ảnh trước tháo (Pre-disassembly)!',
           );
           return;
         }
@@ -273,13 +473,9 @@ class _CompleteWorkOrderContent extends StatelessWidget {
 
       if (viewModel.currentStep == 1) {
         if (viewModel.duringPhotos.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Vui lòng chụp ít nhất 1 ảnh đang tháo (Disassembled)!',
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
+          ZentErrorPopup.show(
+            context,
+            'Vui lòng chụp ít nhất 1 ảnh đang tháo (Disassembled)!',
           );
           return;
         }
@@ -287,13 +483,9 @@ class _CompleteWorkOrderContent extends StatelessWidget {
 
       if (viewModel.currentStep == 2) {
         if (viewModel.postPhotos.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Vui lòng chụp ít nhất 1 ảnh hoàn thiện (Post-assembly)!',
-              ),
-              backgroundColor: Colors.redAccent,
-            ),
+          ZentErrorPopup.show(
+            context,
+            'Vui lòng chụp ít nhất 1 ảnh hoàn thiện (Post-assembly)!',
           );
           return;
         }

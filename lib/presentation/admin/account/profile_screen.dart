@@ -5,10 +5,12 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'widgets/profile_menu_options.dart';
 import 'widgets/profile_user_info.dart';
 import 'viewmodels/profile_viewmodel.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:zent_fe/domain/entities/enums/user_roles.dart' show UserRoles;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -27,7 +29,19 @@ class _ProfileScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<ProfileViewModel>();
+    final authViewModel = context.watch<AuthViewModel>();
+    final userName = authViewModel.currentUser?.name ?? 'Admin';
+    String role = 'Administrator';
+    if (authViewModel.currentUser?.role != null) {
+      final r = authViewModel.currentUser!.role;
+      if (r == UserRoles.superAdmin) {
+        role = 'Super Admin';
+      } else if (r == UserRoles.admin) {
+        role = 'Administrator';
+      } else {
+        role = r.name[0].toUpperCase() + r.name.substring(1);
+      }
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background500,
@@ -50,10 +64,21 @@ class _ProfileScreenContent extends StatelessWidget {
                   showLeading: false,
                 ),
                 const SizedBox(height: AppDimens.spaceLg),
-                Avatar(name: viewModel.userInfo.userName),
+                Avatar(
+                  name: userName,
+                  imageUrl: authViewModel.currentUser?.avatarUrl,
+                  onTap: () =>
+                      context.read<ProfileViewModel>().updateAvatar(context),
+                ),
                 const SizedBox(height: AppDimens.spaceMd),
                 // User Info
-                ProfileUserInfo(userInfo: viewModel.userInfo),
+                ProfileUserInfo(
+                  userInfo: UserProfileInfo(
+                    userName: userName,
+                    role: role,
+                    avatarUrl: '',
+                  ),
+                ),
                 const SizedBox(height: AppDimens.spaceXl),
                 // Menu Items
                 const Padding(

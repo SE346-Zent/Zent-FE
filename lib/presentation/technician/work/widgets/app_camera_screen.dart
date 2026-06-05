@@ -1,7 +1,9 @@
-import 'package:camerawesome/camerawesome_plugin.dart';
+﻿import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
 class AppCameraScreen extends StatefulWidget {
@@ -15,9 +17,75 @@ class AppCameraScreen extends StatefulWidget {
 class _AppCameraScreenState extends State<AppCameraScreen> {
   String? _capturedFilePath;
   bool _isPressed = false;
+  bool _hasError = false;
+  bool _permissionChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCameraPermission();
+  }
+
+  Future<void> _checkCameraPermission() async {
+    final status = await Permission.camera.status;
+    if (!status.isGranted) {
+      final requestStatus = await Permission.camera.request();
+      if (mounted) {
+        setState(() {
+          _hasError = !requestStatus.isGranted;
+          _permissionChecked = true;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _hasError = false;
+          _permissionChecked = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_permissionChecked) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+
+    if (_hasError) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.camera_alt_outlined,
+                color: Colors.white54,
+                size: 64,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Camera is unavailable',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () => context.pop(),
+                child: const Text(
+                  'Go Back',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -80,7 +148,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
                             bottom: 30,
                           ), // Positioned in the middle of black bar
                           child: Center(
-                            child: GestureDetector(
+                            child: ThrottledGestureDetector(
                               behavior: HitTestBehavior.opaque,
                               onTapDown: (_) =>
                                   setState(() => _isPressed = true),
@@ -166,7 +234,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
           Positioned(
             top: MediaQuery.of(context).padding.top + 10,
             left: 20,
-            child: GestureDetector(
+            child: ThrottledGestureDetector(
               onTap: () => context.pop(),
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -192,7 +260,7 @@ class _AppCameraScreenState extends State<AppCameraScreen> {
     required VoidCallback onTap,
     required Color color,
   }) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),

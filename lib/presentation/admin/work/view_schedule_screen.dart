@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -6,7 +7,9 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
+import 'package:intl/intl.dart';
 
 import 'viewmodels/view_schedule_viewmodel.dart';
 
@@ -68,11 +71,28 @@ class _ViewScheduleScreenContent extends StatelessWidget {
             children: [
               _buildProfileCard(viewModel),
               const SizedBox(height: AppDimens.spaceLg),
-              _buildCalendarHeader(),
+              _buildCalendarHeader(context, viewModel),
               const SizedBox(height: AppDimens.spaceMd),
               _buildCalendarStrip(viewModel),
               const SizedBox(height: AppDimens.spaceLg),
-              ...viewModel.workOrders.map((wo) => _buildJobCard(wo)),
+              if (viewModel.isLoading)
+                const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary500),
+                )
+              else if (viewModel.workOrders.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'No work orders for this date',
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.secondary500,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                ...viewModel.workOrders.map((wo) => _buildJobCard(wo)),
             ],
           ),
         ),
@@ -91,27 +111,25 @@ class _ViewScheduleScreenContent extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.network(
-              viewModel.technician['avatar'],
+          if (viewModel.technician['avatar'] != null &&
+              viewModel.technician['avatar'].toString().isNotEmpty)
+            AppNetworkImage(
+              url: viewModel.technician['avatar']?.toString(),
               width: 56,
               height: 56,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 56,
-                  height: 56,
-                  color: AppColors.secondary200,
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                );
-              },
+              borderRadius: BorderRadius.circular(8.0),
+            )
+          else
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.secondary300,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: const Icon(Icons.person, color: Colors.white, size: 32),
             ),
-          ),
           const SizedBox(width: 12.0),
           Expanded(
             child: Column(
@@ -133,7 +151,8 @@ class _ViewScheduleScreenContent extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: '${viewModel.technician['rating']}',
+                  text:
+                      '${viewModel.technician['averageRating'] ?? viewModel.technician['rating'] ?? "5.0"}',
                   style: TextStyles.bodyLarge.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -153,15 +172,31 @@ class _ViewScheduleScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildCalendarHeader() {
+  Widget _buildCalendarHeader(
+    BuildContext context,
+    ViewScheduleViewModel viewModel,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'April 22',
+          DateFormat('MMMM dd').format(viewModel.selectedDate),
           style: TextStyles.middle.copyWith(color: Colors.black),
         ),
-        const Icon(Icons.calendar_today_outlined, color: Colors.black),
+        GestureDetector(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: viewModel.selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+            );
+            if (date != null) {
+              viewModel.pickDate(date);
+            }
+          },
+          child: const Icon(Icons.calendar_today_outlined, color: Colors.black),
+        ),
       ],
     );
   }
@@ -181,7 +216,7 @@ class _ViewScheduleScreenContent extends StatelessWidget {
           final isSelected = index == viewModel.selectedDateIndex;
 
           return Expanded(
-            child: GestureDetector(
+            child: ThrottledGestureDetector(
               onTap: () => viewModel.selectDate(index),
               behavior: HitTestBehavior.opaque,
               child: Container(

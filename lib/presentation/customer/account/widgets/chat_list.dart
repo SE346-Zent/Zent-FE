@@ -26,7 +26,7 @@ class ChatList extends StatelessWidget {
         pathParameters: {'chatId': chat.id},
         queryParameters: {'name': chat.name},
       );
-    } else if (role == UserRoles.admin) {
+    } else if (role == UserRoles.admin || role == UserRoles.superAdmin) {
       context.pushNamed(
         'adminDetailedChat',
         pathParameters: {'chatId': chat.id},
@@ -158,7 +158,7 @@ class ChatList extends StatelessWidget {
       color: AppColors.tertiary500,
       child: ListView.builder(
         itemCount: viewModel.chats.length,
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.only(top: 8.0, bottom: 48.0),
         physics: const AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final chat = viewModel.chats[index];

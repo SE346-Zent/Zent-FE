@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import '../themes/colors.dart';
 import '../themes/text_styles.dart';
@@ -17,14 +18,24 @@ class CustomerMainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      body: navigationShell,
-      bottomNavigationBar: SafeArea(
-        bottom: true,
-        child: _CustomerBottomNavBar(
-          currentIndex: navigationShell.currentIndex,
-          onTap: _onNavTap,
+    final canPop = navigationShell.currentIndex == 0;
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (navigationShell.currentIndex != 0) {
+          _onNavTap(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        body: navigationShell,
+        bottomNavigationBar: SafeArea(
+          bottom: true,
+          child: _CustomerBottomNavBar(
+            currentIndex: navigationShell.currentIndex,
+            onTap: _onNavTap,
+          ),
         ),
       ),
     );
@@ -98,7 +109,7 @@ class _NavBarItem extends StatelessWidget {
     final color = isSelected ? AppColors.tertiary300 : AppColors.secondary300;
 
     return Expanded(
-      child: InkWell(
+      child: ThrottledInkWell(
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

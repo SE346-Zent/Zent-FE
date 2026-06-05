@@ -7,7 +7,6 @@ import 'package:zent_fe/domain/entities/enums/user_roles.dart';
 import 'package:zent_fe/routing/route_names.dart';
 
 import 'package:provider/provider.dart';
-import 'package:zent_fe/di/injection_container.dart' as di;
 import 'package:zent_fe/domain/entities/notification_item.dart';
 
 import 'viewmodels/notifications_viewmodel.dart';
@@ -19,11 +18,7 @@ class NotificationsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          di.sl<NotificationsViewModel>()..fetchNotifications(refresh: true),
-      child: const _NotificationsListScreenContent(),
-    );
+    return const _NotificationsListScreenContent();
   }
 }
 
@@ -43,6 +38,9 @@ class _NotificationsListScreenContentState
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NotificationsViewModel>().fetchNotifications(refresh: true);
+    });
   }
 
   @override
@@ -74,7 +72,10 @@ class _NotificationsListScreenContentState
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => context.pop(),
+                onPressed: () {
+                  context.read<NotificationsViewModel>().fetchUnreadCount();
+                  context.pop();
+                },
               ),
               title: Text(
                 'Notifications',
@@ -236,7 +237,8 @@ class _NotificationsListScreenContentState
                     final category = item.categoryName.toLowerCase();
                     final role = context.read<AuthViewModel>().role;
 
-                    if (role == UserRoles.admin) {
+                    if (role == UserRoles.admin ||
+                        role == UserRoles.superAdmin) {
                       if (category.contains('reject')) {
                         context.pushNamed(
                           RouteNames.adminRejectionDetail,
@@ -254,7 +256,10 @@ class _NotificationsListScreenContentState
                         pathParameters: {'workOrderId': workOrderId},
                       );
                     } else if (role == UserRoles.customer) {
-                      context.pushNamed(RouteNames.customerActiveRepairs);
+                      context.pushNamed(
+                        RouteNames.customerActiveRepairs,
+                        queryParameters: {'workOrderId': workOrderId},
+                      );
                     }
                   }
                 }

@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -22,7 +24,7 @@ class PartSearchItem extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: ThrottledInkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
           child: Padding(
@@ -39,7 +41,7 @@ class PartSearchItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppDimens.boraSm),
                     image: DecorationImage(
-                      image: NetworkImage(part.imageUrl),
+                      image: CachedNetworkImageProvider(part.imageUrl),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -61,12 +63,17 @@ class PartSearchItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 2.0),
                       Text(
-                        'Part No: ${part.partNo} | Commodity: ${part.commodity}',
+                        'Part No: ${part.partNo}',
                         style: TextStyles.label.copyWith(
                           color: AppColors.secondary500,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2.0),
+                      Text(
+                        'Commodity: ${part.commodity}',
+                        style: TextStyles.label.copyWith(
+                          color: AppColors.secondary500,
+                        ),
                       ),
                     ],
                   ),

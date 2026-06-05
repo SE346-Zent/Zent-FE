@@ -44,112 +44,134 @@ class _CustomerNotificationsView extends StatelessWidget {
         showBottomDivider: true,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimens.spaceMd),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'NOTIFICATIONS',
-                style: TextStyles.display.copyWith(
-                  color: AppColors.primary500,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: AppDimens.spaceSm),
-              Text(
-                'Manage how you receive updates about my notifications.',
-                style: TextStyles.bodyLarge.copyWith(
-                  color: AppColors.secondary500,
-                ),
-              ),
-              const SizedBox(height: AppDimens.spaceMd),
-
-              // Section: Communication
-              _buildSectionTitle('Communication'),
-              _buildSwitchRow(
-                title: 'Direct message',
-                subtitle: 'Chat messages from admin',
-                value: viewModel.directMessage,
-                onChanged: (val) => viewModel.toggleSetting('directMsg', val),
-              ),
-
-              // Section: Work Order
-              _buildSectionTitle('Work Order'),
-              _buildSwitchRow(
-                title: 'Tracking',
-                subtitle: 'Follows the active work orders',
-                value: viewModel.tracking,
-                onChanged: (val) => viewModel.toggleSetting('tracking', val),
-              ),
-              _buildSwitchRow(
-                title: 'Appointment reminders',
-                subtitle: 'Follows the active work orders',
-                value: viewModel.appointmentReminders,
-                onChanged: (val) =>
-                    viewModel.toggleSetting('appointmentReminders', val),
-              ),
-              _buildSwitchRow(
-                title: 'Invoice',
-                subtitle: 'Receive digital receipts reminders',
-                value: viewModel.invoice,
-                onChanged: (val) => viewModel.toggleSetting('invoice', val),
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-
-              // Info Box: Push Permissions
-              Container(
-                padding: const EdgeInsets.all(AppDimens.spaceSm),
-                decoration: BoxDecoration(
-                  color: AppColors.tertiary50,
-                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                  border: Border.all(color: AppColors.tertiary500),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        child: viewModel.preferences.isEmpty && viewModel.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(AppDimens.spaceMd),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.info_outline,
-                      color: AppColors.tertiary500,
+                    Text(
+                      'NOTIFICATIONS',
+                      style: TextStyles.display.copyWith(
+                        color: AppColors.primary500,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                    const SizedBox(width: AppDimens.spaceSm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Push Permissions',
-                            style: TextStyles.bodyLarge.copyWith(
-                              color: Colors.black,
-                            ),
+                    const SizedBox(height: AppDimens.spaceSm),
+                    Text(
+                      'Manage how you receive updates about my notifications.',
+                      style: TextStyles.bodyLarge.copyWith(
+                        color: AppColors.secondary500,
+                      ),
+                    ),
+                    const SizedBox(height: AppDimens.spaceMd),
+
+                    // Section: Communication
+                    _buildSectionTitle('Communication'),
+                    _buildSwitchRow(
+                      title: 'Direct message',
+                      subtitle: 'Chat messages from technician and support',
+                      value: viewModel.directMessage,
+                      onChanged: viewModel.toggleDirectMessage,
+                    ),
+                    const SizedBox(height: AppDimens.spaceMd),
+
+                    // Section: Work Order
+                    if (viewModel.preferences.isNotEmpty) ...[
+                      _buildSectionTitle('Work Order'),
+                      ...viewModel.preferences.map((pref) {
+                        final displayName =
+                            pref.categorySlug == 'work_order_assigned'
+                            ? 'Work Order Assignment'
+                            : pref.categoryName;
+                        return _buildSwitchRow(
+                          title: displayName,
+                          subtitle: _getSubtitleForSlug(pref.categorySlug),
+                          value: viewModel.isEnabled(
+                            pref.categoryId,
+                            pref.osEnabled,
                           ),
-                          Text(
-                            'To receive these alerts, ensure notifications are enabled in your device settings',
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary300,
+                          onChanged: (val) =>
+                              viewModel.toggleSetting(pref.categoryId, val),
+                        );
+                      }),
+                      const SizedBox(height: AppDimens.spaceLg),
+                    ],
+
+                    // Info Box: Push Permissions
+                    Container(
+                      padding: const EdgeInsets.all(AppDimens.spaceSm),
+                      decoration: BoxDecoration(
+                        color: AppColors.tertiary50,
+                        borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                        border: Border.all(color: AppColors.tertiary500),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.info_outline,
+                            color: AppColors.tertiary500,
+                          ),
+                          const SizedBox(width: AppDimens.spaceSm),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Push Permissions',
+                                  style: TextStyles.bodyLarge.copyWith(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  'To receive these alerts, ensure notifications are enabled in your device settings',
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary300,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: AppDimens.spaceXl),
+
+                    // Save Button
+                    CustomerPrimaryButton(
+                      text: 'Save Settings',
+                      icon: Icons.save_outlined,
+                      isLoading: viewModel.isLoading,
+                      onPressed: () => viewModel.saveSettings(context),
+                    ),
+                    const SizedBox(height: AppDimens.spaceLg),
                   ],
                 ),
               ),
-              const SizedBox(height: AppDimens.spaceXl),
-
-              // Save Button
-              CustomerPrimaryButton(
-                text: 'Save Settings',
-                icon: Icons.save_outlined,
-                onPressed: () => viewModel.saveSettings(context),
-              ),
-              const SizedBox(height: AppDimens.spaceLg),
-            ],
-          ),
-        ),
       ),
     );
+  }
+
+  String _getSubtitleForSlug(String slug) {
+    switch (slug) {
+      case 'work_order_assigned':
+        return 'Receive notifications when a technician is assigned to your work order';
+      case 'about_to_start':
+        return 'Get reminded when your scheduled service is about to start';
+      case 'work_order_rejection_form':
+        return 'Notifications about rejected work orders';
+      case 'add_new_part':
+        return 'Receive alerts when new parts are requested or added';
+      case 'work_order_escalation':
+        return 'Alerts when a work order needs escalation';
+      case 'chat_message':
+        return 'Receive alerts for direct chat messages';
+      default:
+        return 'Receive notifications for this category';
+    }
   }
 
   Widget _buildSectionTitle(String title) {

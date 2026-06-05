@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../routing/route_names.dart';
@@ -43,7 +44,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
         return Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 onTap: () => Navigator.pop(ctx),
                 behavior: HitTestBehavior.opaque,
                 child: const SizedBox.expand(),
@@ -250,7 +251,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
+              ThrottledGestureDetector(
                 onTap: () {
                   final cleanId = viewModel.orderId.replaceAll('#', '');
                   context.pushNamed(
@@ -353,7 +354,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
                     'Select Technician',
                     style: TextStyles.headline.copyWith(color: Colors.black),
                   ),
-                  GestureDetector(
+                  ThrottledGestureDetector(
                     key: _filterKey,
                     onTap: () => _showSortingDialog(context),
                     child: const Icon(Icons.filter_list, color: Colors.black),
@@ -388,7 +389,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
   }
 
   Widget _buildInfoCard(IconData icon, String text, VoidCallback? onTap) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(

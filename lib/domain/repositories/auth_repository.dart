@@ -1,5 +1,6 @@
 import 'package:zent_fe/domain/entities/user.dart';
 import 'package:zent_fe/domain/entities/login_history_entry.dart';
+import 'package:zent_fe/domain/entities/user_session.dart';
 
 abstract class AuthRepository {
   Future<User> login({
@@ -23,6 +24,12 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
+  Future<void> updateProfile({
+    required String fullName,
+    required String phone,
+    required String email,
+  });
+
   Future<void> refreshToken();
   Future<bool> restoreSession();
 
@@ -30,7 +37,7 @@ abstract class AuthRepository {
 
   Future<void> setFirstTimeDone();
 
-  Future<void> forgotPassword(String email);
+  Future<void> forgotPassword(String email, {bool useRecoveryEmail = false});
 
   Future<List<User>> getUsers({int page = 1, int pageSize = 50, String? role});
 
@@ -43,4 +50,26 @@ abstract class AuthRepository {
   });
 
   Future<List<LoginHistoryEntry>> getLoginHistory();
+
+  Future<void> setRecoveryEmail({
+    required String recoveryEmail,
+    required String password,
+  });
+
+  Future<void> verifyRecoveryEmail({required String otpCode});
+
+  Future<Map<String, dynamic>> getTechnicianMetrics();
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+  Future<String> uploadAvatar(String filePath);
+  Future<void> updateUserStatus(String userId, int statusId);
+  Future<void> closeAccount();
+  Future<User> getMe();
+  Future<User> getUserById(String userId);
+  Future<List<UserSession>> getActiveSessions();
+  Future<void> revokeSession(String sessionId);
+  Future<void> revokeAllOtherSessions();
 }

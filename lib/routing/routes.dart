@@ -36,6 +36,7 @@ abstract final class Routes {
 
   static const adminNotifications = 'admin-notifications';
   static const adminUserManagement = 'admin-user-management';
+  static const adminStaffDetail = 'staff-detail/:userId';
   static const adminSecuritySettings = 'admin-security-settings';
   static const adminSystemLog = 'admin-system-log';
   static const adminChooseRoleCreateAccount =
@@ -62,8 +63,10 @@ abstract final class Routes {
   static const inventorySearch = 'inventory-search';
   static const techSecuritySettings = 'tech-security-settings';
   static const techWorkOrderHistory = 'work-order-history';
+  static const techDetailedHistory = 'detailed-history/:workOrderId';
   static const customerSecuritySettings = 'customer-security-settings';
   static const customerNotifications = 'customer-notifications';
+  static const customerNotificationsList = 'notifications-list';
   static const notifications = 'notifications';
   static const personalInfo = 'personal-info';
   static const appCamera = '/app-camera';
@@ -75,6 +78,9 @@ abstract final class Routes {
   static const activeRepairs = 'active-repairs';
   static const customerCancelWorkOrder = 'cancel-work-order/:workOrderId';
   static const customerWorkOrderHistory = 'work-order-history';
+  static const customerEditWorkOrder =
+      'edit-work-order/:workOrderId/:workOrderNumber';
+  static const customerWorkOrderDetails = 'work-order-details/:workOrderId';
 
   // // auth route builders
   // static String getAuthForgetPasswordRoute() => '$login/$forgetPassword';

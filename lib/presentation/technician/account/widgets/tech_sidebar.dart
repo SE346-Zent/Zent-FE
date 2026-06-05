@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -10,6 +11,7 @@ import 'sidebar_menu_item.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/auth/logout_usecase.dart';
 import 'package:zent_fe/routing/routes.dart';
+import 'package:zent_fe/presentation/customer/account/viewmodels/detailed_chat_viewmodel.dart';
 
 class TechSidebar extends StatelessWidget {
   final String userName;
@@ -25,6 +27,7 @@ class TechSidebar extends StatelessWidget {
 
   Future<void> _onLogoutPressed(BuildContext context) async {
     try {
+      DetailedChatViewModel.clearCache();
       await sl<LogoutUseCase>().execute();
     } catch (e) {
       debugPrint("Error during logout: $e");
@@ -89,26 +92,6 @@ class TechSidebar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SidebarMenuItem(
-                      title: "QR Code Scanner",
-                      icon: const Icon(
-                        Icons.qr_code_scanner,
-                        color: AppColors.surface100,
-                      ),
-                      isActive: true,
-                      onTap: () {
-                        Navigator.pop(context); // Close the drawer first
-                        context.pushNamed(
-                          RouteNames.qrScanner,
-                          extra: {
-                            'onScanned': (String result) {
-                              debugPrint('Sidebar QR Scanned: $result');
-                            },
-                          },
-                        );
-                      },
-                    ),
-
-                    SidebarMenuItem(
                       title: "Part Search",
                       icon: const Icon(
                         Icons.inventory_2_outlined,
@@ -136,7 +119,7 @@ class TechSidebar extends StatelessWidget {
                     Container(height: 1.0, color: AppColors.secondary50),
                     const SizedBox(height: AppDimens.spaceMd),
                     // Logout Action
-                    InkWell(
+                    ThrottledInkWell(
                       onTap: () => _onLogoutPressed(context),
                       borderRadius: BorderRadius.circular(AppDimens.boraSm),
                       child: Padding(
@@ -168,17 +151,6 @@ class TechSidebar extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-
-            // Footer Section
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-              child: Text(
-                appVersion,
-                style: TextStyles.middle.copyWith(
-                  color: AppColors.secondary200,
                 ),
               ),
             ),

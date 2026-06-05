@@ -7,10 +7,13 @@ class InventoryPartModel extends InventoryPart {
     required super.serialNumber,
     super.productId,
     super.partConditionId,
+    super.partConditionName,
+    super.partTypeName,
     super.manufacturedDate,
     super.installationDate,
     super.removalDate,
     super.scrappedDate,
+    super.imageUrl,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -27,6 +30,13 @@ class InventoryPartModel extends InventoryPart {
       productId: json['ProductID'] as String? ?? json['product_id'] as String?,
       partConditionId:
           json['PartConditionID'] as int? ?? json['part_condition_id'] as int?,
+      partConditionName:
+          json['PartConditionName'] as String? ??
+          json['part_condition_name'] as String? ??
+          json['PartCondition'] as String? ??
+          json['part_condition'] as String?,
+      partTypeName:
+          json['PartTypeName'] as String? ?? json['part_type_name'] as String?,
       manufacturedDate: _parseDate(
         json['ManufacturedDate'] as String?,
         fallback: json['manufactured_date'] as String?,
@@ -43,6 +53,7 @@ class InventoryPartModel extends InventoryPart {
         json['ScrappedDate'] as String?,
         fallback: json['scrapped_date'] as String?,
       ),
+      imageUrl: json['image_url'] as String? ?? json['ImageUrl'] as String?,
       createdAt: DateTime.parse(
         (json['CreatedAt'] as String?) ?? (json['created_at'] as String),
       ),

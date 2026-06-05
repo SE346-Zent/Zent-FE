@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zent_fe/data/services/chat_service.dart';
+import 'detailed_chat_viewmodel.dart';
 
 class ChatPreview {
   final String id;
@@ -92,16 +93,10 @@ class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
 
         if (room.latestMessageAt != null) {
           try {
-            String dateStr = room.latestMessageAt!;
-            dateStr = dateStr.replaceAll(
-              RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'),
-              r'$1',
-            );
-            if (dateStr.endsWith('+00:00:00')) {
-              dateStr = dateStr.replaceAll('+00:00:00', 'Z');
+            parsedDt = ChatMessage.parseDateTime(room.latestMessageAt);
+            if (parsedDt != null) {
+              formattedTime = DateFormat('HH:mm').format(parsedDt.toLocal());
             }
-            parsedDt = DateTime.parse(dateStr);
-            formattedTime = DateFormat('HH:mm').format(parsedDt.toLocal());
           } catch (e) {
             debugPrint(
               'Failed to parse date: ${room.latestMessageAt}, error: $e',
@@ -142,20 +137,11 @@ class ChatViewModel extends ChangeNotifier with SafeChangeNotifier {
           return -1;
         }
         try {
-          String aStr = a.latestMessageAt!;
-          aStr = aStr.replaceAll(RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'), r'$1');
-          if (aStr.endsWith('+00:00:00')) {
-            aStr = aStr.replaceAll('+00:00:00', 'Z');
-          }
-
-          String bStr = b.latestMessageAt!;
-          bStr = bStr.replaceAll(RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'), r'$1');
-          if (bStr.endsWith('+00:00:00')) {
-            bStr = bStr.replaceAll('+00:00:00', 'Z');
-          }
-
-          final aDt = DateTime.parse(aStr);
-          final bDt = DateTime.parse(bStr);
+          final aDt = ChatMessage.parseDateTime(a.latestMessageAt);
+          final bDt = ChatMessage.parseDateTime(b.latestMessageAt);
+          if (aDt == null && bDt == null) return 0;
+          if (aDt == null) return 1;
+          if (bDt == null) return -1;
           return bDt.compareTo(aDt); // descending
         } catch (_) {
           return 0;

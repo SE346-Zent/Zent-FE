@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
 import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
@@ -12,16 +14,19 @@ class TechHomeHeader extends StatelessWidget {
   final String userName;
   final VoidCallback onMenuTapped;
   final VoidCallback onProfileTapped;
+  final VoidCallback onViewAllTapped;
 
   const TechHomeHeader({
     super.key,
     required this.userName,
     required this.onMenuTapped,
     required this.onProfileTapped,
+    required this.onViewAllTapped,
   });
 
   @override
   Widget build(BuildContext context) {
+    final avatarUrl = context.watch<AuthViewModel>().currentUser?.avatarUrl;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,7 +40,7 @@ class TechHomeHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  GestureDetector(
+                  ThrottledGestureDetector(
                     onTap: onMenuTapped,
                     behavior: HitTestBehavior.opaque,
                     child: const Icon(
@@ -60,7 +65,7 @@ class TechHomeHeader extends StatelessWidget {
                       final hasUnread = viewModel.unreadCount > 0;
                       return Stack(
                         children: [
-                          GestureDetector(
+                          ThrottledGestureDetector(
                             onTap: () {
                               context.pushNamed(RouteNames.techNotifications);
                             },
@@ -71,17 +76,33 @@ class TechHomeHeader extends StatelessWidget {
                           ),
                           if (hasUnread)
                             Positioned(
-                              top: 0,
-                              right: 0,
+                              top: -4,
+                              right: -4,
                               child: Container(
-                                width: 8,
-                                height: 8,
+                                padding: const EdgeInsets.all(2),
                                 decoration: BoxDecoration(
                                   color: AppColors.tertiary500,
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: AppColors.primary500,
                                     width: 1.5,
+                                  ),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    viewModel.unreadCount > 99
+                                        ? '99+'
+                                        : '${viewModel.unreadCount}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
@@ -91,9 +112,21 @@ class TechHomeHeader extends StatelessWidget {
                     },
                   ),
                   const SizedBox(width: AppDimens.spaceSm),
-                  GestureDetector(
+                  ThrottledGestureDetector(
                     onTap: onProfileTapped,
-                    child: UserAvatar(name: userName, size: 30),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2.0),
+                      ),
+                      child: UserAvatar(
+                        name: userName,
+                        avatarUrl: avatarUrl,
+                        size: 30,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -140,10 +173,8 @@ class TechHomeHeader extends StatelessWidget {
                       color: AppColors.primary400,
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      debugPrint("action triggered: View All");
-                    },
+                  ThrottledInkWell(
+                    onTap: onViewAllTapped,
                     child: Text(
                       "View All",
                       style: TextStyles.label.copyWith(

@@ -128,3 +128,23 @@ class GetScmLutsUseCase {
     return await repository.getScmLuts();
   }
 }
+
+class GetScmAssetsUseCase {
+  final InventoryRepository repository;
+
+  GetScmAssetsUseCase(this.repository);
+
+  Future<Map<String, dynamic>> execute() async {
+    return await repository.getScmAssets();
+  }
+}
+
+class ExportInventoryAssetsUseCase {
+  final InventoryRepository repository;
+
+  ExportInventoryAssetsUseCase(this.repository);
+
+  Future<String> execute({String? query}) async {
+    return await repository.exportInventoryAssets(query: query);
+  }
+}

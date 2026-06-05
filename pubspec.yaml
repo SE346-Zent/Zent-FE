@@ -65,6 +65,12 @@ dependencies:
   firebase_app_installations: ^0.3.3
   flutter_bloc: ^9.1.0
   url_launcher: ^6.3.2
+  cached_network_image: ^3.4.1
+  device_info_plus: ^13.1.0
+  open_file: ^3.5.11
+  image: ^4.8.0
+  http_parser: ^4.1.2
+  gal: ^2.3.2
 
 dev_dependencies:
   flutter_test:

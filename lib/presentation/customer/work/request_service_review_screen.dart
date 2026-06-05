@@ -108,8 +108,8 @@ class _RequestServiceReviewScreenState
         emailVal: emailCtrl.text,
         phoneVal: phoneCtrl.text,
         countryVal: vm.country,
+        provinceVal: vm.province,
         wardVal: vm.ward,
-        cityVal: vm.city,
         addressVal: vm.address,
         buildingVal: vm.building,
       );
@@ -126,8 +126,8 @@ class _RequestServiceReviewScreenState
         emailVal: vm.email,
         phoneVal: vm.phone,
         countryVal: vm.country,
+        provinceVal: vm.province,
         wardVal: vm.ward,
-        cityVal: vm.city,
         addressVal: addressCtrl.text,
         buildingVal: buildingCtrl.text,
       );
@@ -182,62 +182,138 @@ class _RequestServiceReviewScreenState
           ),
           const SizedBox(height: AppDimens.spaceMd),
 
-          // Product Card - Simplified to show selected info without real product validation
-          IntrinsicHeight(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface200,
-                borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                border: Border.all(color: AppColors.secondary100, width: 1),
-                boxShadow: [BoxShadowStyles.subtle],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    width: 6,
-                    decoration: const BoxDecoration(
-                      color: AppColors.tertiary500,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(AppDimens.boraMd),
-                        bottomLeft: Radius.circular(AppDimens.boraMd),
+          // Product Card
+          Builder(
+            builder: (context) {
+              final String productName =
+                  viewModel.selectedProductName ?? 'Unknown Device';
+              final String productSn = viewModel.selectedSerialNumber ?? 'N/A';
+              final String productModel =
+                  viewModel.selectedProductModel ?? 'N/A';
+
+              const Color statusTextColor = AppColors.success500;
+              const String displayStatus = 'In warranty';
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppDimens.boraMd),
+                  border: Border.all(color: AppColors.secondary100, width: 1.0),
+                  boxShadow: [BoxShadowStyles.subtle],
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        width: 6,
+                        decoration: const BoxDecoration(
+                          color: AppColors.tertiary500,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(AppDimens.boraMd),
+                            bottomLeft: Radius.circular(AppDimens.boraMd),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppDimens.spaceMd),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            viewModel.selectedSerialNumber ?? 'N/A',
-                            style: TextStyles.headline.copyWith(
-                              color: AppColors.tertiary500,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppDimens.spaceMd),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                productName,
+                                style: TextStyles.headline.copyWith(
+                                  color: AppColors.primary500,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'S/N',
+                                          style: TextStyles.label.copyWith(
+                                            color: AppColors.secondary400,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          productSn,
+                                          style: TextStyles.bodyMedium.copyWith(
+                                            color: AppColors.primary500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Model (MTM)',
+                                          style: TextStyles.label.copyWith(
+                                            color: AppColors.secondary400,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          productModel.isNotEmpty
+                                              ? productModel
+                                              : 'N/A',
+                                          style: TextStyles.bodyMedium.copyWith(
+                                            color: AppColors.primary500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Warranty Status',
+                                          style: TextStyles.label.copyWith(
+                                            color: AppColors.secondary400,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          displayStatus,
+                                          style: TextStyles.bodyMedium.copyWith(
+                                            color: statusTextColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Seeded Product ID:',
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary600,
-                            ),
-                          ),
-                          Text(
-                            viewModel.selectedProductId ?? 'N/A',
-                            style: TextStyles.bodyMedium.copyWith(
-                              color: Colors.black,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: AppDimens.spaceMd),
 
@@ -380,14 +456,15 @@ class _RequestServiceReviewScreenState
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
-                  label: 'Ward',
-                  value: viewModel.ward,
-                  items: viewModel.wards
-                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  label: 'Province/City',
+                  value: viewModel.province,
+                  items: viewModel.provinces
+                      .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateWard(v);
+                      viewModel.updateProvince(v);
+                      setState(() {});
                     }
                   },
                   isRequired: true,
@@ -396,17 +473,19 @@ class _RequestServiceReviewScreenState
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerDropdownField<String>(
                   label: 'Ward',
-                  value: viewModel.city,
-                  items: viewModel.availableCities
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  value: viewModel.ward,
+                  items: viewModel.availableWards
+                      .map((w) => DropdownMenuItem(value: w, child: Text(w)))
                       .toList(),
                   onChanged: (v) {
                     if (v != null) {
-                      viewModel.updateCity(v);
+                      viewModel.updateWard(v);
+                      setState(() {});
                     }
                   },
                   isRequired: true,
                   readOnly: !viewModel.isEditingAddress,
+                  isSearchable: true,
                 ),
                 const SizedBox(height: AppDimens.spaceMd),
                 CustomerTextField(

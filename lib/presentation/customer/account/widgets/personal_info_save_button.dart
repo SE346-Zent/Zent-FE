@@ -13,7 +13,7 @@ class PersonalInfoSaveButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppDimens.spaceMd),
       child: SaveChangesButton(
         onPressed: () {
-          context.read<PersonalInfoViewModel>().saveChanges();
+          context.read<PersonalInfoViewModel>().saveChanges(context);
           debugPrint("action triggered: save personal info changes");
         },
       ),

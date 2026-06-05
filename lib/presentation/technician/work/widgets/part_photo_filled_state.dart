@@ -1,5 +1,6 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 
@@ -30,7 +31,7 @@ class PartPhotoFilledState extends StatelessWidget {
           if (index == photos.length) {
             // Add more button
             return Center(
-              child: GestureDetector(
+              child: ThrottledGestureDetector(
                 onTap: onAddTap,
                 child: Container(
                   width: 90.0,
@@ -65,7 +66,7 @@ class PartPhotoFilledState extends StatelessWidget {
                 Positioned(
                   top: 4,
                   right: 4,
-                  child: GestureDetector(
+                  child: ThrottledGestureDetector(
                     onTap: () => onRemoveTap(index),
                     child: Container(
                       decoration: const BoxDecoration(

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -84,7 +85,7 @@ class _ChooseRoleScreenContent extends StatelessWidget {
                       ),
                       child: Material(
                         color: Colors.transparent,
-                        child: InkWell(
+                        child: ThrottledInkWell(
                           borderRadius: BorderRadius.circular(8),
                           onTap: () {
                             context.pushNamed(
@@ -133,7 +134,7 @@ class _ChooseRoleScreenContent extends StatelessWidget {
     return Padding(
       // Match the spacing from the screen edges
       padding: const EdgeInsets.symmetric(horizontal: 40.0),
-      child: GestureDetector(
+      child: ThrottledGestureDetector(
         onTap: onTap,
         child: Container(
           width: double.infinity,

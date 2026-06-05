@@ -1,11 +1,13 @@
 import '../../domain/entities/work_order.dart';
 import '../../domain/entities/work_order_completion_draft.dart';
+import '../../domain/entities/reject_form.dart';
 import '../../domain/repositories/work_order_repository.dart';
 import '../datasources/local/work_order_local_datasource.dart';
 import '../datasources/remote/work_order_remote_datasource.dart';
 import '../models/create_work_order_request.dart';
 import '../models/complete_work_order_request.dart';
 import '../models/refuse_work_order_request.dart';
+import '../models/edit_work_order_request.dart';
 import '../models/work_order_completion_draft_model.dart';
 
 class WorkOrderRepositoryImpl implements WorkOrderRepository {
@@ -139,6 +141,14 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   }
 
   @override
+  Future<void> editWorkOrder(
+    String workOrderNumber,
+    EditWorkOrderRequest request,
+  ) async {
+    return await remoteDataSource.editWorkOrder(workOrderNumber, request);
+  }
+
+  @override
   Future<void> saveWorkOrderDraft(WorkOrderCompletionDraft draft) async {
     final model = WorkOrderCompletionDraftModel.fromEntity(draft);
     await localDataSource.cacheWorkOrderDraft(model);
@@ -154,5 +164,23 @@ class WorkOrderRepositoryImpl implements WorkOrderRepository {
   @override
   Future<void> clearWorkOrderDraft(String workOrderId) async {
     await localDataSource.clearWorkOrderDraft(workOrderId);
+  }
+
+  @override
+  Future<List<RejectForm>> getRejectForms({String? province}) async {
+    final models = await remoteDataSource.getRejectForms(province: province);
+    return models.map((m) => m.toEntity()).toList();
+  }
+
+  @override
+  Future<RejectForm> getRejectFormById(
+    String rejectFormId, {
+    String workOrderId = '',
+  }) async {
+    final model = await remoteDataSource.getRejectFormById(
+      rejectFormId,
+      workOrderId: workOrderId,
+    );
+    return model.toEntity();
   }
 }

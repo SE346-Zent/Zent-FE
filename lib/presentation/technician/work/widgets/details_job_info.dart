@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -28,10 +29,12 @@ class DetailsJobInfo extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                viewModel.jobName,
-                style: TextStyles.headline.copyWith(
-                  color: AppColors.primary500,
+              Expanded(
+                child: Text(
+                  viewModel.jobName,
+                  style: TextStyles.headline.copyWith(
+                    color: AppColors.primary500,
+                  ),
                 ),
               ),
               Row(
@@ -63,6 +66,7 @@ class DetailsJobInfo extends StatelessWidget {
                 height: 48,
                 child: Avatar(
                   name: viewModel.customerName,
+                  imageUrl: viewModel.customerAvatarUrl,
                   showEditIcon: false,
                 ),
               ),
@@ -101,8 +105,6 @@ class DetailsJobInfo extends StatelessWidget {
                             style: TextStyles.label.copyWith(
                               color: AppColors.secondary300,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -127,7 +129,7 @@ class DetailsJobInfo extends StatelessWidget {
                 child: _buildActionButton(
                   label: "Contact",
                   icon: Icons.phone_outlined,
-                  onPressed: viewModel.onContactPressed,
+                  onPressed: () => viewModel.onContactPressed(context),
                 ),
               ),
             ],
@@ -142,7 +144,7 @@ class DetailsJobInfo extends StatelessWidget {
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onPressed,
       child: Container(
         height: 48,

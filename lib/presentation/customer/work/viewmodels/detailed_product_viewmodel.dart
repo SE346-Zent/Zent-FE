@@ -1,84 +1,80 @@
-import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/entities/product.dart';
-import 'package:zent_fe/domain/usecases/product/get_my_products_usecase.dart';
-import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
+
+import 'package:zent_fe/domain/entities/product_detail.dart';
 import 'package:zent_fe/domain/usecases/inventory/zent_inventory_usecases.dart';
 import 'package:zent_fe/presentation/common/core/app_assets.dart';
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
-import 'package:intl/intl.dart';
-
-class WarrantyHistoryItem {
-  final String orderNumber;
-  final String date;
-  WarrantyHistoryItem(this.orderNumber, this.date);
-}
 
 class DetailedProductViewModel extends ChangeNotifier with SafeChangeNotifier {
-  final GetMyProductsUseCase getMyProductsUseCase;
-  final GetCurrentUserUseCase getCurrentUserUseCase;
-  final GetProductDetailUseCase? getProductDetailUseCase;
+  final GetProductDetailUseCase getProductDetailUseCase;
 
-  DetailedProductViewModel({
-    required this.getMyProductsUseCase,
-    required this.getCurrentUserUseCase,
-    this.getProductDetailUseCase,
-  });
+  DetailedProductViewModel({required this.getProductDetailUseCase});
 
-  String? currentSerialNumber;
-  Product? product;
-  List<WarrantyHistoryItem> history = [];
+  ProductDetail? productDetail;
   bool isLoading = false;
 
-  Future<void> init(String serialNumber) async {
-    currentSerialNumber = serialNumber;
+  Future<void> init(String productId) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      final user = await getCurrentUserUseCase.execute();
-      if (user != null) {
-        final products = await getMyProductsUseCase.execute(user.id);
-        // Find product by serial number
-        try {
-          product = products.firstWhere((p) => p.serialNumber == serialNumber);
-          debugPrint(
-            '=== [DetailedProductViewModel] Found product: ${product?.name}, productImageUrl: ${product?.productImageUrl}, imagePath: $imagePath ===',
-          );
-        } catch (_) {
-          product = null;
-        }
-      }
+      productDetail = await getProductDetailUseCase.execute(productId);
+      debugPrint(
+        '=== [DetailedProductViewModel] Loaded product detail: ${productDetail?.title} ===',
+      );
     } catch (e) {
-      debugPrint("Error fetching detailed product: $e");
+      debugPrint(
+        '=== [DetailedProductViewModel] Error loading product detail: $e ===',
+      );
     } finally {
       isLoading = false;
       notifyListeners();
     }
-
-    // Mock Data for History (Could be fetched in future)
-    history = [
-      WarrantyHistoryItem('#WO-12345', 'Oct 15'),
-      WarrantyHistoryItem('#WO-12344', 'Oct 14'),
-    ];
-    notifyListeners();
   }
 
-  // UI Helpers
+  // ── UI Computed Properties ──────────────────────────────────────
+
   String get imagePath {
-    if (product != null &&
-        product!.productImageUrl != null &&
-        product!.productImageUrl!.isNotEmpty) {
-      return product!.productImageUrl!;
+    if (productDetail != null &&
+        productDetail!.productImageUrl != null &&
+        productDetail!.productImageUrl!.isNotEmpty) {
+      return productDetail!.productImageUrl!;
     }
-    if (product == null) return AppAssets.laptopA;
-    if (product!.name.toLowerCase().contains('laptop b')) {
+    if (productDetail == null) return AppAssets.laptopA;
+    if (productDetail!.modelName.toLowerCase().contains('laptop b')) {
       return AppAssets.laptopB;
     }
     return AppAssets.laptopA;
   }
 
-  String get warrantyDate {
-    if (product?.warrantyUntil == null) return 'No Warranty';
-    return DateFormat('MMM dd, yyyy').format(product!.warrantyUntil!);
+  String get purchaseDate {
+    if (productDetail?.warranty?.startDate != null) {
+      return DateFormat(
+        'MMM dd, yyyy',
+      ).format(productDetail!.warranty!.startDate!);
+    }
+    return 'NA';
+  }
+
+  String get warrantyEndDate {
+    if (productDetail?.warranty?.endDate != null) {
+      return DateFormat(
+        'MMM dd, yyyy',
+      ).format(productDetail!.warranty!.endDate!);
+    }
+    return 'No Warranty';
+  }
+
+  /// Returns the first active work order from history, if any.
+  String? get activeWorkOrderId {
+    final history = productDetail?.workOrderHistory ?? [];
+    for (final item in history) {
+      final s = item.status.toLowerCase();
+      if (s == 'pending' || s == 'assigned' || s == 'rejectinreview') {
+        return item.workOrderId;
+      }
+    }
+    return null;
   }
 }

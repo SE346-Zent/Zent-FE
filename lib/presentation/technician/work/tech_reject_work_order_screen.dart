@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
@@ -7,9 +8,9 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/ui/button.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
-import 'package:zent_fe/routing/route_names.dart';
 import 'viewmodels/tech_reject_work_order_viewmodel.dart';
 import 'widgets/part_photo_upload.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_success_popup.dart';
 
 class TechRejectWorkOrderScreen extends StatefulWidget {
   final String workOrderId;
@@ -218,7 +219,7 @@ class _TechRejectWorkOrderScreenState extends State<TechRejectWorkOrderScreen> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10.0),
@@ -279,7 +280,11 @@ class _TechRejectWorkOrderScreenState extends State<TechRejectWorkOrderScreen> {
                     viewModel.submitRejection().then((error) {
                       if (context.mounted) {
                         if (error == null) {
-                          context.goNamed(RouteNames.techWorkOrder);
+                          ZentSuccessPopup.show(
+                            context,
+                            'Rejection request submitted successfully!',
+                          );
+                          Navigator.pop(context, true);
                         } else {
                           debugPrint('Rejection Error: $error');
                         }

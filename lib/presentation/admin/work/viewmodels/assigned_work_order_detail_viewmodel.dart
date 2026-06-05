@@ -11,11 +11,14 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
 
   String get orderId => _orderId;
 
+  String displayOrderId = '';
+
   String techAssignedTime = '';
   String symptom = '';
   String description = '';
   String location = '';
   String time = '';
+  String appointment = 'Not set';
 
   Map<String, dynamic> technician = {
     'id': 'TECH-9999',
@@ -40,6 +43,10 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
 
       final workOrder = await repo.getWorkOrderDetail(id: cleanId);
 
+      displayOrderId = workOrder.workOrderNum.isNotEmpty
+          ? workOrder.workOrderNum
+          : _orderId;
+
       symptom = workOrder.symptomName ?? 'N/A';
       description = workOrder.description;
       location = workOrder.addressString;
@@ -50,8 +57,21 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
       techAssignedTime = DateFormat(
         'MMM dd, hh:mm a',
       ).format(workOrder.updatedAt.toLocal());
+      if (workOrder.appointment != null) {
+        appointment = DateFormat(
+          'MMM dd, yyyy - hh:mm a',
+        ).format(workOrder.appointment!.toLocal());
+      } else {
+        appointment = 'Not set';
+      }
       final backendStatus = workOrder.status.name;
       _isRejectInReview = backendStatus == 'rejectInReview';
+
+      final techs = await repo.getTechnicians();
+      final tech = techs.firstWhere(
+        (t) => t['id'] == workOrder.technicianId,
+        orElse: () => <String, dynamic>{},
+      );
 
       technician = {
         'id': workOrder.technicianId,
@@ -59,8 +79,12 @@ class AssignedWorkOrderDetailViewModel extends ChangeNotifier
             (workOrder.technicianName != null &&
                 workOrder.technicianName!.isNotEmpty)
             ? workOrder.technicianName
-            : 'Tech (ID: ${workOrder.technicianId.substring(0, 4)})',
-        'rating': 5.0,
+            : (tech['fullName'] ??
+                  tech['name'] ??
+                  'Tech (ID: ${workOrder.technicianId.substring(0, 4)})'),
+        'rating': tech.isNotEmpty
+            ? (tech['averageRating'] ?? tech['rating'] ?? 0.0)
+            : (workOrder.technicianRating ?? 0.0),
       };
     } catch (e) {
       debugPrint("Lỗi lấy chi tiết đơn hàng: $e");

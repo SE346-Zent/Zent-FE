@@ -14,6 +14,8 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:zent_fe/presentation/common/core/ui/chat_banner_listener.dart';
+import 'package:zent_fe/presentation/common/notifications/viewmodels/notifications_viewmodel.dart';
+import 'package:zent_fe/presentation/common/core/ui/gps_service_guard.dart';
 
 // 1. Create a GlobalKey to control SnackBars from anywhere
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
@@ -41,9 +43,13 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   try {
+    // Hide Android nav bar by default; swipe up from bottom edge to peek it
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
     await dotenv.load(fileName: ".env");
     await di.init();
+
+    // Location permission request deferred to login and layout states to prevent early startup blocks
   } catch (e) {
     developer.log("Local initialization failed: $e");
   }
@@ -59,7 +65,7 @@ Future<void> main() async {
     const InitializationSettings initializationSettings =
         InitializationSettings(
           android: AndroidInitializationSettings(
-            '@mipmap/ic_launcher',
+            '@mipmap/launcher_icon',
           ), // Use your app icon
         );
     await flutterLocalNotificationsPlugin.initialize(
@@ -110,7 +116,8 @@ Future<void> main() async {
   }
 
   try {
-    await _setupFCMForTesting();
+    // Setup FCM for testing asynchronously to prevent blocking runApp()
+    _setupFCMForTesting();
   } catch (e) {
     developer.log("FCM Setup failed: $e");
   }
@@ -154,14 +161,16 @@ void _setupForegroundMessaging() {
       // Use jsonEncode so we can properly parse it in onDidReceiveNotificationResponse
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
-        notification.title,
+        notification.title?.isNotEmpty == true
+            ? notification.title
+            : 'Unknown Product',
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
             channelDescription: channel.description,
-            icon: '@mipmap/ic_launcher',
+            icon: '@mipmap/launcher_icon',
             importance: Importance.max,
             priority: Priority.high,
           ),
@@ -172,19 +181,9 @@ void _setupForegroundMessaging() {
   });
 }
 
-/// Handle notification taps when app is opened from background/killed state.
-/// Saves notification data for deferred navigation after app is fully loaded.
+/// Handle notification taps when app is opened from background state only.
+/// Killed-state taps intentionally do NOT navigate — they only open the app.
 void _setupNotificationTapHandler() {
-  // App was opened by tapping a notification (killed state)
-  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-    if (message != null) {
-      developer.log(
-        'App opened from killed state via notification: ${message.data}',
-      );
-      NotificationNavigator.savePendingNotification(message.data);
-    }
-  });
-
   // App was in background, user tapped notification
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     developer.log(
@@ -192,6 +191,10 @@ void _setupNotificationTapHandler() {
     );
     NotificationNavigator.processNotificationDataDirectly(message.data);
   });
+
+  // Intentionally do NOT handle getInitialMessage (killed-state) here.
+  // Tapping a notification when the app is fully killed should only open
+  // the app to the home screen, not deep-link into a specific chat.
 }
 
 Future<void> fetchInstallationId() async {
@@ -213,20 +216,14 @@ Future<void> fetchInstallationId() async {
 Future<void> _setupFCMForTesting() async {
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    // Notification permission request is deferred to after splash screen removal.
+    // Fetch token silently for background messaging.
+    String? token = await messaging.getToken();
+    developer.log('FCM TOKEN: $token');
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      String? token = await messaging.getToken();
-      developer.log('FCM TOKEN: $token');
-
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-        developer.log('FCM TOKEN REFRESHED: $newToken');
-      });
-    }
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      developer.log('FCM TOKEN REFRESHED: $newToken');
+    });
   } catch (e) {
     developer.log("Error during FCM setup: $e");
   }
@@ -237,8 +234,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => di.sl<AuthViewModel>(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => di.sl<AuthViewModel>()),
+        ChangeNotifierProvider(
+          create: (_) => di.sl<NotificationsViewModel>()..fetchUnreadCount(),
+        ),
+      ],
       child: MaterialApp.router(
         title: 'Zent FE',
         debugShowCheckedModeBanner: false,
@@ -249,7 +251,9 @@ class MyApp extends StatelessWidget {
         ),
         routerConfig: appRouter,
         builder: (context, child) {
-          return ChatBannerListener(child: child ?? const SizedBox.shrink());
+          return GpsServiceGuard(
+            child: ChatBannerListener(child: child ?? const SizedBox.shrink()),
+          );
         },
       ),
     );

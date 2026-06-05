@@ -61,16 +61,24 @@ class _TechWorkOrderView extends StatelessWidget {
             Expanded(
               child: viewModel.isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimens.spaceMd,
+                  : RefreshIndicator(
+                      color: AppColors.tertiary500,
+                      onRefresh: () => viewModel.refreshData(silent: true),
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(
+                          left: AppDimens.spaceMd,
+                          right: AppDimens.spaceMd,
+                          top: AppDimens.spaceSm,
+                          bottom: 56.0,
+                        ),
+                        itemCount: viewModel.filteredOrders.length,
+                        itemBuilder: (context, index) {
+                          return WorkOrderCard(
+                            order: viewModel.filteredOrders[index],
+                          );
+                        },
                       ),
-                      itemCount: viewModel.filteredOrders.length,
-                      itemBuilder: (context, index) {
-                        return WorkOrderCard(
-                          order: viewModel.filteredOrders[index],
-                        );
-                      },
                     ),
             ),
           ],

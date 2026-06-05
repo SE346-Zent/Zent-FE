@@ -16,6 +16,9 @@ class LoginViewModel extends ChangeNotifier with SafeChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _isGoogleLoading = false;
+  bool get isGoogleLoading => _isGoogleLoading;
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
@@ -59,7 +62,7 @@ class LoginViewModel extends ChangeNotifier with SafeChangeNotifier {
   }
 
   Future<User?> loginWithGoogle() async {
-    _isLoading = true;
+    _isGoogleLoading = true;
     _errorMessage = null;
     notifyListeners();
 
@@ -102,7 +105,7 @@ class LoginViewModel extends ChangeNotifier with SafeChangeNotifier {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       return null;
     } finally {
-      _isLoading = false;
+      _isGoogleLoading = false;
       notifyListeners();
     }
   }

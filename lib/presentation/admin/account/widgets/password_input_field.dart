@@ -1,12 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 
 class PasswordInputField extends StatefulWidget {
   final String label;
+  final TextEditingController? controller;
 
-  const PasswordInputField({super.key, required this.label});
+  const PasswordInputField({super.key, required this.label, this.controller});
 
   @override
   State<PasswordInputField> createState() => _PasswordInputFieldState();
@@ -45,6 +47,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
             children: [
               Expanded(
                 child: TextField(
+                  controller: widget.controller,
                   obscureText: _obscureText,
                   decoration: InputDecoration(
                     hintText: '........',
@@ -60,7 +63,7 @@ class _PasswordInputFieldState extends State<PasswordInputField> {
                   ),
                 ),
               ),
-              GestureDetector(
+              ThrottledGestureDetector(
                 onTap: _onToggleVisibility,
                 child: Icon(
                   _obscureText

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 
 // Core Theming
@@ -7,7 +9,7 @@ import '../themes/text_styles.dart';
 import '../themes/boxshadow.dart';
 import '../../../admin/account/widgets/admin_sidebar.dart';
 import '../../../../routing/route_names.dart';
-import '../../../../di/injection_container.dart';
+import 'package:provider/provider.dart';
 import '../../auth/auth_view_model.dart';
 
 class AdminMainLayout extends StatefulWidget {
@@ -20,6 +22,25 @@ class AdminMainLayout extends StatefulWidget {
 }
 
 class _AdminMainLayoutState extends State<AdminMainLayout> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        await Geolocator.requestPermission();
+      }
+    } catch (e) {
+      debugPrint(
+        "Error checking/requesting location permission on admin layout init: $e",
+      );
+    }
+  }
+
   void _goBranch(int index) {
     widget.navigationShell.goBranch(
       index,
@@ -34,48 +55,61 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
     final displayIndex = isQueueScreen
         ? -1
         : widget.navigationShell.currentIndex;
-    final userName = sl<AuthViewModel>().currentUser?.name ?? 'Admin';
-    return Scaffold(
-      backgroundColor: AppColors.background500,
-      resizeToAvoidBottomInset: false,
-      drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
-      drawer: AdminSidebar(userName: userName, adminId: 'ADMIN-1234'),
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
-            ),
-            child: widget.navigationShell,
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              color: AppColors.surface100,
+    final userName =
+        context.watch<AuthViewModel>().currentUser?.name ?? 'Admin';
+    final canPop = widget.navigationShell.currentIndex == 0;
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (widget.navigationShell.currentIndex != 0) {
+          _goBranch(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background500,
+        resizeToAvoidBottomInset: false,
+        drawerScrimColor: AppColors.background500.withValues(alpha: 0.66),
+        drawer: AdminSidebar(userName: userName, adminId: 'ADMIN-1234'),
+        body: Stack(
+          children: [
+            Padding(
               padding: EdgeInsets.only(
-                bottom: MediaQuery.paddingOf(context).bottom,
+                bottom: 70.0 + MediaQuery.paddingOf(context).bottom,
               ),
-              child: _AdminBottomNavBar(
-                currentIndex: displayIndex,
-                onTap: _goBranch,
+              child: widget.navigationShell,
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                color: AppColors.surface100,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.paddingOf(context).bottom,
+                ),
+                child: _AdminBottomNavBar(
+                  currentIndex: displayIndex,
+                  onTap: _goBranch,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: MediaQuery.paddingOf(context).bottom + 70.0 - 30.0,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _AnimatedFAB(
-                onTap: () {
-                  context.pushNamed(RouteNames.adminOperationalQueue);
-                },
+            Positioned(
+              bottom: MediaQuery.paddingOf(context).bottom + 70.0 - 30.0,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _AnimatedFAB(
+                  onTap: () {
+                    if (!isQueueScreen) {
+                      context.pushNamed(RouteNames.adminOperationalQueue);
+                    }
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -94,11 +128,11 @@ class _AnimatedFABState extends State<_AnimatedFAB> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
         setState(() => _isPressed = false);
-        widget.onTap();
+        TapDebounce.call(widget.onTap)?.call();
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedScale(
@@ -194,7 +228,7 @@ class _NavBarItem extends StatelessWidget {
     final color = isSelected ? AppColors.tertiary500 : AppColors.secondary300;
 
     return Expanded(
-      child: InkWell(
+      child: ThrottledInkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8.0),
         child: Column(

@@ -1,5 +1,6 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
@@ -7,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/routing/route_names.dart';
 import 'package:zent_fe/presentation/technician/work/widgets/dashed_border_container.dart';
+import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
 
 /// A reusable, single-phase evidence photo section.
 ///
@@ -155,7 +157,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
           ),
         );
       }
-      return GestureDetector(
+      return ThrottledGestureDetector(
         onTap: () => _onOpenCamera(context),
         child: DashedBorderContainer(
           height: 100,
@@ -183,7 +185,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
             const SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
           if (index == photos.length) {
-            return GestureDetector(
+            return ThrottledGestureDetector(
               onTap: () => _onOpenCamera(context),
               child: Container(
                 width: 100,
@@ -195,23 +197,29 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
               ),
             );
           }
-          return _buildPhotoItem(photos[index], index);
+          return _buildPhotoItem(context, photos[index], index);
         },
       ),
     );
   }
 
-  Widget _buildPhotoItem(String path, int index) {
+  Widget _buildPhotoItem(BuildContext context, String path, int index) {
     return Stack(
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppDimens.boraSm),
-            image: DecorationImage(
-              image: FileImage(File(path)),
-              fit: BoxFit.cover,
+        ThrottledGestureDetector(
+          onTap: () => ImageViewerDialog.show(context, path),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppDimens.boraSm),
+                image: DecorationImage(
+                  image: FileImage(File(path)),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
         ),
@@ -219,7 +227,7 @@ class SinglePhaseEvidencePhotos extends StatelessWidget {
           Positioned(
             top: 4,
             right: 4,
-            child: GestureDetector(
+            child: ThrottledGestureDetector(
               onTap: () => onPhotoRemoved(index),
               child: Container(
                 padding: const EdgeInsets.all(2),

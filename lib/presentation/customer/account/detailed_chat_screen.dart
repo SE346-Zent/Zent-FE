@@ -1,12 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
+import 'package:zent_fe/presentation/common/core/ui/image_viewer_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'viewmodels/detailed_chat_viewmodel.dart';
 
@@ -33,23 +36,6 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
     _scrollController.addListener(_onScroll);
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels <= 100) {
-      _viewModel.loadMoreMessages();
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // According to guide: Send LEAVING when the app goes to background, and VIEWING on resume
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      _viewModel.chatService.stopViewing(widget.chatId);
-    } else if (state == AppLifecycleState.resumed) {
-      _viewModel.chatService.startViewing(widget.chatId);
-    }
-  }
-
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
@@ -59,118 +45,145 @@ class _DetailedChatScreenState extends State<DetailedChatScreen>
     super.dispose();
   }
 
+  bool _didInitialScroll = false;
+
+  void _onScroll() {
+    if (_scrollController.position.pixels <= 100) {
+      _viewModel.loadMoreMessages();
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _viewModel.chatService.stopViewing(widget.chatId);
+    } else if (state == AppLifecycleState.resumed) {
+      _viewModel.chatService.startViewing(widget.chatId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _viewModel,
-      child: _DetailedChatView(scrollController: _scrollController),
-    );
-  }
-}
+      child: Builder(
+        builder: (context) {
+          final viewModel = context.watch<DetailedChatViewModel>();
 
-class _DetailedChatView extends StatelessWidget {
-  final ScrollController scrollController;
-  const _DetailedChatView({required this.scrollController});
+          // Scroll to bottom once on first data load
+          if (!_didInitialScroll &&
+              !viewModel.isLoading &&
+              viewModel.messages.isNotEmpty) {
+            _didInitialScroll = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToBottom();
+            });
+          }
 
-  @override
-  Widget build(BuildContext context) {
-    final viewModel = context.watch<DetailedChatViewModel>();
-
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        backgroundColor: AppColors.surface100,
-        appBar: _buildCustomHeader(context, viewModel.chatPartnerName),
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Vùng hiển thị tin nhắn hoặc loading
-              Expanded(
-                child: viewModel.isLoading && viewModel.messages.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.separated(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(AppDimens.spaceMd),
-                        itemCount:
-                            viewModel.messages.length +
-                            (viewModel.isLoadMoreLoading ? 1 : 0),
-                        separatorBuilder: (context, index) {
-                          final isLoadMore = viewModel.isLoadMoreLoading;
-                          final msgIdx = isLoadMore ? index - 1 : index;
-                          final nextMsgIdx = msgIdx + 1;
-                          if (msgIdx < 0 ||
-                              nextMsgIdx >= viewModel.messages.length) {
-                            return const SizedBox(height: 3.0);
-                          }
-                          final currentMsg = viewModel.messages[msgIdx];
-                          final nextMsg = viewModel.messages[nextMsgIdx];
-                          final gap = currentMsg.isMe != nextMsg.isMe
-                              ? 6.0
-                              : 3.0;
-                          return SizedBox(height: gap);
-                        },
-                        itemBuilder: (context, index) {
-                          if (viewModel.isLoadMoreLoading && index == 0) {
-                            return const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.secondary500,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                          final msgIndex = viewModel.isLoadMoreLoading
-                              ? index - 1
-                              : index;
-                          final msg = viewModel.messages[msgIndex];
-
-                          // Messenger-style time separator calculation
-                          bool showSeparator = false;
-                          if (msgIndex == 0) {
-                            showSeparator = true;
-                          } else {
-                            final prevMsg = viewModel.messages[msgIndex - 1];
-                            final gap = msg.dateTime.difference(
-                              prevMsg.dateTime,
-                            );
-                            if (gap.inMinutes.abs() >= 10) {
-                              showSeparator = true;
-                            }
-                          }
-
-                          final bubble = _buildMessageBubble(
-                            context,
-                            viewModel,
-                            msg,
-                          );
-                          if (showSeparator) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildTimeSeparator(msg.dateTime),
-                                bubble,
-                              ],
-                            );
-                          }
-                          return bubble;
-                        },
-                      ),
+          return ThrottledGestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
+              backgroundColor: AppColors.surface100,
+              appBar: _buildCustomHeader(
+                context,
+                viewModel.chatPartnerName,
+                viewModel.chatPartnerAvatarUrl,
               ),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: viewModel.isLoading && viewModel.messages.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : ListView.separated(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.all(AppDimens.spaceMd),
+                              itemCount:
+                                  viewModel.messages.length +
+                                  (viewModel.isLoadMoreLoading ? 1 : 0),
+                              separatorBuilder: (context, index) {
+                                final isLoadMore = viewModel.isLoadMoreLoading;
+                                final msgIdx = isLoadMore ? index - 1 : index;
+                                final nextMsgIdx = msgIdx + 1;
+                                if (msgIdx < 0 ||
+                                    nextMsgIdx >= viewModel.messages.length) {
+                                  return const SizedBox(height: 3.0);
+                                }
+                                final currentMsg = viewModel.messages[msgIdx];
+                                final nextMsg = viewModel.messages[nextMsgIdx];
+                                final gap = currentMsg.isMe != nextMsg.isMe
+                                    ? 6.0
+                                    : 3.0;
+                                return SizedBox(height: gap);
+                              },
+                              itemBuilder: (context, index) {
+                                if (viewModel.isLoadMoreLoading && index == 0) {
+                                  return const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColors.secondary500,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                final msgIndex = viewModel.isLoadMoreLoading
+                                    ? index - 1
+                                    : index;
+                                final msg = viewModel.messages[msgIndex];
 
-              // Thanh nhập tin nhắn
-              _buildBottomInputArea(context, viewModel),
+                                bool showSeparator = false;
+                                if (msgIndex == 0) {
+                                  showSeparator = true;
+                                } else {
+                                  final prevMsg =
+                                      viewModel.messages[msgIndex - 1];
+                                  final gap = msg.dateTime.difference(
+                                    prevMsg.dateTime,
+                                  );
+                                  if (gap.inMinutes.abs() >= 10) {
+                                    showSeparator = true;
+                                  }
+                                }
 
-              // Nâng thanh chat lên cao một chút
-              const SizedBox(height: AppDimens.spaceMd),
-            ],
-          ),
-        ),
+                                final bubble = _buildMessageBubble(
+                                  context,
+                                  viewModel,
+                                  msg,
+                                );
+                                if (showSeparator) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildTimeSeparator(msg.dateTime),
+                                      bubble,
+                                    ],
+                                  );
+                                }
+                                return bubble;
+                              },
+                            ),
+                    ),
+                    _buildBottomInputArea(context, viewModel),
+                    const SizedBox(height: AppDimens.spaceMd),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -219,12 +232,16 @@ class _DetailedChatView extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildCustomHeader(BuildContext context, String name) {
+  PreferredSizeWidget _buildCustomHeader(
+    BuildContext context,
+    String name,
+    String? avatarUrl,
+  ) {
     return AppBar(
       backgroundColor: AppColors.tertiary400,
       elevation: 4.0,
       shadowColor: const Color(0xFF000000).withValues(alpha: 0.1),
-      shape: const Border(), // sharp/squared
+      shape: const Border(),
       leading: IconButton(
         icon: const Icon(
           Icons.arrow_back_ios_new,
@@ -242,6 +259,7 @@ class _DetailedChatView extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 1.5),
             ),
             child: UserAvatar(
+              avatarUrl: avatarUrl,
               name: name.isEmpty ? 'Chat Partner' : name,
               size: 36,
             ),
@@ -287,7 +305,11 @@ class _DetailedChatView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (!message.isMe) ...[
-          UserAvatar(name: viewModel.chatPartnerName, size: 32),
+          UserAvatar(
+            avatarUrl: viewModel.chatPartnerAvatarUrl,
+            name: viewModel.chatPartnerName,
+            size: 32,
+          ),
           const SizedBox(width: 8),
         ],
         Flexible(
@@ -321,56 +343,48 @@ class _DetailedChatView extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(AppDimens.boraMd),
-                      child: Image.network(
-                        viewModel.chatService.getAttachmentUrl(
-                          message.imageUrl!,
+                      child: ThrottledGestureDetector(
+                        onTap: () => ImageViewerDialog.show(
+                          context,
+                          viewModel.chatService.getAttachmentUrl(
+                            message.imageUrl!,
+                          ),
                         ),
-                        fit: BoxFit.cover,
-                        loadingBuilder:
-                            (
-                              BuildContext context,
-                              Widget child,
-                              ImageChunkEvent? loadingProgress,
-                            ) {
-                              if (loadingProgress == null) {
-                                return child;
-                              }
-                              return Container(
-                                width: 150,
-                                height: 150,
-                                color: AppColors.secondary50,
-                                alignment: Alignment.center,
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes!
-                                        : null,
-                                    valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                          AppColors.secondary400,
-                                        ),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: CachedNetworkImage(
+                            imageUrl: viewModel.chatService.getAttachmentUrl(
+                              message.imageUrl!,
+                            ),
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              width: 150,
+                              height: 150,
+                              color: AppColors.secondary50,
+                              alignment: Alignment.center,
+                              child: const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.secondary400,
                                   ),
                                 ),
-                              );
-                            },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          padding: const EdgeInsets.all(8),
-                          color: Colors.red.shade100,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.error_outline, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text("Failed to load image"),
-                            ],
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              padding: const EdgeInsets.all(8),
+                              color: Colors.red.shade100,
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.error_outline, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text("Failed to load image"),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -424,7 +438,11 @@ class _DetailedChatView extends StatelessWidget {
         ),
         if (message.isMe) ...[
           const SizedBox(width: 8),
-          UserAvatar(name: viewModel.myName, size: 32),
+          UserAvatar(
+            avatarUrl: viewModel.myAvatarUrl,
+            name: viewModel.myName,
+            size: 32,
+          ),
         ],
       ],
     );

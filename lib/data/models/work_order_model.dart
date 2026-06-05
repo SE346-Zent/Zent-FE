@@ -7,6 +7,7 @@ class WorkOrderModel extends WorkOrder {
     required super.title,
     required super.addressString,
     required super.status,
+    super.statusId,
     required super.description,
     required super.rejectReason,
     super.refusalNote = '',
@@ -20,6 +21,7 @@ class WorkOrderModel extends WorkOrder {
     super.customerName = '',
     required super.technicianId,
     super.technicianName,
+    super.technicianRating,
     required super.workOrderNum,
     super.rejectionPhotos = const [],
     super.productName,
@@ -31,6 +33,10 @@ class WorkOrderModel extends WorkOrder {
     super.firstName,
     super.symptomName,
     super.phoneNumber,
+    super.addressLine1,
+    super.customerAvatarUrl,
+    super.technicianAvatarUrl,
+    super.startAt,
   });
 
   factory WorkOrderModel.fromEntity(WorkOrder entity) {
@@ -39,6 +45,7 @@ class WorkOrderModel extends WorkOrder {
       title: entity.title,
       addressString: entity.addressString,
       status: entity.status,
+      statusId: entity.statusId,
       description: entity.description,
       rejectReason: entity.rejectReason,
       refusalNote: entity.refusalNote,
@@ -52,6 +59,7 @@ class WorkOrderModel extends WorkOrder {
       customerName: entity.customerName,
       technicianId: entity.technicianId,
       technicianName: entity.technicianName,
+      technicianRating: entity.technicianRating,
       workOrderNum: entity.workOrderNum,
       rejectionPhotos: entity.rejectionPhotos,
       productName: entity.productName,
@@ -63,10 +71,49 @@ class WorkOrderModel extends WorkOrder {
       firstName: entity.firstName,
       symptomName: entity.symptomName,
       phoneNumber: entity.phoneNumber,
+      addressLine1: entity.addressLine1,
+      customerAvatarUrl: entity.customerAvatarUrl,
+      technicianAvatarUrl: entity.technicianAvatarUrl,
+      startAt: entity.startAt,
     );
   }
 
   factory WorkOrderModel.fromJson(Map<String, dynamic> json) {
+    final rawStatusVal =
+        json['work_order_status_id'] ??
+        json['status_id'] ??
+        json['statusId'] ??
+        json['status'];
+    int? parsedStatusId;
+    if (rawStatusVal is int) {
+      parsedStatusId = rawStatusVal;
+    } else if (rawStatusVal is String) {
+      parsedStatusId = int.tryParse(rawStatusVal);
+      if (parsedStatusId == null) {
+        final s = rawStatusVal
+            .toLowerCase()
+            .replaceAll('_', '')
+            .replaceAll(' ', '');
+        if (s == 'pending' || s.contains('pending')) {
+          parsedStatusId = 1;
+        } else if (s == 'assigned' || s.contains('assigned')) {
+          parsedStatusId = 2;
+        } else if (s == 'inprogress' || s == 'inprog' || s.contains('prog')) {
+          parsedStatusId = 3;
+        } else if (s == 'complete' ||
+            s == 'completed' ||
+            s == 'closed' ||
+            s.contains('complete') ||
+            s.contains('closed')) {
+          parsedStatusId = 4;
+        } else if (s == 'rejectinreview' || s.contains('rejectinreview')) {
+          parsedStatusId = 5;
+        } else if (s == 'rejected' || s.contains('rejected')) {
+          parsedStatusId = 6;
+        }
+      }
+    }
+
     return WorkOrderModel(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
       title:
@@ -78,12 +125,8 @@ class WorkOrderModel extends WorkOrder {
       addressString: _buildAddress(json),
       symptomName:
           json['symptomName'] as String? ?? json['symptom_name'] as String?,
-      status: _parseStatus(
-        json['work_order_status_id'] ??
-            json['status_id'] ??
-            json['statusId'] ??
-            json['status'],
-      ),
+      status: _parseStatus(rawStatusVal),
+      statusId: parsedStatusId,
       description: json['description'] as String? ?? '',
       rejectReason:
           json['reject_reason'] as String? ??
@@ -127,6 +170,18 @@ class WorkOrderModel extends WorkOrder {
       technicianName:
           json['technicianName'] as String? ??
           json['technician_name'] as String?,
+      technicianRating:
+          (json['technicianAverageRating'] as num?)?.toDouble() ??
+          (json['averageRating'] as num?)?.toDouble() ??
+          (json['technician_rating'] as num?)?.toDouble() ??
+          (json['technician'] is Map
+                  ? (json['technician'] as Map)['averageRating'] as num?
+                  : null)
+              ?.toDouble() ??
+          (json['technician'] is Map
+                  ? (json['technician'] as Map)['rating'] as num?
+                  : null)
+              ?.toDouble(),
       workOrderNum:
           json['workOrderNum'] as String? ??
           json['workOrderNumber'] as String? ??
@@ -140,11 +195,13 @@ class WorkOrderModel extends WorkOrder {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
+      productName:
+          json['productName'] as String? ?? json['product_name'] as String?,
       appointment: json['appointment'] != null
           ? DateTime.tryParse(json['appointment'] as String)
           : null,
       building: json['building'] as String?,
-      city: json['city'] as String?,
+      city: json['ward'] as String? ?? json['city'] as String?,
       country: json['country'] as String?,
       email: json['email'] as String?,
       firstName: json['first_name'] as String? ?? json['firstName'] as String?,
@@ -152,6 +209,72 @@ class WorkOrderModel extends WorkOrder {
           json['phoneNumber'] as String? ??
           json['phone_number'] as String? ??
           json['phone'] as String?,
+      addressLine1: json['address'] as String?,
+      customerAvatarUrl:
+          json['customerAvatarUrl'] as String? ??
+          json['customer_avatar_url'] as String? ??
+          json['customerAvatarName'] as String? ??
+          json['customer_avatar_name'] as String? ??
+          json['customerImageUrl'] as String? ??
+          json['customer_image_url'] as String? ??
+          json['customerImage'] as String? ??
+          json['customer_image'] as String? ??
+          json['customerAvatar'] as String? ??
+          json['customer_avatar'] as String? ??
+          json['oppositeImage'] as String? ??
+          json['opposite_image'] as String? ??
+          json['oppositeImageUrl'] as String? ??
+          json['opposite_image_url'] as String? ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarUrl']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatar_url']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarImageName']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatarName']?.toString()
+              : null) ??
+          (json['customer'] is Map
+              ? (json['customer'] as Map)['avatar']?.toString()
+              : null),
+      technicianAvatarUrl:
+          json['technicianAvatarUrl'] as String? ??
+          json['technician_avatar_url'] as String? ??
+          json['technicianAvatarName'] as String? ??
+          json['technician_avatar_name'] as String? ??
+          json['technicianImageUrl'] as String? ??
+          json['technician_image_url'] as String? ??
+          json['technicianImage'] as String? ??
+          json['technician_image'] as String? ??
+          json['technicianAvatar'] as String? ??
+          json['technician_avatar'] as String? ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatarUrl']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatar_url']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatarImageName']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatarName']?.toString()
+              : null) ??
+          (json['technician'] is Map
+              ? (json['technician'] as Map)['avatar']?.toString()
+              : null),
+      startAt: json['startedAt'] != null
+          ? DateTime.tryParse(json['startedAt'] as String)
+          : (json['started_at'] != null
+                ? DateTime.tryParse(json['started_at'] as String)
+                : (json['startAt'] != null
+                      ? DateTime.tryParse(json['startAt'] as String)
+                      : (json['start_at'] != null
+                            ? DateTime.tryParse(json['start_at'] as String)
+                            : null))),
     );
   }
 
@@ -175,10 +298,13 @@ class WorkOrderModel extends WorkOrder {
         case 2:
           return WorkOrderStatus.assigned;
         case 3:
-          return WorkOrderStatus.complete;
+          return WorkOrderStatus
+              .assigned; // In progress -> assigned frontend state
         case 4:
-          return WorkOrderStatus.rejectInReview;
+          return WorkOrderStatus.complete; // Closed -> complete frontend state
         case 5:
+          return WorkOrderStatus.rejectInReview;
+        case 6:
           return WorkOrderStatus.rejected;
         default:
           return WorkOrderStatus.pending;
@@ -227,25 +353,34 @@ class WorkOrderModel extends WorkOrder {
     // Try pre-built string first
     final prebuilt =
         json['addressString'] as String? ?? json['address_string'] as String?;
-    if (prebuilt != null && prebuilt.isNotEmpty) return prebuilt;
+    String addressString = prebuilt ?? '';
 
-    // Build from WorkOrderDetails fields: address, building, ward, city, province, country
-    final parts = <String>[];
-    final address = json['address'] as String?;
-    final building = json['building'] as String?;
-    final ward = json['ward'] as String? ?? json['Ward'] as String?;
-    final city = json['city'] as String?;
-    final province = json['province'] as String?;
-    final country = json['country'] as String?;
+    if (addressString.isEmpty) {
+      // Build from WorkOrderDetails fields: address, building, ward, city, province, country
+      final parts = <String>[];
+      final address = json['address'] as String?;
+      final building = json['building'] as String?;
+      final ward = json['ward'] as String? ?? json['Ward'] as String?;
+      final city = json['city'] as String?;
+      final province = json['province'] as String?;
+      final country = json['country'] as String?;
 
-    if (building != null && building.isNotEmpty) parts.add(building);
-    if (address != null && address.isNotEmpty) parts.add(address);
-    if (ward != null && ward.isNotEmpty) parts.add(ward);
-    if (city != null && city.isNotEmpty) parts.add(city);
-    if (province != null && province.isNotEmpty) parts.add(province);
-    if (country != null && country.isNotEmpty) parts.add(country);
+      if (building != null && building.isNotEmpty) parts.add(building);
+      if (address != null && address.isNotEmpty) parts.add(address);
+      if (ward != null && ward.isNotEmpty) parts.add(ward);
+      if (city != null && city.isNotEmpty) parts.add(city);
+      if (province != null && province.isNotEmpty) parts.add(province);
+      if (country != null && country.isNotEmpty) parts.add(country);
 
-    return parts.join(', ');
+      addressString = parts.join(', ');
+    }
+
+    // Clean address strings by replacing standalone HN and HCM
+    addressString = addressString
+        .replaceAll(RegExp(r'\bHCM\b'), 'Thành phố Hồ Chí Minh')
+        .replaceAll(RegExp(r'\bHN\b'), 'Thành phố Hà Nội');
+
+    return addressString;
   }
 
   Map<String, dynamic> toJson() {
@@ -254,6 +389,7 @@ class WorkOrderModel extends WorkOrder {
       'title': title,
       'address': addressString,
       'status': status.name,
+      'statusId': statusId,
       'description': description,
       'reject_reason': rejectReason,
       'refusal_note': refusalNote,
@@ -276,10 +412,15 @@ class WorkOrderModel extends WorkOrder {
       'email': email,
       'firstName': firstName,
       'phoneNumber': phoneNumber,
+      'addressLine1': addressLine1,
+      'symptomName': symptomName,
       'technician_name': technicianName,
       'work_order_num': workOrderNum,
       'rejection_photos': rejectionPhotos,
-      'symptomName': symptomName,
+      'customerAvatarUrl': customerAvatarUrl,
+      'technicianAvatarUrl': technicianAvatarUrl,
+      'start_at': startAt?.toIso8601String(),
+      'startedAt': startAt?.toIso8601String(),
     };
   }
 }

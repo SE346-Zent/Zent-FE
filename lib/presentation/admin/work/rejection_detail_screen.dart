@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 import 'viewmodels/rejection_detail_viewmodel.dart';
 
 class RejectionDetailScreen extends StatelessWidget {
-  final String workOrderId;
+  final String rejectFormId;
 
-  const RejectionDetailScreen({super.key, required this.workOrderId});
+  const RejectionDetailScreen({super.key, required this.rejectFormId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) =>
-          di.sl<RejectionDetailViewModel>()..loadDetails(workOrderId),
+          di.sl<RejectionDetailViewModel>()..loadDetails(rejectFormId),
       child: const _RejectionDetailContent(),
     );
   }
@@ -101,7 +104,7 @@ class _RejectionDetailContent extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 25.0),
                           child: Text(
-                            wo.refusalReason,
+                            viewModel.reason,
                             style: TextStyles.bodyLarge.copyWith(
                               color: Colors.black,
                             ),
@@ -128,7 +131,7 @@ class _RejectionDetailContent extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 25.0),
                           child: Text(
-                            '"${wo.refusalNote}"',
+                            '"${viewModel.explanation}"',
                             style: TextStyles.bodyLarge.copyWith(
                               color: AppColors.secondary500,
                             ),
@@ -143,7 +146,7 @@ class _RejectionDetailContent extends StatelessWidget {
                     style: TextStyles.title.copyWith(color: Colors.black),
                   ),
                   const SizedBox(height: AppDimens.spaceMd),
-                  if (wo.rejectionPhotos.isEmpty)
+                  if (viewModel.photoUrls.isEmpty)
                     Text(
                       'No evidence photos provided.',
                       style: TextStyles.bodyMedium.copyWith(
@@ -154,22 +157,13 @@ class _RejectionDetailContent extends StatelessWidget {
                     Wrap(
                       spacing: AppDimens.spaceMd,
                       runSpacing: AppDimens.spaceMd,
-                      children: wo.rejectionPhotos.map((url) {
-                        return ClipRRect(
+                      children: viewModel.photoUrls.map((url) {
+                        return AppNetworkImage(
+                          url: url,
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
                           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                          child: Image.network(
-                            url,
-                            width: 90,
-                            height: 90,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  width: 90,
-                                  height: 90,
-                                  color: AppColors.secondary100,
-                                  child: const Icon(Icons.image_not_supported),
-                                ),
-                          ),
                         );
                       }).toList(),
                     ),
@@ -197,18 +191,16 @@ class _RejectionDetailContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
-                        onTap: viewModel.isLoading
+                      child: ThrottledGestureDetector(
+                        onTap: viewModel.isApproving || viewModel.isDenying
                             ? null
                             : () async {
                                 final error = await viewModel.denyRejection();
                                 if (context.mounted) {
                                   if (error != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error)),
-                                    );
+                                    ZentErrorPopup.show(context, error);
                                   } else {
-                                    context.pop();
+                                    context.pop(true);
                                   }
                                 }
                               },
@@ -222,7 +214,7 @@ class _RejectionDetailContent extends StatelessWidget {
                             boxShadow: [BoxShadowStyles.glowing],
                           ),
                           alignment: Alignment.center,
-                          child: viewModel.isLoading
+                          child: viewModel.isDenying
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
@@ -243,19 +235,17 @@ class _RejectionDetailContent extends StatelessWidget {
                     ),
                     const SizedBox(width: AppDimens.spaceMd),
                     Expanded(
-                      child: GestureDetector(
-                        onTap: viewModel.isLoading
+                      child: ThrottledGestureDetector(
+                        onTap: viewModel.isApproving || viewModel.isDenying
                             ? null
                             : () async {
                                 final error = await viewModel
                                     .approveRejection();
                                 if (context.mounted) {
                                   if (error != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error)),
-                                    );
+                                    ZentErrorPopup.show(context, error);
                                   } else {
-                                    context.pop();
+                                    context.pop(true);
                                   }
                                 }
                               },
@@ -268,7 +258,7 @@ class _RejectionDetailContent extends StatelessWidget {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: viewModel.isLoading
+                          child: viewModel.isApproving
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,

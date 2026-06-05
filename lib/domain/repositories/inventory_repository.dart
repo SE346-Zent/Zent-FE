@@ -82,4 +82,8 @@ abstract class InventoryRepository {
   Future<NewPartForm> getPartRequestById(String id);
 
   Future<Map<String, dynamic>> getScmLuts();
+
+  Future<Map<String, dynamic>> getScmAssets();
+
+  Future<String> exportInventoryAssets({String? query});
 }

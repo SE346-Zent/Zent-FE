@@ -1,6 +1,6 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:zent_fe/domain/entities/inventory_part.dart';
+import 'package:zent_fe/domain/entities/part_catalog_entry.dart';
 import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
 
 enum PartStatus { available, unavailable }
@@ -22,9 +22,9 @@ class PartSearchItemModel {
 }
 
 class PartSearchViewModel extends ChangeNotifier with SafeChangeNotifier {
-  final GetPartsUseCase getPartsUseCase;
+  final GetPartCatalogUseCase getPartCatalogUseCase;
 
-  PartSearchViewModel({required this.getPartsUseCase}) {
+  PartSearchViewModel({required this.getPartCatalogUseCase}) {
     _loadInitialData();
   }
 
@@ -58,7 +58,10 @@ class PartSearchViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      final (parts, _) = await getPartsUseCase.execute(page: 1, limit: 50);
+      final (parts, _) = await getPartCatalogUseCase.execute(
+        page: 1,
+        limit: 50,
+      );
       _parts = parts.map(_mapPartToModel).toList();
     } catch (e) {
       _errorMessage = 'Failed to load parts: $e';
@@ -69,13 +72,13 @@ class PartSearchViewModel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
-  PartSearchItemModel _mapPartToModel(InventoryPart part) {
+  PartSearchItemModel _mapPartToModel(PartCatalogEntry part) {
     return PartSearchItemModel(
       imageUrl: 'https://picsum.photos/48/48?random=${part.id.hashCode}',
-      name: part.serialNumber.isNotEmpty ? part.serialNumber : 'Part',
-      partNo: part.id,
-      commodity: part.partCatalogId ?? 'General',
-      status: part.partConditionId != null
+      name: part.partNumber.isNotEmpty ? part.partNumber : 'Part',
+      partNo: part.mfgNumber ?? part.id,
+      commodity: part.description ?? 'General',
+      status: part.partMfgStatus?.toLowerCase() == 'active'
           ? PartStatus.available
           : PartStatus.unavailable,
     );
@@ -93,7 +96,7 @@ class PartSearchViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      final (parts, _) = await getPartsUseCase.execute(
+      final (parts, _) = await getPartCatalogUseCase.execute(
         page: 1,
         limit: 50,
         query: query,
@@ -115,7 +118,7 @@ class PartSearchViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
-      final (moreParts, _) = await getPartsUseCase.execute(
+      final (moreParts, _) = await getPartCatalogUseCase.execute(
         page: (_parts.length / 50).ceil() + 1,
         limit: 50,
         query: _searchQuery.isNotEmpty ? _searchQuery : null,

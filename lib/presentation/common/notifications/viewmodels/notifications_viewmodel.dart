@@ -106,6 +106,8 @@ class NotificationsViewModel extends ChangeNotifier with SafeChangeNotifier {
         isRead: true,
         createdAt: old.createdAt,
         data: old.data,
+        senderAvatarName: old.senderAvatarName,
+        senderName: old.senderName,
       );
       _unreadCount = (_unreadCount > 0) ? _unreadCount - 1 : 0;
       notifyListeners();

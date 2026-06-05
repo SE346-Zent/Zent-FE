@@ -13,15 +13,16 @@ import '../presentation/common/auth/register/verify_otp_screen.dart';
 import '../presentation/common/auth/login/reset_password_screen.dart';
 import '../presentation/common/auth/login/reset_successfully_screen.dart';
 import '../presentation/common/auth/register/register_screen.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import '../presentation/admin/account/profile_screen.dart';
 import '../presentation/admin/account/security_settings_screen.dart';
 import '../presentation/admin/account/user_management_screen.dart';
+import '../presentation/admin/account/staff_detail_screen.dart';
 import '../presentation/admin/account/choose_role_screen.dart';
 import '../presentation/admin/account/create_account_screen.dart';
+import '../presentation/admin/account/personal_info_screen.dart';
 import '../presentation/admin/work/admin_dashboard_screen.dart';
 import '../presentation/admin/work/operational_queue_screen.dart';
-import '../presentation/admin/work/work_order_detail_screen.dart';
+import '../presentation/admin/work/assign_work_order_screen.dart';
 import '../presentation/admin/work/assigned_work_order_detail_screen.dart';
 import '../presentation/admin/work/rejected_work_orders_screen.dart';
 import '../presentation/admin/work/rejection_detail_screen.dart';
@@ -38,10 +39,13 @@ import '../presentation/customer/account/chat_screen.dart';
 import '../presentation/customer/account/profile_screen.dart';
 import '../presentation/customer/account/personal_info_screen.dart';
 import '../presentation/customer/account/security_screen.dart';
+import '../presentation/customer/account/notifications_screen.dart';
 import '../presentation/customer/account/detailed_chat_screen.dart';
 import '../presentation/customer/work/my_products_screen.dart';
 import '../presentation/customer/work/my_detailed_product_screen.dart';
 import '../presentation/customer/work/request_service_screen.dart';
+import '../presentation/customer/work/edit_work_order_screen.dart';
+import '../presentation/customer/work/customer_work_order_details_screen.dart';
 import '../presentation/customer/work/active_repairs_screen.dart';
 import '../presentation/customer/work/customer_cancel_work_order_screen.dart';
 import '../presentation/customer/work/device_registration_screen.dart';
@@ -55,6 +59,7 @@ import '../presentation/common/notifications/notifications_list_screen.dart';
 import '../presentation/technician/work/tech_work_order_screen.dart';
 import '../presentation/technician/work/complete_work_order_screen.dart';
 import '../presentation/technician/work/tech_work_order_details_screen.dart';
+import '../presentation/technician/work/tech_detailed_history_screen.dart';
 import '../presentation/technician/work/tech_pause_work_order_screen.dart';
 import '../presentation/technician/work/tech_reject_work_order_screen.dart';
 import '../presentation/technician/home/technician_home_screen.dart';
@@ -87,17 +92,7 @@ Future<String?> _rbacRedirect(BuildContext context, GoRouterState state) async {
     if (role == UserRoles.admin ||
         role == UserRoles.superAdmin ||
         role == UserRoles.technician) {
-      try {
-        final settings = await FirebaseMessaging.instance.requestPermission();
-        if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-          return Routes.login;
-        }
-      } catch (e) {
-        debugPrint(
-          "Firebase Messaging permission request failed in redirect: $e",
-        );
-        // Cứ tiếp tục điều hướng nếu lỗi Firebase cấu hình ở môi trường Release
-      }
+      // FirebaseMessaging permission request removed to prevent blocking redirects.
     }
     final isPublic = _publicPrefixes.any(
       (p) => location == p || location.startsWith('$p/'),
@@ -226,12 +221,17 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             final extra = state.extra;
             String email = '';
+            bool useRecoveryEmail = false;
             if (extra is String) {
               email = extra;
             } else if (extra is Map<String, dynamic>) {
               email = extra['email'] as String? ?? '';
+              useRecoveryEmail = extra['useRecoveryEmail'] as bool? ?? false;
             }
-            return VerifyForgotOtpScreen(email: email);
+            return VerifyForgotOtpScreen(
+              email: email,
+              useRecoveryEmail: useRecoveryEmail,
+            );
           },
         ),
         GoRoute(
@@ -299,6 +299,15 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const UserManagementScreen(),
                   routes: [
                     GoRoute(
+                      name: RouteNames.adminStaffDetail,
+                      path: Routes.adminStaffDetail,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final userId = state.pathParameters['userId'] ?? '';
+                        return StaffDetailScreen(userId: userId);
+                      },
+                    ),
+                    GoRoute(
                       name: RouteNames.adminChooseRoleCreateAccount,
                       path: Routes.adminChooseRoleCreateAccount,
                       parentNavigatorKey: _rootNavigatorKey,
@@ -354,8 +363,10 @@ final GoRouter appRouter = GoRouter(
                       path: Routes.adminRejectionDetail,
                       parentNavigatorKey: _rootNavigatorKey,
                       builder: (context, state) {
-                        final id = state.pathParameters['id'] ?? '';
-                        return RejectionDetailScreen(workOrderId: id);
+                        final rejectFormId = state.pathParameters['id'] ?? '';
+                        return RejectionDetailScreen(
+                          rejectFormId: rejectFormId,
+                        );
                       },
                     ),
                   ],
@@ -475,6 +486,12 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) => const SecuritySettingsScreen(),
                 ),
                 GoRoute(
+                  name: RouteNames.adminPersonalInfo,
+                  path: Routes.personalInfo,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const AdminPersonalInfoScreen(),
+                ),
+                GoRoute(
                   name: RouteNames.adminSystemLog,
                   path: Routes.adminSystemLog,
                   parentNavigatorKey: _rootNavigatorKey,
@@ -528,6 +545,17 @@ final GoRouter appRouter = GoRouter(
                   path: Routes.techWorkOrderHistory,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const WorkOrdersHistoryScreen(),
+                  routes: [
+                    GoRoute(
+                      name: RouteNames.techDetailedHistory,
+                      path: Routes.techDetailedHistory,
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) {
+                        final id = state.pathParameters['workOrderId'] ?? '';
+                        return TechDetailedHistoryScreen(workOrderId: id);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -669,8 +697,11 @@ final GoRouter appRouter = GoRouter(
                       builder: (context, state) {
                         final serialNumber =
                             state.pathParameters['serialNumber']!;
+                        final productId =
+                            state.uri.queryParameters['productId'] ?? '';
                         return MyDetailedProductScreen(
                           serialNumber: serialNumber,
+                          productId: productId,
                         );
                       },
                       routes: [
@@ -681,7 +712,12 @@ final GoRouter appRouter = GoRouter(
                           builder: (context, state) {
                             final serialNumber =
                                 state.pathParameters['serialNumber']!;
-                            return PartsScreen(serialNumber: serialNumber);
+                            final modelCode =
+                                state.uri.queryParameters['modelCode'] ?? '';
+                            return PartsScreen(
+                              serialNumber: serialNumber,
+                              modelCode: modelCode,
+                            );
                           },
                         ),
                       ],
@@ -698,7 +734,11 @@ final GoRouter appRouter = GoRouter(
                   name: RouteNames.customerActiveRepairs,
                   path: Routes.activeRepairs,
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (context, state) => const ActiveRepairsScreen(),
+                  builder: (context, state) {
+                    final workOrderId =
+                        state.uri.queryParameters['workOrderId'];
+                    return ActiveRepairsScreen(workOrderId: workOrderId);
+                  },
                 ),
                 GoRoute(
                   name: RouteNames.customerWorkOrderHistory,
@@ -713,6 +753,31 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final workOrderId = state.pathParameters['workOrderId']!;
                     return CustomerCancelWorkOrderScreen(
+                      workOrderId: workOrderId,
+                    );
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.customerEditWorkOrder,
+                  path: Routes.customerEditWorkOrder,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    final workOrderNumber =
+                        state.pathParameters['workOrderNumber']!;
+                    return EditWorkOrderScreen(
+                      workOrderId: workOrderId,
+                      workOrderNumber: workOrderNumber,
+                    );
+                  },
+                ),
+                GoRoute(
+                  name: RouteNames.customerWorkOrderDetails,
+                  path: Routes.customerWorkOrderDetails,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) {
+                    final workOrderId = state.pathParameters['workOrderId']!;
+                    return CustomerWorkOrderDetailsScreen(
                       workOrderId: workOrderId,
                     );
                   },
@@ -768,6 +833,13 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   name: RouteNames.customerNotifications,
                   path: Routes.customerNotifications,
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      const CustomerNotificationsScreen(),
+                ),
+                GoRoute(
+                  name: RouteNames.customerNotificationsList,
+                  path: Routes.customerNotificationsList,
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const NotificationsListScreen(),
                 ),

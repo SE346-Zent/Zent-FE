@@ -4,6 +4,7 @@ import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/domain/usecases/auth/recovery_and_metrics_usecases.dart';
 
 class TechScheduleItem {
   final String id;
@@ -24,20 +25,22 @@ class TechScheduleItem {
 class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
   final GetManyWorkOrdersUseCase? getManyWorkOrdersUseCase;
   final GetCurrentUserUseCase? getCurrentUserUseCase;
+  final GetTechnicianMetricsUseCase? getTechnicianMetricsUseCase;
 
   TechnicianHomeViewModel({
     this.getManyWorkOrdersUseCase,
     this.getCurrentUserUseCase,
+    this.getTechnicianMetricsUseCase,
   });
 
   String? _fetchedUserName;
   String get userName =>
       _fetchedUserName ?? sl<AuthViewModel>().currentUser?.name ?? 'Technician';
 
-  final int _jobsDone = 10;
+  int _jobsDone = 0;
   int get jobsDone => _jobsDone;
 
-  final double _averageRating = 4.5;
+  double _averageRating = 0.0;
   double get averageRating => _averageRating;
 
   List<TechScheduleItem> _todaySchedule = [];
@@ -45,9 +48,11 @@ class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   bool isLoading = false;
 
-  Future<void> fetchTodaySchedule() async {
-    isLoading = true;
-    notifyListeners();
+  Future<void> fetchTodaySchedule({bool silent = false}) async {
+    if (!silent) {
+      isLoading = true;
+      notifyListeners();
+    }
 
     try {
       final user = await getCurrentUserUseCase?.execute();
@@ -58,61 +63,85 @@ class TechnicianHomeViewModel extends ChangeNotifier with SafeChangeNotifier {
         }
       }
 
-      if (user != null && getManyWorkOrdersUseCase != null) {
-        final results = await getManyWorkOrdersUseCase!.execute(
-          technicianId: user.id,
-          limit: 100,
-        );
-
-        final now = DateTime.now();
-        // 1. Filter only today's work orders
-        final todayOrders = results.where((order) {
-          final timeSource = order.appointment ?? order.createdAt;
-          return timeSource.year == now.year &&
-              timeSource.month == now.month &&
-              timeSource.day == now.day;
-        }).toList();
-
-        // 2. Sort from earliest to latest (sớm đến muộn)
-        todayOrders.sort((a, b) {
-          final timeA = a.appointment ?? a.createdAt;
-          final timeB = b.appointment ?? b.createdAt;
-          return timeA.compareTo(timeB);
-        });
-
-        final List<TechScheduleItem> items = [];
-        for (final order in todayOrders) {
-          final timeSource = order.appointment ?? order.createdAt;
-          final hour = timeSource.hour;
-          final minute = timeSource.minute.toString().padLeft(2, '0');
-          final isPm = hour >= 12;
-          final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-          final timeStr = "$displayHour:$minute";
-          final ampmStr = isPm ? "PM" : "AM";
-
-          final woNum = order.workOrderNum.isNotEmpty
-              ? order.workOrderNum
-              : order.id.substring(0, 8);
-          final titleStr = "$woNum | ${order.title}";
-
-          items.add(
-            TechScheduleItem(
-              id: order.id,
-              time: timeStr,
-              ampm: ampmStr,
-              title: titleStr,
-              address: order.address,
-            ),
-          );
-        }
-
-        _todaySchedule = items;
-      }
+      // Fetch metrics in parallel with schedule
+      await Future.wait([
+        _fetchMetrics(),
+        if (user != null && getManyWorkOrdersUseCase != null)
+          _fetchSchedule(user.id),
+      ]);
     } catch (e) {
-      debugPrint("Error fetching technician schedule: $e");
+      debugPrint("Error fetching technician home data: $e");
     } finally {
-      isLoading = false;
+      if (!silent) {
+        isLoading = false;
+      }
       notifyListeners();
+    }
+  }
+
+  Future<void> _fetchMetrics() async {
+    try {
+      if (getTechnicianMetricsUseCase == null) return;
+      final data = await getTechnicianMetricsUseCase!.execute();
+      _jobsDone = (data['jobsDone'] as num?)?.toInt() ?? 0;
+      _averageRating = (data['overallRating'] as num?)?.toDouble() ?? 0.0;
+    } catch (e) {
+      debugPrint("Error fetching tech metrics: $e");
+    }
+  }
+
+  Future<void> _fetchSchedule(String technicianId) async {
+    try {
+      final results = await getManyWorkOrdersUseCase!.execute(
+        technicianId: technicianId,
+        limit: 100,
+      );
+
+      final now = DateTime.now();
+      // 1. Filter only today's work orders
+      final todayOrders = results.where((order) {
+        final timeSource = order.appointment ?? order.createdAt;
+        return timeSource.year == now.year &&
+            timeSource.month == now.month &&
+            timeSource.day == now.day;
+      }).toList();
+
+      // 2. Sort from earliest to latest
+      todayOrders.sort((a, b) {
+        final timeA = a.appointment ?? a.createdAt;
+        final timeB = b.appointment ?? b.createdAt;
+        return timeA.compareTo(timeB);
+      });
+
+      final List<TechScheduleItem> items = [];
+      for (final order in todayOrders) {
+        final timeSource = order.appointment ?? order.createdAt;
+        final hour = timeSource.hour;
+        final minute = timeSource.minute.toString().padLeft(2, '0');
+        final isPm = hour >= 12;
+        final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+        final timeStr = "$displayHour:$minute";
+        final ampmStr = isPm ? "PM" : "AM";
+
+        final woNum = order.workOrderNum.isNotEmpty
+            ? order.workOrderNum
+            : order.id.substring(0, 8);
+        final titleStr = "$woNum | ${order.title}";
+
+        items.add(
+          TechScheduleItem(
+            id: order.id,
+            time: timeStr,
+            ampm: ampmStr,
+            title: titleStr,
+            address: order.address,
+          ),
+        );
+      }
+
+      _todaySchedule = items;
+    } catch (e) {
+      debugPrint("Error fetching today's schedule: $e");
     }
   }
 

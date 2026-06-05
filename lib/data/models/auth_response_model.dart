@@ -7,12 +7,14 @@ class AuthResponseModel {
   final String refreshToken;
   final User user;
   final String tokenType;
+  final String? sessionId;
 
   AuthResponseModel({
     required this.accessToken,
     required this.refreshToken,
     required this.user,
     required this.tokenType,
+    this.sessionId,
   });
 
   //* from json
@@ -46,6 +48,8 @@ class AuthResponseModel {
       refreshToken: (json['refreshToken'] ?? '').toString(),
       user: UserModel.fromJson(userJson),
       tokenType: (json['tokenType'] ?? 'Bearer').toString(),
+      sessionId:
+          json['sessionId']?.toString() ?? json['session_id']?.toString(),
     );
   }
 
@@ -56,6 +60,7 @@ class AuthResponseModel {
       'refreshToken': refreshToken,
       'user': UserModel.fromEntity(user).toJson(),
       'tokenType': tokenType,
+      if (sessionId != null) 'sessionId': sessionId,
     };
   }
 }

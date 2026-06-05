@@ -4,8 +4,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:zent_fe/data/services/chat_service.dart';
 import 'package:zent_fe/domain/usecases/auth/get_current_user_usecase.dart';
+import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/di/injection_container.dart';
 
 class ChatMessage {
   final String id;
@@ -31,18 +34,6 @@ class ChatMessage {
     try {
       String cleanStr = dateStr.trim();
 
-      // Remove any spaces before + or - timezone offsets
-      cleanStr = cleanStr.replaceAll(
-        RegExp(r'\s+([+-]\d{2}(?::?\d{2})?)'),
-        r'$1',
-      );
-
-      // Normalize timezone offset with seconds (e.g. '+00:00:00' -> '+00:00')
-      final match = RegExp(r'([+-]\d{2}:\d{2}):\d{2}$').firstMatch(cleanStr);
-      if (match != null) {
-        cleanStr = cleanStr.substring(0, match.start) + match.group(1)!;
-      }
-
       // Support Unix Epoch Timestamps (seconds or milliseconds)
       final numericVal = int.tryParse(cleanStr);
       if (numericVal != null) {
@@ -56,12 +47,66 @@ class ChatMessage {
       if (cleanStr.endsWith(' UTC')) {
         cleanStr = '${cleanStr.substring(0, cleanStr.length - 4)}Z';
       }
-      if (cleanStr.length > 10 && cleanStr[10] == ' ') {
-        cleanStr = '${cleanStr.substring(0, 10)}T${cleanStr.substring(11)}';
+
+      // Standardize timezone offset (+00:00:00 -> +00:00)
+      final offsetRegex = RegExp(r'\s+([+-]\d{2}):?(\d{2}):?(\d{2})?$');
+      final offsetMatch = offsetRegex.firstMatch(cleanStr);
+      String offsetPart = "";
+      if (offsetMatch != null) {
+        final hoursWithSign = offsetMatch.group(1)!; // e.g. "+00" or "-00"
+        final minutes = offsetMatch.group(2)!; // e.g. "00"
+        offsetPart = "$hoursWithSign:$minutes";
+        cleanStr = cleanStr.substring(0, offsetMatch.start).trim();
+      } else {
+        final offsetRegex2 = RegExp(r'\s+([+-]\d{2}):?(\d{2})?$');
+        final offsetMatch2 = offsetRegex2.firstMatch(cleanStr);
+        if (offsetMatch2 != null) {
+          final hoursWithSign = offsetMatch2.group(1)!;
+          final minutes = offsetMatch2.group(2) ?? "00";
+          offsetPart = "$hoursWithSign:$minutes";
+          cleanStr = cleanStr.substring(0, offsetMatch2.start).trim();
+        }
       }
+
+      // Convert space separator to 'T' and format single-digit hours (e.g. "4:48:36" -> "04:48:36")
+      if (cleanStr.contains(' ')) {
+        final parts = cleanStr.split(' ');
+        final datePart = parts[0];
+        String timePart = parts[1];
+
+        final timeParts = timePart.split(':');
+        if (timeParts.isNotEmpty && timeParts[0].length == 1) {
+          timeParts[0] = "0${timeParts[0]}";
+        }
+        timePart = timeParts.join(':');
+        cleanStr = "${datePart}T$timePart";
+      } else if (cleanStr.contains('T')) {
+        final parts = cleanStr.split('T');
+        final datePart = parts[0];
+        String timePart = parts[1];
+
+        final timeParts = timePart.split(':');
+        if (timeParts.isNotEmpty && timeParts[0].length == 1) {
+          timeParts[0] = "0${timeParts[0]}";
+        }
+        timePart = timeParts.join(':');
+        cleanStr = "${datePart}T$timePart";
+      }
+
+      if (offsetPart.isNotEmpty) {
+        cleanStr = "$cleanStr$offsetPart";
+      } else if (!cleanStr.endsWith('Z')) {
+        cleanStr = "${cleanStr}Z";
+      }
+
       return DateTime.parse(cleanStr);
-    } catch (_) {
-      return DateTime.tryParse(dateStr);
+    } catch (e) {
+      debugPrint("Detailed parseDateTime failed for '$dateStr': $e");
+      try {
+        return DateTime.tryParse(dateStr);
+      } catch (_) {
+        return null;
+      }
     }
   }
 }
@@ -73,13 +118,25 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
   // Static RAM caches for instant room loading on re-entrance
   static final Map<String, List<ChatMessage>> _roomMessagesCache = {};
   static final Map<String, String> _roomPartnerNamesCache = {};
+  static final Map<String, String?> _roomPartnerAvatarsCache = {};
   static final Map<String, bool> _hasMoreCache = {};
   static String? _cachedUserId;
   static String? _cachedMyName;
 
+  static void clearCache() {
+    _roomMessagesCache.clear();
+    _roomPartnerNamesCache.clear();
+    _roomPartnerAvatarsCache.clear();
+    _hasMoreCache.clear();
+    _cachedUserId = null;
+    _cachedMyName = null;
+  }
+
   String? currentChatId;
   String chatPartnerName = "";
+  String? chatPartnerAvatarUrl;
   String myName = "";
+  String? get myAvatarUrl => sl<AuthViewModel>().currentUser?.avatarUrl;
   String? currentUserId;
   bool isLoading = false;
   bool isLoadMoreLoading = false;
@@ -187,10 +244,12 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
       messages = List.from(_roomMessagesCache[chatId]!);
       chatPartnerName =
           _roomPartnerNamesCache[chatId] ?? (initialPartnerName ?? "");
+      chatPartnerAvatarUrl = _roomPartnerAvatarsCache[chatId];
       hasMore = _hasMoreCache[chatId] ?? true;
       isLoading = false;
     } else {
       chatPartnerName = initialPartnerName ?? "";
+      chatPartnerAvatarUrl = null;
       isLoading = true;
       hasMore = true;
     }
@@ -242,11 +301,12 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
       // 2. Fetch messages from REST API
       final fetchedMessages = await chatService.getMessages(chatId);
 
-      // Get partner name from the rooms list first
+      // Get partner name and avatar from the rooms list first
       try {
         final rooms = await chatService.getRooms();
         final room = rooms.firstWhere((r) => r.id == chatId);
         chatPartnerName = room.oppositeUserName;
+        chatPartnerAvatarUrl = room.oppositeAvatarUrl;
       } catch (_) {
         // Fallback to checking messages if rooms list fails
         if (fetchedMessages.isNotEmpty) {
@@ -260,10 +320,12 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
         } else {
           chatPartnerName = "Chat Partner";
         }
+        chatPartnerAvatarUrl = null;
       }
 
-      // Update partner name in cache
+      // Update partner name and avatar in cache
       _roomPartnerNamesCache[chatId] = chatPartnerName;
+      _roomPartnerAvatarsCache[chatId] = chatPartnerAvatarUrl;
 
       // Convert fetched messages to UI messages
       messages = fetchedMessages.reversed.map((msg) {
@@ -278,7 +340,7 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
           time: formattedTime,
           imageUrl: msg.imageUrl,
           isSeen: _isMe(msg.senderId) && msg.readBy.any((id) => !_isMe(id)),
-          dateTime: parsedDt ?? DateTime.fromMillisecondsSinceEpoch(0),
+          dateTime: parsedDt ?? DateTime.now(),
         );
       }).toList();
 
@@ -557,6 +619,11 @@ class DetailedChatViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   Future<void> sendCameraImage() async {
     if (currentChatId == null) return;
+
+    final status = await Permission.camera.request();
+    if (!status.isGranted) {
+      return;
+    }
 
     final picker = ImagePicker();
     final image = await picker.pickImage(

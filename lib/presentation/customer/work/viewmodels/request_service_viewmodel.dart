@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:zent_fe/data/models/create_work_order_request.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/domain/usecases/work_order/create_work_order_usecase.dart';
+import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/usecases/work_order/get_many_work_orders_usecase.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/data/datasources/local/auth_local_datasource.dart';
 import 'package:intl/intl.dart';
@@ -85,6 +87,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   RequestServiceViewModel(this.createWorkOrderUseCase);
 
   int _currentStep = 1;
+  String? _selectedProductWarrantyStatus;
   bool _isLoading = false;
 
   int get currentStep => _currentStep;
@@ -94,6 +97,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   // Selected device
   String? selectedProductId;
   String? selectedSerialNumber;
+  String? selectedProductName;
+  String? selectedProductModel;
 
   // Selected information for Step 2
   String? symptom;
@@ -109,8 +114,14 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   // Step 3 Data: Address Info
   String? country = 'Vietnam';
+  String? province;
   String? ward;
-  String? city;
+  String?
+  city; // We map 'city' to the API field, but in UI we label it Province/City. The backend requires 'province' or 'ward' (as HN/HCM). Wait, the deserialization error: "missing field `province`". Let's check: Backend needs `province` but our request class did not define a `province` parameter, it had `ward`! No, wait, look at the deserialization error: "Failed to deserialize the JSON body into the target type: missing field `province` at line 1 column 329". This means the request body sent to the backend MUST contain a field named `province`!
+  // Let's check CreateWorkOrderRequest toJson() or property definition. It has 'ward' but not 'province'! Ah! CreateWorkOrderRequest had:
+  // final String country;
+  // final String ward;
+  // Let's check the error: missing field `province`. Yes, the endpoint must have changed to require `province`. Let's define `province` in the request!
   String? address;
   String? building;
 
@@ -132,11 +143,10 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   final List<String> countries = ['Vietnam'];
   final List<String> provinces = [];
-  final List<String> wards = [];
-  final Map<String, List<String>> _citiesByWard = {};
+  final Map<String, List<String>> _wardsByProvince = {};
 
   Future<void> loadLocationData() async {
-    if (wards.isNotEmpty) return;
+    if (provinces.isNotEmpty) return;
 
     try {
       final String response = await rootBundle.loadString(
@@ -144,21 +154,21 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       );
       final List<dynamic> data = json.decode(response);
 
-      wards.clear();
-      _citiesByWard.clear();
+      provinces.clear();
+      _wardsByProvince.clear();
 
       for (var item in data) {
-        final wardName = item['name'] as String;
-        final citiesList = (item['cities'] as List)
-            .map((e) => e.toString())
-            .toList();
-
-        wards.add(wardName);
-        _citiesByWard[wardName] = citiesList;
+        final provName = item['name'] as String;
+        // Limit to only 'Thành phố Hồ Chí Minh' and 'Thành phố Hà Nội'
+        if (provName == 'Thành phố Hồ Chí Minh' ||
+            provName == 'Thành phố Hà Nội') {
+          provinces.add(provName);
+          final wardsList = (item['cities'] as List)
+              .map((e) => e.toString())
+              .toList();
+          _wardsByProvince[provName] = wardsList;
+        }
       }
-
-      provinces.clear();
-      provinces.addAll(['Thành phố Hồ Chí Minh', 'Thành phố Hà Nội']);
 
       notifyListeners();
     } catch (e) {
@@ -166,20 +176,20 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
-  List<String> get availableCities =>
-      ward != null ? (_citiesByWard[ward!] ?? []) : [];
+  List<String> get availableWards =>
+      province != null ? (_wardsByProvince[province!] ?? []) : [];
 
-  void updateWard(String newWard) {
-    if (ward != newWard) {
-      ward = newWard;
-      city = null;
+  void updateProvince(String newProv) {
+    if (province != newProv) {
+      province = newProv;
+      ward = null;
       _saveDraft();
       notifyListeners();
     }
   }
 
-  void updateCity(String newCity) {
-    city = newCity;
+  void updateWard(String newWard) {
+    ward = newWard;
     _saveDraft();
     notifyListeners();
   }
@@ -208,9 +218,19 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     ),
   ];
 
-  void selectDevice(String id, String sn) {
+  void selectDevice(
+    String id,
+    String sn, {
+    String? warrantyStatus,
+    String? name,
+    String? model,
+  }) {
     selectedProductId = id;
     selectedSerialNumber = sn;
+    _selectedProductWarrantyStatus = warrantyStatus;
+    selectedProductName = name;
+    selectedProductModel = model;
+    errorMessage = null; // Clear previous error when new device selected
     notifyListeners();
   }
 
@@ -247,8 +267,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     String? emailVal,
     String? phoneVal,
     String? countryVal,
+    String? provinceVal,
     String? wardVal,
-    String? cityVal,
     String? addressVal,
     String? buildingVal,
   }) {
@@ -257,8 +277,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     email = emailVal;
     phone = phoneVal;
     country = countryVal;
+    province = provinceVal;
     ward = wardVal;
-    city = cityVal;
     address = addressVal;
     building = buildingVal;
     _saveDraft();
@@ -388,6 +408,16 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
   Future<void> nextStep() async {
     if (currentStep < 5) {
       if (_currentStep == 1 && selectedProductId != null) {
+        // Block proceeding if product has no warranty or is expired
+        if (_selectedProductWarrantyStatus == 'No Warranty' ||
+            _selectedProductWarrantyStatus == 'Expired') {
+          throw BusinessException(
+            _selectedProductWarrantyStatus == 'No Warranty'
+                ? 'This product has no warranty coverage. Please register a product with valid warranty to request service.'
+                : 'This product\'s warranty has expired. Please renew the warranty or register a different product to request service.',
+          );
+        }
+
         await _loadDraftForProduct(selectedProductId!);
         if (_currentStep > 1) {
           await _saveDraft();
@@ -395,6 +425,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
           return;
         }
       }
+      errorMessage = null;
       _currentStep++;
       await _saveDraft();
       notifyListeners();
@@ -452,14 +483,16 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         throw BusinessException('Please provide a description of the problem.');
       }
 
-      String finalWard = ward ?? '';
-
-      // Map full names to short codes for Backend
-      if (finalWard.contains('Hồ Chí Minh')) {
-        finalWard = 'HCM';
-      } else if (finalWard.contains('Hà Nội')) {
-        finalWard = 'HN';
+      String finalProv = province ?? '';
+      if (finalProv.contains('Hồ Chí Minh') || finalProv == 'HCM') {
+        finalProv = 'HCM';
+      } else if (finalProv.contains('Hà Nội') || finalProv == 'HN') {
+        finalProv = 'HN';
       }
+
+      final resolvedReferenceTicketId = await _resolveReferenceTicketId(
+        ticketRef,
+      );
 
       final request = CreateWorkOrderRequest(
         address: address ?? '',
@@ -472,10 +505,9 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         lastName: lastName ?? '',
         phoneNumber: phone,
         productId: selectedProductId ?? '',
-        referenceTicketId: (ticketRef != null && ticketRef!.trim().isNotEmpty)
-            ? ticketRef
-            : null,
-        ward: finalWard,
+        referenceTicketId: resolvedReferenceTicketId,
+        ward: ward ?? '',
+        province: finalProv,
         workOrderSymptomId: symptomId,
       );
 
@@ -504,6 +536,40 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     }
   }
 
+  Future<String?> _resolveReferenceTicketId(String? ticketRef) async {
+    if (ticketRef == null || ticketRef.trim().isEmpty) {
+      return null;
+    }
+    final trimmed = ticketRef.trim();
+    final uuidRegex = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    );
+    final uuidNoDashesRegex = RegExp(r'^[0-9a-fA-F]{32}$');
+    if (uuidRegex.hasMatch(trimmed) || uuidNoDashesRegex.hasMatch(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      final getManyUseCase = sl<GetManyWorkOrdersUseCase>();
+      final orders = await getManyUseCase.execute(limit: 1000);
+      final match = orders.cast<WorkOrder?>().firstWhere(
+        (o) =>
+            o != null &&
+            o.workOrderNum.trim().toLowerCase() == trimmed.toLowerCase(),
+        orElse: () => null,
+      );
+      if (match != null) {
+        return match.id;
+      }
+    } catch (e) {
+      debugPrint("Error resolving reference ticket UUID: $e");
+    }
+
+    throw BusinessException(
+      'Reference ticket "$trimmed" not found. Please enter a valid Work Order number.',
+    );
+  }
+
   Future<void> reset() async {
     final sp = sl<SharedPreferences>();
     if (selectedProductId != null) {
@@ -524,6 +590,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     email = null;
     phone = null;
     country = 'Vietnam';
+    province = null;
     ward = null;
     city = null;
     address = null;
@@ -535,7 +602,12 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
 
     selectedProductId = null;
     selectedSerialNumber = null;
+    selectedProductName = null;
+    selectedProductModel = null;
     selectedServiceId = null;
+
+    _selectedProductWarrantyStatus = null;
+    errorMessage = null;
 
     notifyListeners();
   }
@@ -564,6 +636,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
       final draftMap = {
         'selectedProductId': selectedProductId,
         'selectedSerialNumber': selectedSerialNumber,
+        'selectedProductName': selectedProductName,
+        'selectedProductModel': selectedProductModel,
         'symptom': symptom,
         'ticketRef': ticketRef,
         'description': description,
@@ -573,6 +647,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         'email': email,
         'phone': phone,
         'country': country,
+        'province': province,
         'ward': ward,
         'city': city,
         'address': address,
@@ -600,6 +675,8 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         final draftMap = json.decode(jsonString) as Map<String, dynamic>;
         selectedProductId = draftMap['selectedProductId'] as String?;
         selectedSerialNumber = draftMap['selectedSerialNumber'] as String?;
+        selectedProductName = draftMap['selectedProductName'] as String?;
+        selectedProductModel = draftMap['selectedProductModel'] as String?;
         symptom = draftMap['symptom'] as String?;
         ticketRef = draftMap['ticketRef'] as String?;
         description = draftMap['description'] as String?;
@@ -609,6 +686,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         email = draftMap['email'] as String?;
         phone = draftMap['phone'] as String?;
         country = draftMap['country'] as String? ?? 'Vietnam';
+        province = draftMap['province'] as String?;
         ward = draftMap['ward'] as String?;
         city = draftMap['city'] as String?;
         address = draftMap['address'] as String?;
@@ -616,7 +694,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
         _currentStep = draftMap['currentStep'] as int? ?? 1;
         selectedServiceId = draftMap['selectedServiceId'] as String?;
 
-        if (ward != null) {
+        if (province != null) {
           loadLocationData();
         }
       } else {

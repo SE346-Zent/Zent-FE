@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
 
 import 'widgets/admin_text_field.dart';
@@ -90,44 +92,28 @@ class _DetailRequestScreenContent extends StatelessWidget {
                     onPressed: () async {
                       final reason = reasonController.text.trim();
                       if (reason.isEmpty) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Please provide a reason for rejection',
-                            ),
-                            backgroundColor: AppColors.warning500,
-                          ),
+                        ZentErrorPopup.show(
+                          ctx,
+                          'Please provide a reason for rejection',
                         );
                         return;
                       }
                       if (reason.length < 10) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Reason for rejection must be at least 10 characters long',
-                            ),
-                            backgroundColor: AppColors.warning500,
-                          ),
+                        ZentErrorPopup.show(
+                          ctx,
+                          'Reason for rejection must be at least 10 characters long',
                         );
                         return;
                       }
                       Navigator.pop(ctx);
                       final success = await viewModel.denyPart(reason);
-                      if (ctx.mounted) {
+                      if (context.mounted) {
                         if (success) {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            const SnackBar(
-                              content: Text('Part request rejected'),
-                              backgroundColor: AppColors.success500,
-                            ),
-                          );
-                          Navigator.of(ctx).pop(true);
+                          Navigator.of(context).pop(true);
                         } else {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            const SnackBar(
-                              content: Text('Failed to reject part request'),
-                              backgroundColor: AppColors.error500,
-                            ),
+                          ZentErrorPopup.show(
+                            context,
+                            'Failed to reject part request',
                           );
                         }
                       }
@@ -236,72 +222,266 @@ class _DetailRequestScreenContent extends StatelessWidget {
                               color: AppColors.primary500,
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppDimens.spaceSm,
-                              vertical: 4.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  (viewModel.status.toLowerCase() == 'pending'
+                          if (!viewModel.isReviewed)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppDimens.spaceSm,
+                                vertical: 4.0,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    (viewModel.status.toLowerCase() == 'pending'
+                                            ? AppColors.warning500
+                                            : (viewModel.status.toLowerCase() ==
+                                                      'approved'
+                                                  ? AppColors.success500
+                                                  : AppColors.error500))
+                                        .withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimens.boraSm,
+                                ),
+                                border: Border.all(
+                                  color:
+                                      viewModel.status.toLowerCase() ==
+                                          'pending'
+                                      ? AppColors.warning500
+                                      : (viewModel.status.toLowerCase() ==
+                                                'approved'
+                                            ? AppColors.success500
+                                            : AppColors.error500),
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8.0,
+                                    height: 8.0,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          viewModel.status.toLowerCase() ==
+                                              'pending'
                                           ? AppColors.warning500
                                           : (viewModel.status.toLowerCase() ==
                                                     'approved'
                                                 ? AppColors.success500
-                                                : AppColors.error500))
-                                      .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(
-                                AppDimens.boraSm,
-                              ),
-                              border: Border.all(
-                                color:
-                                    viewModel.status.toLowerCase() == 'pending'
-                                    ? AppColors.warning500
-                                    : (viewModel.status.toLowerCase() ==
-                                              'approved'
-                                          ? AppColors.success500
-                                          : AppColors.error500),
-                                width: 1.0,
+                                                : AppColors.error500),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppDimens.spaceSm),
+                                  Text(
+                                    viewModel.status,
+                                    style: TextStyles.label.copyWith(
+                                      color:
+                                          viewModel.status.toLowerCase() ==
+                                              'pending'
+                                          ? AppColors.warning500
+                                          : (viewModel.status.toLowerCase() ==
+                                                    'approved'
+                                                ? AppColors.success500
+                                                : AppColors.error500),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 8.0,
-                                  height: 8.0,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        viewModel.status.toLowerCase() ==
-                                            'pending'
-                                        ? AppColors.warning500
-                                        : (viewModel.status.toLowerCase() ==
-                                                  'approved'
-                                              ? AppColors.success500
-                                              : AppColors.error500),
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: AppDimens.spaceSm),
-                                Text(
-                                  viewModel.status,
-                                  style: TextStyles.label.copyWith(
-                                    color:
-                                        viewModel.status.toLowerCase() ==
-                                            'pending'
-                                        ? AppColors.warning500
-                                        : (viewModel.status.toLowerCase() ==
-                                                  'approved'
-                                              ? AppColors.success500
-                                              : AppColors.error500),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
+                      if (viewModel.isReviewed) ...[
+                        const SizedBox(height: 8.0),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                              AppDimens.boraSm,
+                            ),
+                            border: Border.all(
+                              color: AppColors.secondary200,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppDimens.boraSm,
+                            ),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Container(
+                                    width: 6.0,
+                                    color:
+                                        viewModel.status.toLowerCase() ==
+                                            'approved'
+                                        ? AppColors.success500
+                                        : AppColors.error500,
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: AppDimens.spaceMd,
+                                        vertical: 10.0,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            viewModel.status.toLowerCase() ==
+                                                    'approved'
+                                                ? 'Approved By'
+                                                : 'Rejected By',
+                                            style: TextStyles.middle.copyWith(
+                                              color:
+                                                  viewModel.status
+                                                          .toLowerCase() ==
+                                                      'approved'
+                                                  ? AppColors.success500
+                                                  : AppColors.error500,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6.0),
+                                          if (viewModel.status.toLowerCase() ==
+                                              'approved') ...[
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.person_outline,
+                                                  color: AppColors.success300,
+                                                  size: 16.0,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppDimens.spaceXs,
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    viewModel.reviewedBy ??
+                                                        'Admin',
+                                                    style: TextStyles.bodyLarge
+                                                        .copyWith(
+                                                          color: AppColors
+                                                              .primary500,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 4.0),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.access_time,
+                                                  color: AppColors.success300,
+                                                  size: 16.0,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppDimens.spaceXs,
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    viewModel
+                                                            .reviewedAtFormatted ??
+                                                        'N/A',
+                                                    style: TextStyles.bodyLarge
+                                                        .copyWith(
+                                                          color: AppColors
+                                                              .primary500,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ] else ...[
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.person_outline,
+                                                  color: AppColors.error300,
+                                                  size: 16.0,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppDimens.spaceXs,
+                                                ),
+                                                Text(
+                                                  viewModel.reviewedBy ??
+                                                      'Admin',
+                                                  style: TextStyles.bodyLarge
+                                                      .copyWith(
+                                                        color: AppColors
+                                                            .primary500,
+                                                      ),
+                                                ),
+                                                const SizedBox(
+                                                  width: AppDimens.spaceXl,
+                                                ),
+                                                Icon(
+                                                  Icons.access_time,
+                                                  color: AppColors.error300,
+                                                  size: 16.0,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppDimens.spaceXs,
+                                                ),
+                                                Text(
+                                                  viewModel
+                                                          .reviewedAtFormatted ??
+                                                      'N/A',
+                                                  style: TextStyles.bodyLarge
+                                                      .copyWith(
+                                                        color: AppColors
+                                                            .primary500,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                            if (viewModel.denialReason !=
+                                                    null &&
+                                                viewModel
+                                                    .denialReason!
+                                                    .isNotEmpty) ...[
+                                              const SizedBox(height: 6.0),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.assignment_outlined,
+                                                    color: AppColors.error300,
+                                                    size: 16.0,
+                                                  ),
+                                                  const SizedBox(
+                                                    width: AppDimens.spaceXs,
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(
+                                                      viewModel.denialReason!,
+                                                      style: TextStyles
+                                                          .bodyLarge
+                                                          .copyWith(
+                                                            color: AppColors
+                                                                .primary500,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: AppDimens.spaceMd),
                       AdminTextField(
                         label: 'Part Name',
@@ -425,54 +605,24 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                     const SizedBox(width: AppDimens.spaceSm),
                                 itemBuilder: (context, index) {
                                   final url = viewModel.photoUrls[index];
-                                  final isNetworkImage =
-                                      url.startsWith('http') ||
-                                      url.startsWith('https');
-                                  return ClipRRect(
+                                  return AppNetworkImage(
+                                    url: url.startsWith('http') ? url : null,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
                                     borderRadius: BorderRadius.circular(
                                       AppDimens.boraSm,
                                     ),
-                                    child: isNetworkImage
-                                        ? Image.network(
+                                    errorWidget:
+                                        !url.startsWith('http') &&
+                                            url.isNotEmpty
+                                        ? Image.asset(
                                             url,
                                             width: 80,
                                             height: 80,
                                             fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    width: 80,
-                                                    height: 80,
-                                                    color:
-                                                        AppColors.secondary50,
-                                                    child: const Icon(
-                                                      Icons.broken_image,
-                                                      color: AppColors
-                                                          .secondary200,
-                                                    ),
-                                                  );
-                                                },
                                           )
-                                        : Image.asset(
-                                            url,
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    width: 80,
-                                                    height: 80,
-                                                    color:
-                                                        AppColors.secondary50,
-                                                    child: const Icon(
-                                                      Icons.broken_image,
-                                                      color: AppColors
-                                                          .secondary200,
-                                                    ),
-                                                  );
-                                                },
-                                          ),
+                                        : null,
                                   );
                                 },
                               ),
@@ -501,7 +651,7 @@ class _DetailRequestScreenContent extends StatelessWidget {
                           onPressed: viewModel.isProcessing
                               ? null
                               : () => _showRejectDialog(context, viewModel),
-                          child: viewModel.isProcessing
+                          child: viewModel.isDenying
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
@@ -535,32 +685,16 @@ class _DetailRequestScreenContent extends StatelessWidget {
                                   final success = await viewModel.acceptPart();
                                   if (context.mounted) {
                                     if (success) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Part request approved',
-                                          ),
-                                          backgroundColor: AppColors.success500,
-                                        ),
-                                      );
                                       Navigator.of(context).pop(true);
                                     } else {
-                                      ScaffoldMessenger.of(
+                                      ZentErrorPopup.show(
                                         context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Failed to approve part request',
-                                          ),
-                                          backgroundColor: AppColors.error500,
-                                        ),
+                                        'Failed to approve part request',
                                       );
                                     }
                                   }
                                 },
-                          child: viewModel.isProcessing
+                          child: viewModel.isApproving
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,

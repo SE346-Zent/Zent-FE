@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../domain/usecases/auth/login_usecase.dart';
 import '../../../domain/usecases/auth/logout_usecase.dart';
 import '../../../domain/entities/user.dart';
+import '../../customer/account/viewmodels/detailed_chat_viewmodel.dart';
 
 class LoginViewModel extends ChangeNotifier with SafeChangeNotifier {
   final LoginUseCase loginUseCase;
@@ -40,6 +41,7 @@ class LoginViewModel extends ChangeNotifier with SafeChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
+      DetailedChatViewModel.clearCache();
       await logoutUseCase.execute();
       _user = null;
     } catch (e) {

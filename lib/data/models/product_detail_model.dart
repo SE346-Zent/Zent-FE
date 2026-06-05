@@ -23,7 +23,7 @@ class ProductDetailModel extends ProductDetail {
       modelCode: json['modelCode'] as String,
       modelName: json['modelName'] as String,
       serialNumber: json['serialNumber'] as String,
-      productImageUrl: json['productImageUrl'] as String?,
+      productImageUrl: (json['productImageUrl'] ?? json['imageUrl']) as String?,
       warranty: json['warranty'] != null
           ? _parseWarrantyInfo(json['warranty'] as Map<String, dynamic>)
           : null,

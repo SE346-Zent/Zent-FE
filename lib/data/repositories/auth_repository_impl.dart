@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/entities/login_history_entry.dart';
+import '../../domain/entities/user_session.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
 import '../datasources/remote/auth_remote_datasource.dart';
 import '../models/user_model.dart';
 import '../models/login_history_entry_model.dart';
+import '../models/user_session_model.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
+import 'package:zent_fe/domain/exceptions/business_exception.dart';
+import 'package:zent_fe/presentation/common/core/ui/avatar_utils.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -34,12 +38,22 @@ class AuthRepositoryImpl implements AuthRepository {
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
+      sessionId: response.sessionId,
     );
 
-    // 2. Save User Info
-    await authLocalDataSource.saveUser(response.user);
+    // 2. Fetch fresh user info to get the actual uploaded avatar url, etc.
+    User latestUser;
+    try {
+      latestUser = await getMe();
+    } catch (e) {
+      debugPrint("Failed to fetch fresh user profile on login: $e");
+      latestUser = response.user;
+    }
 
-    return response.user;
+    // 3. Save User Info
+    await authLocalDataSource.saveUser(latestUser);
+
+    return latestUser;
   }
 
   @override
@@ -53,12 +67,22 @@ class AuthRepositoryImpl implements AuthRepository {
     await authLocalDataSource.saveCredentials(
       response.accessToken,
       response.refreshToken,
+      sessionId: response.sessionId,
     );
 
-    // 2. Save User Info
-    await authLocalDataSource.saveUser(response.user);
+    // 2. Fetch fresh user info
+    User latestUser;
+    try {
+      latestUser = await getMe();
+    } catch (e) {
+      debugPrint("Failed to fetch fresh user profile on googleLogin: $e");
+      latestUser = response.user;
+    }
 
-    return response.user;
+    // 3. Save User Info
+    await authLocalDataSource.saveUser(latestUser);
+
+    return latestUser;
   }
 
   @override
@@ -107,6 +131,39 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> updateProfile({
+    required String fullName,
+    required String phone,
+    required String email,
+  }) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+
+    await authRemoteService.updateProfile(
+      accessToken: accessToken,
+      fullName: fullName,
+      phone: phone,
+      email: email,
+    );
+
+    // Update the locally cached user object
+    final currentUser = await authLocalDataSource.getUser();
+    if (currentUser != null) {
+      final updatedUser = UserModel(
+        id: currentUser.id,
+        email: email,
+        name: fullName,
+        phoneNumber: phone,
+        role: currentUser.role,
+        province: currentUser.province,
+      );
+      await authLocalDataSource.saveUser(updatedUser);
+    }
+  }
+
+  @override
   Future<void> refreshToken() async {
     final email = (await authLocalDataSource.getUser())?.email ?? '';
     final refreshToken = await authLocalDataSource.getRefreshToken() ?? '';
@@ -118,6 +175,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await authLocalDataSource.saveCredentials(
         response.accessToken,
         response.refreshToken,
+        sessionId: response.sessionId,
       );
     }
   }
@@ -129,22 +187,58 @@ class AuthRepositoryImpl implements AuthRepository {
       final refreshTokenStr = await authLocalDataSource.getRefreshToken();
 
       if (user != null && refreshTokenStr != null) {
-        // Luôn thử refresh token để lấy access token mới khi khởi động
-        final response = await authRemoteService.refreshToken(
-          user.email,
-          refreshTokenStr,
-        );
-
-        await authLocalDataSource.saveCredentials(
-          response.accessToken,
-          response.refreshToken,
-        );
-        await authLocalDataSource.saveUser(response.user);
-
         try {
-          sl<AuthViewModel>().setLoggedInUser(response.user);
-        } catch (e) {
-          debugPrint("Could not set user in AuthViewModel: $e");
+          // Luôn thử refresh token để lấy access token mới khi khởi động
+          final response = await authRemoteService.refreshToken(
+            user.email,
+            refreshTokenStr,
+          );
+
+          await authLocalDataSource.saveCredentials(
+            response.accessToken,
+            response.refreshToken,
+            sessionId: response.sessionId,
+          );
+
+          User latestUser;
+          try {
+            latestUser = await getMe();
+          } catch (e) {
+            debugPrint(
+              "Failed to fetch fresh user profile on restoreSession: $e",
+            );
+            latestUser = response.user;
+          }
+
+          await authLocalDataSource.saveUser(latestUser);
+
+          try {
+            sl<AuthViewModel>().setLoggedInUser(latestUser);
+          } catch (e) {
+            debugPrint("Could not set user in AuthViewModel: $e");
+          }
+        } catch (refreshError) {
+          debugPrint(
+            "Restore session: Refresh token attempt failed: $refreshError",
+          );
+          final errStr = refreshError.toString().toLowerCase();
+
+          // Only force a logout if it is a definitive authentication failure (e.g. invalid credentials, 400, 401).
+          // If it is a connection/transient error, keep the current session intact so they remain logged in offline.
+          if (errStr.contains('unauthorized') ||
+              errStr.contains('invalid') ||
+              errStr.contains('401') ||
+              errStr.contains('400')) {
+            await logout();
+            return false;
+          }
+
+          // Otherwise, set the cached user in AuthViewModel so they can continue offline
+          try {
+            sl<AuthViewModel>().setLoggedInUser(user);
+          } catch (e) {
+            debugPrint("Could not set cached user in AuthViewModel: $e");
+          }
         }
 
         return true;
@@ -168,8 +262,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> forgotPassword(String email) async {
-    await authRemoteService.forgotPassword(email);
+  Future<void> forgotPassword(
+    String email, {
+    bool useRecoveryEmail = false,
+  }) async {
+    await authRemoteService.forgotPassword(
+      email,
+      useRecoveryEmail: useRecoveryEmail,
+    );
   }
 
   @override
@@ -223,5 +323,176 @@ class AuthRepositoryImpl implements AuthRepository {
     return historyJson
         .map((json) => LoginHistoryEntryModel.fromJson(json))
         .toList();
+  }
+
+  @override
+  Future<void> setRecoveryEmail({
+    required String recoveryEmail,
+    required String password,
+  }) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.setRecoveryEmail(
+      accessToken: accessToken,
+      recoveryEmail: recoveryEmail,
+      password: password,
+    );
+  }
+
+  @override
+  Future<void> verifyRecoveryEmail({required String otpCode}) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.verifyRecoveryEmail(
+      accessToken: accessToken,
+      otpCode: otpCode,
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> getTechnicianMetrics() async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    return await authRemoteService.getTechnicianMetrics(accessToken);
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.changePassword(
+      accessToken: accessToken,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+  }
+
+  @override
+  Future<String> uploadAvatar(String filePath) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+
+    final avatarName = await authRemoteService.uploadAvatar(
+      accessToken: accessToken,
+      filePath: filePath,
+    );
+
+    final fullUrl = AvatarUtils.getAvatarUrl(avatarName);
+
+    final currentUser = await authLocalDataSource.getUser();
+    if (currentUser != null) {
+      final updatedUser = UserModel(
+        id: currentUser.id,
+        email: currentUser.email,
+        name: currentUser.name,
+        phoneNumber: currentUser.phoneNumber,
+        role: currentUser.role,
+        province: currentUser.province,
+        avatarUrl: fullUrl,
+      );
+      await authLocalDataSource.saveUser(updatedUser);
+      sl<AuthViewModel>().setLoggedInUser(updatedUser);
+    }
+
+    return avatarName;
+  }
+
+  @override
+  Future<void> updateUserStatus(String userId, int statusId) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.updateUserStatus(
+      accessToken: accessToken,
+      userId: userId,
+      statusId: statusId,
+    );
+  }
+
+  @override
+  Future<void> closeAccount() async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.closeAccount(accessToken: accessToken);
+    await logout();
+    sl<AuthViewModel>().clearUser();
+  }
+
+  @override
+  Future<User> getMe() async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    final userMap = await authRemoteService.getMe(accessToken: accessToken);
+    return UserModel.fromJson(userMap);
+  }
+
+  @override
+  Future<User> getUserById(String userId) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    final userMap = await authRemoteService.getUserById(
+      accessToken: accessToken,
+      userId: userId,
+    );
+    return UserModel.fromJson(userMap);
+  }
+
+  @override
+  Future<List<UserSession>> getActiveSessions() async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    final currentSessionId = await authLocalDataSource.getSessionId();
+    final sessionsJson = await authRemoteService.getActiveSessions(accessToken);
+    return sessionsJson
+        .map(
+          (json) => UserSessionModel.fromJson(
+            json,
+            currentSessionId: currentSessionId,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<void> revokeSession(String sessionId) async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    await authRemoteService.revokeSession(
+      accessToken: accessToken,
+      sessionId: sessionId,
+    );
+  }
+
+  @override
+  Future<void> revokeAllOtherSessions() async {
+    final accessToken = await authLocalDataSource.getAccessToken() ?? '';
+    if (accessToken.isEmpty) {
+      throw Exception('Unauthenticated: Access token is missing');
+    }
+    await authRemoteService.revokeAllOtherSessions(accessToken: accessToken);
   }
 }

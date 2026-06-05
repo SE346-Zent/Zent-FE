@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../domain/entities/inventory_part.dart';
 import '../../domain/entities/pagination_meta.dart';
@@ -327,6 +329,37 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<Map<String, dynamic>> getScmLuts() async {
     return await remoteDataSource.getScmLuts();
+  }
+
+  @override
+  Future<Map<String, dynamic>> getScmAssets() async {
+    return await remoteDataSource.getScmAssets();
+  }
+
+  @override
+  Future<String> exportInventoryAssets({String? query}) async {
+    final bytes = await remoteDataSource.exportInventoryAssets(query: query);
+    Directory? directory;
+    if (Platform.isAndroid) {
+      // Save directly to the public Downloads folder so the file is visible
+      // in the device's file manager without any extra steps.
+      directory = Directory('/storage/emulated/0/Download');
+      if (!await directory.exists()) {
+        // Fallback: app-private external storage
+        directory = await getExternalStorageDirectory();
+      }
+    } else if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      directory =
+          await getDownloadsDirectory() ?? await getTemporaryDirectory();
+    }
+    final path = directory?.path ?? (await getTemporaryDirectory()).path;
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final filePath = '$path/inventory_assets_$timestamp.xlsx';
+    final file = File(filePath);
+    await file.writeAsBytes(bytes);
+    return filePath;
   }
 
   // ──────────────────────────────────────────────────────

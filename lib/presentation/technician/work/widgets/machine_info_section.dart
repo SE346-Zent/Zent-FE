@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
@@ -95,7 +97,26 @@ class MachineInfoSection extends StatelessWidget {
             import_router.RouteNames.qrScanner,
             extra: {
               'onScanned': (String result) {
-                viewModel.serialNumberController.text = result;
+                try {
+                  final decoded = jsonDecode(result);
+                  if (decoded is Map<String, dynamic> && decoded.length == 2) {
+                    String? mtmVal;
+                    String? snVal;
+                    decoded.forEach((k, v) {
+                      if (k.toLowerCase() == 'mtm') mtmVal = v.toString();
+                      if (k.toLowerCase() == 'sn') snVal = v.toString();
+                    });
+                    if (mtmVal != null && snVal != null) {
+                      viewModel.mtmController.text = mtmVal!;
+                      viewModel.serialNumberController.text = snVal!;
+                      viewModel.notifyListeners();
+                      return;
+                    }
+                  }
+                  ZentErrorPopup.show(context, 'QR không hỗ trợ');
+                } catch (e) {
+                  ZentErrorPopup.show(context, 'QR không hỗ trợ');
+                }
               },
             },
           );

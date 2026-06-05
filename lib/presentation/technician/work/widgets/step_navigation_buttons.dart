@@ -3,6 +3,7 @@ import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 
 class StepNavigationButtons extends StatelessWidget {
   final int currentStep;
@@ -45,7 +46,7 @@ class StepNavigationButtons extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimens.boraMd),
       ),
       child: ElevatedButton(
-        onPressed: onBackPressed,
+        onPressed: TapDebounce.call(onBackPressed),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.surface600,
           foregroundColor: AppColors.secondary500,
@@ -71,7 +72,7 @@ class StepNavigationButtons extends StatelessWidget {
         boxShadow: [BoxShadowStyles.glowing],
       ),
       child: ElevatedButton(
-        onPressed: onNextPressed,
+        onPressed: TapDebounce.call(onNextPressed),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.tertiary500,
           foregroundColor: AppColors.surface50,

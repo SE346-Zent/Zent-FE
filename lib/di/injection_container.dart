@@ -21,13 +21,20 @@ import '../domain/usecases/auth/register_usecase.dart';
 import '../domain/usecases/auth/verify_otp_usecase.dart';
 import '../domain/usecases/auth/resend_otp_usecase.dart';
 import '../domain/usecases/auth/forgot_password_usecase.dart';
+import '../domain/usecases/auth/update_profile_usecase.dart';
 import '../domain/usecases/auth/verify_forgot_otp_usecase.dart';
 import '../domain/usecases/work_order/reassign_work_order_usecase.dart';
 import '../domain/usecases/auth/get_login_history_usecase.dart';
+import '../domain/usecases/auth/change_password_usecase.dart';
+import '../domain/usecases/auth/recovery_and_metrics_usecases.dart';
+import '../domain/usecases/auth/session_usecases.dart';
 import '../domain/usecases/work_order/work_order_draft_usecase.dart';
 import '../domain/usecases/work_order/get_single_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_many_work_orders_usecase.dart';
+import '../domain/usecases/work_order/get_reject_forms_usecase.dart';
+import '../domain/usecases/work_order/get_reject_form_by_id_usecase.dart';
 import '../domain/usecases/work_order/create_work_order_usecase.dart';
+import '../domain/usecases/work_order/edit_work_order_usecase.dart';
 import '../domain/usecases/work_order/get_active_repairs_usecase.dart';
 import '../domain/usecases/work_order/refuse_work_order_usecase.dart';
 import '../domain/usecases/work_order/approve_refusal_usecase.dart';
@@ -69,6 +76,9 @@ import '../presentation/admin/account/viewmodels/inventory_assets_viewmodel.dart
 import '../presentation/admin/account/viewmodels/detail_request_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/choose_role_viewmodel.dart';
 import '../presentation/admin/account/viewmodels/create_account_viewmodel.dart';
+import '../presentation/admin/account/viewmodels/personal_info_viewmodel.dart'
+    as admin_personal_info;
+import '../presentation/admin/account/viewmodels/staff_detail_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_dashboard_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_notifications_viewmodel.dart';
 import '../presentation/admin/work/viewmodels/admin_reports_viewmodel.dart';
@@ -96,6 +106,8 @@ import '../presentation/customer/work/viewmodels/detailed_product_viewmodel.dart
 import '../presentation/customer/work/viewmodels/request_service_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/active_repairs_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/customer_cancel_work_order_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/edit_work_order_viewmodel.dart';
+import '../presentation/customer/work/viewmodels/customer_work_order_details_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/device_registration_viewmodel.dart';
 import '../presentation/customer/work/viewmodels/parts_viewmodel.dart';
 import '../presentation/common/auth/register/view_models/register_view_model.dart';
@@ -130,15 +142,28 @@ Future<void> init() async {
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
   sl.registerLazySingleton(() => ResendOtpUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
   sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
   sl.registerLazySingleton(() => VerifyForgotOtpUseCase(sl()));
   sl.registerLazySingleton(() => GetLoginHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => SetRecoveryEmailUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyRecoveryEmailUseCase(sl()));
+  sl.registerLazySingleton(() => GetTechnicianMetricsUseCase(sl()));
+  sl.registerLazySingleton(() => ChangePasswordUseCase(sl()));
+  sl.registerLazySingleton(() => GetActiveSessionsUseCase(sl()));
+  sl.registerLazySingleton(() => RevokeSessionUseCase(sl()));
+  sl.registerLazySingleton(() => RevokeAllOtherSessionsUseCase(sl()));
 
   // Work Order Use Cases
   sl.registerLazySingleton(() => WorkOrderDraftUseCase(sl()));
   sl.registerLazySingleton(() => GetSingleWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetManyWorkOrdersUseCase(sl()));
+  sl.registerLazySingleton(
+    () => GetRejectFormsUseCase(repository: sl(), getCurrentUserUseCase: sl()),
+  );
+  sl.registerLazySingleton(() => GetRejectFormByIdUseCase(repository: sl()));
   sl.registerLazySingleton(() => CreateWorkOrderUseCase(sl()));
+  sl.registerLazySingleton(() => EditWorkOrderUseCase(sl()));
   sl.registerLazySingleton(() => GetActiveRepairsUseCase(sl()));
   sl.registerLazySingleton(() => GetMyProductsUseCase(sl()));
   sl.registerLazySingleton(() => RefuseWorkOrderUseCase(sl()));
@@ -166,6 +191,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetPartRequestsUseCase(sl()));
   sl.registerLazySingleton(() => GetNewPartFormByIdUseCase(sl()));
   sl.registerLazySingleton(() => GetScmLutsUseCase(sl()));
+  sl.registerLazySingleton(() => GetScmAssetsUseCase(sl()));
+  sl.registerLazySingleton(() => ExportInventoryAssetsUseCase(sl()));
 
   // Inventory Use Cases — Zent
   sl.registerLazySingleton(() => GetProductDetailUseCase(sl()));
@@ -195,7 +222,22 @@ Future<void> init() async {
     () => VerifyOtpViewModel(verifyOtpUseCase: sl(), resendOtpUseCase: sl()),
   );
   sl.registerFactory(() => UserManagementViewModel(getUsersUseCase: sl()));
-  sl.registerFactory(() => AdminDashboardViewModel());
+  sl.registerFactoryParam<StaffDetailViewModel, String, void>(
+    (userId, _) => StaffDetailViewModel(authRepository: sl(), userId: userId),
+  );
+  sl.registerFactory(
+    () => AdminDashboardViewModel(
+      getCurrentUserUseCase: sl(),
+      getRejectFormsUseCase: sl(),
+      getPartRequestsUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => admin_personal_info.AdminPersonalInfoViewModel(
+      getCurrentUserUseCase: sl(),
+      updateProfileUseCase: sl(),
+    ),
+  );
   sl.registerFactory(() => AdminNotificationsViewModel());
   sl.registerFactory(() => AdminReportsViewModel(getAnalyticsUseCase: sl()));
   sl.registerFactory(
@@ -208,6 +250,7 @@ Future<void> init() async {
     () => AssignWorkOrderViewModel(
       getTechniciansUseCase: sl(),
       assignWorkOrderUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
     ),
   );
   sl.registerFactory(() => AssignedWorkOrderDetailViewModel());
@@ -220,7 +263,8 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => RejectedWorkOrdersViewModel(
-      getManyWorkOrdersUseCase: sl(),
+      getRejectFormsUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
       approveRefusalUseCase: sl(),
       denyRefusalUseCase: sl(),
     ),
@@ -228,21 +272,32 @@ Future<void> init() async {
   sl.registerFactory(
     () => RejectionDetailViewModel(
       getSingleWorkOrderUseCase: sl(),
+      getRejectFormByIdUseCase: sl(),
+      getRejectFormsUseCase: sl(),
       approveRefusalUseCase: sl(),
       denyRefusalUseCase: sl(),
     ),
   );
   sl.registerFactory(() => ChooseRoleViewModel());
   sl.registerFactory(() => CreateAccountViewModel());
-  sl.registerFactory(() => ProfileViewModel(sl(), sl()));
+  sl.registerFactory(() => ProfileViewModel(sl(), sl(), sl()));
   sl.registerFactory(
-    () => SecuritySettingsViewModel(getLoginHistoryUseCase: sl()),
+    () => SecuritySettingsViewModel(
+      getLoginHistoryUseCase: sl(),
+      setRecoveryEmailUseCase: sl(),
+      verifyRecoveryEmailUseCase: sl(),
+      changePasswordUseCase: sl(),
+      getActiveSessionsUseCase: sl(),
+      revokeSessionUseCase: sl(),
+      revokeAllOtherSessionsUseCase: sl(),
+    ),
   );
   sl.registerFactory(() => PartRequestsViewModel(getPartRequestsUseCase: sl()));
   sl.registerFactory(
     () => InventoryAssetsViewModel(
       getScmProductsUseCase: sl(),
       getPartCatalogUseCase: sl(),
+      exportInventoryAssetsUseCase: sl(),
     ),
   );
   sl.registerFactory(
@@ -253,14 +308,24 @@ Future<void> init() async {
       getScmLutsUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => CustomerProfileViewModel(sl(), sl()));
-  sl.registerFactory(() => PersonalInfoViewModel(sl()));
+  sl.registerFactory(() => CustomerProfileViewModel(sl(), sl(), sl()));
+  sl.registerFactory(() => PersonalInfoViewModel(sl(), sl()));
   sl.registerFactory(() => ServiceViewModel(getCurrentUserUseCase: sl()));
   sl.registerFactory(() => ChatViewModel(chatService: sl()));
   sl.registerFactory(
-    () => CustomerSecurityViewModel(getLoginHistoryUseCase: sl()),
+    () => CustomerSecurityViewModel(
+      getLoginHistoryUseCase: sl(),
+      setRecoveryEmailUseCase: sl(),
+      verifyRecoveryEmailUseCase: sl(),
+      changePasswordUseCase: sl(),
+      getActiveSessionsUseCase: sl(),
+      revokeSessionUseCase: sl(),
+      revokeAllOtherSessionsUseCase: sl(),
+    ),
   );
-  sl.registerFactory(() => CustomerNotificationsViewModel());
+  sl.registerFactory(
+    () => CustomerNotificationsViewModel(notificationRepository: sl()),
+  );
   sl.registerFactory(
     () => ProductsViewModel(
       getMyProductsUseCase: sl(),
@@ -268,18 +333,32 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(
-    () => DetailedProductViewModel(
-      getMyProductsUseCase: sl(),
-      getCurrentUserUseCase: sl(),
-      getProductDetailUseCase: sl(),
-    ),
+    () => DetailedProductViewModel(getProductDetailUseCase: sl()),
   );
   sl.registerFactory(() => RequestServiceViewModel(sl()));
   sl.registerFactory(
-    () => ActiveRepairsViewModel(getManyWorkOrdersUseCase: sl()),
+    () => ActiveRepairsViewModel(
+      getManyWorkOrdersUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+    ),
   );
   sl.registerFactory(
     () => CustomerCancelWorkOrderViewModel(cancelWorkOrderUseCase: sl()),
+  );
+  sl.registerFactoryParam<EditWorkOrderViewModel, List<String>, void>(
+    (params, _) => EditWorkOrderViewModel(
+      editWorkOrderUseCase: sl(),
+      getSingleWorkOrderUseCase: sl(),
+      getMyProductsUseCase: sl(),
+      workOrderId: params[0],
+      workOrderNumber: params[1],
+    ),
+  );
+  sl.registerFactoryParam<CustomerWorkOrderDetailsViewModel, String, void>(
+    (workOrderId, _) => CustomerWorkOrderDetailsViewModel(
+      getSingleWorkOrderUseCase: sl(),
+      workOrderId: workOrderId,
+    ),
   );
   sl.registerFactory(
     () => DetailedChatViewModel(chatService: sl(), getCurrentUserUseCase: sl()),
@@ -291,13 +370,22 @@ Future<void> init() async {
       getScmProductsUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => PartsViewModel(getPartCatalogUseCase: sl()));
-  sl.registerFactory(() => NotificationsViewModel());
+  sl.registerFactory(
+    () => PartsViewModel(
+      getPartsUseCase: sl(),
+      getMyProductsUseCase: sl(),
+      getCurrentUserUseCase: sl(),
+      getPartCatalogUseCase: sl(),
+      getScmProductsUseCase: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => NotificationsViewModel());
 
   sl.registerFactory(
     () => TechnicianHomeViewModel(
       getManyWorkOrdersUseCase: sl(),
       getCurrentUserUseCase: sl(),
+      getTechnicianMetricsUseCase: sl(),
     ),
   );
   sl.registerFactory(
@@ -329,11 +417,21 @@ Future<void> init() async {
       getSingleWorkOrderUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => TechProfileViewModel(sl(), sl()));
-  sl.registerFactory(() => TechPersonalInfoViewModel(sl()));
+  sl.registerFactory(() => TechProfileViewModel(sl(), sl(), sl()));
+  sl.registerFactory(() => TechPersonalInfoViewModel(sl(), sl()));
   sl.registerFactory(() => TechNotificationsViewModel());
-  sl.registerFactory(() => TechSecurityViewModel(getLoginHistoryUseCase: sl()));
-  sl.registerFactory(() => PartSearchViewModel(getPartsUseCase: sl()));
+  sl.registerFactory(
+    () => TechSecurityViewModel(
+      getLoginHistoryUseCase: sl(),
+      setRecoveryEmailUseCase: sl(),
+      verifyRecoveryEmailUseCase: sl(),
+      changePasswordUseCase: sl(),
+      getActiveSessionsUseCase: sl(),
+      revokeSessionUseCase: sl(),
+      revokeAllOtherSessionsUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(() => PartSearchViewModel(getPartCatalogUseCase: sl()));
   sl.registerFactory(
     () => WorkOrdersHistoryViewModel(
       getManyWorkOrdersUseCase: sl(),

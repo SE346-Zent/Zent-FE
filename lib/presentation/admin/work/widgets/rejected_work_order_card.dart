@@ -1,26 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
-import 'package:zent_fe/domain/entities/work_order.dart';
+import 'package:zent_fe/domain/entities/reject_form.dart';
+import 'package:zent_fe/presentation/common/core/ui/user_avatar.dart';
 
-class RejectedWorkOrderCard extends StatelessWidget {
-  final WorkOrder workOrder;
-  final VoidCallback onApprove;
-  final VoidCallback onDeny;
+class RejectedWorkOrderCard extends StatefulWidget {
+  final RejectForm rejectForm;
+  final Future<void> Function() onApprove;
+  final Future<void> Function() onDeny;
   final VoidCallback onDetailTap;
 
   const RejectedWorkOrderCard({
     super.key,
-    required this.workOrder,
+    required this.rejectForm,
     required this.onApprove,
     required this.onDeny,
     required this.onDetailTap,
   });
 
   @override
+  State<RejectedWorkOrderCard> createState() => _RejectedWorkOrderCardState();
+}
+
+class _RejectedWorkOrderCardState extends State<RejectedWorkOrderCard> {
+  bool _isApproving = false;
+  bool _isDenying = false;
+
+  @override
   Widget build(BuildContext context) {
+    final form = widget.rejectForm;
+    final onApprove = widget.onApprove;
+    final onDeny = widget.onDeny;
+    final onDetailTap = widget.onDetailTap;
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.spaceLg),
       decoration: BoxDecoration(
@@ -33,16 +47,20 @@ class RejectedWorkOrderCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '#${workOrder.id}',
+            form.workOrderNumber.startsWith('WO')
+                ? form.workOrderNumber
+                : '#${form.workOrderNumber}',
             style: TextStyles.middle.copyWith(color: AppColors.tertiary500),
           ),
           const SizedBox(height: 4.0),
           Text(
-            workOrder.title,
+            form.reason,
             style: TextStyles.headline.copyWith(color: AppColors.primary500),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppDimens.spaceMd),
-          GestureDetector(
+          ThrottledGestureDetector(
             onTap: onDetailTap,
             child: Container(
               padding: const EdgeInsets.symmetric(
@@ -75,16 +93,19 @@ class RejectedWorkOrderCard extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const CircleAvatar(
-                                  radius: 10,
-                                  backgroundImage: NetworkImage(
-                                    'https://i.pravatar.cc/150?img=11',
-                                  ),
+                                UserAvatar(
+                                  size: 20,
+                                  name: form.technicianName.isNotEmpty
+                                      ? form.technicianName
+                                      : 'Technician',
+                                  avatarUrl: null,
                                 ),
                                 const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
-                                    workOrder.technicianName ?? 'N/A',
+                                    form.technicianName.isNotEmpty
+                                        ? form.technicianName
+                                        : 'N/A',
                                     style: TextStyles.middle.copyWith(
                                       color: Colors.black,
                                     ),
@@ -112,16 +133,19 @@ class RejectedWorkOrderCard extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const CircleAvatar(
-                                  radius: 10,
-                                  backgroundImage: NetworkImage(
-                                    'https://i.pravatar.cc/150?img=5',
-                                  ),
+                                UserAvatar(
+                                  size: 20,
+                                  name: form.customerName.isNotEmpty
+                                      ? form.customerName
+                                      : 'Customer',
+                                  avatarUrl: null,
                                 ),
                                 const SizedBox(width: 8.0),
                                 Flexible(
                                   child: Text(
-                                    workOrder.customerName,
+                                    form.customerName.isNotEmpty
+                                        ? form.customerName
+                                        : 'N/A',
                                     style: TextStyles.middle.copyWith(
                                       color: Colors.black,
                                     ),
@@ -148,7 +172,7 @@ class RejectedWorkOrderCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6.0),
                   Text(
-                    '"${workOrder.refusalNote}"',
+                    '"${form.reason}"',
                     style: TextStyles.bodyLarge.copyWith(color: Colors.black),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -161,8 +185,23 @@ class RejectedWorkOrderCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: onDeny,
+                child: ThrottledGestureDetector(
+                  onTap: _isApproving || _isDenying
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isDenying = true;
+                          });
+                          try {
+                            await onDeny();
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isDenying = false;
+                              });
+                            }
+                          }
+                        },
                   child: Container(
                     height: 44,
                     decoration: BoxDecoration(
@@ -175,17 +214,43 @@ class RejectedWorkOrderCard extends StatelessWidget {
                       boxShadow: [BoxShadowStyles.glowing],
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Deny',
-                      style: TextStyles.middle.copyWith(color: Colors.white),
-                    ),
+                    child: _isDenying
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Deny',
+                            style: TextStyles.middle.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ),
               ),
               const SizedBox(width: AppDimens.spaceMd),
               Expanded(
-                child: GestureDetector(
-                  onTap: onApprove,
+                child: ThrottledGestureDetector(
+                  onTap: _isApproving || _isDenying
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isApproving = true;
+                          });
+                          try {
+                            await onApprove();
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isApproving = false;
+                              });
+                            }
+                          }
+                        },
                   child: Container(
                     height: 44,
                     decoration: BoxDecoration(
@@ -197,12 +262,21 @@ class RejectedWorkOrderCard extends StatelessWidget {
                       ),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Approve',
-                      style: TextStyles.middle.copyWith(
-                        color: AppColors.primary500,
-                      ),
-                    ),
+                    child: _isApproving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary500,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Approve',
+                            style: TextStyles.middle.copyWith(
+                              color: AppColors.primary500,
+                            ),
+                          ),
                   ),
                 ),
               ),

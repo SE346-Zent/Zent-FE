@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
+import 'package:zent_fe/presentation/common/core/ui/zent_error_popup.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/domain/entities/work_order.dart';
@@ -170,7 +172,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
         itemCount: vm.filters.length,
         itemBuilder: (context, index) {
           final isSelected = vm.selectedFilterIndex == index;
-          return GestureDetector(
+          return ThrottledGestureDetector(
             onTap: () => vm.setFilterIndex(index),
             child: Container(
               margin: const EdgeInsets.only(right: AppDimens.spaceSm),
@@ -220,16 +222,26 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: ThrottledInkWell(
           borderRadius: BorderRadius.circular(AppDimens.boraSm),
-          onTap: isCustomer
-              ? null
-              : () {
-                  context.pushNamed(
-                    RouteNames.adminDetailedHistory,
-                    pathParameters: {'workOrderId': wo.id},
-                  );
-                },
+          onTap: () {
+            if (isCustomer) {
+              context.pushNamed(
+                RouteNames.customerWorkOrderDetails,
+                pathParameters: {'workOrderId': wo.id},
+              );
+            } else if (vm.currentUser?.role == UserRoles.technician) {
+              context.pushNamed(
+                RouteNames.techDetailedHistory,
+                pathParameters: {'workOrderId': wo.id},
+              );
+            } else {
+              context.pushNamed(
+                RouteNames.adminDetailedHistory,
+                pathParameters: {'workOrderId': wo.id},
+              );
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.only(
               top: 12.0,
@@ -273,75 +285,87 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                 ),
 
                 // Bottom: 3 Info Rows (Name, Address, Last Updated)
-                Column(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Row 1: Name
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.person_outline,
-                          size: 14.0,
-                          color: AppColors.secondary400,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Expanded(
-                          child: Text(
-                            isCustomer
-                                ? (wo.technicianName ?? 'Unassigned')
-                                : wo.customerName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          // Row 1: Name
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.person_outline,
+                                size: 14.0,
+                                color: AppColors.secondary400,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  isCustomer
+                                      ? (wo.technicianName ?? 'Unassigned')
+                                      : wo.customerName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2.0),
-                    // Row 2: Address
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on_outlined,
-                          size: 14.0,
-                          color: AppColors.secondary400,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Expanded(
-                          child: Text(
-                            wo.addressString,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
+                          const SizedBox(height: 2.0),
+                          // Row 2: Address
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                size: 14.0,
+                                color: AppColors.secondary400,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  wo.addressString,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2.0),
-                    // Row 3: Last Updated
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.access_time,
-                          size: 14.0,
-                          color: AppColors.secondary400,
-                        ),
-                        const SizedBox(width: 4.0),
-                        Expanded(
-                          child: Text(
-                            DateFormat(
-                              'dd MMM yyyy, HH:mm',
-                            ).format(wo.updatedAt.toLocal()),
-                            style: TextStyles.label.copyWith(
-                              color: AppColors.secondary400,
-                            ),
+                          const SizedBox(height: 2.0),
+                          // Row 3: Last Updated
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time,
+                                size: 14.0,
+                                color: AppColors.secondary400,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  DateFormat(
+                                    'dd MMM yyyy, HH:mm',
+                                  ).format(wo.updatedAt.toLocal()),
+                                  style: TextStyles.label.copyWith(
+                                    color: AppColors.secondary400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    if (isCustomer)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, bottom: 2.0),
+                        child: _buildStatusLabel(wo),
+                      ),
                   ],
                 ),
               ],
@@ -400,6 +424,8 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
   // Customer Triple-Dot Popup Menu
   // ──────────────────────────────────────────────────────────────────────────
   Widget _buildCustomerPopupMenu(BuildContext context, WorkOrder wo) {
+    final isComplete = wo.status == WorkOrderStatus.complete;
+
     return PopupMenuButton<String>(
       constraints: const BoxConstraints(minWidth: 140.0, maxWidth: 140.0),
       padding: EdgeInsets.zero,
@@ -420,15 +446,22 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
             width: double.infinity,
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            child: InkWell(
+            child: ThrottledInkWell(
               onTap: () {
                 Navigator.pop(context);
+                if (!isComplete) {
+                  ZentErrorPopup.show(
+                    context,
+                    'Work order must be completed before rating.',
+                  );
+                  return;
+                }
                 _showRatingDialog(context, wo);
               },
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isComplete ? Colors.white : AppColors.secondary50,
                   borderRadius: BorderRadius.circular(AppDimens.boraXs),
                   border: Border.all(color: AppColors.secondary200, width: 1.0),
                 ),
@@ -436,7 +469,9 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                 child: Text(
                   "Rate",
                   style: TextStyles.label.copyWith(
-                    color: AppColors.primary500,
+                    color: isComplete
+                        ? AppColors.primary500
+                        : AppColors.secondary300,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -508,7 +543,7 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                       children: List.generate(5, (index) {
                         final score = index + 1;
                         final isFilled = score <= rating;
-                        return GestureDetector(
+                        return ThrottledGestureDetector(
                           onTap: () => setState(() => rating = score),
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 3.0),
@@ -598,7 +633,6 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                       ),
                       onPressed: () async {
                         final navigator = Navigator.of(context);
-                        final messenger = ScaffoldMessenger.of(context);
                         navigator.pop(context);
 
                         final success = await vm.rateWorkOrder(
@@ -609,18 +643,10 @@ class _WorkOrdersHistoryScreenState extends State<WorkOrdersHistoryScreen> {
                               : commentController.text.trim(),
                         );
 
-                        if (mounted) {
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? 'Rating submitted successfully! Thank you.'
-                                    : 'Failed to submit rating. Please try again.',
-                              ),
-                              backgroundColor: success
-                                  ? AppColors.success500
-                                  : AppColors.error500,
-                            ),
+                        if (!success && context.mounted) {
+                          ZentErrorPopup.show(
+                            context,
+                            'Failed to submit rating. Please try again.',
                           );
                         }
                       },

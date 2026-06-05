@@ -15,7 +15,6 @@ class InventoryAssetCard extends StatelessWidget {
     final isProduct = asset.type == 'PRODUCT';
     final mainColor = isProduct ? AppColors.tertiary500 : AppColors.error500;
     final bgColor = isProduct ? AppColors.tertiary50 : AppColors.error50;
-    final inStock = asset.stockCount > 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -75,67 +74,10 @@ class InventoryAssetCard extends StatelessWidget {
                           const SizedBox(height: AppDimens.spaceMd),
                           Text(
                             asset.title,
-                            style: TextStyles.title.copyWith(
+                            style: TextStyles.headline.copyWith(
                               color: Colors.black,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          const SizedBox(height: 4.0),
-                          Text(
-                            asset.description,
-                            style: TextStyles.bodyMedium.copyWith(
-                              color: Colors.black,
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: AppDimens.spaceMd,
-                            ),
-                            child: Divider(
-                              color: AppColors.secondary50,
-                              height: 1.0,
-                              thickness: 1.0,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              inStock
-                                  ? const Icon(
-                                      Icons.assignment_turned_in_outlined,
-                                      color: AppColors.success500,
-                                      size: 16.0,
-                                    )
-                                  : Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.assignment_outlined,
-                                          color: AppColors.error500,
-                                          size: 16.0,
-                                        ),
-                                        Container(
-                                          width: 8,
-                                          height: 8,
-                                          color: Colors.white,
-                                        ),
-                                        const Icon(
-                                          Icons.close,
-                                          color: AppColors.error500,
-                                          size: 10.0,
-                                        ),
-                                      ],
-                                    ),
-                              const SizedBox(width: AppDimens.spaceXs),
-                              Text(
-                                inStock
-                                    ? '${asset.stockCount} In Stock'
-                                    : 'Out of Stock',
-                                style: TextStyles.label.copyWith(
-                                  color: inStock
-                                      ? AppColors.success500
-                                      : AppColors.error500,
-                                ),
-                              ),
-                            ],
                           ),
                         ],
                       ),

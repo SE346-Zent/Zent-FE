@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:zent_fe/di/injection_container.dart' as di;
@@ -7,6 +8,7 @@ import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
 import 'package:zent_fe/presentation/common/core/ui/account_header.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 import 'viewmodels/detailed_history_viewmodel.dart';
 
 class DetailedHistoryScreen extends StatefulWidget {
@@ -170,7 +172,7 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
     Color iconColor = AppColors.tertiary500,
     Widget? customIcon,
   }) {
-    return InkWell(
+    return ThrottledInkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -438,20 +440,15 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
         child: Row(
           children: [
             // Part Image
-            Container(
+            AppNetworkImage(
+              url: imageUrl.isNotEmpty
+                  ? imageUrl
+                  : 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=200',
               width: 48.0,
               height: 48.0,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                image: DecorationImage(
-                  image: NetworkImage(
-                    imageUrl.isNotEmpty
-                        ? imageUrl
-                        : 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?q=80&w=200',
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
+              fit: BoxFit.cover,
+              borderRadius: BorderRadius.circular(AppDimens.boraSm),
+              enableViewer: true,
             ),
             const SizedBox(width: AppDimens.spaceMd),
             // Part Info
@@ -589,16 +586,13 @@ class _DetailedHistoryScreenState extends State<DetailedHistoryScreen> {
         separatorBuilder: (context, index) =>
             const SizedBox(width: AppDimens.spaceSm),
         itemBuilder: (context, index) {
-          return Container(
+          return AppNetworkImage(
+            url: urls[index],
             width: 68.0,
             height: 68.0,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppDimens.boraSm),
-              image: DecorationImage(
-                image: NetworkImage(urls[index]),
-                fit: BoxFit.cover,
-              ),
-            ),
+            fit: BoxFit.cover,
+            borderRadius: BorderRadius.circular(AppDimens.boraSm),
+            enableViewer: true,
           );
         },
       ),

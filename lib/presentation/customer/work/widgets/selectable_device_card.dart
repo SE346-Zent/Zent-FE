@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:zent_fe/presentation/common/core/themes/colors.dart';
 import 'package:zent_fe/presentation/common/core/themes/dimens.dart';
 import 'package:zent_fe/presentation/common/core/themes/text_styles.dart';
 import 'package:zent_fe/presentation/common/core/themes/boxshadow.dart';
+import 'package:zent_fe/presentation/common/core/ui/app_network_image.dart';
 
 class SelectableDeviceCard extends StatelessWidget {
   final String imagePath;
@@ -31,7 +33,7 @@ class SelectableDeviceCard extends StatelessWidget {
         ? [BoxShadowStyles.subtle]
         : [BoxShadowStyles.raised];
 
-    return GestureDetector(
+    return ThrottledGestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -47,61 +49,12 @@ class SelectableDeviceCard extends StatelessWidget {
           children: [
             // Image
             RepaintBoundary(
-              child: ClipRRect(
+              child: AppNetworkImage(
+                url: imagePath,
+                width: 64,
+                height: 64,
+                fit: BoxFit.cover,
                 borderRadius: BorderRadius.circular(AppDimens.boraSm),
-                child:
-                    imagePath.startsWith('http') ||
-                        imagePath.startsWith('https')
-                    ? Image.network(
-                        imagePath,
-                        width: 64,
-                        height: 64,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          debugPrint(
-                            '=== [SelectableDeviceCard] Network Image Error for $imagePath: $error ===',
-                          );
-                          return Container(
-                            width: 64,
-                            height: 64,
-                            color: AppColors.secondary50,
-                            child: const Icon(
-                              Icons.broken_image,
-                              color: AppColors.secondary200,
-                              size: 24,
-                            ),
-                          );
-                        },
-                      )
-                    : imagePath.isNotEmpty
-                    ? Image.asset(
-                        imagePath,
-                        width: 64,
-                        height: 64,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 64,
-                            height: 64,
-                            color: AppColors.secondary50,
-                            child: const Icon(
-                              Icons.broken_image,
-                              color: AppColors.secondary200,
-                              size: 24,
-                            ),
-                          );
-                        },
-                      )
-                    : Container(
-                        width: 64,
-                        height: 64,
-                        color: AppColors.secondary50,
-                        child: const Icon(
-                          Icons.image_not_supported,
-                          color: AppColors.secondary200,
-                          size: 24,
-                        ),
-                      ),
               ),
             ),
             const SizedBox(width: AppDimens.spaceMd),

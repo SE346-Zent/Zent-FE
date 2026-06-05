@@ -38,7 +38,9 @@ class _TechMainLayoutState extends State<TechMainLayout> {
         await Geolocator.requestPermission();
       }
     } catch (e) {
-      debugPrint("Error checking/requesting location permission on tech layout init: $e");
+      debugPrint(
+        "Error checking/requesting location permission on tech layout init: $e",
+      );
     }
   }
 

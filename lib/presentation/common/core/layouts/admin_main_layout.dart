@@ -35,7 +35,9 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
         await Geolocator.requestPermission();
       }
     } catch (e) {
-      debugPrint("Error checking/requesting location permission on admin layout init: $e");
+      debugPrint(
+        "Error checking/requesting location permission on admin layout init: $e",
+      );
     }
   }
 

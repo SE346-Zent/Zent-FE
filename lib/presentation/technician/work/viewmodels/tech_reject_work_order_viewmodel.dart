@@ -5,6 +5,7 @@ import '../../../../domain/usecases/work_order/get_single_work_order_usecase.dar
 import '../../../../domain/usecases/auth/get_current_user_usecase.dart';
 import '../../../../data/models/refuse_work_order_request.dart';
 import '../../../../domain/entities/work_order.dart';
+import 'package:zent_fe/presentation/common/core/utils/image_utils.dart';
 
 class TechRejectWorkOrderViewModel extends ChangeNotifier
     with SafeChangeNotifier {
@@ -93,6 +94,12 @@ class TechRejectWorkOrderViewModel extends ChangeNotifier
     notifyListeners();
 
     try {
+      if (evidenceImageUrls.isNotEmpty) {
+        for (final path in evidenceImageUrls) {
+          await ImageUtils.compressImage(path);
+        }
+      }
+
       final request = RefuseWorkOrderRequest(
         reason:
             rejectReasons.firstWhere(

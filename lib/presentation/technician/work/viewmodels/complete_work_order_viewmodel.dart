@@ -1,7 +1,6 @@
 import 'package:zent_fe/presentation/common/core/safe_change_notifier.dart';
-import 'dart:io';
-import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
+import 'package:zent_fe/presentation/common/core/utils/image_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:native_exif/native_exif.dart';
@@ -582,34 +581,7 @@ class CompleteWorkOrderViewModel extends ChangeNotifier
   }
 
   Future<void> _compressImage(String path) async {
-    try {
-      final file = File(path);
-      final bytes = await file.readAsBytes();
-      final image = img.decodeImage(bytes);
-      if (image == null) {
-        debugPrint("Failed to decode image at $path");
-        return;
-      }
-
-      // Resize the image to a maximum width of 1080px (maintain aspect ratio)
-      img.Image resized;
-      if (image.width > 1080) {
-        resized = img.copyResize(image, width: 1080);
-      } else {
-        resized = image;
-      }
-
-      // Compress to JPEG with 80% quality
-      final compressedBytes = img.encodeJpg(resized, quality: 80);
-
-      // Write back to the same file path
-      await file.writeAsBytes(compressedBytes);
-      debugPrint(
-        "Image compressed successfully: ${bytes.length} -> ${compressedBytes.length} bytes",
-      );
-    } catch (e) {
-      debugPrint("Error compressing image: $e");
-    }
+    await ImageUtils.compressImage(path);
   }
 
   Future<void> addPhoto(String path, String phase) async {

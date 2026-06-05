@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:zent_fe/domain/usecases/inventory/zent_inventory_usecases.dart';
 import 'package:zent_fe/domain/usecases/inventory/get_inventory_usecases.dart';
 import 'package:zent_fe/data/services/chat_service.dart';
+import 'package:zent_fe/presentation/common/core/utils/image_utils.dart';
 
 class AddNewPartViewModel extends ChangeNotifier with SafeChangeNotifier {
   final AddPartsToWorkOrderUseCase addPartsToWorkOrderUseCase;
@@ -104,6 +105,12 @@ class AddNewPartViewModel extends ChangeNotifier with SafeChangeNotifier {
     notifyListeners();
 
     try {
+      if (_photos.isNotEmpty) {
+        for (final path in _photos) {
+          await ImageUtils.compressImage(path);
+        }
+      }
+
       await addPartsToWorkOrderUseCase.execute(
         workOrderId: workOrderId,
         partNumber: partName,

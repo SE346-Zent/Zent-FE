@@ -9,6 +9,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
+import android.app.DownloadManager
+
 class MainActivity : FlutterActivity() {
 
     private val CHANNEL = "zent_fe/file_manager"
@@ -37,25 +39,38 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun openFolderInFileManager(path: String) {
-        // Build the content URI for the folder to highlight it in the Files app.
-        // This works for /storage/emulated/0/Download and similar public paths.
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Android 8+ – open via DocumentsUI
-            val downloadsUri = Uri.parse(
-                "content://com.android.externalstorage.documents/document/primary%3ADownload"
-            )
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(downloadsUri, "vnd.android.document/directory")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                // Try opening DocumentsUI pointing to Downloads directory
+                val downloadsUri = Uri.parse(
+                    "content://com.android.externalstorage.documents/document/primary%3ADownload"
+                )
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(downloadsUri, "vnd.android.document/directory")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                // Fallback: Open general downloads folder using DownloadManager
+                val fallbackIntent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(fallbackIntent)
             }
         } else {
-            // Older Android – open via file URI
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(Uri.fromFile(File(path)), "resource/folder")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(Uri.fromFile(File(path)), "resource/folder")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                val fallbackIntent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(fallbackIntent)
             }
         }
-        startActivity(intent)
     }
 }

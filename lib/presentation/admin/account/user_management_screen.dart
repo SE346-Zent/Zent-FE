@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -37,8 +37,12 @@ class _UserManagementScreenContent extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background500,
         floatingActionButton: AddUserFab(
-          onPressed: () =>
-              context.pushNamed(RouteNames.adminChooseRoleCreateAccount),
+          onPressed: () async {
+            await context.pushNamed(RouteNames.adminChooseRoleCreateAccount);
+            if (context.mounted) {
+              viewModel.refreshData();
+            }
+          },
         ),
         body: SafeArea(
           child: Column(

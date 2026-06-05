@@ -86,6 +86,10 @@ abstract class AuthRemoteDatasource {
     required String sessionId,
   });
   Future<void> revokeAllOtherSessions({required String accessToken});
+  Future<void> createUser({
+    required String accessToken,
+    required Map<String, dynamic> requestData,
+  });
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -602,7 +606,45 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       return usersList.map((item) => item as Map<String, dynamic>).toList();
     } catch (e) {
       if (e is Exception) rethrow;
-      throw Exception('Error fetching users: $e');
+      throw Exception('Error fetching user details: $e');
+    }
+  }
+
+  @override
+  Future<void> createUser({
+    required String accessToken,
+    required Map<String, dynamic> requestData,
+  }) async {
+    final url = Uri.parse('$_baseURL/users');
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode(requestData),
+          )
+          .timeout(_timeOut);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _handleErrorResponse(response);
+      }
+
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<dynamic>.fromJson(
+        jsonMap,
+        (data) => data,
+      );
+
+      if (!apiResponse.isSuccessful) {
+        throw Exception(apiResponse.message ?? 'Failed to create user');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Create user error: $e');
     }
   }
 

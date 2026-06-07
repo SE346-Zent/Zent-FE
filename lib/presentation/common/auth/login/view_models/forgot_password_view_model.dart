@@ -22,7 +22,7 @@ class ForgotPasswordViewModel extends ChangeNotifier with SafeChangeNotifier {
 
   bool get isEmailValid {
     if (_email.isEmpty) return false;
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w-\.\+]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(_email);
   }
 

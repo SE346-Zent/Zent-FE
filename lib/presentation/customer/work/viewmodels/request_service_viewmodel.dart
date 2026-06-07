@@ -46,7 +46,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     "Headset",
     "Kit(Mouse and Keyboard)",
     "MousePad",
-    "Other",
+    "Other (Accessories)",
     "PC Port not working properly",
     "Pen",
     "Printer",
@@ -81,7 +81,7 @@ class RequestServiceViewModel extends ChangeNotifier with SafeChangeNotifier {
     "Smart Collab",
     "Software",
     "USB Port",
-    "Other",
+    "Other (Device)",
   ];
 
   RequestServiceViewModel(this.createWorkOrderUseCase);

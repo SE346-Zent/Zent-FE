@@ -12,6 +12,7 @@ import 'package:zent_fe/di/injection_container.dart';
 import 'package:zent_fe/presentation/common/auth/auth_view_model.dart';
 import 'package:zent_fe/domain/exceptions/business_exception.dart';
 import 'package:zent_fe/presentation/common/core/ui/avatar_utils.dart';
+import 'package:zent_fe/data/models/create_user_request.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource authRemoteService;
@@ -494,5 +495,17 @@ class AuthRepositoryImpl implements AuthRepository {
       throw Exception('Unauthenticated: Access token is missing');
     }
     await authRemoteService.revokeAllOtherSessions(accessToken: accessToken);
+  }
+
+  @override
+  Future<void> createUser(CreateUserRequest request) async {
+    final accessToken = await authLocalDataSource.getAccessToken();
+    if (accessToken == null) {
+      throw BusinessException('User is not authenticated');
+    }
+    await authRemoteService.createUser(
+      accessToken: accessToken,
+      requestData: request.toJson(),
+    );
   }
 }

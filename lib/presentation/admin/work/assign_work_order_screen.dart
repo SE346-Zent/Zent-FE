@@ -473,7 +473,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimens.spaceSm,
-          vertical: AppDimens.spaceMd,
+          vertical: AppDimens.spaceSm,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -596,7 +596,7 @@ class _WorkOrderDetailScreenContent extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppDimens.spaceMd),
+          const SizedBox(height: AppDimens.spaceSm),
           Row(
             children: [
               Expanded(

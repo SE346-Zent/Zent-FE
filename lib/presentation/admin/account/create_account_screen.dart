@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:zent_fe/presentation/common/core/utils/tap_debounce.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -174,31 +174,73 @@ class _CreateAccountScreenContent extends StatelessWidget {
                           color: Colors.transparent,
                           child: ThrottledInkWell(
                             borderRadius: BorderRadius.circular(8),
-                            onTap: () {
-                              context.pop();
-                            },
+                            onTap: viewModel.isLoading
+                                ? null
+                                : () async {
+                                    final success = await viewModel
+                                        .submitCreateAccount();
+                                    if (!context.mounted) return;
+
+                                    if (success) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Account created successfully. An email has been sent.',
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                      context.pop();
+                                    } else if (viewModel.errorMessage != null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            viewModel.errorMessage!,
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 vertical: 12.0,
                               ),
                               child: Center(
-                                child: Text(
-                                  titleText,
-                                  style: TextStyles.title.copyWith(
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                child: viewModel.isLoading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        titleText,
+                                        style: TextStyles.title.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: AppDimens.spaceXl),
+
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
+                        child: Center(child: ZentBottomLogo()),
+                      ),
                     ],
                   ),
                 ),
               ),
-              const ZentBottomLogo(),
             ],
           ),
         ),

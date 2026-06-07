@@ -1,6 +1,7 @@
 import 'package:zent_fe/domain/entities/user.dart';
 import 'package:zent_fe/domain/entities/login_history_entry.dart';
 import 'package:zent_fe/domain/entities/user_session.dart';
+import 'package:zent_fe/data/models/create_user_request.dart';
 
 abstract class AuthRepository {
   Future<User> login({
@@ -72,4 +73,5 @@ abstract class AuthRepository {
   Future<List<UserSession>> getActiveSessions();
   Future<void> revokeSession(String sessionId);
   Future<void> revokeAllOtherSessions();
+  Future<void> createUser(CreateUserRequest request);
 }

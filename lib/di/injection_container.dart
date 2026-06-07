@@ -23,6 +23,7 @@ import '../domain/usecases/auth/resend_otp_usecase.dart';
 import '../domain/usecases/auth/forgot_password_usecase.dart';
 import '../domain/usecases/auth/update_profile_usecase.dart';
 import '../domain/usecases/auth/verify_forgot_otp_usecase.dart';
+import '../domain/usecases/auth/create_user_usecase.dart';
 import '../domain/usecases/work_order/reassign_work_order_usecase.dart';
 import '../domain/usecases/auth/get_login_history_usecase.dart';
 import '../domain/usecases/auth/change_password_usecase.dart';
@@ -136,6 +137,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => GoogleLoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
+  sl.registerLazySingleton(() => CreateUserUseCase(sl()));
   sl.registerLazySingleton(() => FirstTimeUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
@@ -278,8 +280,8 @@ Future<void> init() async {
       denyRefusalUseCase: sl(),
     ),
   );
-  sl.registerFactory(() => ChooseRoleViewModel());
-  sl.registerFactory(() => CreateAccountViewModel());
+  sl.registerFactory(() => ChooseRoleViewModel(getCurrentUserUseCase: sl()));
+  sl.registerFactory(() => CreateAccountViewModel(createUserUseCase: sl()));
   sl.registerFactory(() => ProfileViewModel(sl(), sl(), sl()));
   sl.registerFactory(
     () => SecuritySettingsViewModel(
